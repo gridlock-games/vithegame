@@ -45,10 +45,12 @@ namespace Vi.UI
 
         private Attributes attributes;
         private FixedString64Bytes originalActiveLoadoutSlot;
+        private WebRequestManager.Loadout originalActiveLoadout;
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
             originalActiveLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
+            originalActiveLoadout = attributes.CachedPlayerData.character.GetActiveLoadout();
 
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             {
@@ -162,11 +164,20 @@ namespace Vi.UI
                 }
             }
 
-            FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
             if (originalActiveLoadoutSlot != activeLoadoutSlot)
             {
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(attributes.CachedPlayerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+                PersistentLocalObjects.Singleton.StartCoroutine(ExecuteDestroyRequests(attributes.CachedPlayerData.character._id.ToString(), attributes.CachedPlayerData.character.GetActiveLoadout()));
             }
+        }
+
+        private IEnumerator ExecuteDestroyRequests(string characterId, WebRequestManager.Loadout newLoadout)
+        {
+            if (newLoadout.EqualsIgnoringSlot(WebRequestManager.Loadout.GetEmptyLoadout()))
+            {
+                yield return WebRequestManager.Singleton.UpdateCharacterLoadout(characterId, newLoadout);
+            }
+            yield return WebRequestManager.Singleton.UseCharacterLoadout(characterId, newLoadout.loadoutSlot.ToString());
         }
 
         private void OnEnable()
@@ -230,47 +241,101 @@ namespace Vi.UI
             }
             
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
-            CharacterReference.WeaponOption weaponOption1 = weaponOptions[WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon1ItemId).itemId];
-            CharacterReference.WeaponOption weaponOption2 = weaponOptions[WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.weapon2ItemId).itemId];
+
+            CharacterReference.WeaponOption primaryWeaponOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out primaryWeaponOption))
+                {
+                    Debug.LogWarning("Can't find primary weapon inventory item in character reference");
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(loadout.weapon1ItemId.ToString()))
+            {
+                Debug.LogWarning("Can't find primary weapon inventory item " + loadout.weapon1ItemId);
+            }
+
+            CharacterReference.WeaponOption secondaryWeaponOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out secondaryWeaponOption))
+                {
+                    Debug.LogWarning("Can't find secondary weapon inventory item in character reference");
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(loadout.weapon2ItemId.ToString()))
+            {
+                Debug.LogWarning("Can't find secondary weapon inventory item " + loadout.weapon2ItemId);
+            }
 
             primaryWeaponButton.onClick.RemoveAllListeners();
-            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption1, weaponOption2, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
-            primaryWeaponButton.GetComponent<Image>().sprite = weaponOption1.weaponIcon;
+            CharacterReference.WeaponOption otherSecondaryOption = secondaryWeaponOption;
+            if (otherSecondaryOption == null)
+            {
+                otherSecondaryOption = WebRequestManager.GetDefaultSecondaryWeapon();
+            }
+            primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(primaryWeaponOption, otherSecondaryOption, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
+            primaryWeaponButton.GetComponent<Image>().sprite = primaryWeaponOption == null ? defaultSprite : primaryWeaponOption.weaponIcon;
             bool canEditLoadout = PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None;
             primaryWeaponButton.interactable = canEditLoadout;
 
             secondaryWeaponButton.onClick.RemoveAllListeners();
-            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(weaponOption2, weaponOption1, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
-            secondaryWeaponButton.GetComponent<Image>().sprite = weaponOption2.weaponIcon;
+            CharacterReference.WeaponOption otherPrimaryOption = primaryWeaponOption;
+            if (otherPrimaryOption == null)
+            {
+                otherPrimaryOption = WebRequestManager.GetDefaultPrimaryWeapon();
+            }
+            secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(secondaryWeaponOption, otherPrimaryOption, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
+            secondaryWeaponButton.GetComponent<Image>().sprite = secondaryWeaponOption == null ? defaultSprite : secondaryWeaponOption.weaponIcon;
             secondaryWeaponButton.interactable = canEditLoadout;
 
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
 
-            CharacterReference.WearableEquipmentOption helmOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.helmGearItemId).itemId);
+            CharacterReference.WearableEquipmentOption helmOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.helmGearItemId.ToString(), out WebRequestManager.InventoryItem helmInventoryItem))
+            {
+                helmOption = WebRequestManager.GetEquipmentOption(helmInventoryItem, playerData.character.raceAndGender);
+            }
             helmButton.onClick.RemoveAllListeners();
             helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
             helmButton.interactable = canEditLoadout;
             helmImage.sprite = helmOption == null ? defaultSprite : helmOption.GetIcon(playerData.character.raceAndGender);
 
-            CharacterReference.WearableEquipmentOption chestOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.chestArmorGearItemId).itemId);
+            CharacterReference.WearableEquipmentOption chestOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.chestArmorGearItemId.ToString(), out WebRequestManager.InventoryItem chestInventoryItem))
+            {
+                chestOption = WebRequestManager.GetEquipmentOption(chestInventoryItem, playerData.character.raceAndGender);
+            }
             chestButton.onClick.RemoveAllListeners();
             chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
             chestButton.interactable = canEditLoadout;
             chestImage.sprite = chestOption == null ? defaultSprite : chestOption.GetIcon(playerData.character.raceAndGender);
 
-            CharacterReference.WearableEquipmentOption shouldersOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.shouldersGearItemId).itemId);
+            CharacterReference.WearableEquipmentOption shouldersOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.shouldersGearItemId.ToString(), out WebRequestManager.InventoryItem shouldersInventoryItem))
+            {
+                shouldersOption = WebRequestManager.GetEquipmentOption(shouldersInventoryItem, playerData.character.raceAndGender);
+            }
             shouldersButton.onClick.RemoveAllListeners();
             shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
             shouldersButton.interactable = canEditLoadout;
             shouldersImage.sprite = shouldersOption == null ? defaultSprite : shouldersOption.GetIcon(playerData.character.raceAndGender);
 
-            CharacterReference.WearableEquipmentOption glovesOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.glovesGearItemId).itemId);
+            CharacterReference.WearableEquipmentOption glovesOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.glovesGearItemId.ToString(), out WebRequestManager.InventoryItem glovesInventoryItem))
+            {
+                glovesOption = WebRequestManager.GetEquipmentOption(glovesInventoryItem, playerData.character.raceAndGender);
+            }
             glovesButton.onClick.RemoveAllListeners();
             glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
             glovesButton.interactable = canEditLoadout;
             glovesImage.sprite = glovesOption == null ? defaultSprite : glovesOption.GetIcon(playerData.character.raceAndGender);
 
-            CharacterReference.WearableEquipmentOption capeOption = armorOptions.Find(item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == loadout.capeGearItemId).itemId);
+            CharacterReference.WearableEquipmentOption capeOption = null;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.capeGearItemId.ToString(), out WebRequestManager.InventoryItem capeInventoryItem))
+            {
+                capeOption = WebRequestManager.GetEquipmentOption(capeInventoryItem, playerData.character.raceAndGender);
+            }
             capeButton.onClick.RemoveAllListeners();
             capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });
             capeButton.interactable = canEditLoadout;

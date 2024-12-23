@@ -328,6 +328,11 @@ namespace Vi.Core
             }
         }
 
+        private void OnSpawnFromPool()
+        {
+            glowRenderer.RegisterChildRenderers();
+        }
+
         private void OnReturnToPool()
         {
             foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in new Dictionary<CharacterReference.EquipmentType, WearableEquipment>(WearableEquipmentInstances))
@@ -350,6 +355,8 @@ namespace Vi.Core
             IsAtRest = true;
 
             appliedCharacterMaterials.Clear();
+
+            glowRenderer.UnregisterAllRenderers();
         }
 
         private readonly static List<CharacterReference.EquipmentType> equipmentTypesToEvaluateForArmorType = new List<CharacterReference.EquipmentType>()
@@ -439,6 +446,7 @@ namespace Vi.Core
 
             if (TryGetComponent(out PooledObject pooledObject))
             {
+                pooledObject.OnSpawnFromPool += OnSpawnFromPool;
                 pooledObject.OnReturnToPool += OnReturnToPool;
             }
 

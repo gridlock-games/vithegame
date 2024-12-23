@@ -652,7 +652,7 @@ namespace Vi.UI
             selectedGender = raceAndGenderStrings[1];
             CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
 
-            if (WebRequestManager.Singleton.InventoryItems.ContainsKey(character._id.ToString()))
+            if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
             {
                 primaryWeaponDisplayElement.gameObject.SetActive(true);
                 secondaryWeaponDisplayElement.gameObject.SetActive(true);
@@ -676,7 +676,7 @@ namespace Vi.UI
                     equipmentImageValues[i].gameObject.SetActive(false);
                 }
 
-                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.Singleton.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
+                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
             if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }

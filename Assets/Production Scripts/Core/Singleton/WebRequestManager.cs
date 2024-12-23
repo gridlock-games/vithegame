@@ -792,6 +792,7 @@ namespace Vi.Core
                     CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
 
                     CharacterJson.DeserializeJson(json);
+
                 }
                 catch
                 {
@@ -799,6 +800,16 @@ namespace Vi.Core
                 }
 
                 getRequest.Dispose();
+
+                int index = Characters.FindIndex(item => item._id == CharacterById._id);
+                if (index == -1)
+                {
+                    Characters.Add(CharacterById);
+                }
+                else
+                {
+                    Characters[index] = CharacterById;
+                }
 
                 yield return GetCharacterInventory(CharacterById._id.ToString());
 
@@ -832,7 +843,104 @@ namespace Vi.Core
             putRequest.Dispose();
         }
 
-        public Dictionary<string, List<InventoryItem>> InventoryItems { get; private set; } = new Dictionary<string, List<InventoryItem>>();
+        //public List<InventoryItem> GetInventoryItems(string characterId)
+        //{
+        //    if (characterId == null) { characterId = ""; }
+
+        //    if (InventoryItems.TryGetValue(characterId, out List<InventoryItem> result))
+        //    {
+        //        return result;
+        //    }
+        //    return new List<InventoryItem>();
+        //}
+
+        public static bool IsItemInInventory(string characterId, string itemWebId)
+        {
+            if (characterId == null) { characterId = ""; }
+            if (itemWebId == null) { itemWebId = ""; }
+
+            if (HasCharacterInventory(characterId))
+            {
+                List<InventoryItem> inventoryItems = GetInventory(characterId);
+                return inventoryItems.Exists(item => item.itemId == itemWebId);
+            }
+
+            return false;
+        }
+
+        public static CharacterReference.WeaponOption GetWeaponOption(InventoryItem inventoryItem)
+        {
+            CharacterReference.WeaponOption[] options = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            int index = System.Array.FindIndex(options, item => item.itemWebId == inventoryItem.itemId);
+
+            if (index == -1) { return null; }
+
+            return options[index];
+        }
+
+        public static CharacterReference.WearableEquipmentOption GetEquipmentOption(InventoryItem inventoryItem, CharacterReference.RaceAndGender raceAndGender)
+        {
+            List<CharacterReference.WearableEquipmentOption> options = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
+            int index = options.FindIndex(item => item.itemWebId == inventoryItem.itemId);
+
+            if (index == -1) { return null; }
+
+            return options[index];
+        }
+
+        public static bool TryGetInventoryItem(string characterId, string inventoryItemId, out InventoryItem resultingInventoryItem)
+        {
+            if (characterId == null) { characterId = ""; }
+            if (inventoryItemId == null) { inventoryItemId = ""; }
+
+            if (inventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
+            {
+                int index = items.FindIndex(item => item.id == inventoryItemId);
+                if (index != -1)
+                {
+                    resultingInventoryItem = items[index];
+                    return true;
+                }
+            }
+
+            resultingInventoryItem = InventoryItem.GetEmptyInventoryItem();
+            return false;
+        }
+
+        public static bool HasCharacterInventory(string characterId)
+        {
+            if (characterId == null) { characterId = ""; }
+            return inventoryItems.ContainsKey(characterId);
+        }
+
+        public static bool HasInventoryItem(string characterId, string inventoryItemId)
+        {
+            if (characterId == null) { characterId = ""; }
+            if (inventoryItemId == null) { inventoryItemId = ""; }
+
+            if (inventoryItems.TryGetValue(characterId, out List<InventoryItem> items))
+            {
+                int index = items.FindIndex(item => item.id == inventoryItemId);
+                if (index != -1)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static List<InventoryItem> GetInventory(string characterId)
+        {
+            if (characterId == null) { characterId = ""; }
+
+            if (HasCharacterInventory(characterId))
+            {
+                return inventoryItems[characterId];
+            }
+            return new List<InventoryItem>();
+        }
+
+        private static Dictionary<string, List<InventoryItem>> inventoryItems = new Dictionary<string, List<InventoryItem>>();
         public IEnumerator GetCharacterInventory(Character character)
         {
             string characterId = character._id.ToString();
@@ -852,10 +960,10 @@ namespace Vi.Core
                     allItems.Add(new InventoryItem(characterId, new List<int>(), option.itemWebId, true, option.itemWebId));
                 }
 
-                if (!InventoryItems.ContainsKey(characterId))
-                    InventoryItems.Add(characterId, allItems);
+                if (!inventoryItems.ContainsKey(characterId))
+                    inventoryItems.Add(characterId, allItems);
                 else
-                    InventoryItems[characterId] = allItems;
+                    inventoryItems[characterId] = allItems;
             }
             else
             {
@@ -870,10 +978,10 @@ namespace Vi.Core
                 }
                 string json = getRequest.downloadHandler.text;
 
-                if (!InventoryItems.ContainsKey(characterId))
-                    InventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
+                if (!inventoryItems.ContainsKey(characterId))
+                    inventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
                 else
-                    InventoryItems[characterId] = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
+                    inventoryItems[characterId] = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
 
                 getRequest.Dispose();
             }
@@ -892,10 +1000,10 @@ namespace Vi.Core
             }
             string json = getRequest.downloadHandler.text;
 
-            if (!InventoryItems.ContainsKey(characterId))
-                InventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
+            if (!inventoryItems.ContainsKey(characterId))
+                inventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
             else
-                InventoryItems[characterId] = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
+                inventoryItems[characterId] = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
 
             getRequest.Dispose();
         }
@@ -915,6 +1023,11 @@ namespace Vi.Core
                 this.itemId = itemId;
                 this.enabled = enabled;
                 this.id = id;
+            }
+
+            public static InventoryItem GetEmptyInventoryItem()
+            {
+                return new InventoryItem("", null, "", false, "");
             }
         }
 
@@ -969,19 +1082,24 @@ namespace Vi.Core
 
         public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout)
         {
+            if (!int.TryParse(newLoadout.loadoutSlot.ToString(), out int result))
+            {
+                Debug.LogWarning("Could not parse loadout slot from new loadout! " + newLoadout.loadoutSlot);
+            }
+
             yield return GetCharacterInventory(characterId.ToString());
 
-            newLoadout.helmGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "";
-            newLoadout.capeGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "";
-            newLoadout.pantsGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "";
-            newLoadout.shouldersGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "";
-            newLoadout.chestArmorGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "";
-            newLoadout.glovesGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "";
-            newLoadout.beltGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "";
-            newLoadout.robeGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "";
-            newLoadout.bootsGearItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
-            newLoadout.weapon1ItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
-            newLoadout.weapon2ItemId = InventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
+            newLoadout.helmGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "";
+            newLoadout.capeGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "";
+            newLoadout.pantsGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "";
+            newLoadout.shouldersGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "";
+            newLoadout.chestArmorGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "";
+            newLoadout.glovesGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "";
+            newLoadout.beltGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "";
+            newLoadout.robeGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "";
+            newLoadout.bootsGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
+            newLoadout.weapon1ItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
+            newLoadout.weapon2ItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
@@ -1008,6 +1126,11 @@ namespace Vi.Core
 
         public IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
         {
+            if (!int.TryParse(loadoutSlot.ToString(), out int result))
+            {
+                Debug.LogWarning("Could not parse loadout slot from new loadout! " + loadoutSlot);
+            }
+
             UseCharacterLoadoutPayload payload = new UseCharacterLoadoutPayload(characterId, loadoutSlot);
 
             string json = JsonConvert.SerializeObject(payload);
@@ -1082,10 +1205,7 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(postRequest.downloadHandler.text);
 
-            foreach (Loadout loadout in GetDefaultCharacterCreationLoadouts(character))
-            {
-                yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, loadout);
-            }
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender));
 
             yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
 
@@ -1185,11 +1305,22 @@ namespace Vi.Core
                 raceAndGender);
         }
 
-        public Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
+        public static CharacterReference.WeaponOption GetDefaultPrimaryWeapon()
+        {
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            return System.Array.Find(weaponOptions, item => item.name == "Flintblade");
+        }
+
+        public static CharacterReference.WeaponOption GetDefaultSecondaryWeapon()
+        {
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            return System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel");
+        }
+
+        public static Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
+            
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "Winterstalk").itemWebId,
@@ -1200,8 +1331,8 @@ namespace Vi.Core
                 "",
                 "",
                 "",
-                System.Array.Find(weaponOptions, item => item.name == "Flintblade").itemWebId,
-                System.Array.Find(weaponOptions, item => item.name == "Sylvan Sentinel").itemWebId,
+                GetDefaultPrimaryWeapon().itemWebId,
+                GetDefaultSecondaryWeapon().itemWebId,
                 true);
         }
 
@@ -1212,70 +1343,8 @@ namespace Vi.Core
             CharacterReference.EquipmentType.Gloves,
             CharacterReference.EquipmentType.Helm,
             CharacterReference.EquipmentType.Shoulders,
+            CharacterReference.EquipmentType.Robe
         };
-
-        private Loadout[] GetDefaultCharacterCreationLoadouts(Character character)
-        {
-            List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-            var helmOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Helm & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var chestOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Chest & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var shoulderOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Shoulders & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var bootsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Boots & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var pantsOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Pants & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var beltOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Belt & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var gloveOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Gloves & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var capeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Cape & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-            var robeOptions = armorOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Robe & InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-
-            weaponOptions = System.Array.FindAll(weaponOptions, item => InventoryItems[character._id.ToString()].Exists(inv => inv.itemId == item.itemWebId));
-
-            List<int> possibleWeaponIndicies = new List<int>();
-            for (int i = 0; i < weaponOptions.Length; i++)
-            {
-                possibleWeaponIndicies.Add(i);
-            }
-
-            List<Loadout> loadouts = new List<Loadout>();
-            for (int i = 1; i < 5; i++)
-            {
-                int helmIndex = helmOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Helm) ? -1 : 0, helmOptions.Count);
-                int shoulderIndex = shoulderOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Shoulders) ? -1 : 0, shoulderOptions.Count);
-                int gloveIndex = gloveOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Gloves) ? -1 : 0, gloveOptions.Count);
-                int capeIndex = capeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Cape) ? -1 : 0, capeOptions.Count);
-                int robeIndex = robeOptions.Count == 0 ? -1 : Random.Range(NullableEquipmentTypes.Contains(CharacterReference.EquipmentType.Robe) ? -1 : 0, robeOptions.Count);
-                
-                // These must be in the same grouping
-                int chestIndex = Random.Range(0, chestOptions.Count);
-                int pantsIndex = pantsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-                int bootsIndex = bootsOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-                int beltIndex = beltOptions.FindIndex(item => item.groupName == chestOptions[chestIndex].groupName);
-
-                int weapon1Index = possibleWeaponIndicies.Count == 0 ? 0 : possibleWeaponIndicies[Random.Range(0, possibleWeaponIndicies.Count)];
-                if (i == 1) { weapon1Index = System.Array.FindIndex(weaponOptions, item => item.name == "Flintblade"); }
-                possibleWeaponIndicies.Remove(weapon1Index);
-
-                var weaponOptionsOfDifferentClass = System.Array.FindAll(weaponOptions, item => item.weapon.GetWeaponClass() != weaponOptions[weapon1Index].weapon.GetWeaponClass());
-                int weapon2Index = Random.Range(0, weaponOptionsOfDifferentClass.Length);
-                weapon2Index = System.Array.FindIndex(weaponOptions, item => item.itemWebId == weaponOptionsOfDifferentClass[weapon2Index].itemWebId);
-
-                loadouts.Add(new Loadout(i.ToString(),
-                    helmOptions.Count == 0 ? "" : (helmIndex == -1 ? "" : helmOptions[helmIndex].itemWebId),
-                    chestOptions.Count == 0 ? "" : (chestIndex == -1 ? "" : chestOptions[chestIndex].itemWebId),
-                    shoulderOptions.Count == 0 ? "" : (shoulderIndex == -1 ? "" : shoulderOptions[shoulderIndex].itemWebId),
-                    bootsOptions.Count == 0 ? "" : (bootsIndex == -1 ? "" : bootsOptions[bootsIndex].itemWebId),
-                    pantsOptions.Count == 0 ? "" : (pantsIndex == -1 ? "" : pantsOptions[pantsIndex].itemWebId),
-                    beltOptions.Count == 0 ? "" : (beltIndex == -1 ? "" : beltOptions[beltIndex].itemWebId),
-                    gloveOptions.Count == 0 ? "" : (gloveIndex == -1 ? "" : gloveOptions[gloveIndex].itemWebId),
-                    capeOptions.Count == 0 ? "" : (capeIndex == -1 ? "" : capeOptions[capeIndex].itemWebId),
-                    robeOptions.Count == 0 ? "" : (robeIndex == -1 ? "" : robeOptions[robeIndex].itemWebId),
-                    weaponOptions[weapon1Index].itemWebId,
-                    weaponOptions[weapon2Index].itemWebId,
-                    false));
-            }
-            return loadouts.ToArray();
-        }
 
         public Loadout GetRandomizedLoadout(CharacterReference.RaceAndGender raceAndGender, bool useDefaultPrimaryWeapon = false)
         {
@@ -1373,6 +1442,11 @@ namespace Vi.Core
 
             public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
+                loadoutPreset1.loadoutSlot = "1";
+                loadoutPreset2.loadoutSlot = "2";
+                loadoutPreset3.loadoutSlot = "3";
+                loadoutPreset4.loadoutSlot = "4";
+
                 slot = 0;
                 this._id = _id;
                 this.model = model;
@@ -1466,15 +1540,19 @@ namespace Vi.Core
                 switch (loadoutSlot)
                 {
                     case 0:
+                        newLoadout.loadoutSlot = "1";
                         copy.loadoutPreset1 = newLoadout;
                         break;
                     case 1:
+                        newLoadout.loadoutSlot = "2";
                         copy.loadoutPreset2 = newLoadout;
                         break;
                     case 2:
+                        newLoadout.loadoutSlot = "3";
                         copy.loadoutPreset3 = newLoadout;
                         break;
                     case 3:
+                        newLoadout.loadoutSlot = "4";
                         copy.loadoutPreset4 = newLoadout;
                         break;
                     default:
@@ -1549,6 +1627,11 @@ namespace Vi.Core
                 this.active = active;
             }
 
+            public static Loadout GetEmptyLoadout()
+            {
+                return new Loadout();
+            }
+
             public Loadout Copy()
             {
                 return new Loadout(loadoutSlot, helmGearItemId, chestArmorGearItemId, shouldersGearItemId, bootsGearItemId, pantsGearItemId,
@@ -1607,6 +1690,47 @@ namespace Vi.Core
                 };
             }
 
+            public bool IsValid()
+            {
+                if (string.IsNullOrWhiteSpace(weapon1ItemId.ToString())) { return false; }
+                if (string.IsNullOrWhiteSpace(weapon2ItemId.ToString())) { return false; }
+
+                foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in GetLoadoutArmorPiecesAsDictionary())
+                {
+                    if (!NullableEquipmentTypes.Contains(kvp.Key))
+                    {
+                        if (string.IsNullOrWhiteSpace(kvp.Value.ToString()))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            public Loadout GetValidCopy(CharacterReference.RaceAndGender raceAndGender)
+            {
+                if (IsValid()) { return this; }
+
+                Loadout validCopy = Copy();
+                Loadout defaultLoadout = GetDefaultDisplayLoadout(raceAndGender);
+
+                if (string.IsNullOrWhiteSpace(validCopy.weapon1ItemId.ToString())) { validCopy.weapon1ItemId = defaultLoadout.weapon1ItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.weapon2ItemId.ToString())) { validCopy.weapon2ItemId = defaultLoadout.weapon2ItemId; }
+
+                if (string.IsNullOrWhiteSpace(validCopy.helmGearItemId.ToString())) { validCopy.helmGearItemId = defaultLoadout.helmGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.chestArmorGearItemId.ToString())) { validCopy.chestArmorGearItemId = defaultLoadout.chestArmorGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.shouldersGearItemId.ToString())) { validCopy.shouldersGearItemId = defaultLoadout.shouldersGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.bootsGearItemId.ToString())) { validCopy.bootsGearItemId = defaultLoadout.bootsGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.pantsGearItemId.ToString())) { validCopy.pantsGearItemId = defaultLoadout.pantsGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.beltGearItemId.ToString())) { validCopy.beltGearItemId = defaultLoadout.beltGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.glovesGearItemId.ToString())) { validCopy.glovesGearItemId = defaultLoadout.glovesGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.capeGearItemId.ToString())) { validCopy.capeGearItemId = defaultLoadout.capeGearItemId; }
+                if (string.IsNullOrWhiteSpace(validCopy.robeGearItemId.ToString())) { validCopy.robeGearItemId = defaultLoadout.robeGearItemId; }
+
+                return validCopy;
+            }
+
             public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
             {
                 serializer.SerializeValue(ref loadoutSlot);
@@ -1627,6 +1751,14 @@ namespace Vi.Core
             public bool Equals(Loadout other)
             {
                 return loadoutSlot == other.loadoutSlot & helmGearItemId == other.helmGearItemId & chestArmorGearItemId == other.chestArmorGearItemId
+                    & shouldersGearItemId == other.shouldersGearItemId & bootsGearItemId == other.bootsGearItemId & pantsGearItemId == other.pantsGearItemId
+                    & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
+                    & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
+            }
+
+            public bool EqualsIgnoringSlot(Loadout other)
+            {
+                return helmGearItemId == other.helmGearItemId & chestArmorGearItemId == other.chestArmorGearItemId
                     & shouldersGearItemId == other.shouldersGearItemId & bootsGearItemId == other.bootsGearItemId & pantsGearItemId == other.pantsGearItemId
                     & beltGearItemId == other.beltGearItemId & glovesGearItemId == other.glovesGearItemId & capeGearItemId == other.capeGearItemId
                     & robeGearItemId == other.robeGearItemId & weapon1ItemId == other.weapon1ItemId & weapon2ItemId == other.weapon2ItemId;
@@ -2080,11 +2212,20 @@ namespace Vi.Core
                 int loadout3Index = loadOuts.FindIndex(item => item.loadoutSlot == "3");
                 int loadout4Index = loadOuts.FindIndex(item => item.loadoutSlot == "4");
 
+                // Index values of -1 mean that this loadout doesn't exist in the API yet
+
+                //return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                //    loadout1Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
+                //    loadout2Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
+                //    loadout3Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
+                //    loadout4Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                //    raceAndGender);
+
                 return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
-                    loadout1Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout1Index].ToLoadout(),
-                    loadout2Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout2Index].ToLoadout(),
-                    loadout3Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout3Index].ToLoadout(),
-                    loadout4Index == -1 ? Singleton.GetRandomizedLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
+                    loadout1Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout1Index].ToLoadout(),
+                    loadout2Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout2Index].ToLoadout(),
+                    loadout3Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout3Index].ToLoadout(),
+                    loadout4Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout4Index].ToLoadout(),
                     raceAndGender);
             }
         }
@@ -2134,6 +2275,11 @@ namespace Vi.Core
                         case "loadoutSlot":
                             if (i + 2 < splitStrings.Count)
                             {
+                                if (splitStrings[i + 1].Contains("null"))
+                                {
+                                    Debug.LogWarning("Loadout slot should not be null!");
+                                }
+
                                 if (splitStrings[i + 1] != ":")
                                 {
                                     Debug.LogError("loadoutSlot can't find a : in between the value!");

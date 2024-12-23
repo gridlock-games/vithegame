@@ -14,7 +14,6 @@ using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static Vi.Core.PlayerDataManager;
 
 namespace Vi.Core
 {

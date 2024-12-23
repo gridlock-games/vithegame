@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Vi.Utility;
+using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -37,10 +38,11 @@ namespace Vi.UI
             UICanvas.gameObject.SetActive(true);
             purchaseErrorText.text = "";
 
+            string localCharacterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
                 // If this weapon option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId);
+                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
 
@@ -51,7 +53,7 @@ namespace Vi.UI
                     | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
 
                 // If this armor option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.Singleton.InventoryItems[PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()].Exists(item => item.itemId == wearableEquipmentOption.itemWebId);
+                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
         }

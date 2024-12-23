@@ -62,8 +62,10 @@ namespace Vi.Utility
                 int var = i;
                 pooledObjectReferences[i].LoadAssetAsync().Completed += (handle) => OnInitialObjectLoad(handle, var);
                 loadCalledCount++;
-                if (!Application.isEditor) { yield return new WaitUntil(() => loadCalledCount - LoadCompletedCount < 3); }
+                //if (!Application.isEditor) { yield return new WaitUntil(() => loadCalledCount - LoadCompletedCount < 8); }
             }
+
+            yield return null;
         }
 
         public int LoadCompletedCount { get; private set; }

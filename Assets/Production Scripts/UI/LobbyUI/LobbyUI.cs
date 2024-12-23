@@ -8,6 +8,7 @@ using Unity.Netcode;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
+using Unity.Collections;
 
 namespace Vi.UI
 {
@@ -878,7 +879,7 @@ namespace Vi.UI
                     if (!accountCardCounter.ContainsKey(playerData.team)) { accountCardCounter.Add(playerData.team, 0); }
 
                     Transform accountCardParent = teamParentDict[playerData.team];
-                    if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length == 1) { accountCardParent = accountCardCounter[playerData.team] >= 4 ? rightTeamParent.transformParent : teamParentDict[playerData.team]; }
+                    if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length == 1) { accountCardParent = accountCardCounter[playerData.team] >= 5 ? rightTeamParent.transformParent : teamParentDict[playerData.team]; }
 
                     AccountCard accountCard = Instantiate(playerAccountCardPrefab.gameObject, accountCardParent).GetComponent<AccountCard>();
                     accountCard.Initialize(playerData.id, lockedClients.Contains((ulong)playerData.id));
@@ -970,38 +971,71 @@ namespace Vi.UI
             PlayerDataManager.Singleton.AddBotData(team, false);
         }
 
-        private void ChooseLoadoutPreset(Button button, int loadoutSlot)
+        private void ChooseLoadoutPreset(Button button, int loadoutSlotIndex)
         {
             foreach (Button b in loadoutPresetButtons)
             {
                 b.interactable = button != b;
             }
 
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.LocalPlayerData;
 
-            Unity.Collections.FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
-            if ((loadoutSlot + 1).ToString() != activeLoadoutSlot)
+            FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
+            if ((loadoutSlotIndex + 1).ToString() != activeLoadoutSlot)
             {
                 PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
+
+                playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlotIndex);
+                PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
 
-            PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), (loadoutSlot + 1).ToString()));
+            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
 
-            playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlot);
-            PlayerDataManager.Singleton.SetPlayerData(playerData);
+            CharacterReference.WeaponOption primaryOption;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out primaryOption))
+                {
+                    Debug.LogWarning("Can't find primary weapon inventory item in character reference");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Can't find primary weapon inventory item");
+                primaryOption = null;
+            }
 
-            CharacterReference.WeaponOption primaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon1ItemId).itemId);
-            CharacterReference.WeaponOption secondaryOption = System.Array.Find(weaponOptions, item => item.itemWebId == WebRequestManager.Singleton.InventoryItems[playerData.character._id.ToString()].Find(item => item.id == playerData.character.GetLoadoutFromSlot(loadoutSlot).weapon2ItemId).itemId);
+            CharacterReference.WeaponOption secondaryOption;
+            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            {
+                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out secondaryOption))
+                {
+                    Debug.LogWarning("Can't find primary weapon inventory item in character reference");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Can't find primary weapon inventory item");
+                secondaryOption = null;
+            }
 
-            primaryWeaponIcon.sprite = primaryOption.weaponIcon;
-            primaryWeaponText.text = primaryOption.name;
-            secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
-            secondaryWeaponText.text = secondaryOption.name;
+            if (primaryOption != null)
+            {
+                primaryWeaponIcon.sprite = primaryOption.weaponIcon;
+                primaryWeaponText.text = primaryOption.name;
+            }
 
+            if (secondaryOption != null)
+            {
+                secondaryWeaponIcon.sprite = secondaryOption.weaponIcon;
+                secondaryWeaponText.text = secondaryOption.name;
+            }
+            
             if (previewObject)
             {
-                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender, playerData.character.GetLoadoutFromSlot(loadoutSlot), playerData.character._id.ToString());
+                previewObject.GetComponent<LoadoutManager>().ApplyLoadout(playerData.character.raceAndGender,
+                    loadout, playerData.character._id.ToString());
             }
         }
 

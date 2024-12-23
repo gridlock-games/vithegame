@@ -62,7 +62,7 @@ namespace Vi.UI
             button = GetComponent<Button>();
             button.onClick.AddListener(() => combatAgent.AnimationHandler.UsePotion(potionType));
 
-            graphics = GetComponentsInChildren<Graphic>();
+            graphics = GetComponentsInChildren<Graphic>(true);
 
             if (FasterPlayerPrefs.IsMobilePlatform)
             {
