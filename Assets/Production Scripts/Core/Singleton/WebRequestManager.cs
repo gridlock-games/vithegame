@@ -769,6 +769,7 @@ namespace Vi.Core
         }
 
         public bool IsGettingCharacterById { get; private set; }
+        public bool LastCharacterByIdWasSuccessful { get; private set; }
         public Character CharacterById { get; private set; }
         public void GetCharacterById(string characterId) { StartCoroutine(CharacterByIdGetRequest(characterId)); }
 
@@ -777,6 +778,7 @@ namespace Vi.Core
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 CharacterById = Characters.Find(item => item._id == characterId);
+                LastCharacterByIdWasSuccessful = true;
             }
             else
             {
@@ -789,19 +791,46 @@ namespace Vi.Core
                 {
                     Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
                     getRequest.Dispose();
+                    LastCharacterByIdWasSuccessful = false;
+                    IsGettingCharacterById = false;
                     yield break;
                 }
+
                 string json = getRequest.downloadHandler.text;
+
+                if (json == "[]")
+                {
+                    getRequest.Dispose();
+                    LastCharacterByIdWasSuccessful = false;
+                    IsGettingCharacterById = false;
+                    yield break;
+                }
+
                 try
                 {
-                    CharacterById = JsonConvert.DeserializeObject<CharacterJson>(json).ToCharacter();
+                    CharacterJson characterJson = JsonConvert.DeserializeObject<CharacterJson>(json);
+
+                    if (!characterJson.enabled)
+                    {
+                        getRequest.Dispose();
+                        LastCharacterByIdWasSuccessful = false;
+                        IsGettingCharacterById = false;
+                        yield break;
+                    }
+
+                    CharacterById = characterJson.ToCharacter();
 
                     CharacterJson.DeserializeJson(json);
-
                 }
-                catch
+                catch (System.Exception e)
                 {
+                    Debug.LogError("Get Character by ID Exception " + e);
                     CharacterById = GetDefaultCharacter(CharacterReference.RaceAndGender.HumanMale);
+
+                    getRequest.Dispose();
+                    LastCharacterByIdWasSuccessful = false;
+                    IsGettingCharacterById = false;
+                    yield break;
                 }
 
                 getRequest.Dispose();
@@ -818,6 +847,7 @@ namespace Vi.Core
 
                 yield return GetCharacterInventory(CharacterById._id.ToString());
 
+                LastCharacterByIdWasSuccessful = true;
                 IsGettingCharacterById = false;
             }
         }
