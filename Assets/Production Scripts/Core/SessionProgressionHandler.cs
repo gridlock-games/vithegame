@@ -208,6 +208,7 @@ namespace Vi.Core
             }
         }
 
+        public VisualEffect LevelUpVisualEffect { get { return levelUpVisualEffect; } }
         [SerializeField] private VisualEffect levelUpVisualEffect;
         [SerializeField] private AudioClip[] levelUpAudioClips;
 

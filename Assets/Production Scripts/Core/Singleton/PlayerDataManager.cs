@@ -1434,10 +1434,31 @@ namespace Vi.Core
             attributesToRespawn.LoadoutManager.SwapLoadoutOnRespawn();
         }
 
+        [SerializeField] private AudioClip reviveAudioClip;
         public void RevivePlayer(Attributes attributesToRevive)
         {
+            if (!IsServer) { Debug.LogError("PlayerDataManager.RevivePlayer() should only be called on the server!"); return; }
+
             attributesToRevive.ResetStats(0.5f, true, true, false);
             attributesToRevive.AnimationHandler.CancelAllActions(0, true);
+            PlayReviveEffectsRpc(new NetworkObjectReference(attributesToRevive.NetworkObject));
+        }
+
+        [Rpc(SendTo.ClientsAndHost, Delivery = RpcDelivery.Unreliable)]
+        private void PlayReviveEffectsRpc(NetworkObjectReference networkObjectReference)
+        {
+            if (networkObjectReference.TryGet(out NetworkObject networkObject, NetworkManager))
+            {
+                if (networkObject.TryGetComponent(out Attributes attributesToRevive))
+                {
+                    AudioManager.Singleton.PlayClipAtPoint(attributesToRevive.gameObject, reviveAudioClip, attributesToRevive.MovementHandler.GetPosition(), 0.7f);
+                    attributesToRevive.SessionProgressionHandler.LevelUpVisualEffect.Play();
+                }
+                else
+                {
+                    Debug.LogWarning("Couldn't find attributes component on network object for revive effects");
+                }
+            }
         }
 
         public void RespawnAllPlayers()
