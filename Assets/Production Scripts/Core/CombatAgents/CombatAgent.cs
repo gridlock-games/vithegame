@@ -271,8 +271,6 @@ namespace Vi.Core
             spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
 
-            StopGrabSequence();
-
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
 
             PlayerDataManager.Singleton.RemoveCombatAgent(this);
@@ -863,7 +861,14 @@ namespace Vi.Core
 
         protected NetworkVariable<ActionClip.Ailment> ailment = new NetworkVariable<ActionClip.Ailment>();
         public ActionClip.Ailment GetAilment() { return ailment.Value; }
-        public void ResetAilment() { ailment.Value = ActionClip.Ailment.None; }
+        public void ResetAilment()
+        {
+            if (!IsServer) { Debug.LogError("CombatAgent.ResetAilment() should only be called on the server!"); return; }
+
+            StopGrabSequence();
+            isPulled.Value = false;
+            ailment.Value = ActionClip.Ailment.None;
+        }
 
         protected Coroutine ailmentResetCoroutine;
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)

@@ -14,6 +14,8 @@ using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using static Vi.Core.PlayerDataManager;
+using static Vi.Core.WebRequestManager;
 
 namespace Vi.Core
 {
@@ -830,10 +832,22 @@ namespace Vi.Core
                     playerDataList.Add(playerData);
                     disconnectedPlayerDataList.RemoveAt(index);
                 }
-                
+
+                int loadoutSlotIndex = serverSideOriginalLoadouts.FindIndex(item => item.Item1 == playerData.id);
+                if (loadoutSlotIndex == -1)
+                {
+                    serverSideOriginalLoadouts.Add((playerData.id, playerData.character.GetActiveLoadout().loadoutSlot));
+                }
+                else
+                {
+                    serverSideOriginalLoadouts[loadoutSlotIndex] = (playerData.id, playerData.character.GetActiveLoadout().loadoutSlot);
+                }
+
                 if (GameModeManager.Singleton & playerData.team != Team.Spectator) { GameModeManager.Singleton.AddPlayerScore(playerData.id, playerData.character._id); }
             }
         }
+
+        private List<(int, FixedString64Bytes)> serverSideOriginalLoadouts = new List<(int, FixedString64Bytes)>();
 
         private IEnumerator WaitForSpawnToAddPlayerData(PlayerData playerData)
         {
@@ -1578,7 +1592,29 @@ namespace Vi.Core
         private void OnClientDisconnectCallback(ulong clientId)
         {
             Debug.Log("Id: " + clientId + " - Name: " + GetPlayerData((int)clientId).character.name + " has disconnected.");
-            if (IsServer) { RemovePlayerData((int)clientId); }
+            if (IsServer)
+            {
+                if (ContainsId((int)clientId))
+                {
+                    // If player
+                    if (clientId >= 0)
+                    {
+                        PlayerData playerData = GetPlayerData((int)clientId);
+                        WebRequestManager.Loadout activeLoadout = playerData.character.GetActiveLoadout();
+
+                        int loadoutSlotIndex = serverSideOriginalLoadouts.FindIndex(item => item.Item1 == playerData.id);
+                        if (loadoutSlotIndex != -1)
+                        {
+                            if (serverSideOriginalLoadouts[loadoutSlotIndex].Item2 != activeLoadout.loadoutSlot)
+                            {
+                                PersistentLocalObjects.Singleton.StartCoroutine(ExecuteLoadoutSwap(playerData, activeLoadout));
+                            }
+                        }
+                    }
+                    RemovePlayerData((int)clientId);
+                }
+            }
+
             if (!NetworkManager.IsServer && NetworkManager.DisconnectReason != string.Empty)
             {
                 Debug.Log($"Approval Declined Reason: {NetworkManager.DisconnectReason}");
@@ -1591,6 +1627,15 @@ namespace Vi.Core
                     PersistentLocalObjects.Singleton.StartCoroutine(ReturnToCharacterSelectOnServerShutdown());
                 }
             }
+        }
+
+        private IEnumerator ExecuteLoadoutSwap(PlayerData playerData, Loadout loadout)
+        {
+            if (loadout.EqualsIgnoringSlot(WebRequestManager.Loadout.GetEmptyLoadout()))
+            {
+                yield return WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), loadout);
+            }
+            yield return WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), loadout.loadoutSlot.ToString());
         }
 
         private IEnumerator ReturnToCharacterSelectOnServerShutdown()

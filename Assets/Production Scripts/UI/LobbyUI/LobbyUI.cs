@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using Vi.Utility;
 using System.Linq;
 using Unity.Collections;
+using Vi.Core.CombatAgents;
 
 namespace Vi.UI
 {
@@ -984,8 +985,6 @@ namespace Vi.UI
             FixedString64Bytes activeLoadoutSlot = playerData.character.GetActiveLoadout().loadoutSlot.ToString();
             if ((loadoutSlotIndex + 1).ToString() != activeLoadoutSlot)
             {
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), activeLoadoutSlot.ToString()));
-
                 playerData.character = playerData.character.ChangeActiveLoadoutFromSlot(loadoutSlotIndex);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
@@ -1019,6 +1018,9 @@ namespace Vi.UI
                 Debug.LogWarning("Can't find primary weapon inventory item");
                 secondaryOption = null;
             }
+
+            if (primaryOption == null) { primaryOption = WebRequestManager.GetDefaultPrimaryWeapon(); }
+            if (secondaryOption == null) { secondaryOption = WebRequestManager.GetDefaultSecondaryWeapon(); }
 
             if (primaryOption != null)
             {
