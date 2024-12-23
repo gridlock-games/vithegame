@@ -16,8 +16,7 @@ namespace Vi.UI
         [SerializeField] private Text nameDisplay;
 
         [Header("Status UI")]
-        [SerializeField] private Transform statusImageParent;
-        [SerializeField] private StatusIcon statusImagePrefab;
+        [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
 
         [Header("Health UI")]
         [SerializeField] private Text healthText;
@@ -55,10 +54,17 @@ namespace Vi.UI
         [SerializeField] private Text levelText;
 
         private CombatAgent combatAgent;
-        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         public void Initialize(CombatAgent combatAgent, bool useTeamColor = false)
         {
+            if (!IsMainCard())
+            {
+                if (!combatAgent)
+                {
+                    statusIconLayoutGroup.Initialize(null);
+                }
+            }
+            
             if ((combatAgent == this.combatAgent) & (combatAgent != null)) { return; }
             this.combatAgent = combatAgent;
             if (!canvas) { canvas = GetComponent<Canvas>(); }
@@ -72,18 +78,9 @@ namespace Vi.UI
                     healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
                 }
 
-                List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
+                if (!IsMainCard())
                 {
-                    if (activeStatuses.Contains(statusIcon.Status))
-                    {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
-                    }
+                    statusIconLayoutGroup.Initialize(combatAgent.StatusAgent);
                 }
 
                 RefreshLevelingSystem();
@@ -162,23 +159,6 @@ namespace Vi.UI
             if (!IsMainCard())
             {
                 DisableStaminaAndSpiritDisplay();
-
-                if (combatAgent)
-                {
-                    List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
-                    foreach (StatusIcon statusIcon in statusIcons)
-                    {
-                        if (activeStatuses.Contains(statusIcon.Status))
-                        {
-                            statusIcon.SetActive(true);
-                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                        }
-                        else
-                        {
-                            statusIcon.SetActive(false);
-                        }
-                    }
-                }
             }
 
             RefreshLevelingSystem();
@@ -217,15 +197,6 @@ namespace Vi.UI
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
-
-            List<Graphic> graphicsToTint = this.graphicsToTint.ToList();
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
-                statusIcon.InitializeStatusIcon(status);
-                statusIcons.Add(statusIcon);
-                graphicsToTint.AddRange(statusIcon.GetComponentsInChildren<Graphic>());
-            }
 
             healthFillImage.fillAmount = 0;
             staminaFillImage.fillAmount = 0;
@@ -332,26 +303,6 @@ namespace Vi.UI
             // Interim images - these update every frame
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * fillSpeed);
             interimRageFillImage.fillAmount = Mathf.Lerp(interimRageFillImage.fillAmount, rage / maxRage, Time.deltaTime * fillSpeed);
-
-            if (!playerUI | staminaAndSpiritAreDisabled)
-            {
-                if (combatAgent.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
-                {
-                    List<ActionClip.Status> activeStatuses = combatAgent.StatusAgent.GetActiveStatuses();
-                    foreach (StatusIcon statusIcon in statusIcons)
-                    {
-                        if (activeStatuses.Contains(statusIcon.Status))
-                        {
-                            statusIcon.SetActive(true);
-                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                        }
-                        else
-                        {
-                            statusIcon.SetActive(false);
-                        }
-                    }
-                }
-            }
 
             if (!IsMainCard())
             {

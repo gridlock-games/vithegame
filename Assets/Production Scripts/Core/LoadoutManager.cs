@@ -464,6 +464,17 @@ namespace Vi.Core
         private void Update()
         {
             if (!IsSpawned) { return; }
+
+            if (primaryWeaponInstance)
+            {
+                primaryWeaponInstance.AbilityCooldownMultiplier = combatAgent.StatusAgent.GetAbilityCooldownMultiplier();
+            }
+
+            if (secondaryWeaponInstance)
+            {
+                secondaryWeaponInstance.AbilityCooldownMultiplier = combatAgent.StatusAgent.GetAbilityCooldownMultiplier();
+            }
+
             if (!IsLocalPlayer) { return; }
             if (!combatAgent.WeaponHandler.WeaponInitialized) { return; }
 

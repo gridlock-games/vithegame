@@ -18,13 +18,10 @@ namespace Vi.UI
         [SerializeField] private Image structureHPImage;
         [SerializeField] private Image structureIntermHPImage;
         [Header("Structure Status UI")]
-        [SerializeField] private Transform statusImageParent;
-        [SerializeField] private StatusIcon statusImagePrefab;
+        [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
 
         private HordeModeManager hordeModeManager;
         private Structure structure;
-
-        private List<StatusIcon> statusIcons = new List<StatusIcon>();
 
         private new void Start()
         {
@@ -32,13 +29,6 @@ namespace Vi.UI
             hordeModeManager = GameModeManager.Singleton.GetComponent<HordeModeManager>();
             EvaluateWavesText();
             structureHealthBarParent.SetActive(false);
-
-            foreach (ActionClip.Status status in System.Enum.GetValues(typeof(ActionClip.Status)))
-            {
-                StatusIcon statusIcon = Instantiate(statusImagePrefab.gameObject, statusImageParent).GetComponent<StatusIcon>();
-                statusIcon.InitializeStatusIcon(status);
-                statusIcons.Add(statusIcon);
-            }
         }
 
         protected override void UpdateDiscordRichPresence()
@@ -94,23 +84,6 @@ namespace Vi.UI
                 lastMaxHP = maxHP;
 
                 structureIntermHPImage.fillAmount = Mathf.Lerp(structureIntermHPImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
-
-                if (structure.StatusAgent.ActiveStatusesWasUpdatedThisFrame)
-                {
-                    List<ActionClip.Status> activeStatuses = structure.StatusAgent.GetActiveStatuses();
-                    foreach (StatusIcon statusIcon in statusIcons)
-                    {
-                        if (activeStatuses.Contains(statusIcon.Status))
-                        {
-                            statusIcon.SetActive(true);
-                            statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                        }
-                        else
-                        {
-                            statusIcon.SetActive(false);
-                        }
-                    }
-                }
             }
             else
             {
@@ -166,19 +139,7 @@ namespace Vi.UI
                 structureHPImage.fillAmount = HP / maxHP;
                 structureIntermHPImage.fillAmount = HP / maxHP;
 
-                List<ActionClip.Status> activeStatuses = structure.StatusAgent.GetActiveStatuses();
-                foreach (StatusIcon statusIcon in statusIcons)
-                {
-                    if (activeStatuses.Contains(statusIcon.Status))
-                    {
-                        statusIcon.SetActive(true);
-                        statusIcon.transform.SetSiblingIndex(statusImageParent.childCount / 2);
-                    }
-                    else
-                    {
-                        statusIcon.SetActive(false);
-                    }
-                }
+                statusIconLayoutGroup.Initialize(structure.StatusAgent);
             }
         }
     }

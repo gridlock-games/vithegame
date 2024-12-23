@@ -12,7 +12,7 @@ namespace Vi.Core.GameModeManagers
     [RequireComponent(typeof(ObjectiveHandler))]
     public class GameItem : NetworkBehaviour, IHittable
     {
-        protected const float gameItemVolume = 0.85f;
+        protected const float gameItemVolume = 0.7f;
 
         public ObjectiveHandler ObjectiveHandler { get; private set; }
 

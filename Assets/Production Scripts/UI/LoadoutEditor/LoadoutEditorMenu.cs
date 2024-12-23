@@ -44,13 +44,9 @@ namespace Vi.UI
         [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
-        private FixedString64Bytes originalActiveLoadoutSlot;
-        private WebRequestManager.Loadout originalActiveLoadout;
         private void Awake()
         {
             attributes = GetComponentInParent<Attributes>();
-            originalActiveLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
-            originalActiveLoadout = attributes.CachedPlayerData.character.GetActiveLoadout();
 
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             {
@@ -163,21 +159,6 @@ namespace Vi.UI
                     Destroy(previewObject);
                 }
             }
-
-            FixedString64Bytes activeLoadoutSlot = attributes.CachedPlayerData.character.GetActiveLoadout().loadoutSlot;
-            if (originalActiveLoadoutSlot != activeLoadoutSlot)
-            {
-                PersistentLocalObjects.Singleton.StartCoroutine(ExecuteDestroyRequests(attributes.CachedPlayerData.character._id.ToString(), attributes.CachedPlayerData.character.GetActiveLoadout()));
-            }
-        }
-
-        private IEnumerator ExecuteDestroyRequests(string characterId, WebRequestManager.Loadout newLoadout)
-        {
-            if (newLoadout.EqualsIgnoringSlot(WebRequestManager.Loadout.GetEmptyLoadout()))
-            {
-                yield return WebRequestManager.Singleton.UpdateCharacterLoadout(characterId, newLoadout);
-            }
-            yield return WebRequestManager.Singleton.UseCharacterLoadout(characterId, newLoadout.loadoutSlot.ToString());
         }
 
         private void OnEnable()

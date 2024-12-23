@@ -580,9 +580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nameDisplay: {fileID: 7401489532861140048}
-  statusImageParent: {fileID: 4375269428043147127}
-  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
-    type: 3}
+  statusIconLayoutGroup: {fileID: 7732631603667807376}
   healthText: {fileID: 3819835944573705657}
   healthFillImage: {fileID: 8825118740436756027}
   interimHealthFillImage: {fileID: 7297089366903985045}
@@ -643,6 +641,7 @@ GameObject:
   - component: {fileID: 4375269428043147127}
   - component: {fileID: 6637659544878211495}
   - component: {fileID: 8256501610047407201}
+  - component: {fileID: 7732631603667807376}
   m_Layer: 5
   m_Name: StatusImageParent
   m_TagString: Untagged
@@ -718,6 +717,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &7732631603667807376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2274119490182361912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42890d8dca3d6b946abb0ec0997f13ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
+    type: 3}
 --- !u!1 &2521831021270949527
 GameObject:
   m_ObjectHideFlags: 0

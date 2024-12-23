@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3375120690881210108}
+  - component: {fileID: 4998703128588600633}
   - component: {fileID: 2709342838355290566}
+  - component: {fileID: 8541277903195807654}
   m_Layer: 5
   m_Name: StatusImageParent
   m_TagString: Untagged
@@ -36,6 +38,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -215}
   m_SizeDelta: {x: 1430, y: 91.4465}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!223 &4998703128588600633
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706187618841448912}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!114 &2709342838355290566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,6 +87,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8541277903195807654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1706187618841448912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42890d8dca3d6b946abb0ec0997f13ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
+    type: 3}
 --- !u!1 &1853356149766297276
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,6 +1272,36 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 211.04848
+      objectReference: {fileID: 0}
+    - target: {fileID: 1230429204541571325, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.683304
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 796.4051
+      objectReference: {fileID: 0}
+    - target: {fileID: 1380500614198325837, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 128.52351
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 513.8849
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364406153092944380, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 128.52351
+      objectReference: {fileID: 0}
     - target: {fileID: 3389305359995068172, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_Text
@@ -1243,9 +1312,59 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0.00012207031
       objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 190.20682
+      objectReference: {fileID: 0}
+    - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 51.683304
+      objectReference: {fileID: 0}
     - target: {fileID: 7589406189482174834, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -1485,9 +1604,7 @@ MonoBehaviour:
   structureHealthBarParent: {fileID: 4826031280533800905}
   structureHPImage: {fileID: 1310030777036215892}
   structureIntermHPImage: {fileID: 8638141840593585003}
-  statusImageParent: {fileID: 3375120690881210108}
-  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
-    type: 3}
+  statusIconLayoutGroup: {fileID: 8541277903195807654}
   essenceBuffMenu: {fileID: 4294788091324872314}
 --- !u!114 &5326114351186326957 stripped
 MonoBehaviour:

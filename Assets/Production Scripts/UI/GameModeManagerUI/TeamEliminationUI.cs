@@ -23,8 +23,13 @@ namespace Vi.UI
             originalViLogoSprite = viLogoImage.sprite;
 
             leftScoreTeamColorImage.enabled = true;
-            leftScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetLeftScoreTeam());
             rightScoreTeamColorImage.enabled = true;
+            RefreshTeamColors();
+        }
+
+        private void RefreshTeamColors()
+        {
+            leftScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetLeftScoreTeam());
             rightScoreTeamColorImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(teamEliminationManager.GetRightScoreTeam());
         }
 
@@ -36,6 +41,8 @@ namespace Vi.UI
         protected override void Update()
         {
             base.Update();
+
+            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { RefreshTeamColors(); }
 
             if (gameModeManager.ShouldDisplaySpecialNextGameActionMessage())
             {

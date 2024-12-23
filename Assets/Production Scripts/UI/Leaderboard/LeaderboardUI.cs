@@ -20,6 +20,8 @@ namespace Vi.UI
         [SerializeField] private GameObject teamElimHeaders;
         [SerializeField] private GameObject hordeModeHeaders;
 
+        [SerializeField] private Text leaderboardRequestText;
+
         private List<PlayerDataManager.GameMode> gameModeValues = new List<PlayerDataManager.GameMode>();
 
         private void Awake()
@@ -37,7 +39,8 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            RefreshLeaderboard();
+            leaderboardRequestText.text = "";
+            OnGameModeChange();
         }
 
         public void OnGameModeChange()
@@ -98,7 +101,9 @@ namespace Vi.UI
         private IEnumerator RefreshLeaderboardCoroutine()
         {
             refreshButton.interactable = false;
+            leaderboardRequestText.text = "LOADING LEADERBOARD";
             yield return WebRequestManager.Singleton.GetLeaderboard();
+            leaderboardRequestText.text = "";
             refreshButton.interactable = true;
             OnGameModeChange();
         }

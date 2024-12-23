@@ -341,6 +341,7 @@ namespace Vi.Core
                 combatAgent.ResetAilment();
                 combatAgent.StatusAgent.RemoveAllStatuses();
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+                combatAgent.LoadoutManager.ReloadAllWeapons();
             }
             
             CancelAllActionsClientRpc(transitionTime, resetGameplayVariables);

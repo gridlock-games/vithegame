@@ -359,6 +359,7 @@ GameObject:
   - component: {fileID: 3952354506870513417}
   - component: {fileID: 4913194369913396429}
   - component: {fileID: 7832439316162593821}
+  - component: {fileID: 5744767898449179600}
   m_Layer: 7
   m_Name: StatusImageParent
   m_TagString: Untagged
@@ -434,6 +435,20 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &5744767898449179600
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6829599395826129937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42890d8dca3d6b946abb0ec0997f13ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
+    type: 3}
 --- !u!1 &7095846274158110524
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,9 +648,7 @@ MonoBehaviour:
   healthFillImage: {fileID: 5812772587367031554}
   interimHealthFillImage: {fileID: 7496229367581369695}
   healthText: {fileID: 9047881861537450979}
-  statusImageParent: {fileID: 3952354506870513417}
-  statusImagePrefab: {fileID: 2114845971928191588, guid: 5f248bb24707fc94fb2825c7d0b729c3,
-    type: 3}
+  statusIconLayoutGroup: {fileID: 5744767898449179600}
 --- !u!225 &8622354700707930082
 CanvasGroup:
   m_ObjectHideFlags: 0

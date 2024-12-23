@@ -230,10 +230,17 @@ namespace Vi.Isolated
             // If the game crashed, or the player disconnected for some reason, don't add their data
             if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId))
             {
-                PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId,
+                if (WebRequestManager.Singleton.LastCharacterByIdWasSuccessful)
+                {
+                    PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId,
                     channel,
                     WebRequestManager.Singleton.CharacterById,
                     team));
+                }
+                else
+                {
+                    NetworkManager.Singleton.DisconnectClient(clientId, "Invalid Character Id.");
+                }
             }
 
             addPlayerDataRunning = false;

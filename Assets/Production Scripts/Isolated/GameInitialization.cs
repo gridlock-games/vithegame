@@ -53,6 +53,7 @@ namespace Vi.Core
                 if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
                 {
                     // Just updated, execute this code
+                    FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", true);
                 }
             }
 
@@ -103,7 +104,7 @@ namespace Vi.Core
                 }
                 else
                 {
-                    Debug.LogError("Erorr while parsing datetime string " + FasterPlayerPrefs.Singleton.GetString("LastLoginTime"));
+                    Debug.LogError("Error while parsing datetime string " + FasterPlayerPrefs.Singleton.GetString("LastLoginTime"));
                 }
             }
             else
@@ -135,7 +136,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("PacketLossEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PacketLossEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("JitterEnabled")) { FasterPlayerPrefs.Singleton.SetBool("JitterEnabled", false); }
-            if (!FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", true); }
 
             if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
