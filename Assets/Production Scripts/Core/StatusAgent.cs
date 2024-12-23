@@ -70,14 +70,16 @@ namespace Vi.Core
 
         private static readonly List<ActionClip.Status> negativeStatuses = new List<ActionClip.Status>()
         {
-            ActionClip.Status.burning,
             ActionClip.Status.damageReceivedMultiplier,
+            ActionClip.Status.spiritReductionMultiplier,
+            ActionClip.Status.burning,
+            ActionClip.Status.poisoned,
             ActionClip.Status.drain,
             ActionClip.Status.movementSpeedDecrease,
-            ActionClip.Status.poisoned,
             ActionClip.Status.rooted,
             ActionClip.Status.silenced,
-            ActionClip.Status.spiritIncreaseMultiplier
+            ActionClip.Status.fear,
+            ActionClip.Status.attackSpeedDecrease
         };
 
         private static Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>> statusEvents = new Dictionary<StatusAgent, Dictionary<int, ActionClip.StatusPayload>>();
@@ -86,9 +88,9 @@ namespace Vi.Core
         {
             get
             {
-                if (statusEvents.ContainsKey(this))
+                if (statusEvents.TryGetValue(this, out Dictionary<int, ActionClip.StatusPayload> result))
                 {
-                    return statusEvents[this];
+                    return result;
                 }
                 else
                 {
@@ -229,6 +231,26 @@ namespace Vi.Core
         {
             float increase = movementSpeedIncreaseAmount.Value;
             increase += baseRunSpeed * movementSpeedIncreasePercentage.Value;
+            return Mathf.Max(0, increase);
+        }
+
+        private NetworkVariable<float> attackSpeedDecreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> attackSpeedDecreasePercentage = new NetworkVariable<float>();
+
+        public float GetAttackSpeedDecreaseAmount(float baseAttackSpeed)
+        {
+            float decrease = attackSpeedDecreaseAmount.Value;
+            decrease += baseAttackSpeed * attackSpeedDecreasePercentage.Value;
+            return Mathf.Max(0, decrease);
+        }
+
+        private NetworkVariable<float> attackSpeedIncreaseAmount = new NetworkVariable<float>();
+        private NetworkVariable<float> attackSpeedIncreasePercentage = new NetworkVariable<float>();
+
+        public float GetAttackSpeedIncreaseAmount(float baseAttackSpeed)
+        {
+            float increase = attackSpeedIncreaseAmount.Value;
+            increase += baseAttackSpeed * attackSpeedIncreasePercentage.Value;
             return Mathf.Max(0, increase);
         }
 
@@ -630,6 +652,66 @@ namespace Vi.Core
                             if (stopAllStatusesAssociatedWithWeapon) { break; }
                         }
                         yield return null;
+                    }
+                    break;
+                case ActionClip.Status.attackSpeedDecrease:
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        attackSpeedDecreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        attackSpeedDecreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        attackSpeedDecreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        attackSpeedDecreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    break;
+                case ActionClip.Status.attackSpeedIncrease:
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        attackSpeedIncreasePercentage.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        attackSpeedIncreaseAmount.Value += StatusEventsForThisObject[statusEventId].value;
+                    }
+
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+
+                    if (StatusEventsForThisObject[statusEventId].valueIsPercentage)
+                    {
+                        attackSpeedIncreasePercentage.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    else
+                    {
+                        attackSpeedIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
                     }
                     break;
                 default:

@@ -180,9 +180,29 @@ namespace Vi.Core.MovementHandlers
 
         public float GetAnimatorSpeed()
         {
-            float baseMovementSpeed = weaponHandler.GetWeapon().GetRunSpeed();
-            float moveSpeedAdjusted = baseMovementSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount(baseMovementSpeed) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount(baseMovementSpeed);
-            return Mathf.Max(0, moveSpeedAdjusted) / weaponHandler.GetWeapon().GetRunSpeed() * (combatAgent.AnimationHandler.IsAtRest() ? 1 : (weaponHandler.IsInRecovery ? weaponHandler.CurrentActionClip.recoveryAnimationSpeed : weaponHandler.CurrentActionClip.animationSpeed));
+            if (combatAgent.AnimationHandler.IsAtRest())
+            {
+                float baseMovementSpeed = weaponHandler.GetWeapon().GetRunSpeed();
+                float moveSpeedAdjusted = baseMovementSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount(baseMovementSpeed) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount(baseMovementSpeed);
+
+                float animatorSpeed = Mathf.Max(0.05f, moveSpeedAdjusted) / weaponHandler.GetWeapon().GetRunSpeed();
+                return animatorSpeed;
+            }
+            else
+            {
+                float baseAttackSpeed;
+                if (weaponHandler.IsInRecovery)
+                {
+                    baseAttackSpeed = weaponHandler.CurrentActionClip.recoveryAnimationSpeed;
+                }
+                else
+                {
+                    baseAttackSpeed = weaponHandler.CurrentActionClip.animationSpeed;
+                }
+
+                float attackSpeedAdjusted = baseAttackSpeed - combatAgent.StatusAgent.GetAttackSpeedDecreaseAmount(baseAttackSpeed) + combatAgent.StatusAgent.GetAttackSpeedIncreaseAmount(baseAttackSpeed);
+                return Mathf.Max(0.05f, attackSpeedAdjusted);
+            }
         }
 
         protected override void Update()

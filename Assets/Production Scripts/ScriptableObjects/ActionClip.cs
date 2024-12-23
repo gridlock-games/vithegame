@@ -69,7 +69,9 @@ namespace Vi.ScriptableObjects
             immuneToAilments,
             immuneToNegativeStatuses,
             spiritRegeneration,
-            staminaRegeneration
+            staminaRegeneration,
+            attackSpeedDecrease,
+            attackSpeedIncrease
         }
 
         [System.Serializable]
