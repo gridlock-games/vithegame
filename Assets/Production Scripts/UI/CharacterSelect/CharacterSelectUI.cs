@@ -753,6 +753,7 @@ namespace Vi.UI
             tutorialButton.onClick.AddListener(() => GoToTutorial());
 
             trainingRoomSettingsButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
+            goToTrainingRoomButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
 
             HandlePlatformAPI(false);
         }
@@ -1085,14 +1086,13 @@ namespace Vi.UI
 
             selectCharacterButton.onClick.RemoveAllListeners();
             selectCharacterButton.onClick.AddListener(() => GoToTrainingRoom());
-
-            goToTrainingRoomButton.gameObject.SetActive(false);
         }
 
         public void SkipTutorial()
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", true);
-            trainingRoomSettingsButton.gameObject.SetActive(FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"));
+            trainingRoomSettingsButton.gameObject.SetActive(true);
+            goToTrainingRoomButton.gameObject.SetActive(true);
         }
 
         private const string connectToServerCode = "217031";
