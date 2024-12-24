@@ -219,6 +219,9 @@ namespace Vi.Core
 
         public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
         {
+            if (col.forceUseStaticWallCollisions) { return true; }
+            if (other.forceUseStaticWallCollisions) { return true; }
+
             if (!col.hasStaticWallBody) { return false; }
             if (!other.hasStaticWallBody) { return false; }
 
