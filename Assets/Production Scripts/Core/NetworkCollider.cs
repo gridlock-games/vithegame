@@ -30,6 +30,7 @@ namespace Vi.Core
 
         // This is for code executed not on the main thread
         private bool hasStaticWallBody;
+        private bool forceUseStaticWallCollisions;
 
         private void Awake()
         {
@@ -123,6 +124,7 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
+            forceUseStaticWallCollisions = default;
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
@@ -319,14 +321,17 @@ namespace Vi.Core
                 {
                     if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                     {
+                        forceUseStaticWallCollisions = false;
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
                     else if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
                     {
+                        forceUseStaticWallCollisions = false;
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
                     else // Player hub
                     {
+                        forceUseStaticWallCollisions = true;
                         c.enabled = false;
                     }
                 }
