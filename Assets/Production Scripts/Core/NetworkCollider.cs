@@ -241,8 +241,7 @@ namespace Vi.Core
 
             if (!other.CombatAgent.AnimationHandler.IsAtRest())
             {
-                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
-                    & !other.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                 {
                     if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
                     {
@@ -250,11 +249,13 @@ namespace Vi.Core
                     }
                     else
                     {
-                        Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
-                        if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
-                        {
-                            return true;
-                        }
+                        return true;
+
+                        //Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
+                        //if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
+                        //{
+                        //    return true;
+                        //}
                     }
                 }
                 else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
@@ -341,17 +342,6 @@ namespace Vi.Core
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
-
-            //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-            //{
-            //    foreach (Collider col in Colliders)
-            //    {
-            //        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
-            //        {
-            //            Physics.IgnoreCollision(col, otherCol, ShouldApplyRecoveryDodgeLogic() | StaticWallsEnabledForThisCollision(attributes.NetworkCollider));
-            //        }
-            //    }
-            //}
         }
 
         private void OnCollisionEnter(Collision collision)
