@@ -105,6 +105,10 @@ namespace Vi.UI
             openGearsSectionButton.interactable = false;
         }
 
+        [SerializeField] private Light previewLightPrefab;
+
+        private GameObject previewLightInstance;
+
         private GameObject previewObject;
         private void CreatePreview()
         {
@@ -133,6 +137,10 @@ namespace Vi.UI
                 characterPreviewCamera.transform.SetParent(null);
                 characterPreviewCamera.transform.position = basePos + SpawnPoints.cameraPreviewCharacterPositionOffset;
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(SpawnPoints.cameraPreviewCharacterRotation);
+
+                previewLightInstance = Instantiate(previewLightPrefab.gameObject);
+                previewLightInstance.transform.position = basePos + previewObject.transform.rotation * SpawnPoints.previewLightPositionOffset;
+                previewLightInstance.transform.rotation = Quaternion.Euler(SpawnPoints.previewLightRotation);
             }
 
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
@@ -146,6 +154,7 @@ namespace Vi.UI
             }
 
             if (characterPreviewCamera) { Destroy(characterPreviewCamera.gameObject); }
+            if (previewLightInstance) { Destroy(previewLightInstance); }
 
             if (previewObject)
             {
@@ -182,6 +191,7 @@ namespace Vi.UI
         private void OnDisable()
         {
             if (characterPreviewCamera) { characterPreviewCamera.enabled = false; }
+            if (previewLightInstance) { Destroy(previewLightInstance); }
 
             if (previewObject)
             {
