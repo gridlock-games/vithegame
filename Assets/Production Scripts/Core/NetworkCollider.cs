@@ -224,21 +224,9 @@ namespace Vi.Core
             // Also use static wall collisions when one player is playing a hit reaction
             if (!col.CombatAgent.AnimationHandler.IsAtRest())
             {
-                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
-                    & !col.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                if (col.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                 {
-                    if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        Quaternion rel = Quaternion.LookRotation(other.MovementHandler.GetPosition() - col.MovementHandler.GetPosition());
-                        if (Quaternion.Angle(rel, col.MovementHandler.GetRotation()) < 50)
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
                 else if (col.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
