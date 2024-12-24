@@ -30,6 +30,7 @@ namespace Vi.Core
 
         // This is for code executed not on the main thread
         private bool hasStaticWallBody;
+        private bool forceUseStaticWallCollisions;
 
         private void Awake()
         {
@@ -123,6 +124,7 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
+            forceUseStaticWallCollisions = default;
             if (staticWallBody)
             {
                 NetworkPhysicsSimulation.RemoveRigidbody(staticWallBody);
@@ -217,6 +219,9 @@ namespace Vi.Core
 
         public static bool StaticWallsEnabledForThisCollision(NetworkCollider col, NetworkCollider other)
         {
+            if (col.forceUseStaticWallCollisions) { return true; }
+            if (other.forceUseStaticWallCollisions) { return true; }
+
             if (!col.hasStaticWallBody) { return false; }
             if (!other.hasStaticWallBody) { return false; }
 
@@ -236,8 +241,7 @@ namespace Vi.Core
 
             if (!other.CombatAgent.AnimationHandler.IsAtRest())
             {
-                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack()
-                    & !other.CombatAgent.WeaponHandler.CurrentActionClip.IsRangedAttack())
+                if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                 {
                     if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
                     {
@@ -245,11 +249,13 @@ namespace Vi.Core
                     }
                     else
                     {
-                        Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
-                        if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
-                        {
-                            return true;
-                        }
+                        return true;
+
+                        //Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
+                        //if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
+                        //{
+                        //    return true;
+                        //}
                     }
                 }
                 else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
@@ -319,31 +325,23 @@ namespace Vi.Core
                 {
                     if (NetSceneManager.Singleton.IsSceneGroupLoaded("Tutorial Room") | NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                     {
+                        forceUseStaticWallCollisions = false;
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
                     else if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None)
                     {
+                        forceUseStaticWallCollisions = false;
                         c.enabled = CombatAgent.GetAilment() != ActionClip.Ailment.Death & CombatAgent.IsSpawned;
                     }
                     else // Player hub
                     {
+                        forceUseStaticWallCollisions = true;
                         c.enabled = false;
                     }
                 }
             }
             lastAilmentEvaluated = CombatAgent.GetAilment();
             lastSpawnState = CombatAgent.IsSpawned;
-
-            //foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-            //{
-            //    foreach (Collider col in Colliders)
-            //    {
-            //        foreach (Collider otherCol in attributes.NetworkCollider.Colliders)
-            //        {
-            //            Physics.IgnoreCollision(col, otherCol, ShouldApplyRecoveryDodgeLogic() | StaticWallsEnabledForThisCollision(attributes.NetworkCollider));
-            //        }
-            //    }
-            //}
         }
 
         private void OnCollisionEnter(Collision collision)

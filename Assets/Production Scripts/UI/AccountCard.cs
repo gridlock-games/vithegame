@@ -45,6 +45,7 @@ namespace Vi.UI
         public void SetChangeTeamLogic(PlayerDataManager.Team teamToChangeTo, bool isRightSideCard)
         {
             if (teamToChangeTo == PlayerDataManager.Team.Environment) { return; }
+            if (!PlayerDataManager.Singleton.IsLobbyLeader()) { return; }
 
             if (isRightSideCard)
             {

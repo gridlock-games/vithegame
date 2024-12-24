@@ -30,12 +30,13 @@ namespace Vi.Core
 
         public static readonly Vector3 previewCharacterRotation = new Vector3(0, 180, 0);
 
-        public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 1.733f, -2.592f);
-        public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(18.07f, 0, 0);
+        // Old
+        //public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 1.733f, -2.592f);
+        //public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(18.07f, 0, 0);
 
         // Calculated from character select
-        //public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 1.47f, -1.80f);
-        //public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(349.5f, 0, 0);
+        public static readonly Vector3 cameraPreviewCharacterPositionOffset = new Vector3(0, 0.8f, -3);
+        public static readonly Vector3 cameraPreviewCharacterRotation = new Vector3(0, 0, 0);
 
         public static readonly Vector3 previewLightPositionOffset = new Vector3(0, 3.45f, 2.48f);
         public static readonly Vector3 previewLightRotation = new Vector3(30, 0, 0);
