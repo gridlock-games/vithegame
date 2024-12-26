@@ -371,6 +371,7 @@ namespace Vi.Core
             if (combatAgent.GetAilment() != ActionClip.Ailment.None) { return false; }
             if (!animationHandler.IsAtRest()) { return false; }
             if (animationHandler.IsReloading()) { return false; }
+            if (animationHandler.WaitingForActionClipToPlay) { return false; }
             return true;
         }
 
