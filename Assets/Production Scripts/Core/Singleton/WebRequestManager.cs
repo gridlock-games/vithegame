@@ -693,6 +693,8 @@ namespace Vi.Core
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 Characters.Clear();
+                yield return new WaitUntil(() => PlayerDataManager.DoesExist());
+                yield return new WaitUntil(() => PlayerDataManager.IsCharacterReferenceLoaded());
                 for (int i = 0; i < 5; i++)
                 {
                     Character character = GetRandomizedCharacter(false);
