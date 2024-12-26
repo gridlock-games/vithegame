@@ -19,6 +19,37 @@ namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Remove Is Readable")]
+        private static void RemoveIsReadable()
+        {
+            List<string> paths = new List<string>();
+            paths.AddRange(AssetDatabase.FindAssets("t:Model"));
+
+            for (int i = 0; i < paths.Count; i++)
+            {
+                if (EditorUtility.DisplayCancelableProgressBar("Removing is readable",
+                    i.ToString() + " out of " + paths.Count, (float)i / paths.Count)) { break; }
+                
+                ModelImporter modelImporter = AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(paths[i])) as ModelImporter;
+                if (modelImporter)
+                {
+                    if (modelImporter.isReadable)
+                    {
+                        modelImporter.isReadable = false;
+                        EditorUtility.SetDirty(modelImporter);
+                        modelImporter.SaveAndReimport();
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No model importer at " + paths[i]);
+                }
+                EditorUtility.UnloadUnusedAssetsImmediate();
+            }
+            EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("Tools/Production/Enable GPU Instancing")]
         private static void EnableGPUInstancing()
         {
