@@ -16,8 +16,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -32,7 +30,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
@@ -40,6 +38,7 @@ ModelImporter:
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
+    importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
@@ -1119,12 +1118,14 @@ ModelImporter:
     - name: DB_HairPonny_E_06
       parentName: DB_HairPonny_E_05
       position: {x: -0.20536478, y: 0.0000000181024, z: -0.000000052352917}
-      rotation: {x: 0.000000010306467, y: 0.00000037532288, z: -0.00000015743396, w: 1}
+      rotation: {x: 0.000000010306467, y: 0.00000037532288, z: -0.00000015743396,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_HairPonny_E_07
       parentName: DB_HairPonny_E_06
       position: {x: -0.20241548, y: -0.000000007486665, z: -0.000000014204306}
-      rotation: {x: -0.000000013092317, y: -0.0000013895333, z: 0.000000036315225, w: 1}
+      rotation: {x: -0.000000013092317, y: -0.0000013895333, z: 0.000000036315225,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_HairPonny_E_08
       parentName: DB_HairPonny_E_07
@@ -1379,7 +1380,8 @@ ModelImporter:
     - name: DB_Sode_B_03_L
       parentName: DB_Sode_B_02_L
       position: {x: -0.00000003495618, y: 0.16377598, z: 0.00000008490355}
-      rotation: {x: 0.00000043213367, y: -0.000000017451445, z: 0.000000006864544, w: 1}
+      rotation: {x: 0.00000043213367, y: -0.000000017451445, z: 0.000000006864544,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_Sode_B_04_L
       parentName: DB_Sode_B_03_L
@@ -1424,12 +1426,14 @@ ModelImporter:
     - name: DB_Sode_A_05_L
       parentName: DB_Sode_A_04_L
       position: {x: 0.0000000058321894, y: 0.18826447, z: -0.000000033450405}
-      rotation: {x: -0.0000031758095, y: -0.00000007047311, z: -0.000000009660246, w: 1}
+      rotation: {x: -0.0000031758095, y: -0.00000007047311, z: -0.000000009660246,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_Sode_A_06_L
       parentName: DB_Sode_A_05_L
       position: {x: -0.00000004670306, y: 0.10419001, z: -0.00000009729876}
-      rotation: {x: 0.0000025499612, y: -0.0000000085358245, z: 0.0000000013564954, w: 1}
+      rotation: {x: 0.0000025499612, y: -0.0000000085358245, z: 0.0000000013564954,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_Sode_A_06_L_end
       parentName: DB_Sode_A_06_L
@@ -1929,7 +1933,8 @@ ModelImporter:
     - name: DB_Skirt_E_04_L
       parentName: DB_Skirt_E_03_L
       position: {x: -0.061201386, y: 0.0000000047683715, z: 0.00000004529953}
-      rotation: {x: 0.00000017229465, y: 0.0000000018626438, z: -0.00000020489097, w: 1}
+      rotation: {x: 0.00000017229465, y: 0.0000000018626438, z: -0.00000020489097,
+        w: 1}
       scale: {x: 0.99999994, y: 1.0000002, z: 1.0000001}
     - name: DB_Skirt_E_04_L_end
       parentName: DB_Skirt_E_04_L
@@ -1954,7 +1959,8 @@ ModelImporter:
     - name: DB_Skirt_D_04_L
       parentName: DB_Skirt_D_03_L
       position: {x: -0.06120134, y: 0.000000028610229, z: 0.00000008167233}
-      rotation: {x: -0.0000001379085, y: 0.000000059069862, z: -0.000000031664968, w: 1}
+      rotation: {x: -0.0000001379085, y: 0.000000059069862, z: -0.000000031664968,
+        w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: DB_Skirt_D_04_L_end
       parentName: DB_Skirt_D_04_L
@@ -2004,7 +2010,8 @@ ModelImporter:
     - name: DB_Skirt_D_04_R
       parentName: DB_Skirt_D_03_R
       position: {x: -0.061201222, y: 0.000000022649765, z: 0.0000000997819}
-      rotation: {x: 0.00000008333883, y: -0.00000006679329, z: 0.0000000046566138, w: 1}
+      rotation: {x: 0.00000008333883, y: -0.00000006679329, z: 0.0000000046566138,
+        w: 1}
       scale: {x: 1, y: 0.9999998, z: 0.9999999}
     - name: DB_Skirt_D_04_R_end
       parentName: DB_Skirt_D_04_R
@@ -2029,7 +2036,8 @@ ModelImporter:
     - name: DB_Skirt_E_04_R
       parentName: DB_Skirt_E_03_R
       position: {x: -0.06120137, y: -0.000000052452087, z: 0.000000007152557}
-      rotation: {x: -0.000000073574476, y: -0.00000002328306, z: 0.00000030547378, w: 1}
+      rotation: {x: -0.000000073574476, y: -0.00000002328306, z: 0.00000030547378,
+        w: 1}
       scale: {x: 1.0000001, y: 1.0000001, z: 1.0000001}
     - name: DB_Skirt_E_04_R_end
       parentName: DB_Skirt_E_04_R
@@ -2054,7 +2062,8 @@ ModelImporter:
     - name: DB_Skirt_C_04_R
       parentName: DB_Skirt_C_03_R
       position: {x: -0.061201274, y: 0.000000007897615, z: 0.000000007152557}
-      rotation: {x: 0.000000013969838, y: 0.0000000015133992, z: 0.0000000942091, w: 1}
+      rotation: {x: 0.000000013969838, y: 0.0000000015133992, z: 0.0000000942091,
+        w: 1}
       scale: {x: 1, y: 1, z: 1.0000001}
     - name: DB_Skirt_C_04_R_end
       parentName: DB_Skirt_C_04_R
@@ -2079,7 +2088,8 @@ ModelImporter:
     - name: DB_Skirt_B_04_R
       parentName: DB_Skirt_B_03_R
       position: {x: -0.061201327, y: 0.000000023841856, z: -0.000000014305114}
-      rotation: {x: -0.000000018626448, y: -0.00000012479722, z: -0.00000025518239, w: 1}
+      rotation: {x: -0.000000018626448, y: -0.00000012479722, z: -0.00000025518239,
+        w: 1}
       scale: {x: 1, y: 1.0000001, z: 1.0000001}
     - name: DB_Skirt_B_04_R_end
       parentName: DB_Skirt_B_04_R
@@ -2114,7 +2124,8 @@ ModelImporter:
     - name: DB_Skirt_A_05_R
       parentName: DB_Skirt_A_04_R
       position: {x: -0.068666466, y: -0.0000000011920929, z: 0.000000023841856}
-      rotation: {x: -0.000000070780516, y: -0.000000027008351, z: 0.000000088475645, w: 1}
+      rotation: {x: -0.000000070780516, y: -0.000000027008351, z: 0.000000088475645,
+        w: 1}
       scale: {x: 1.0000001, y: 1, z: 1.0000001}
     - name: DB_Skirt_A_05_R_end
       parentName: DB_Skirt_A_05_R

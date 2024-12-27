@@ -1,16 +1,13 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using Vi.Core;
-using Vi.ScriptableObjects;
-using Vi.Utility;
+using Vi.Core.GameModeManagers;
 using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
-using Unity.Netcode.Components;
-using System.Linq;
-using Vi.Core.GameModeManagers;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Player
 {
@@ -549,7 +546,7 @@ namespace Vi.Player
         private void SetLastMovement(Vector3 lastMovement)
         {
             bool value = lastMovement == Vector3.zero;
-            
+
             LastMovementWasZero = value;
 
             if (IsServer)
@@ -820,6 +817,26 @@ namespace Vi.Player
             {
                 lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
             }
+
+            // Uncomment this for profiler in android build when player is spawned
+            //#if PLATFORM_ANDROID && !UNITY_EDITOR
+            //            if (Debug.isDebugBuild)
+            //            {
+            //                if (IsLocalPlayer)
+            //                {
+            //                    if (!UnityEngine.Profiling.Profiler.enabled)
+            //                    {
+            //                        Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
+            //                        UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+            //                        UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+            //                        UnityEngine.Profiling.Profiler.enabled = true;
+
+            //                        // Optional, if more memory is needed for the buffer
+            //                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+            //                    }
+            //                }
+            //            }
+            //#endif
         }
 
         public override void OnNetworkDespawn()
@@ -853,6 +870,25 @@ namespace Vi.Player
             {
                 lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
             }
+
+            // Uncomment this for profiler in android build when player is spawned
+            //#if PLATFORM_ANDROID && !UNITY_EDITOR
+            //            if (Debug.isDebugBuild)
+            //            {
+            //                if (IsLocalPlayer)
+            //                {
+            //                    if (UnityEngine.Profiling.Profiler.enabled)
+            //                    {
+            //                        Debug.Log("Disabling Profiler");
+            //                        UnityEngine.Profiling.Profiler.enableBinaryLog = false;
+            //                        UnityEngine.Profiling.Profiler.enabled = false;
+
+            //                        // Optional, if more memory is needed for the buffer
+            //                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+            //                    }
+            //                }
+            //            }
+            //#endif
         }
 
         private void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
@@ -1022,9 +1058,9 @@ namespace Vi.Player
             }
         }
 
-# if UNITY_EDITOR
+#if UNITY_EDITOR
         private bool drawCasts;
-# endif
+#endif
 
         private bool autoAim;
         RaycastHit[] cameraHits = new RaycastHit[10];

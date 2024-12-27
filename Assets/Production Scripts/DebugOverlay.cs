@@ -7,7 +7,6 @@ using Vi.Core;
 using Vi.Utility;
 using Vi.Player;
 using Unity.Netcode;
-using UnityEngine.Profiling;
 using System.IO;
 using Vi.Core.CombatAgents;
 using Unity.Netcode.Transports.UTP;
@@ -47,24 +46,14 @@ public class DebugOverlay : MonoBehaviour
 
         thermalWarningImage.enabled = false;
 
-#if PLATFORM_ANDROID && !UNITY_EDITOR
-        if (Debug.isDebugBuild)
-        {
-            Debug.Log(Path.Join(Application.persistentDataPath, "myLog.raw"));
-            Profiler.logFile = Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
-            Profiler.enableBinaryLog = true;
-            Profiler.enabled = true;
-
-            // Optional, if more memory is needed for the buffer
-            //Profiler.maxUsedMemory = 256 * 1024 * 1024;
-        }
-#endif
-
         ap = Holder.Instance;
         if (ap != null)
         {
             if (!ap.Active)
+            {
+                Debug.LogWarning("Adapative Performance is Disabled!");
                 return;
+            }
 
             ap.ThermalStatus.ThermalEvent += OnThermalEvent;
         }
