@@ -818,24 +818,25 @@ namespace Vi.Player
                 lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
             }
 
-#if PLATFORM_ANDROID && !UNITY_EDITOR
-            if (Debug.isDebugBuild)
-            {
-                if (IsLocalPlayer)
-                {
-                    if (!UnityEngine.Profiling.Profiler.enabled)
-                    {
-                        Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
-                        UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
-                        UnityEngine.Profiling.Profiler.enableBinaryLog = true;
-                        UnityEngine.Profiling.Profiler.enabled = true;
+            // Uncomment this for profiler in android build when player is spawned
+            //#if PLATFORM_ANDROID && !UNITY_EDITOR
+            //            if (Debug.isDebugBuild)
+            //            {
+            //                if (IsLocalPlayer)
+            //                {
+            //                    if (!UnityEngine.Profiling.Profiler.enabled)
+            //                    {
+            //                        Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
+            //                        UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+            //                        UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+            //                        UnityEngine.Profiling.Profiler.enabled = true;
 
-                        // Optional, if more memory is needed for the buffer
-                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
-                    }
-                }
-            }
-#endif
+            //                        // Optional, if more memory is needed for the buffer
+            //                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+            //                    }
+            //                }
+            //            }
+            //#endif
         }
 
         public override void OnNetworkDespawn()
@@ -870,23 +871,24 @@ namespace Vi.Player
                 lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
             }
 
-#if PLATFORM_ANDROID && !UNITY_EDITOR
-            if (Debug.isDebugBuild)
-            {
-                if (IsLocalPlayer)
-                {
-                    if (UnityEngine.Profiling.Profiler.enabled)
-                    {
-                        Debug.Log("Disabling Profiler");
-                        UnityEngine.Profiling.Profiler.enableBinaryLog = false;
-                        UnityEngine.Profiling.Profiler.enabled = false;
+            // Uncomment this for profiler in android build when player is spawned
+            //#if PLATFORM_ANDROID && !UNITY_EDITOR
+            //            if (Debug.isDebugBuild)
+            //            {
+            //                if (IsLocalPlayer)
+            //                {
+            //                    if (UnityEngine.Profiling.Profiler.enabled)
+            //                    {
+            //                        Debug.Log("Disabling Profiler");
+            //                        UnityEngine.Profiling.Profiler.enableBinaryLog = false;
+            //                        UnityEngine.Profiling.Profiler.enabled = false;
 
-                        // Optional, if more memory is needed for the buffer
-                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
-                    }
-                }
-            }
-#endif
+            //                        // Optional, if more memory is needed for the buffer
+            //                        //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+            //                    }
+            //                }
+            //            }
+            //#endif
         }
 
         private void OnInputBufferChanged(NetworkListEvent<InputPayload> networkListEvent)
