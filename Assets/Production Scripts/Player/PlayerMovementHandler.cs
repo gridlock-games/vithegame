@@ -8,9 +8,6 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
-#if DEVELOPMENT_BUILD
-using UnityEngine.Profiling;
-#endif
 
 namespace Vi.Player
 {
@@ -826,12 +823,12 @@ namespace Vi.Player
             {
                 if (IsLocalPlayer)
                 {
-                    if (!Profiler.enabled)
+                    if (!UnityEngine.Profiling.Profiler.enabled)
                     {
                         Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
-                        Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
-                        Profiler.enableBinaryLog = true;
-                        Profiler.enabled = true;
+                        UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+                        UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+                        UnityEngine.Profiling.Profiler.enabled = true;
 
                         // Optional, if more memory is needed for the buffer
                         //Profiler.maxUsedMemory = 256 * 1024 * 1024;
@@ -878,11 +875,11 @@ namespace Vi.Player
             {
                 if (IsLocalPlayer)
                 {
-                    if (Profiler.enabled)
+                    if (UnityEngine.Profiling.Profiler.enabled)
                     {
                         Debug.Log("Disabling Profiler");
-                        Profiler.enableBinaryLog = false;
-                        Profiler.enabled = false;
+                        UnityEngine.Profiling.Profiler.enableBinaryLog = false;
+                        UnityEngine.Profiling.Profiler.enabled = false;
 
                         // Optional, if more memory is needed for the buffer
                         //Profiler.maxUsedMemory = 256 * 1024 * 1024;

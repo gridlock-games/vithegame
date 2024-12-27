@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
@@ -962,10 +961,11 @@ namespace Vi.ScriptableObjects
 
             public float GetMaxCurveTime(string stateNameForDebugging)
             {
-                if (curveX.keys == null | curveY.keys == null | curveZ.keys == null) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
-                if (curveX.keys.Length == 0 | curveY.keys.Length == 0 | curveZ.keys.Length == 0) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
+                if (curveX.length == 0 | curveY.length == 0 | curveZ.length == 0) { Debug.LogWarning("Curve doesn't have keys! " + stateNameForDebugging + " " + this); return 0; }
 
-                return Mathf.Max(curveX.keys[^1].time, curveY.keys[^1].time, curveZ.keys[^1].time);
+                return Mathf.Max(curveX[curveX.length - 1].time,
+                    curveY[curveY.length - 1].time,
+                    curveZ[curveZ.length - 1].time);
             }
         }
 
