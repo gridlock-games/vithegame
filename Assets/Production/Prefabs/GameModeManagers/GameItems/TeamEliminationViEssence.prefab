@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: -4435751382175246863}
   - component: {fileID: 5367918032510719529}
   - component: {fileID: 156981952275146121}
+  - component: {fileID: 6799425343301166963}
   m_Layer: 6
   m_Name: TeamEliminationViEssence
   m_TagString: Untagged
@@ -70,7 +71,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 767527621
+  GlobalObjectIdHash: 1665408099
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -137,8 +138,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 1
-  pooledObjectIndex: 26
+  pooledObjectIndex: 25
   isPrewarmObject: 1
+--- !u!114 &6799425343301166963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712034217526863517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a87dc2daa2ed39408d62461989dd9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &5468039275417533161
 PrefabInstance:
   m_ObjectHideFlags: 0

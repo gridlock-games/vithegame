@@ -3142,6 +3142,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
+  debugMode: 0
+  debugColor: {r: 0, g: 0, b: 0, a: 0}
+  debugFresnelBounds: {x: 0, y: 0}
+  debugBreathSpeed: 0
+  debugEmissionPower: 0
 --- !u!114 &6354780308172313104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3204,7 +3209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 194
+  pooledObjectIndex: 193
   isPrewarmObject: 1
 --- !u!114 &7736768306598619903
 MonoBehaviour:

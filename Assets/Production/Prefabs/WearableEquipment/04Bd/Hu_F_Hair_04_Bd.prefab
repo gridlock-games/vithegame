@@ -79,7 +79,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 243
+  pooledObjectIndex: 242
   isPrewarmObject: 1
 --- !u!114 &8739875695547886449
 MonoBehaviour:
@@ -96,6 +96,8 @@ MonoBehaviour:
   equipmentType: 11
   armorType: 0
   shouldDisableCharSkinRenderer: 0
+  isShort: 0
+  sleevesRenderer: {fileID: 0}
   renderList:
   - {fileID: 1297099001031566359}
 --- !u!1 &79187011868602142

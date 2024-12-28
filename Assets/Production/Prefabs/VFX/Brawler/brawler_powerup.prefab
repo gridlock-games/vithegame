@@ -8,10 +8,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1066419596, guid: 91618da2b53d706408f82c37aae1dc9d, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1763715061, guid: 91618da2b53d706408f82c37aae1dc9d, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4117237027463824399, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5075657727207989412, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 5075657727644975032, guid: 91618da2b53d706408f82c37aae1dc9d,
         type: 3}
       propertyPath: m_Name
       value: brawler_powerup
+      objectReference: {fileID: 0}
+    - target: {fileID: 5075657727644975032, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5075657727644975037, guid: 91618da2b53d706408f82c37aae1dc9d,
         type: 3}
@@ -63,6 +86,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5075657728342325370, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5075657728681340623, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8671302190999714217, guid: 91618da2b53d706408f82c37aae1dc9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -103,7 +141,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 370
+  pooledObjectIndex: 369
   isPrewarmObject: 1
 --- !u!114 &3441336403055083396
 MonoBehaviour:
