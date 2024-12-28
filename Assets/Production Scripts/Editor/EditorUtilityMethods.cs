@@ -14,11 +14,35 @@ using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using Vi.Core.Weapons;
 using UnityEditor.Animations;
+using UnityEngine.SceneManagement;
 
 namespace Vi.Editor
 {
     public class EditorUtilityMethods : UnityEditor.Editor
     {
+        [MenuItem("Tools/Production/Set GPU Instancing Based On Static Objects")]
+        private static void SetGPUInstancingBasedOnStaticObjects()
+        {
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                foreach (Renderer r in g.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (r.gameObject.isStatic | r.isPartOfStaticBatch)
+                    {
+                        foreach (Material m in r.materials)
+                        {
+                            if (m.enableInstancing)
+                            {
+                                m.enableInstancing = false;
+                                EditorUtility.SetDirty(m);
+                            }
+                        }
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         [MenuItem("Tools/Production/Remove Is Readable")]
         private static void RemoveIsReadable()
         {
@@ -53,7 +77,8 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Enable GPU Instancing")]
         private static void EnableGPUInstancing()
         {
-            string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
+            List<string> paths = new List<string>();
+            paths.AddRange(Directory.GetFiles(@"Assets\PackagedPrefabs", "*.mat", SearchOption.AllDirectories));
             foreach (string path in paths)
             {
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
