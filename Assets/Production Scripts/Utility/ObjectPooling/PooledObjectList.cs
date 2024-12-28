@@ -140,7 +140,7 @@ namespace Vi.Utility
         }
 
         [ContextMenu("Find Duplicates")]
-        private void FindDuplicates()
+        public void FindDuplicates()
         {
             pooledObjectReferences.RemoveAll(item => item.editorAsset == null);
 
@@ -151,7 +151,7 @@ namespace Vi.Utility
 
             foreach (string guid in query)
             {
-                Debug.Log(AssetDatabase.GUIDToAssetPath(guid));
+                Debug.Log("DUPLICATE " + AssetDatabase.GUIDToAssetPath(guid));
             }
         }
 #endif

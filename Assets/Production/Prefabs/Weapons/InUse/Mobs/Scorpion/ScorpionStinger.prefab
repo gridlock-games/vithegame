@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponMaterial: 2
+  collidesWithClothWhileStowed: 1
+  weaponBoneFollowTargets: []
   dropWeaponPrefab: {fileID: 0}
   weaponTrailVFX: {fileID: 0}
 --- !u!114 &4015539120210364517
@@ -62,7 +64,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 180
+  pooledObjectIndex: 179
   isPrewarmObject: 1
 --- !u!135 &6126230119404951742
 SphereCollider:

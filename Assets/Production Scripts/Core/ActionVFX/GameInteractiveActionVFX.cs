@@ -19,6 +19,13 @@ namespace Vi.Core.VFX
 
         public SpellType GetSpellType() { return spellType; }
 
+#if UNITY_EDITOR
+        public FollowUpVFX[] GetFollowUpVFX()
+        {
+            return followUpVFXToPlayOnDestroy;
+        }
+#endif
+
         [SerializeField] protected SpellType spellType = SpellType.NotASpell;
         [SerializeField] private FollowUpVFX[] followUpVFXToPlayOnDestroy;
         [SerializeField] private bool shouldBlockProjectiles;

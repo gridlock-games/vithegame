@@ -960,6 +960,26 @@ namespace Vi.Core
 
         [SerializeField] private List<OnHitActionVFX> ailmentOnHitActionVFXList = new List<OnHitActionVFX>();
 
+#if UNITY_EDITOR
+        public List<PooledObject> GetPooledObjectDependencies()
+        {
+            List<PooledObject> returnedList = new List<PooledObject>();
+            foreach (OnHitActionVFX onHitActionVFX in ailmentOnHitActionVFXList)
+            {
+                returnedList.Add(onHitActionVFX.actionVFX.GetComponent<PooledObject>());
+            }
+            returnedList.Add(rageAtMaxVFXPrefab);
+            returnedList.Add(ragingVFXPrefab);
+            returnedList.Add(rageStartVFXPrefab);
+            if (deathVFX)
+            {
+                returnedList.Add(deathVFX.GetComponent<PooledObject>());
+            }
+            returnedList.RemoveAll(item => item == null);
+            return returnedList;
+        }
+#endif
+
         private void OnValidate()
         {
             List<ActionVFX> actionVFXToRemove = new List<ActionVFX>();

@@ -8,6 +8,8 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Vi.Core;
+using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
 using Vi.Core.MeshSlicing;
 using Vi.Core.Weapons;
@@ -25,6 +27,24 @@ namespace Vi.Editor
         }
 
         #region
+        private static Attributes[] GetBotAndPlayerPrefabs()
+        {
+            List<Attributes> returnedList = new List<Attributes>();
+            returnedList.Add(AssetDatabase.LoadAssetAtPath<GameObject>(@"Assets\Production\Prefabs\Bot.prefab").GetComponent<Attributes>());
+            returnedList.Add(AssetDatabase.LoadAssetAtPath<GameObject>(@"Assets\Production\Prefabs\Player.prefab").GetComponent<Attributes>());
+            return returnedList.ToArray();
+        }
+
+        private static Mob[] GetMobPrefabs()
+        {
+            List<Mob> mobList = new List<Mob>();
+            foreach (string filePath in Directory.GetFiles(@"Assets\Production\Prefabs\Mobs", "*.prefab", SearchOption.AllDirectories))
+            {
+                mobList.Add(AssetDatabase.LoadAssetAtPath<GameObject>(filePath).GetComponent<Mob>());
+            }
+            return mobList.ToArray();
+        }
+
         // Loading Scriptable Object Methods
         private static string networkPrefabListFolderPath = @"Assets\Production";
         static List<NetworkPrefabsList> GetNetworkPrefabsLists()
@@ -92,7 +112,7 @@ namespace Vi.Editor
             GenerateDroppedWeaponVariants();
             RemoveComponentsFromWeaponPreviews();
             SetActionVFXLayers();
-            AddUnregisteredPooledObjects();
+            ValidatePooledObjectsList();
             //ValidateNetworkPrefabsLists();
             AssetDatabase.SaveAssets();
             Debug.Log("REMEMBER TO CHECK AND ORGANIZE YOUR ADDRESSABLE GROUPS");
@@ -473,8 +493,8 @@ namespace Vi.Editor
             EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
-        [MenuItem("Tools/Production/Add Unregistered Pooled Objects")]
-        static void AddUnregisteredPooledObjects()
+        [MenuItem("Tools/Production/Validate Pooled Objects List")]
+        static void ValidatePooledObjectsList()
         {
             List<ActionClip> actionClips = GetActionClips();
 
@@ -482,13 +502,16 @@ namespace Vi.Editor
 
             List<PooledObject> pooledObjectsThatShouldBeIncluded = new List<PooledObject>();
 
+            Mob[] mobs = GetMobPrefabs();
+            Attributes[] players = GetBotAndPlayerPrefabs(); 
+
             int counter = 0;
             List<string> files = new List<string>();
             files.AddRange(Directory.GetFiles("Assets", "*.prefab", SearchOption.AllDirectories));
             foreach (string prefabFilePath in files)
             {
                 counter++;
-                if (EditorUtility.DisplayCancelableProgressBar("Adding Unregistered Pooled Objects", counter + " out of " + files.Count, counter / (float)files.Count)) { break; }
+                if (EditorUtility.DisplayCancelableProgressBar("Validating Pooled Objects", counter + " out of " + files.Count, counter / (float)files.Count)) { break; }
 
                 GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabFilePath);
                 if (prefab)
@@ -496,7 +519,6 @@ namespace Vi.Editor
                     if (prefab.name == "MobBase") { continue; }
                     if (prefab.TryGetComponent(out PooledObject pooledObject))
                     {
-                        Debug.Log("Adding pooled object to list " + pooledObject);
                         if (prefab.TryGetComponent(out NetworkObject networkObject))
                         {
                             if (prefab.TryGetComponent(out ActionVFX actionVFX))
@@ -504,7 +526,7 @@ namespace Vi.Editor
                                 bool vfxReferencedInActionClip = false;
                                 foreach (ActionClip actionClip in actionClips)
                                 {
-                                    if (actionClip.actionVFXList.Contains(actionVFX))
+                                    if (actionClip.actionVFXList.Contains(actionVFX) | actionClip.chargeAttackChargingVFX == actionVFX)
                                     {
                                         vfxReferencedInActionClip = true;
                                         break;
@@ -515,6 +537,42 @@ namespace Vi.Editor
                                 {
                                     pooledObjectList.TryAddPooledObject(pooledObject);
                                     pooledObjectsThatShouldBeIncluded.Add(pooledObject);
+
+                                    if (actionVFX is GameInteractiveActionVFX g)
+                                    {
+                                        foreach (FollowUpVFX followUpVFX in g.GetFollowUpVFX())
+                                        {
+                                            pooledObjectList.TryAddPooledObject(followUpVFX.GetComponent<PooledObject>());
+                                            pooledObjectsThatShouldBeIncluded.Add(followUpVFX.GetComponent<PooledObject>());
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    bool broken = false;
+                                    foreach (Attributes attributes in players)
+                                    {
+                                        if (attributes.GetPooledObjectDependencies().Contains(pooledObject))
+                                        {
+                                            pooledObjectList.TryAddPooledObject(pooledObject);
+                                            pooledObjectsThatShouldBeIncluded.Add(pooledObject);
+                                            broken = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!broken)
+                                    {
+                                        foreach (Mob mob in mobs)
+                                        {
+                                            if (mob.GetPooledObjectDependencies().Contains(pooledObject))
+                                            {
+                                                pooledObjectList.TryAddPooledObject(pooledObject);
+                                                pooledObjectsThatShouldBeIncluded.Add(pooledObject);
+                                                break;
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             else
@@ -544,7 +602,7 @@ namespace Vi.Editor
                 {
                     if (!pooledObjectsThatShouldBeIncluded.Contains(pl))
                     {
-                        Debug.Log(pl + " is no longer needed in the pooled object list and can be safely removed");
+                        Debug.Log(pl + " is no longer needed in the pooled object list and can be safely removed " + pooledObjectsThatShouldBeIncluded.Count);
                     }
                 }
                 else
@@ -552,6 +610,9 @@ namespace Vi.Editor
                     Debug.LogWarning("Pooled object is null");
                 }
             }
+
+            pooledObjectList.FindDuplicates();
+
             AssetDatabase.SaveAssets();
             EditorUtility.UnloadUnusedAssetsImmediate();
         }

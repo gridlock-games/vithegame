@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 154
+  pooledObjectIndex: 153
   isPrewarmObject: 1
 --- !u!114 &6420672105542109404
 MonoBehaviour:
@@ -322,6 +322,8 @@ MonoBehaviour:
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  enemyStatuses: []
+  friendlyStatuses: []
   teamColorParticleSystems: []
   shouldAffectSelf: 0
   shouldAffectTeammates: 0

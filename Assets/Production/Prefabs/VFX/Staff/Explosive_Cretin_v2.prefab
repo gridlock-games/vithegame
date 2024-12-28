@@ -434,6 +434,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 9179522632341402904}
+    - targetCorrespondingSourceObject: {fileID: 4971687155524193028, guid: b6591a5002c70994ba44128e22a049c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2978755319940552368}
   m_SourcePrefab: {fileID: 100100000, guid: b6591a5002c70994ba44128e22a049c1, type: 3}
 --- !u!1 &5550226111408205535 stripped
 GameObject:
@@ -560,6 +564,8 @@ MonoBehaviour:
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  enemyStatuses: []
+  friendlyStatuses: []
   teamColorParticleSystems: []
 --- !u!114 &212779739182094407
 MonoBehaviour:
@@ -574,7 +580,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 80
+  pooledObjectIndex: 79
   isPrewarmObject: 1
 --- !u!114 &5694973853404052442
 MonoBehaviour:
@@ -622,3 +628,15 @@ MonoBehaviour:
   bodyHeightOffset: 2
   stoppingDistance: 1
   navMeshAgentTypeName: Humanoid
+--- !u!114 &2978755319940552368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5550226111408205535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a87dc2daa2ed39408d62461989dd9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -14793,6 +14793,8 @@ MonoBehaviour:
   - {fileID: 2654175274349702557, guid: 1bf608eaa8ac3b144974fd6af172ca17, type: 3}
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  enemyStatuses: []
+  friendlyStatuses: []
   teamColorParticleSystems:
   - {fileID: 4514755523061157347}
   projectileForce: {x: 0, y: 0, z: 10}
@@ -14855,7 +14857,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 64
+  pooledObjectIndex: 63
   isPrewarmObject: 1
 --- !u!135 &6599107316140914520
 SphereCollider:

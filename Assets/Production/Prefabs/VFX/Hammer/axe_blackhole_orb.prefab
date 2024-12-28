@@ -302,6 +302,8 @@ MonoBehaviour:
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
+  enemyStatuses: []
+  friendlyStatuses: []
   teamColorParticleSystems:
   - {fileID: 8723014708127516046}
   - {fileID: 7865164107599564033}
@@ -352,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 57
+  pooledObjectIndex: 56
   isPrewarmObject: 1
 --- !u!198 &7865164107599564033 stripped
 ParticleSystem:
