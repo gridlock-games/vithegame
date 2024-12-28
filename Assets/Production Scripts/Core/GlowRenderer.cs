@@ -64,6 +64,7 @@ namespace Vi.Core
             currentColor = default;
             lastColor = default;
             isBearer = false;
+            forceUpdate = default;
         }
 
         public void RegisterChildRenderers()
@@ -83,6 +84,8 @@ namespace Vi.Core
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj) { return; }
+
+            forceUpdate = true;
 
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
             {
@@ -109,15 +112,6 @@ namespace Vi.Core
         public void UnregisterRenderer(Renderer renderer)
         {
             if (!glowMaterialInstances.ContainsKey(renderer)) { return; }
-            
-            List<Material> newMatList = renderer.materials.ToList();
-            foreach (Material glowMaterialInstance in glowMaterialInstances[renderer])
-            {
-                newMatList.Remove(glowMaterialInstance);
-                Destroy(glowMaterialInstance);
-            }
-            renderer.materials = newMatList.ToArray();
-
             glowMaterialInstances.Remove(renderer);
         }
 
@@ -143,6 +137,7 @@ namespace Vi.Core
         private Color currentColor;
         private Color lastColor;
 
+        private bool forceUpdate;
         private void Update()
         {
             Color colorTarget = defaultColor;
@@ -183,7 +178,7 @@ namespace Vi.Core
             }
 
             currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
-            if (lastColor != currentColor)
+            if (lastColor != currentColor | forceUpdate)
             {
                 foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
@@ -196,6 +191,7 @@ namespace Vi.Core
             }
             
             lastColor = currentColor;
+            forceUpdate = false;
         }
 
         private readonly int _GlowColor = Shader.PropertyToID("_GlowColor");
