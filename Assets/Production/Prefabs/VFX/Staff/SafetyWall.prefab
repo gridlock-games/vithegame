@@ -460,6 +460,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1712926932317761436}
     m_Modifications:
+    - target: {fileID: 6326152368792382781, guid: 7ae611719d10a5b489337fcd4622030a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6326152368792382783, guid: 7ae611719d10a5b489337fcd4622030a,
         type: 3}
       propertyPath: InitialModule.startColor.maxColor.a
@@ -474,6 +479,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: HCFX_Shine_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089031658145368973, guid: 7ae611719d10a5b489337fcd4622030a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8089031658145368974, guid: 7ae611719d10a5b489337fcd4622030a,
         type: 3}
@@ -634,6 +644,11 @@ PrefabInstance:
         type: 3}
       propertyPath: InitialModule.startColor.maxGradient.m_NumAlphaKeys
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089031659650617374, guid: 7ae611719d10a5b489337fcd4622030a,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
