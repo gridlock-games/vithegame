@@ -202,10 +202,6 @@ namespace Vi.Core.Weapons
                 {
                     parentCombatAgent.GlowRenderer.RegisterRenderer(renderer);
                 }
-                else
-                {
-                    Debug.LogWarning("No glow renderer!");
-                }
             }
             StartCoroutine(EnableRenderersAfterOneFrame());
 
