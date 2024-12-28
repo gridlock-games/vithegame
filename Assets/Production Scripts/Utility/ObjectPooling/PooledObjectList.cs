@@ -86,6 +86,12 @@ namespace Vi.Utility
         }
 
 # if UNITY_EDITOR
+        public bool Contains(PooledObject pooledObject)
+        {
+            string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(pooledObject.gameObject));
+            return pooledObjectReferences.Exists(item => item.AssetGUID == guid);
+        }
+
         public bool TryAddPooledObject(PooledObject pooledObject)
         {
             string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(pooledObject.gameObject));

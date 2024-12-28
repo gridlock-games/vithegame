@@ -53,7 +53,6 @@ namespace Vi.Core
                 if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
                 {
                     // Just updated, execute this code
-                    FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", true);
                 }
             }
 
