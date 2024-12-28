@@ -86,6 +86,12 @@ namespace Vi.Utility
         }
 
 # if UNITY_EDITOR
+        public bool Contains(PooledObject pooledObject)
+        {
+            string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(pooledObject.gameObject));
+            return pooledObjectReferences.Exists(item => item.AssetGUID == guid);
+        }
+
         public bool TryAddPooledObject(PooledObject pooledObject)
         {
             string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(pooledObject.gameObject));
@@ -134,7 +140,7 @@ namespace Vi.Utility
         }
 
         [ContextMenu("Find Duplicates")]
-        private void FindDuplicates()
+        public void FindDuplicates()
         {
             pooledObjectReferences.RemoveAll(item => item.editorAsset == null);
 
@@ -145,7 +151,7 @@ namespace Vi.Utility
 
             foreach (string guid in query)
             {
-                Debug.Log(AssetDatabase.GUIDToAssetPath(guid));
+                Debug.Log("DUPLICATE " + AssetDatabase.GUIDToAssetPath(guid));
             }
         }
 #endif

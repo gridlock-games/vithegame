@@ -81,6 +81,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponMaterial: 0
   collidesWithClothWhileStowed: 0
+  weaponBoneFollowTargets: []
   dropWeaponPrefab: {fileID: 3306732144284760831, guid: d542a56965fbd1b43bbc7d575953215f,
     type: 3}
   canADS: 0
@@ -101,15 +102,19 @@ MonoBehaviour:
   - raceAndGender: 0
     aimHandIKOffset: {x: 0, y: 67.6, z: -1.4}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 1
     aimHandIKOffset: {x: 0, y: 67.6, z: -1.4}
     bodyAimIKOffset: {x: 0, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 2
     aimHandIKOffset: {x: -9.61, y: 26.2, z: 0}
     bodyAimIKOffset: {x: 35, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
   - raceAndGender: 3
     aimHandIKOffset: {x: -7.98, y: 6.18, z: 2.09}
     bodyAimIKOffset: {x: 25, y: 0, z: 0}
+    offHandIKOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &102408958681105487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 147
+  pooledObjectIndex: 146
   isPrewarmObject: 1
 --- !u!114 &5972891025352119189
 MonoBehaviour:
