@@ -1,20 +1,18 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.IO;
-using Unity.Netcode;
-using Vi.Core;
-using Vi.ScriptableObjects;
-using Vi.Core.MeshSlicing;
 using System.Linq;
-using Vi.Core.CombatAgents;
-using Vi.Utility;
+using Unity.Netcode;
+using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
-using Vi.Core.Weapons;
 using UnityEditor.Animations;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using Vi.Core.CombatAgents;
+using Vi.Core.MeshSlicing;
+using Vi.Core.Weapons;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Editor
 {
@@ -114,14 +112,30 @@ namespace Vi.Editor
 
             if (prefab.TryGetComponent(out AudioManager audioManager))
             {
-                foreach (string guid in AssetDatabase.FindAssets("t:audioclip"))
+                string[] guids = AssetDatabase.FindAssets("t:audioclip");
+                int counter = -1;
+                foreach (string guid in guids)
                 {
+                    counter += 1;
+                    if (EditorUtility.DisplayCancelableProgressBar("Setting audio clip compression settings",
+                        counter.ToString() + " out of " + guids.Length.ToString() + " audio clips completed",
+                        (float)counter / guids.Length))
+                    {
+                        break;
+                    }
+
                     string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                     AudioImporter audioImporter = AssetImporter.GetAtPath(assetPath) as AudioImporter;
                     if (audioImporter)
                     {
                         AudioClip clip = AssetDatabase.LoadAssetAtPath<AudioClip>(assetPath);
-                        audioImporter.loadInBackground = true;
+                        bool shouldReimport = false;
+                        if (!audioImporter.loadInBackground)
+                        {
+                            audioImporter.loadInBackground = true;
+                            shouldReimport = true;
+                        }
+
                         if (clip)
                         {
                             foreach (BuildTargetGroup buildTargetGroup in buildTargetGroups)
@@ -175,14 +189,28 @@ namespace Vi.Editor
                                     sampleSettings.quality = 0.7f;
                                 }
 
-                                audioImporter.SetOverrideSampleSettings(buildTargetGroup, sampleSettings);
+                                AudioImporterSampleSettings existingSettings = audioImporter.GetOverrideSampleSettings(buildTargetGroup);
+
+                                if (existingSettings.compressionFormat != sampleSettings.compressionFormat
+                                    | existingSettings.loadType != sampleSettings.loadType
+                                    | existingSettings.preloadAudioData != sampleSettings.preloadAudioData
+                                    | existingSettings.quality != sampleSettings.quality
+                                    | existingSettings.sampleRateSetting != sampleSettings.sampleRateSetting)
+                                {
+                                    audioImporter.SetOverrideSampleSettings(buildTargetGroup, sampleSettings);
+                                    shouldReimport = true;
+                                }
                             }
                         }
                         else
                         {
                             Debug.LogWarning("Couldn't get audio clip at path: " + assetPath);
                         }
-                        audioImporter.SaveAndReimport();
+                        
+                        if (shouldReimport)
+                        {
+                            audioImporter.SaveAndReimport();
+                        }
                     }
                     else
                     {
@@ -194,6 +222,9 @@ namespace Vi.Editor
             {
                 Debug.LogError("Audio Manager is null");
             }
+            EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Set Video Clip Import Overrides")]
@@ -202,9 +233,9 @@ namespace Vi.Editor
             string[] videoClips = AssetDatabase.FindAssets("t:VideoClip");
             for (int i = 0; i < videoClips.Length; i++)
             {
-                if (EditorUtility.DisplayCancelableProgressBar("Overriding video clips For Android",
+                if (EditorUtility.DisplayCancelableProgressBar("Setting video clip import settings",
                     i.ToString() + " out of " + videoClips.Length.ToString() + " video clips completed",
-                    i / videoClips.Length))
+                    (float)i / videoClips.Length))
                 {
                     break;
                 }
@@ -214,24 +245,46 @@ namespace Vi.Editor
                 if (assetPath.Length == 0) { Debug.LogError(videoClips[i] + " not found"); continue; }
 
                 VideoClipImporter importer = (VideoClipImporter)AssetImporter.GetAtPath(assetPath);
-                importer.importAudio = false;
 
+                bool shouldReimport = false;
+                if (importer.importAudio)
+                {
+                    importer.importAudio = false;
+                    shouldReimport = true;
+                }
+                
                 VideoImporterTargetSettings defaultSettings = importer.defaultTargetSettings;
-                defaultSettings.enableTranscoding = true;
+                if (!defaultSettings.enableTranscoding)
+                {
+                    defaultSettings.enableTranscoding = true;
+                    importer.defaultTargetSettings = defaultSettings;
+                    shouldReimport = true;
+                }
+                
+                if (importer.GetTargetSettings("Android").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+                {
+                    VideoImporterTargetSettings androidSettings = defaultSettings;
+                    androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("Android", androidSettings);
+                    shouldReimport = true;
+                }
 
-                importer.defaultTargetSettings = defaultSettings;
-
-                VideoImporterTargetSettings androidSettings = defaultSettings;
-                androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
-                importer.SetTargetSettings("Android", androidSettings);
-
-                VideoImporterTargetSettings iPhoneSettings = defaultSettings;
-                iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
-                importer.SetTargetSettings("iPhone", iPhoneSettings);
-
-                importer.SaveAndReimport();
+                if (importer.GetTargetSettings("iPhone").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+                {
+                    VideoImporterTargetSettings iPhoneSettings = defaultSettings;
+                    iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("iPhone", iPhoneSettings);
+                    shouldReimport = true;
+                }
+                
+                if (shouldReimport)
+                {
+                    importer.SaveAndReimport();
+                }
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Set Texture Import Overrides")]
@@ -286,6 +339,8 @@ namespace Vi.Editor
                 }
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]
@@ -340,6 +395,8 @@ namespace Vi.Editor
                 counter++;
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Remove Components From Weapon Previews")]
@@ -373,6 +430,8 @@ namespace Vi.Editor
                 if (componentDestroyed) { EditorUtility.SetDirty(weaponOption.weaponPreviewPrefab); }
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Set Action VFX Layers")]
@@ -410,6 +469,8 @@ namespace Vi.Editor
                 }
             }
             EditorUtility.ClearProgressBar();
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Add Unregistered Pooled Objects")]
@@ -418,6 +479,8 @@ namespace Vi.Editor
             List<ActionClip> actionClips = GetActionClips();
 
             PooledObjectList pooledObjectList = GetPooledObjectList();
+
+            List<PooledObject> pooledObjectsThatShouldBeIncluded = new List<PooledObject>();
 
             int counter = 0;
             List<string> files = new List<string>();
@@ -433,37 +496,37 @@ namespace Vi.Editor
                     if (prefab.name == "MobBase") { continue; }
                     if (prefab.TryGetComponent(out PooledObject pooledObject))
                     {
-                        if (!pooledObjectList.Contains(pooledObject))
+                        Debug.Log("Adding pooled object to list " + pooledObject);
+                        if (prefab.TryGetComponent(out NetworkObject networkObject))
                         {
-                            Debug.Log("Adding pooled object to list " + pooledObject);
-                            if (prefab.TryGetComponent(out NetworkObject networkObject))
+                            if (prefab.TryGetComponent(out ActionVFX actionVFX))
                             {
-                                if (prefab.TryGetComponent(out ActionVFX actionVFX))
+                                bool vfxReferencedInActionClip = false;
+                                foreach (ActionClip actionClip in actionClips)
                                 {
-                                    bool vfxReferencedInActionClip = false;
-                                    foreach (ActionClip actionClip in actionClips)
+                                    if (actionClip.actionVFXList.Contains(actionVFX))
                                     {
-                                        if (actionClip.actionVFXList.Contains(actionVFX))
-                                        {
-                                            vfxReferencedInActionClip = true;
-                                            break;
-                                        }
-                                    }
-
-                                    if (vfxReferencedInActionClip)
-                                    {
-                                        pooledObjectList.TryAddPooledObject(pooledObject);
+                                        vfxReferencedInActionClip = true;
+                                        break;
                                     }
                                 }
-                                else
+
+                                if (vfxReferencedInActionClip)
                                 {
                                     pooledObjectList.TryAddPooledObject(pooledObject);
+                                    pooledObjectsThatShouldBeIncluded.Add(pooledObject);
                                 }
                             }
-                            else // No Network Object
+                            else
                             {
                                 pooledObjectList.TryAddPooledObject(pooledObject);
+                                pooledObjectsThatShouldBeIncluded.Add(pooledObject);
                             }
+                        }
+                        else // No Network Object
+                        {
+                            pooledObjectList.TryAddPooledObject(pooledObject);
+                            pooledObjectsThatShouldBeIncluded.Add(pooledObject);
                         }
                     }
                 }
@@ -473,6 +536,24 @@ namespace Vi.Editor
                 }
             }
             EditorUtility.ClearProgressBar();
+
+            foreach (PooledObjectReference pooledObjectReference in pooledObjectList.GetPooledObjectReferences())
+            {
+                PooledObject pl = AssetDatabase.LoadAssetAtPath<PooledObject>(AssetDatabase.GUIDToAssetPath(pooledObjectReference.AssetGUID));
+                if (pl)
+                {
+                    if (!pooledObjectsThatShouldBeIncluded.Contains(pl))
+                    {
+                        Debug.Log(pl + " is no longer needed in the pooled object list and can be safely removed");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("Pooled object is null");
+                }
+            }
+            AssetDatabase.SaveAssets();
+            EditorUtility.UnloadUnusedAssetsImmediate();
         }
 
         [MenuItem("Tools/Production/Organize Addressable Groups")]
@@ -793,7 +874,7 @@ namespace Vi.Editor
             }
         }
 
-        [MenuItem("Tools/Utility/Z.Set Network Prefabs As Dirty")]
+        [MenuItem("Tools/Utility/Set Network Prefabs As Dirty")]
         static void SetNetworkPrefabsAsDirty()
         {
             foreach (NetworkPrefabsList networkPrefabList in GetNetworkPrefabsLists())
