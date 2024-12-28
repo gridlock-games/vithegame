@@ -18,7 +18,6 @@ namespace Vi.UI
             if (float.TryParse(value, out float result))
             {
                 FasterPlayerPrefs.Singleton.SetFloat(playerPrefName, result);
-                inputField.SetTextWithoutNotify(result.ToString());
             }
             else if (value != ".")
             {
