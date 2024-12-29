@@ -6,6 +6,7 @@ using UnityEngine;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.MeshSlicing;
 
 namespace Vi.Core
 {
@@ -13,6 +14,7 @@ namespace Vi.Core
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(LimbReferences))]
     [RequireComponent(typeof(GlowRenderer))]
+    [RequireComponent(typeof(ExplodableMeshController))]
     public class AnimatorReference : MonoBehaviour
     {
         [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
@@ -333,8 +335,15 @@ namespace Vi.Core
             glowRenderer.RegisterChildRenderers();
         }
 
+        private void OnDestroy()
+        {
+            ExplodableMeshController.ClearInstances();
+        }
+
         private void OnReturnToPool()
         {
+            ExplodableMeshController.ClearInstances();
+
             foreach (KeyValuePair<CharacterReference.EquipmentType, WearableEquipment> kvp in new Dictionary<CharacterReference.EquipmentType, WearableEquipment>(WearableEquipmentInstances))
             {
                 foreach (SkinnedMeshRenderer smr in kvp.Value.GetRenderList())
@@ -433,6 +442,8 @@ namespace Vi.Core
         GlowRenderer glowRenderer;
         public Renderer[] Renderers { get; private set; } = new Renderer[0];
 
+        public ExplodableMeshController ExplodableMeshController { get; private set; }
+
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -440,6 +451,7 @@ namespace Vi.Core
 
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();
+            ExplodableMeshController = GetComponent<ExplodableMeshController>();
 
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
