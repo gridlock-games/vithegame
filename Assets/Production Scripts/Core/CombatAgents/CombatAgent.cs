@@ -674,7 +674,7 @@ namespace Vi.Core
         protected const float stunDuration = 3;
         protected const float knockdownDuration = 2;
         protected const float knockupDuration = 4;
-        protected const float attackerRageToBeAddedOnHit = 100;
+        protected const float attackerRageToBeAddedOnHit = 2;
         protected const float victimRageToBeAddedOnHit = 1;
 
         protected CombatAgent lastAttackingCombatAgent;
