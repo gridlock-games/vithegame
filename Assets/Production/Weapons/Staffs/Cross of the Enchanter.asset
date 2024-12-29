@@ -299,6 +299,10 @@ MonoBehaviour:
   ability2: {fileID: 11400000, guid: 429496a86e9763a4db2289ec7f65791e, type: 2}
   ability3: {fileID: 11400000, guid: 67d82ed4a8aab5c438b198e2e4555f2a, type: 2}
   ability4: {fileID: 11400000, guid: a6c0ec761e0f69c4eaa94e8aded5b631, type: 2}
+  maxAbility1Count: 1
+  maxAbility2Count: 1
+  maxAbility3Count: 2
+  maxAbility4Count: 1
   flashAttack: {fileID: 0}
   attackList:
   - inputs: 00000000
@@ -308,7 +312,6 @@ MonoBehaviour:
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: d758f089662dbc243ab7060333b47145, type: 2}
   grabAttackClipList: []
-  dodgeCooldownDuration: 5
   dodgeF: {fileID: 11400000, guid: ebd731d71844d414e81328775aab0d4b, type: 2}
   dodgeFL: {fileID: 11400000, guid: c19c7d6f12c96fe4c9b07de569a3260f, type: 2}
   dodgeFR: {fileID: 11400000, guid: c0bb9f32a0406bb4fbc7033646e9143f, type: 2}

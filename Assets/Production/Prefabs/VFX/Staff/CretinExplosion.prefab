@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 125851748
+  GlobalObjectIdHash: 3312896513
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -250,7 +250,8 @@ MonoBehaviour:
   raycastMaxDistance: 5
   lookRotationUpDirection: {x: 0, y: 1, z: 0}
   weaponBone: 18
-  audioClipToPlayOnAwake: {fileID: 0}
+  audioClipToPlayOnAwake: {fileID: 8300000, guid: 82d475339cd0b427abadb1fa355cda11,
+    type: 3}
   awakeAudioClipDelay: 0
   awakeAudioClipStartTime: 0
   audioClipToPlayOnDestroy: {fileID: 0}
@@ -272,6 +273,7 @@ MonoBehaviour:
   scaleVFXBasedOnEdges: 0
   boundsPoint: {x: 0, y: 0, z: 2.5}
   boundsLocalAxis: {x: 0, y: -1, z: 0}
+  latchToFirstTarget: 0
 --- !u!135 &5751881566917617747
 SphereCollider:
   m_ObjectHideFlags: 0

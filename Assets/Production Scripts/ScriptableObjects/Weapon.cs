@@ -464,10 +464,35 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip ability3;
         [SerializeField] private ActionClip ability4;
 
-        private const int maxAbility1Count = 1;
-        private const int maxAbility2Count = 1;
-        private const int maxAbility3Count = 1;
-        private const int maxAbility4Count = 1;
+        [SerializeField] private int maxAbility1Count = 1;
+        [SerializeField] private int maxAbility2Count = 1;
+        [SerializeField] private int maxAbility3Count = 1;
+        [SerializeField] private int maxAbility4Count = 1;
+
+        public int GetMaxAbilityStacks(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return maxAbility1Count;
+            }
+            else if (ability == ability2)
+            {
+                return maxAbility2Count;
+            }
+            else if (ability == ability3)
+            {
+                return maxAbility3Count;
+            }
+            else if (ability == ability4)
+            {
+                return maxAbility4Count;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
 
         private float[] lastAbility1ActivateTimes;
         private float[] lastAbility2ActivateTimes;
@@ -845,7 +870,7 @@ namespace Vi.ScriptableObjects
         {
             get
             {
-                if (GetNumberOfDodgesOffCooldown() == 2)
+                if (GetNumberOfDodgesOffCooldown() == lastDodgeActivateTimes.Length)
                 {
                     return 10;
                 }

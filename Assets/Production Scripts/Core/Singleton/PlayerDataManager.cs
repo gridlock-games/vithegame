@@ -14,8 +14,6 @@ using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using static Vi.Core.PlayerDataManager;
-using static Vi.Core.WebRequestManager;
 
 namespace Vi.Core
 {
@@ -239,6 +237,11 @@ namespace Vi.Core
         {
             if (attacker.Master == victim) { return false; }
             if (attacker.GetSlaves().Contains(victim)) { return false; }
+
+            if (attacker.Master)
+            {
+                if (attacker.Master.GetSlaves().Contains(victim)) { return false; }
+            }
 
             if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
             if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }
@@ -1662,7 +1665,7 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator ExecuteLoadoutSwap(PlayerData playerData, Loadout loadout)
+        private IEnumerator ExecuteLoadoutSwap(PlayerData playerData, WebRequestManager.Loadout loadout)
         {
             if (loadout.EqualsIgnoringSlot(WebRequestManager.Loadout.GetEmptyLoadout()))
             {
