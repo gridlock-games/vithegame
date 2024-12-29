@@ -341,6 +341,7 @@ namespace Vi.Core
                 combatAgent.ResetAilment();
                 combatAgent.StatusAgent.RemoveAllStatuses();
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+                combatAgent.WeaponHandler.GetWeapon().ResetDodgeCooldowns();
                 combatAgent.LoadoutManager.ReloadAllWeapons();
             }
             
@@ -365,6 +366,7 @@ namespace Vi.Core
             if (resetGameplayVariables)
             {
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+                combatAgent.WeaponHandler.GetWeapon().ResetDodgeCooldowns();
             }
         }
 
