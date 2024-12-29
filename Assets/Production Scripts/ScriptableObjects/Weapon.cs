@@ -727,52 +727,55 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
 
-        private float lastDodge1ActivateTime = Mathf.NegativeInfinity;
-        private float lastDodge2ActivateTime = Mathf.NegativeInfinity;
+        private float[] lastDodgeActivateTimes = new float[] { Mathf.NegativeInfinity, Mathf.NegativeInfinity };
 
         public void StartDodgeCooldown()
         {
-            if (lastDodge1ActivateTime <= lastDodge2ActivateTime)
+            float min = lastDodgeActivateTimes.Min();
+            int index = System.Array.FindIndex(lastDodgeActivateTimes, item => Mathf.Approximately(item, min) | item == min);
+            if (index == -1)
             {
-                lastDodge1ActivateTime = Time.time;
+                Debug.LogWarning("No index for min dodge activate time!");
             }
             else
             {
-                lastDodge2ActivateTime = Time.time;
+                lastDodgeActivateTimes[index] = Time.time;
             }
         }
 
         public bool IsDodgeOnCooldown()
         {
-            float timeToConsider = Mathf.Min(lastDodge1ActivateTime, lastDodge2ActivateTime);
+            float timeToConsider = lastDodgeActivateTimes.Min();
             return Time.time - timeToConsider < dodgeCooldownDuration;
         }
 
         public float GetDodgeCooldownProgress()
         {
-            float cooldown1 = Mathf.Clamp((Time.time - lastDodge1ActivateTime) / dodgeCooldownDuration, 0, 1);
-            float cooldown2 = Mathf.Clamp((Time.time - lastDodge2ActivateTime) / dodgeCooldownDuration, 0, 1);
-
-            if (GetNumberOfDodgesOffCooldown() == 2)
+            List<float> normalizedCooldownTimes = new List<float>();
+            foreach (float lastDodgeActivateTime in lastDodgeActivateTimes)
             {
-                return Mathf.Max(cooldown1, cooldown2);
+                normalizedCooldownTimes.Add(Mathf.Clamp((Time.time - lastDodgeActivateTime) / dodgeCooldownDuration, 0, 1));
+            }
+
+            if (GetNumberOfDodgesOffCooldown() == lastDodgeActivateTimes.Length)
+            {
+                return normalizedCooldownTimes.Max();
             }
             else
             {
-                return Mathf.Min(cooldown1, cooldown2);
+                return normalizedCooldownTimes.Min();
             }
         }
 
         public int GetNumberOfDodgesOffCooldown()
         {
             int numDodgesOfCooldown = 0;
-            if (Time.time - lastDodge1ActivateTime >= dodgeCooldownDuration)
+            foreach (float lastDodgeActivateTime in lastDodgeActivateTimes)
             {
-                numDodgesOfCooldown++;
-            }
-            if (Time.time - lastDodge2ActivateTime >= dodgeCooldownDuration)
-            {
-                numDodgesOfCooldown++;
+                if (Time.time - lastDodgeActivateTime >= dodgeCooldownDuration)
+                {
+                    numDodgesOfCooldown++;
+                }
             }
             return numDodgesOfCooldown;
         }
