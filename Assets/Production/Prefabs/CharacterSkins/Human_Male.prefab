@@ -2841,6 +2841,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4088674142259164115}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b8e1729aa66c4542b0dfb77c151371ff,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6680980855912615425}
     - targetCorrespondingSourceObject: {fileID: -4504369626594253086, guid: b8e1729aa66c4542b0dfb77c151371ff,
         type: 3}
       insertIndex: -1
@@ -4035,12 +4039,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eca690d54d871d641a22f843a90b0d3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  glowMaterial: {fileID: 2100000, guid: 2f561486e6f80de45990e152be8f968f, type: 2}
-  debugMode: 0
-  debugColor: {r: 0, g: 0, b: 0, a: 0}
-  debugFresnelBounds: {x: 0, y: 0}
-  debugBreathSpeed: 0
-  debugEmissionPower: 0
 --- !u!114 &6327476249908702672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4100,7 +4098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numberOfObjectsToPool: 5
-  pooledObjectIndex: 182
+  pooledObjectIndex: 180
   isPrewarmObject: 1
 --- !u!114 &4088674142259164115
 MonoBehaviour:
@@ -4148,6 +4146,18 @@ MonoBehaviour:
   - {x: -0.062, y: -0.0961, z: 0.0338}
   - {x: -0.06852, y: -0.1017, z: -0.0339}
   - {x: -0.06852, y: -0.1017, z: 0.0339}
+--- !u!114 &6680980855912615425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5038419873832753389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e2115f8c7fb824c80561d601a874e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!137 &5121705956526998793 stripped
 SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: -8196958614974914379, guid: b8e1729aa66c4542b0dfb77c151371ff,
