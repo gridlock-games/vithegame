@@ -26,6 +26,12 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
         }
 
+        [MenuItem("Tools/Unload Unused Assets")]
+        static void UnloadUnusedAssets()
+        {
+            EditorUtility.UnloadUnusedAssetsImmediate();
+        }
+
         #region
         private static Attributes[] GetBotAndPlayerPrefabs()
         {
@@ -742,36 +748,62 @@ namespace Vi.Editor
         [MenuItem("Tools/Utility/Mass Convert Material Shaders")]
         private static void MassConvertMaterialShaders()
         {
-            string[] paths = Directory.GetFiles(@"Assets\PackagedPrefabs\MODEL_CHAR_StylizedCharacter", "*.mat", SearchOption.AllDirectories);
             Shader shader = Shader.Find("Shader Graphs/Character and Weapon Shader");
-            foreach (string path in paths)
+            Mob[] mobs = GetMobPrefabs();
+            for (int i = 0; i < mobs.Length; i++)
             {
-                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
-                if (mat)
+                Mob mob = mobs[i];
+
+                if (EditorUtility.DisplayCancelableProgressBar("Converting Shaders", i.ToString() + " out of " + mobs.Length, i / (float)mobs.Length))
+                { break; }
+
+                foreach (Renderer r in mob.GetComponentsInChildren<Renderer>(true))
                 {
-                    if (mat.shader != shader)
+                    foreach (Material mat in r.sharedMaterials)
                     {
-                        //Texture baseMap = mat.GetTexture("_BaseMap");
-                        //Texture normalMap = mat.GetTexture("_BumpMap");
+                        if (mat.shader != shader)
+                        {
+                            if (!mat.shader.name.Contains("Lit"))
+                            {
+                                Debug.LogWarning("Unknown shader " + mat.shader + " " + mat + " " + mob + " " + r);
+                                continue;
+                            }
 
-                        Texture baseMap = mat.GetTexture("_Base_Color");
+                            if (!mat.HasTexture("_BaseMap"))
+                            {
+                                Debug.LogWarning("No Base Map " + mat.shader + " " + mat + " " + mob + " " + r);
+                                continue;
+                            }
 
-                        //if (!baseMap) { Debug.LogWarning("No base map found " + mat); }
-                        //if (!normalMap) { Debug.LogWarning("No normal map found " + mat); }
+                            Texture baseMap = null;
+                            if (mat.HasTexture("_BaseMap"))
+                            {
+                                baseMap = mat.GetTexture("_BaseMap");
+                            }
 
-                        mat.shader = shader;
+                            //Texture normalMap = mat.GetTexture("_BumpMap");
 
-                        mat.SetTexture("_Base_Color", baseMap);
-                        //mat.SetTexture("_Normal_Map", normalMap);
+                            //Texture baseMap = mat.GetTexture("_Base_Color");
 
-                        mat.SetFloat("_Alpha_cut", 1);
-                        mat.SetFloat("_Ambient_Strength", 1);
-                        mat.SetFloat("_Roughness", 0);
+                            //if (!baseMap) { Debug.LogWarning("No base map found " + mat); }
+                            //if (!normalMap) { Debug.LogWarning("No normal map found " + mat); }
 
-                        EditorUtility.SetDirty(mat);
+                            mat.shader = shader;
+
+                            mat.SetTexture("_Base_Color", baseMap);
+                            //mat.SetTexture("_Normal_Map", normalMap);
+
+                            mat.SetFloat("_Alpha_cut", 1);
+                            mat.SetFloat("_Ambient_Strength", 1);
+                            mat.SetFloat("_Roughness", 0);
+
+                            EditorUtility.SetDirty(mat);
+                        }
                     }
                 }
             }
+            EditorUtility.ClearProgressBar();
+            EditorUtility.UnloadUnusedAssetsImmediate();
             AssetDatabase.SaveAssets();
         }
 

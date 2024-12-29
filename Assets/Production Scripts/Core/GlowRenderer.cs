@@ -112,6 +112,13 @@ namespace Vi.Core
         public void UnregisterRenderer(Renderer renderer)
         {
             if (!glowMaterialInstances.ContainsKey(renderer)) { return; }
+
+            foreach (Material mat in glowMaterialInstances[renderer])
+            {
+                mat.SetColor(_GlowColor, defaultColor);
+                mat.SetFloat(_EmissivePower, 2);
+            }
+
             glowMaterialInstances.Remove(renderer);
         }
 
