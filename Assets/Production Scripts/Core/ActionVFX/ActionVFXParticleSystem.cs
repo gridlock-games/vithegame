@@ -26,6 +26,7 @@ namespace Vi.Core.VFX
         [SerializeField] private bool scaleVFXBasedOnEdges;
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
+        [SerializeField] private bool latchToFirstTarget;
 
         private new void Awake()
         {
@@ -123,8 +124,18 @@ namespace Vi.Core.VFX
             }
         }
 
+        private void LateUpdate()
+        {
+            if (latchTarget)
+            {
+                transform.position = latchTarget.transform.position;
+                transform.rotation = Quaternion.identity;
+            }
+        }
+
         private const string layersToHit = "NetworkPrediction";
 
+        private Transform latchTarget;
         protected override void OnTriggerEnter(Collider other)
         {
             base.OnTriggerEnter(other);
@@ -154,6 +165,17 @@ namespace Vi.Core.VFX
                             ps.trigger.AddCollider(other);
                         }
                     }
+
+                    if (networkCollider)
+                    {
+                        if (!latchTarget)
+                        {
+                            if (ShouldAffect(networkCollider.CombatAgent))
+                            {
+                                latchTarget = networkCollider.MovementHandler.transform;
+                            }
+                        }
+                    }
                 }
             }
             else if (particleSystemType == ParticleSystemType.GenericCollisions)
@@ -161,12 +183,17 @@ namespace Vi.Core.VFX
                 if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (networkCollider.CombatAgent)
+                    if (!latchTarget)
                     {
-                        if (CanHit(networkCollider.CombatAgent))
+                        if (ShouldAffect(networkCollider.CombatAgent))
                         {
-                            ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
+                            latchTarget = networkCollider.MovementHandler.transform;
                         }
+                    }
+
+                    if (CanHit(networkCollider.CombatAgent))
+                    {
+                        ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
                     }
                 }
                 else if (other.transform.root.TryGetComponent(out HittableAgent hittable))
@@ -239,6 +266,7 @@ namespace Vi.Core.VFX
                 }
                 ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
+            latchTarget = null;
         }
 
         List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();

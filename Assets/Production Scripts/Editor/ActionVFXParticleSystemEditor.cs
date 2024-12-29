@@ -22,6 +22,8 @@ namespace Vi.Editor
         private SerializedProperty spBoundsPoint;
         private SerializedProperty spBoundsLocalAxis;
 
+        private SerializedProperty spLatchToFirstTarget;
+
         private new void OnEnable()
         {
             base.OnEnable();
@@ -35,6 +37,8 @@ namespace Vi.Editor
             spScaleVFXBasedOnEdges = serializedObject.FindProperty("scaleVFXBasedOnEdges");
             spBoundsPoint = serializedObject.FindProperty("boundsPoint");
             spBoundsLocalAxis = serializedObject.FindProperty("boundsLocalAxis");
+
+            spLatchToFirstTarget = serializedObject.FindProperty("latchToFirstTarget");
         }
 
         public override void OnInspectorGUI()
@@ -56,6 +60,8 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spBoundsPoint);
                 EditorGUILayout.PropertyField(spBoundsLocalAxis);
             }
+
+            EditorGUILayout.PropertyField(spLatchToFirstTarget);
 
             serializedObject.ApplyModifiedProperties();
         }
