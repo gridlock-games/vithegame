@@ -16,6 +16,7 @@ MonoBehaviour:
   followUpActionClipsToPlay: []
   hitReactionType: 0
   shouldApplyRootMotion: 1
+  shouldIgnoreGravity: 0
   rootMotionForwardMultiplier:
     serializedVersion: 2
     m_Curve:
@@ -3269,10 +3270,14 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.05
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1.3
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
@@ -3286,6 +3291,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.7
   recoveryNormalizedTime: 1
   isAffectedByRage: 1
@@ -3304,7 +3310,45 @@ MonoBehaviour:
   isFollowUpAttack: 0
   ailment: 0
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 
   dodgeLock: 0
   canCancelLightAttacks: 0
@@ -3320,19 +3364,19 @@ MonoBehaviour:
   statusesToApplyToTargetOnHit:
   - status: 12
     value: 0
+    valueIsPercentage: 0
     duration: 4
     delay: 0
     associatedWithCurrentWeapon: 0
   - status: 9
     value: 0.1
+    valueIsPercentage: 0
     duration: 5
     delay: 0
     associatedWithCurrentWeapon: 0
   statusesToApplyToTeammateOnHit: []
-  actionVFXList:
-  - {fileID: 4091993530340001571, guid: 7830b8a95c0c9e74dbbf63570c305abf, type: 3}
-  previewActionVFX: {fileID: 649302495236812608, guid: 5018b3ee257acd84fb55f47bf0955508,
-    type: 3}
+  actionVFXList: []
+  previewActionVFX: {fileID: 0}
   previewActionVFXPositionOffset: {x: 0, y: 0, z: 0}
   previewActionVFXRotationOffset: {x: 0, y: 0, z: 0}
   previewActionVFXScale: {x: 2.4, y: 2.4, z: 2.4}
@@ -3342,6 +3386,7 @@ MonoBehaviour:
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0
@@ -3349,3 +3394,9 @@ MonoBehaviour:
   shouldAimOffHand: 0
   requireAmmo: 0
   requiredAmmoAmount: 1
+  reloadNormalizedTime: 0.5
+  summonables:
+  - {fileID: 1445922378194096478, guid: dcc7d25ddc4b5f54682aa566007ca39f, type: 3}
+  normalizedSummonTime: 0.5
+  summonPositionOffset: {x: 0, y: 0, z: 2}
+  summonableCount: 1

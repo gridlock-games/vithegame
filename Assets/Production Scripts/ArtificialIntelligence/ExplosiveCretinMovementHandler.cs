@@ -9,8 +9,10 @@ using Vi.Core.MovementHandlers;
 
 namespace Vi.ArtificialIntelligence
 {
+    [RequireComponent(typeof(GameplayTargetFinder))]
     public class ExplosiveCretinMovementHandler : MovementHandler
     {
+        private GameplayTargetFinder gameplayTargetFinder;
         private Animator animator;
         private GameInteractiveActionVFX actionVFX;
         private new void Awake()
@@ -19,6 +21,7 @@ namespace Vi.ArtificialIntelligence
             animator = GetComponent<Animator>();
             animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             actionVFX = GetComponent<GameInteractiveActionVFX>();
+            gameplayTargetFinder = GetComponent<GameplayTargetFinder>();
             SetDestination(transform.position);
         }
 
@@ -56,7 +59,7 @@ namespace Vi.ArtificialIntelligence
             animator.SetFloat("MoveForward", Mathf.MoveTowards(animator.GetFloat("MoveForward"), moveForwardTarget.Value, Time.deltaTime * runAnimationTransitionSpeed));
         }
 
-        private const float roamRadius = 10;
+        private const float roamRadius = 4;
         private void FixedUpdate()
         {
             if (!IsSpawned) { return; }

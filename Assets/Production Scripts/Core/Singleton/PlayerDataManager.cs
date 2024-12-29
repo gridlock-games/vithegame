@@ -235,6 +235,16 @@ namespace Vi.Core
             return CanHit(attacker.GetTeam(), victim.GetTeam()) & attacker != victim;
         }
 
+        public bool CanHit(CombatAgent attacker, CombatAgent victim)
+        {
+            if (attacker.Master == victim) { return false; }
+            if (attacker.GetSlaves().Contains(victim)) { return false; }
+
+            if (!attacker) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null attacker!"); return false; }
+            if (!victim) { Debug.LogWarning("Calling PlayerDataManager.CanHit() with a null victim!"); return false; }
+            return CanHit(attacker.GetTeam(), victim.GetTeam()) & attacker != victim;
+        }
+
         private readonly static Dictionary<Team, Color> teamColors = new Dictionary<Team, Color>()
         {
             { Team.Peaceful, new Color(65 / 255f, 65 / 255f, 65 / 255f, 1) },

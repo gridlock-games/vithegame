@@ -87,6 +87,11 @@ namespace Vi.Core.MovementHandlers
         [Header("Mob Movement Handler")]
         [SerializeField] private TargetingType targetingType = TargetingType.StructuresThenPlayers;
         [SerializeField] private float targetingSwitchDistance = 11;
+
+        [SerializeField] private bool targetingConstrainedByDistance;
+        [SerializeField] private float maxTargetDistance;
+
+        [Header("Flying")]
         [SerializeField] private bool canFly;
         [SerializeField] private AnimationCurve flightMovement = new AnimationCurve();
         private enum TargetingType
@@ -136,6 +141,15 @@ namespace Vi.Core.MovementHandlers
                         if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         targetFinder.SetTarget(combatAgent);
                         break;
                     }
@@ -145,6 +159,15 @@ namespace Vi.Core.MovementHandlers
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(structure.transform.position, GetPosition()) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         targetFinder.SetTarget(structure);
                         break;
                     }
@@ -155,8 +178,17 @@ namespace Vi.Core.MovementHandlers
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        targetFinder.SetTarget(structure);
+
                         distanceToStructure = Vector3.Distance(structure.transform.position, GetPosition());
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (distanceToStructure > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
+                        targetFinder.SetTarget(structure);
                         break;
                     }
 
@@ -166,6 +198,15 @@ namespace Vi.Core.MovementHandlers
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         float dist = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (dist > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         if (dist > targetingSwitchDistance | dist > distanceToStructure) { continue; }
                         targetFinder.SetTarget(combatAgent);
                         break;
@@ -188,6 +229,15 @@ namespace Vi.Core.MovementHandlers
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
                         float dist = Vector3.Distance(structure.transform.position, GetPosition());
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (dist > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         if (dist > targetingSwitchDistance | dist > distanceToAgent) { continue; }
                         targetFinder.SetTarget(structure);
                         break;
@@ -199,6 +249,15 @@ namespace Vi.Core.MovementHandlers
                         if (attributes == combatAgent) { continue; }
                         if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, attributes)) { continue; }
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), GetPosition()) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         targetFinder.SetTarget(attributes);
                         break;
                     }
@@ -381,15 +440,33 @@ namespace Vi.Core.MovementHandlers
         [Header("Suicide")]
         [SerializeField] private bool canSuicide;
         [SerializeField] private float suicideDistance;
+        [SerializeField] private bool suicideIsConstrainedByTime;
+        [SerializeField] private float suicideTimer;
 
         [Header("Rage")]
         [SerializeField] private bool canRage;
         [SerializeField] private float HPRagePercent = 0.5f;
 
+        private float spawnFixedTime = Mathf.NegativeInfinity;
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            spawnFixedTime = Time.fixedTime;
+        }
+
         private void EvaluateAction()
         {
             if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { return; }
             if (combatAgent.StatusAgent.IsFeared()) { return; }
+
+            if (canSuicide & suicideIsConstrainedByTime)
+            {
+                if (Time.fixedTime - spawnFixedTime >= suicideTimer)
+                {
+                    combatAgent.ProcessEnvironmentDamage(-combatAgent.GetHP(), NetworkObject);
+                    return;
+                }
+            }
 
             if (targetFinder.GetTarget())
             {
@@ -453,6 +530,13 @@ namespace Vi.Core.MovementHandlers
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
+
+            if (targetingConstrainedByDistance)
+            {
+                Gizmos.color = Color.blue;
+                Gizmos.DrawWireSphere(transform.position, maxTargetDistance);
+            }
+
             Gizmos.color = Color.red;
             Gizmos.DrawRay(transform.position + BodyHeightOffset / 2, transform.forward * LightAttackDistance);
             if (Application.isPlaying)
