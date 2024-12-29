@@ -47,7 +47,6 @@ namespace Vi.UI
         [SerializeField] private RawImage rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
-        [SerializeField] private Image rageIndicatorMask;
 
         [Header("Experience UI")]
         [SerializeField] private Image experienceProgressImage;
@@ -212,8 +211,6 @@ namespace Vi.UI
 
                 graphic.material = materialInstance;
             }
-
-            rageIndicatorMask.enabled = true;
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
