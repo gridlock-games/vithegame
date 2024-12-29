@@ -193,7 +193,7 @@ namespace Vi.UI
         [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
 
         private PlayerUI playerUI;
-        private List<Material> tintMaterialInstances = new List<Material>();
+        private Material materialInstance;
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
@@ -210,8 +210,9 @@ namespace Vi.UI
 
             foreach (Graphic graphic in graphicsToTint)
             {
-                graphic.material = new Material(graphic.material);
-                tintMaterialInstances.Add(graphic.material);
+                if (!materialInstance) { materialInstance = new Material(graphic.material); }
+
+                graphic.material = materialInstance;
             }
 
             rageIndicatorMask.enabled = true;
@@ -309,10 +310,7 @@ namespace Vi.UI
                 Color colorTarget = combatAgent.GetAilment() == ActionClip.Ailment.Death ? deathTintColor : aliveTintColor;
                 if (colorTarget != lastColorTarget)
                 {
-                    foreach (Material material in tintMaterialInstances)
-                    {
-                        material.color = colorTarget;
-                    }
+                    materialInstance.color = colorTarget;
                 }
                 lastColorTarget = colorTarget;
             }
