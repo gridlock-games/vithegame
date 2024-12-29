@@ -2054,10 +2054,10 @@ MonoBehaviour:
   gameVersionText: {fileID: 743725626}
   characterPreviewCamera: {fileID: 1085791623}
   defaultCameraOrientation:
-    position: {x: -0.00215, y: 1.316, z: -10.319}
-    rotation: {x: -0.09150162, y: 0, z: 0, w: 0.9958049}
+    position: {x: -0.00215, y: 0.65, z: -11.52}
+    rotation: {x: 0, y: 0, z: 0, w: 1}
   headCameraOrientation:
-    position: {x: -0.014, y: 1.292, z: -9.665}
+    position: {x: -0.014, y: 0.93, z: -9.665}
     rotation: {x: -0.11977297, y: 0, z: 0, w: 0.9928013}
   characterSelectParent: {fileID: 888486590}
   characterCardInstances:
@@ -2595,7 +2595,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 73, y: -500}
+  m_AnchoredPosition: {x: 75, y: 181}
   m_SizeDelta: {x: -1100, y: -1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &485399309
@@ -6623,11 +6623,11 @@ RectTransform:
   - {fileID: 485399308}
   m_Father: {fileID: 888486591}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 2000, y: 2000}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &988536305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11506,7 +11506,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 73, y: -500}
+  m_AnchoredPosition: {x: 0, y: 167}
   m_SizeDelta: {x: -1100, y: -1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1566531485
@@ -12529,7 +12529,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 426.64978, y: 63.47716}
+  m_SizeDelta: {x: 437.8261, y: 65.86957}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1816820239
 MonoBehaviour:
@@ -13397,11 +13397,11 @@ RectTransform:
   - {fileID: 1566531484}
   m_Father: {fileID: 1643527853}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -200}
   m_SizeDelta: {x: 2000, y: 2000}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1961429581
 MonoBehaviour:
   m_ObjectHideFlags: 0
