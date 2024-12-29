@@ -25,6 +25,11 @@ namespace Vi.Utility
             {
                 if (!particleSystem.isPlaying) { particleSystem.Play(false); }
             }
+
+            foreach (ParticleSystem particleSystem in particleSystemsToExclude)
+            {
+                if (!particleSystem.isPlaying) { particleSystem.gameObject.SetActive(false); }
+            }
         }
     }
 }

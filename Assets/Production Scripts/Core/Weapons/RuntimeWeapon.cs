@@ -197,6 +197,11 @@ namespace Vi.Core.Weapons
                 }
                 renderer.forceRenderingOff = true;
                 renderer.gameObject.layer = LayerMask.NameToLayer(parentCombatAgent.IsSpawned ? "NetworkPrediction" : "Preview");
+
+                if (parentCombatAgent.GlowRenderer)
+                {
+                    parentCombatAgent.GlowRenderer.RegisterRenderer(renderer);
+                }
             }
             StartCoroutine(EnableRenderersAfterOneFrame());
 
@@ -222,6 +227,17 @@ namespace Vi.Core.Weapons
 
         protected void OnDisable()
         {
+            if (parentCombatAgent)
+            {
+                if (parentCombatAgent.GlowRenderer)
+                {
+                    foreach (Renderer renderer in renderers)
+                    {
+                        parentCombatAgent.GlowRenderer.UnregisterRenderer(renderer);
+                    }
+                }
+            }
+            
             parentCombatAgent = null;
             IsStowed = false;
             associatedRuntimeWeapons.Clear();

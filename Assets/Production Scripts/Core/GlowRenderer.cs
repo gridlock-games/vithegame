@@ -11,8 +11,6 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class GlowRenderer : MonoBehaviour
     {
-        [SerializeField] private Material glowMaterial;
-
         private float lastHitTime = -5;
         public void RenderHit()
         {
@@ -66,6 +64,7 @@ namespace Vi.Core
             currentColor = default;
             lastColor = default;
             isBearer = false;
+            forceUpdate = default;
         }
 
         public void RegisterChildRenderers()
@@ -85,33 +84,19 @@ namespace Vi.Core
 
             NetworkObject netObj = GetComponentInParent<NetworkObject>();
             if (!netObj) { return; }
-            if (!netObj.IsSpawned) { return; }
+
+            forceUpdate = true;
 
             if (renderer.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
             {
                 skinnedMeshRenderer.updateWhenOffscreen = netObj.IsLocalPlayer;
             }
 
-            List<Material> materialList = new List<Material>();
-
             foreach (Material m in renderer.materials)
             {
-                materialList.Add(m);
-            }
-
-            int materialCount = 1;
-            for (int i = 0; i < materialCount; i++)
-            {
-                materialList.Add(glowMaterial);
-            }
-
-            renderer.materials = materialList.ToArray();
-
-            foreach (Material m in renderer.materials)
-            {
-                if (m.name.Replace("(Instance)", "").Trim() == glowMaterial.name.Trim())
+                if (m.HasColor(_GlowColor))
                 {
-                    m.SetColor(_Color, defaultColor);
+                    m.SetColor(_GlowColor, defaultColor);
                     if (glowMaterialInstances.ContainsKey(renderer))
                     {
                         glowMaterialInstances[renderer].Add(m);
@@ -127,15 +112,6 @@ namespace Vi.Core
         public void UnregisterRenderer(Renderer renderer)
         {
             if (!glowMaterialInstances.ContainsKey(renderer)) { return; }
-            
-            List<Material> newMatList = renderer.materials.ToList();
-            foreach (Material glowMaterialInstance in glowMaterialInstances[renderer])
-            {
-                newMatList.Remove(glowMaterialInstance);
-                Destroy(glowMaterialInstance);
-            }
-            renderer.materials = newMatList.ToArray();
-
             glowMaterialInstances.Remove(renderer);
         }
 
@@ -161,33 +137,9 @@ namespace Vi.Core
         private Color currentColor;
         private Color lastColor;
 
-#if UNITY_EDITOR
-        [SerializeField] private bool debugMode;
-        [SerializeField] private Color debugColor;
-        [SerializeField] private Vector2 debugFresnelBounds;
-        [SerializeField] private float debugBreathSpeed;
-        [SerializeField] private float debugEmissionPower;
-#endif
-
+        private bool forceUpdate;
         private void Update()
         {
-#if UNITY_EDITOR
-            if (debugMode)
-            {
-                foreach (List<Material> materialList in glowMaterialInstances.Values)
-                {
-                    foreach (Material glowMaterialInstance in materialList)
-                    {
-                        glowMaterialInstance.SetColor(_Color, debugColor);
-                        glowMaterialInstance.SetVector(_FresnelBounds, debugFresnelBounds);
-                        glowMaterialInstance.SetFloat(_EmissivePower, debugEmissionPower);
-                        glowMaterialInstance.SetFloat(_BreathSpeed, debugBreathSpeed);
-                    }
-                }
-                return;
-            }
-#endif
-
             Color colorTarget = defaultColor;
 
             if (Time.time - lastHitTime < 0.25f)
@@ -226,26 +178,23 @@ namespace Vi.Core
             }
 
             currentColor = Vector4.MoveTowards(currentColor, colorTarget, colorChangeSpeed * Time.deltaTime);
-            if (lastColor != currentColor)
+            if (lastColor != currentColor | forceUpdate)
             {
                 foreach (List<Material> materialList in glowMaterialInstances.Values)
                 {
                     foreach (Material glowMaterialInstance in materialList)
                     {
-                        glowMaterialInstance.SetColor(_Color, currentColor);
+                        glowMaterialInstance.SetColor(_GlowColor, currentColor);
                         glowMaterialInstance.SetFloat(_EmissivePower, emissivePower);
                     }
                 }
             }
             
             lastColor = currentColor;
+            forceUpdate = false;
         }
 
-        private readonly int _Color = Shader.PropertyToID("_Color");
-#if UNITY_EDITOR
-        private readonly int _FresnelBounds = Shader.PropertyToID("_FresnelBounds");
-        private readonly int _BreathSpeed = Shader.PropertyToID("_BreathSpeed");
-#endif
-        private readonly int _EmissivePower = Shader.PropertyToID("_EmissivePower");
+        private readonly int _GlowColor = Shader.PropertyToID("_GlowColor");
+        private readonly int _EmissivePower = Shader.PropertyToID("_GlowEmissivePower");
     }
 }

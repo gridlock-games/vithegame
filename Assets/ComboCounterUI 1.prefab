@@ -4814,6 +4814,9 @@ ParticleSystemRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -4948,7 +4951,10 @@ MonoBehaviour:
   m_GroupId: 0
   m_GroupMaxId: 0
   m_PositionMode: 0
-  m_AutoScaling: 1
+  m_AutoScaling: 0
+  m_AutoScalingMode: 2
+  m_UseCustomView: 0
+  m_CustomViewSize: 10
 --- !u!1 &6945499235059931985
 GameObject:
   m_ObjectHideFlags: 0

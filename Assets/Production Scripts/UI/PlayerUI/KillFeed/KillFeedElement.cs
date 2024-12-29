@@ -104,14 +104,18 @@ namespace Vi.UI
 
         public bool IsNotRunning() { return Time.time - initializationTime > 5; }
 
-        private List<Material> tintMaterialInstances = new List<Material>();
         private RectTransform rt;
+        private Material materialInstance;
         private void Start()
         {
             foreach (Graphic graphic in GetComponentsInChildren<Graphic>())
             {
-                graphic.material = new Material(graphic.material);
-                tintMaterialInstances.Add(graphic.material);
+                if (!materialInstance)
+                {
+                    materialInstance = new Material(graphic.material);
+                }
+
+                graphic.material = materialInstance;
                 Color newColor = graphic.color;
                 newColor.a = 0;
                 graphic.material.color = newColor;
@@ -150,12 +154,9 @@ namespace Vi.UI
             while (true)
             {
                 List<Color> colorList = new List<Color>();
-                for (int i = 0; i < tintMaterialInstances.Count; i++)
-                {
-                    Color colorResult = Vector4.MoveTowards(tintMaterialInstances[i].color, targetColor, Time.deltaTime * fadeTime);
-                    tintMaterialInstances[i].color = colorResult;
-                    colorList.Add(colorResult);
-                }
+                Color colorResult = Vector4.MoveTowards(materialInstance.color, targetColor, Time.deltaTime * fadeTime);
+                materialInstance.color = colorResult;
+                colorList.Add(colorResult);
                 if (colorList.TrueForAll(item => item == targetColor)) { break; }
                 yield return null;
             }

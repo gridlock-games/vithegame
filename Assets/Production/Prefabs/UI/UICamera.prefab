@@ -145,6 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layerMask:
   - UI
+  particleUICamera: {fileID: 2613126926477622201}
 --- !u!1 &8091365847478233225
 GameObject:
   m_ObjectHideFlags: 0
@@ -187,7 +188,7 @@ Camera:
   m_GameObject: {fileID: 8091365847478233225}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 4
   m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

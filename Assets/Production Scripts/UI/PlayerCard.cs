@@ -47,7 +47,6 @@ namespace Vi.UI
         [SerializeField] private RawImage rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
-        [SerializeField] private Image rageIndicatorMask;
 
         [Header("Experience UI")]
         [SerializeField] private Image experienceProgressImage;
@@ -190,10 +189,8 @@ namespace Vi.UI
             }
         }
 
-        [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
-
         private PlayerUI playerUI;
-        private List<Material> tintMaterialInstances = new List<Material>();
+        private Material materialInstance;
         private void Start()
         {
             playerUI = GetComponentInParent<PlayerUI>();
@@ -208,13 +205,12 @@ namespace Vi.UI
             interimSpiritFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
 
-            foreach (Graphic graphic in graphicsToTint)
+            foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
             {
-                graphic.material = new Material(graphic.material);
-                tintMaterialInstances.Add(graphic.material);
-            }
+                if (!materialInstance) { materialInstance = new Material(graphic.material); }
 
-            rageIndicatorMask.enabled = true;
+                graphic.material = materialInstance;
+            }
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
@@ -309,10 +305,7 @@ namespace Vi.UI
                 Color colorTarget = combatAgent.GetAilment() == ActionClip.Ailment.Death ? deathTintColor : aliveTintColor;
                 if (colorTarget != lastColorTarget)
                 {
-                    foreach (Material material in tintMaterialInstances)
-                    {
-                        material.color = colorTarget;
-                    }
+                    materialInstance.color = colorTarget;
                 }
                 lastColorTarget = colorTarget;
             }
