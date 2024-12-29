@@ -464,101 +464,228 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip ability3;
         [SerializeField] private ActionClip ability4;
 
-        private float lastAbility1ActivateTime = Mathf.NegativeInfinity;
-        private float lastAbility2ActivateTime = Mathf.NegativeInfinity;
-        private float lastAbility3ActivateTime = Mathf.NegativeInfinity;
-        private float lastAbility4ActivateTime = Mathf.NegativeInfinity;
+        private const int maxAbility1Count = 1;
+        private const int maxAbility2Count = 1;
+        private const int maxAbility3Count = 1;
+        private const int maxAbility4Count = 1;
+
+        private float[] lastAbility1ActivateTimes;
+        private float[] lastAbility2ActivateTimes;
+        private float[] lastAbility3ActivateTimes;
+        private float[] lastAbility4ActivateTimes;
 
         public void ResetAllAbilityCooldowns()
         {
-            lastAbility1ActivateTime = Mathf.NegativeInfinity;
-            lastAbility2ActivateTime = Mathf.NegativeInfinity;
-            lastAbility3ActivateTime = Mathf.NegativeInfinity;
-            lastAbility4ActivateTime = Mathf.NegativeInfinity;
+            lastAbility1ActivateTimes = new float[maxAbility1Count];
+            for (int i = 0; i < lastAbility1ActivateTimes.Length; i++)
+            {
+                lastAbility1ActivateTimes[i] = Mathf.NegativeInfinity;
+            }
+
+            lastAbility2ActivateTimes = new float[maxAbility2Count];
+            for (int i = 0; i < lastAbility2ActivateTimes.Length; i++)
+            {
+                lastAbility2ActivateTimes[i] = Mathf.NegativeInfinity;
+            }
+
+            lastAbility3ActivateTimes = new float[maxAbility3Count];
+            for (int i = 0; i < lastAbility3ActivateTimes.Length; i++)
+            {
+                lastAbility3ActivateTimes[i] = Mathf.NegativeInfinity;
+            }
+
+            lastAbility4ActivateTimes = new float[maxAbility4Count];
+            for (int i = 0; i < lastAbility4ActivateTimes.Length; i++)
+            {
+                lastAbility4ActivateTimes[i] = Mathf.NegativeInfinity;
+            }
         }
 
         public void StartAbilityCooldown(ActionClip ability)
         {
             if (ability == ability1)
             {
-                lastAbility1ActivateTime = Time.time;
+                float min = lastAbility1ActivateTimes.Min();
+                int index = System.Array.FindIndex(lastAbility1ActivateTimes, item => Mathf.Approximately(item, min) | item == min);
+                if (index == -1)
+                {
+                    Debug.LogWarning("No index for min ability activate time!");
+                }
+                else
+                {
+                    lastAbility1ActivateTimes[index] = Time.time;
+                }
             }
             else if (ability == ability2)
             {
-                lastAbility2ActivateTime = Time.time;
+                float min = lastAbility2ActivateTimes.Min();
+                int index = System.Array.FindIndex(lastAbility2ActivateTimes, item => Mathf.Approximately(item, min) | item == min);
+                if (index == -1)
+                {
+                    Debug.LogWarning("No index for min ability activate time!");
+                }
+                else
+                {
+                    lastAbility2ActivateTimes[index] = Time.time;
+                }
             }
             else if (ability == ability3)
             {
-                lastAbility3ActivateTime = Time.time;
+                float min = lastAbility3ActivateTimes.Min();
+                int index = System.Array.FindIndex(lastAbility3ActivateTimes, item => Mathf.Approximately(item, min) | item == min);
+                if (index == -1)
+                {
+                    Debug.LogWarning("No index for min ability activate time!");
+                }
+                else
+                {
+                    lastAbility3ActivateTimes[index] = Time.time;
+                }
             }
             else if (ability == ability4)
             {
-                lastAbility4ActivateTime = Time.time;
+                float min = lastAbility4ActivateTimes.Min();
+                int index = System.Array.FindIndex(lastAbility4ActivateTimes, item => Mathf.Approximately(item, min) | item == min);
+                if (index == -1)
+                {
+                    Debug.LogWarning("No index for min ability activate time!");
+                }
+                else
+                {
+                    lastAbility4ActivateTimes[index] = Time.time;
+                }
             }
             else
             {
                 Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+        }
+
+        public int GetNumberOfAbilitiesOffCooldown(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                int numAbilitiesOfCooldown = 0;
+                foreach (float lastAbilityActivateTime in lastAbility1ActivateTimes)
+                {
+                    if (Time.time - lastAbilityActivateTime >= GetAbilityCooldownDuration(ability))
+                    {
+                        numAbilitiesOfCooldown++;
+                    }
+                }
+                return numAbilitiesOfCooldown;
+            }
+            else if (ability == ability2)
+            {
+                int numAbilitiesOfCooldown = 0;
+                foreach (float lastAbilityActivateTime in lastAbility2ActivateTimes)
+                {
+                    if (Time.time - lastAbilityActivateTime >= GetAbilityCooldownDuration(ability))
+                    {
+                        numAbilitiesOfCooldown++;
+                    }
+                }
+                return numAbilitiesOfCooldown;
+            }
+            else if (ability == ability3)
+            {
+                int numAbilitiesOfCooldown = 0;
+                foreach (float lastAbilityActivateTime in lastAbility3ActivateTimes)
+                {
+                    if (Time.time - lastAbilityActivateTime >= GetAbilityCooldownDuration(ability))
+                    {
+                        numAbilitiesOfCooldown++;
+                    }
+                }
+                return numAbilitiesOfCooldown;
+            }
+            else if (ability == ability4)
+            {
+                int numAbilitiesOfCooldown = 0;
+                foreach (float lastAbilityActivateTime in lastAbility4ActivateTimes)
+                {
+                    if (Time.time - lastAbilityActivateTime >= GetAbilityCooldownDuration(ability))
+                    {
+                        numAbilitiesOfCooldown++;
+                    }
+                }
+                return numAbilitiesOfCooldown;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+            }
+            return 0;
+        }
+
+        private float GetLastAbilityActivateTime(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                if (GetNumberOfAbilitiesOffCooldown(ability) == lastAbility1ActivateTimes.Length)
+                {
+                    return lastAbility1ActivateTimes.Max();
+                }
+                else
+                {
+                    return lastAbility1ActivateTimes.Min();
+                }
+            }
+            else if (ability == ability2)
+            {
+                if (GetNumberOfAbilitiesOffCooldown(ability) == lastAbility2ActivateTimes.Length)
+                {
+                    return lastAbility2ActivateTimes.Max();
+                }
+                else
+                {
+                    return lastAbility2ActivateTimes.Min();
+                }
+            }
+            else if (ability == ability3)
+            {
+                if (GetNumberOfAbilitiesOffCooldown(ability) == lastAbility3ActivateTimes.Length)
+                {
+                    return lastAbility3ActivateTimes.Max();
+                }
+                else
+                {
+                    return lastAbility3ActivateTimes.Min();
+                }
+            }
+            else if (ability == ability4)
+            {
+                if (GetNumberOfAbilitiesOffCooldown(ability) == lastAbility4ActivateTimes.Length)
+                {
+                    return lastAbility4ActivateTimes.Max();
+                }
+                else
+                {
+                    return lastAbility4ActivateTimes.Min();
+                }
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
             }
         }
 
         public float GetAbilityCooldownTimeLeft(ActionClip ability)
         {
-            float abilityCooldownTime = GetAbilityCooldownTime(ability);
-            if (ability == ability1)
-            {
-                return abilityCooldownTime - (Time.time - lastAbility1ActivateTime);
-            }
-            else if (ability == ability2)
-            {
-                return abilityCooldownTime - (Time.time - lastAbility2ActivateTime);
-            }
-            else if (ability == ability3)
-            {
-                return abilityCooldownTime - (Time.time - lastAbility3ActivateTime);
-            }
-            else if (ability == ability4)
-            {
-                return abilityCooldownTime - (Time.time - lastAbility4ActivateTime);
-            }
-            else
-            {
-                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
-                return 0;
-            }
+            float abilityCooldownDuration = GetAbilityCooldownDuration(ability);
+            return abilityCooldownDuration - (Time.time - GetLastAbilityActivateTime(ability));
         }
 
         public float GetAbilityCooldownProgress(ActionClip ability)
         {
-            float abilityCooldownTime = GetAbilityCooldownTime(ability);
-            if (ability == ability1)
-            {
-                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
-                return Mathf.Clamp((Time.time - lastAbility1ActivateTime) / abilityCooldownTime, 0, 1);
-            }
-            else if (ability == ability2)
-            {
-                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
-                return Mathf.Clamp((Time.time - lastAbility2ActivateTime) / abilityCooldownTime, 0, 1);
-            }
-            else if (ability == ability3)
-            {
-                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
-                return Mathf.Clamp((Time.time - lastAbility3ActivateTime) / abilityCooldownTime, 0, 1);
-            }
-            else if (ability == ability4)
-            {
-                if (Mathf.Approximately(abilityCooldownTime, 0)) { return 1; }
-                return Mathf.Clamp((Time.time - lastAbility4ActivateTime) / abilityCooldownTime, 0, 1);
-            }
-            else
-            {
-                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
-                return 0;
-            }
+            float abilityCooldownDuration = GetAbilityCooldownDuration(ability);
+            if (Mathf.Approximately(abilityCooldownDuration, 0)) { return 1; }
+            return Mathf.Clamp((Time.time - GetLastAbilityActivateTime(ability)) / abilityCooldownDuration, 0, 1);
         }
 
         public float AbilityCooldownMultiplier { get; set; }
-        private float GetAbilityCooldownTime(ActionClip ability)
+        private float GetAbilityCooldownDuration(ActionClip ability)
         {
             if (ability == ability1)
             {
@@ -642,19 +769,31 @@ namespace Vi.ScriptableObjects
         {
             if (ability == ability1)
             {
-                lastAbility1ActivateTime -= ability1.abilityCooldownTime * percent;
+                for (int i = 0; i < lastAbility1ActivateTimes.Length; i++)
+                {
+                    lastAbility1ActivateTimes[i] -= ability1.abilityCooldownTime * percent;
+                }
             }
             else if (ability == ability2)
             {
-                lastAbility2ActivateTime -= ability2.abilityCooldownTime * percent;
+                for (int i = 0; i < lastAbility2ActivateTimes.Length; i++)
+                {
+                    lastAbility2ActivateTimes[i] -= ability1.abilityCooldownTime * percent;
+                }
             }
             else if (ability == ability3)
             {
-                lastAbility3ActivateTime -= ability3.abilityCooldownTime * percent;
+                for (int i = 0; i < lastAbility3ActivateTimes.Length; i++)
+                {
+                    lastAbility3ActivateTimes[i] -= ability1.abilityCooldownTime * percent;
+                }
             }
             else if (ability == ability4)
             {
-                lastAbility4ActivateTime -= ability4.abilityCooldownTime * percent;
+                for (int i = 0; i < lastAbility4ActivateTimes.Length; i++)
+                {
+                    lastAbility4ActivateTimes[i] -= ability1.abilityCooldownTime * percent;
+                }
             }
             else
             {
@@ -714,6 +853,15 @@ namespace Vi.ScriptableObjects
                 {
                     return 20;
                 }
+            }
+        }
+
+        public void ResetDodgeCooldowns()
+        {
+            lastDodgeActivateTimes = new float[maxDodgeCount];
+            for (int i = 0; i < lastDodgeActivateTimes.Length; i++)
+            {
+                lastDodgeActivateTimes[i] = Mathf.NegativeInfinity;
             }
         }
 
@@ -852,11 +1000,9 @@ namespace Vi.ScriptableObjects
             animationClipLookup = animationClipLookupKeys.Zip(animationClipLookupValues, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
             rootMotionLookup = animationClipLookupKeys.Zip(animationRootMotion, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
 
-            lastDodgeActivateTimes = new float[maxDodgeCount];
-            for (int i = 0; i < lastDodgeActivateTimes.Length; i++)
-            {
-                lastDodgeActivateTimes[i] = Mathf.NegativeInfinity;
-            }
+            ResetDodgeCooldowns();
+
+            ResetAllAbilityCooldowns();
         }
 
         private Dictionary<string, ActionClip> GetActionClipLookup()

@@ -166,13 +166,16 @@ namespace Vi.Core.VFX
                         }
                     }
 
-                    if (networkCollider)
+                    if (latchToFirstTarget)
                     {
-                        if (!latchTarget)
+                        if (networkCollider)
                         {
-                            if (ShouldAffect(networkCollider.CombatAgent))
+                            if (!latchTarget)
                             {
-                                latchTarget = networkCollider.MovementHandler.transform;
+                                if (ShouldAffect(networkCollider.CombatAgent))
+                                {
+                                    latchTarget = networkCollider.MovementHandler.transform;
+                                }
                             }
                         }
                     }
@@ -183,14 +186,17 @@ namespace Vi.Core.VFX
                 if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (!latchTarget)
+                    if (latchToFirstTarget)
                     {
-                        if (ShouldAffect(networkCollider.CombatAgent))
+                        if (!latchTarget)
                         {
-                            latchTarget = networkCollider.MovementHandler.transform;
+                            if (ShouldAffect(networkCollider.CombatAgent))
+                            {
+                                latchTarget = networkCollider.MovementHandler.transform;
+                            }
                         }
                     }
-
+                    
                     if (CanHit(networkCollider.CombatAgent))
                     {
                         ProcessHit(networkCollider.CombatAgent, other.ClosestPointOnBounds(transform.position));
