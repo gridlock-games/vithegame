@@ -403,28 +403,10 @@ MonoBehaviour:
   followUpVFXToPlayOnDestroy: []
   shouldBlockProjectiles: 0
   shouldDestroyOnEnemyHit: 0
-  enemyStatuses:
-  - status: 9
-    value: 0.25
-    valueIsPercentage: 1
-    duration: 0
-    delay: 0
-    associatedWithCurrentWeapon: 0
+  enemyStatuses: []
   friendlyStatuses:
   - status: 14
-    value: 0.03
-    valueIsPercentage: 1
-    duration: 0
-    delay: 0
-    associatedWithCurrentWeapon: 0
-  - status: 18
-    value: 0.03
-    valueIsPercentage: 1
-    duration: 0
-    delay: 0
-    associatedWithCurrentWeapon: 0
-  - status: 10
-    value: 0.15
+    value: 0.05
     valueIsPercentage: 1
     duration: 0
     delay: 0
