@@ -716,8 +716,10 @@ namespace Vi.ScriptableObjects
                 }
             }
         }
+
+        private float dodgeCooldownDuration = 5;
+
         [Header("Dodge Assignments")]
-        public float dodgeCooldownDuration = 5; // This should be cut in half for the first dodge
         [SerializeField] private ActionClip dodgeF;
         [SerializeField] private ActionClip dodgeFL;
         [SerializeField] private ActionClip dodgeFR;
@@ -727,7 +729,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private ActionClip dodgeL;
         [SerializeField] private ActionClip dodgeR;
 
-        private float[] lastDodgeActivateTimes = new float[] { Mathf.NegativeInfinity, Mathf.NegativeInfinity };
+        private const int maxDodgeCount = 2;
+        private float[] lastDodgeActivateTimes;
 
         public void StartDodgeCooldown()
         {
@@ -848,6 +851,12 @@ namespace Vi.ScriptableObjects
             actionClipLookup = GetActionClipLookup();
             animationClipLookup = animationClipLookupKeys.Zip(animationClipLookupValues, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
             rootMotionLookup = animationClipLookupKeys.Zip(animationRootMotion, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v);
+
+            lastDodgeActivateTimes = new float[maxDodgeCount];
+            for (int i = 0; i < lastDodgeActivateTimes.Length; i++)
+            {
+                lastDodgeActivateTimes[i] = Mathf.NegativeInfinity;
+            }
         }
 
         private Dictionary<string, ActionClip> GetActionClipLookup()
