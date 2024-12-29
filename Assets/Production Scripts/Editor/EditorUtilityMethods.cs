@@ -761,6 +761,12 @@ namespace Vi.Editor
                 {
                     foreach (Material mat in r.sharedMaterials)
                     {
+                        if (!mat.enableInstancing)
+                        {
+                            mat.enableInstancing = true;
+                            EditorUtility.SetDirty(mat);
+                        }
+                        
                         if (mat.shader != shader)
                         {
                             if (!mat.shader.name.Contains("Lit"))
