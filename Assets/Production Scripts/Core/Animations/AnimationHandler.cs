@@ -280,9 +280,9 @@ namespace Vi.Core
         {
             yield return new WaitForSeconds(deadRendererDisplayTime);
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = true;
+                r.forceRenderingOff = true;
                 foreach (var kvp in animatorReference.WearableEquipmentInstances)
                 {
                     if (kvp.Value)
@@ -295,9 +295,9 @@ namespace Vi.Core
                 }
             }
             yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = false;
+                r.forceRenderingOff = false;
                 foreach (var kvp in animatorReference.WearableEquipmentInstances)
                 {
                     if (kvp.Value)
@@ -1600,9 +1600,9 @@ namespace Vi.Core
         {
             if (animatorReference)
             {
-                foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+                foreach (Renderer r in animatorReference.Renderers)
                 {
-                    skinnedMeshRenderer.forceRenderingOff = false;
+                    r.forceRenderingOff = false;
                 }
 
                 if (animatorReference.TryGetComponent(out PooledObject pooledObject))
@@ -1837,9 +1837,9 @@ namespace Vi.Core
         {
             yield return new WaitForSeconds(delay);
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = true;
+                r.forceRenderingOff = true;
             }
 
             foreach (ExplodableMesh explodableMesh in explodableMeshes)
@@ -1859,9 +1859,9 @@ namespace Vi.Core
         public void RemoveExplosion()
         {
             if (explosionCoroutine != null) { StopCoroutine(explosionCoroutine); }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = false;
+                r.forceRenderingOff = false;
             }
 
             foreach (PooledObject sliceInstance in sliceInstances)

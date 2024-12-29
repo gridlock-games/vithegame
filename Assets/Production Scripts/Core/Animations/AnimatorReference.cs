@@ -431,7 +431,7 @@ namespace Vi.Core
         Animator animator;
         LimbReferences limbReferences;
         GlowRenderer glowRenderer;
-        public SkinnedMeshRenderer[] SkinnedMeshRenderers { get; private set; } = new SkinnedMeshRenderer[0];
+        public Renderer[] Renderers { get; private set; } = new Renderer[0];
 
         private void Awake()
         {
@@ -451,19 +451,22 @@ namespace Vi.Core
             }
 
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
-            SkinnedMeshRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+            Renderers = GetComponentsInChildren<Renderer>();
 
-            foreach (SkinnedMeshRenderer smr in SkinnedMeshRenderers)
+            foreach (Renderer r in Renderers)
             {
-                smr.updateWhenOffscreen = true;
+                if (r is SkinnedMeshRenderer smr)
+                {
+                    smr.updateWhenOffscreen = true;
+                }
             }
         }
 
         public void OnNetworkSpawn()
         {
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+            foreach (Renderer r in Renderers)
             {
-                skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
+                r.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
             }
         }
 
@@ -475,15 +478,15 @@ namespace Vi.Core
             if (combatAgent)
             {
                 animationHandler = combatAgent.GetComponent<AnimationHandler>();
-                foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+                foreach (Renderer r in Renderers)
                 {
-                    skinnedMeshRenderer.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
+                    r.gameObject.layer = LayerMask.NameToLayer(combatAgent.IsSpawned ? "Character" : "Preview");
                 }
             }
 
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+            foreach (Renderer r in Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = true;
+                r.forceRenderingOff = true;
             }
             StartCoroutine(TurnRenderersBackOn());
         }
@@ -491,9 +494,9 @@ namespace Vi.Core
         private IEnumerator TurnRenderersBackOn()
         {
             yield return null;
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in SkinnedMeshRenderers)
+            foreach (Renderer r in Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = false;
+                r.forceRenderingOff = false;
             }
         }
 
