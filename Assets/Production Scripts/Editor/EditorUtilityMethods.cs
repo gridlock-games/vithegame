@@ -8,6 +8,7 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Vi.UI;
 using Vi.Core;
 using Vi.Core.VFX;
 using Vi.Core.CombatAgents;
@@ -664,6 +665,22 @@ namespace Vi.Editor
             }
         }
         #endregion
+
+        [MenuItem("Tools/Utility/Log Negative Scales in Scene")]
+        private static void LogNegativeScalesInScene()
+        {
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                foreach (Renderer r in g.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (r.transform.localScale.x < 0 | r.transform.localScale.y < 0 | r.transform.localScale.z < 0)
+                    {
+                        Debug.Log(r + " " + r.transform.localScale + " " + PlatformUIDefinition.GetGameObjectPath(r.gameObject));
+                    }
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
 
         [MenuItem("Tools/Utility/Set GPU Instancing Based On Static Objects")]
         private static void SetGPUInstancingBasedOnStaticObjects()
