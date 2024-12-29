@@ -190,8 +190,6 @@ namespace Vi.UI
             }
         }
 
-        [SerializeField] private Graphic[] graphicsToTint = new Graphic[0];
-
         private PlayerUI playerUI;
         private Material materialInstance;
         private void Start()
@@ -208,7 +206,7 @@ namespace Vi.UI
             interimSpiritFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
 
-            foreach (Graphic graphic in graphicsToTint)
+            foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
             {
                 if (!materialInstance) { materialInstance = new Material(graphic.material); }
 
