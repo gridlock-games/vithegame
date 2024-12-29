@@ -79,7 +79,10 @@ namespace Vi.Core.MovementHandlers
                 }
             }
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
+            {
+                if (!targetFinder.GetTarget() & targetingConstrainedByDistance) { return transform.rotation; }
                 return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : IsolateYRotation(Quaternion.LookRotation(camDirection)), Time.deltaTime * 3);
+            }
 
             return transform.rotation;
         }
@@ -271,11 +274,13 @@ namespace Vi.Core.MovementHandlers
             {
                 targetFinder.SetDestination(this);
             }
-            else if (Vector3.Distance(GetPosition(), Destination) < stoppingDistance)
+            else if (ShouldStop)
             {
                 SetDestination(GetRandomDestination());
             }
         }
+
+        private bool ShouldStop { get { return Vector3.Distance(GetPosition(), Destination) < stoppingDistance; } }
 
         private void Move()
         {

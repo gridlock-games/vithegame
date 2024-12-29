@@ -138,7 +138,7 @@ PrefabInstance:
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2868041225
+      value: 1088489621
       objectReference: {fileID: 0}
     - target: {fileID: 2620220826113739033, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -238,7 +238,7 @@ PrefabInstance:
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: suicideDistance
-      value: 1
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 7749469332241152431, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
@@ -428,6 +428,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 8493005809729390772}
+    - targetCorrespondingSourceObject: {fileID: 3205846159395635039, guid: a11703d5161ef9345861e26ed11d825c,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 398906160469713053}
     - targetCorrespondingSourceObject: {fileID: 7183537951617099631, guid: a11703d5161ef9345861e26ed11d825c,
         type: 3}
       insertIndex: -1
@@ -894,6 +898,18 @@ MonoBehaviour:
     rendererToFollow: {fileID: 3278849626839400832}
     positionOffsetFromRenderer: {x: 0, y: 0, z: 0.75}
     scaleMultiplier: 1
+--- !u!114 &398906160469713053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6555534809414145068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e2115f8c7fb824c80561d601a874e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6555534809629460556 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3205846159074075455, guid: a11703d5161ef9345861e26ed11d825c,

@@ -8,6 +8,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 228763423542720022, guid: dcc7d25ddc4b5f54682aa566007ca39f,
+        type: 3}
+      propertyPath: pooledObjectIndex
+      value: 375
+      objectReference: {fileID: 0}
     - target: {fileID: 287556458649279115, guid: dcc7d25ddc4b5f54682aa566007ca39f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -66,7 +71,7 @@ PrefabInstance:
     - target: {fileID: 1445922378194096478, guid: dcc7d25ddc4b5f54682aa566007ca39f,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 4238681312
+      value: 4121867172
       objectReference: {fileID: 0}
     - target: {fileID: 1445922378194096478, guid: dcc7d25ddc4b5f54682aa566007ca39f,
         type: 3}
@@ -78,6 +83,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cretin Red
       objectReference: {fileID: 0}
+    - target: {fileID: 2675619497672751035, guid: dcc7d25ddc4b5f54682aa566007ca39f,
+        type: 3}
+      propertyPath: deathVFXAttack
+      value: 
+      objectReference: {fileID: 11400000, guid: f5293c1eef6bced4cb332111c546d5d5,
+        type: 2}
     - target: {fileID: 2759219896768475816, guid: dcc7d25ddc4b5f54682aa566007ca39f,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -220,6 +231,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 712162999281794323}
+    - targetCorrespondingSourceObject: {fileID: 4971687155524193028, guid: b6591a5002c70994ba44128e22a049c1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6151965073277274035}
     - targetCorrespondingSourceObject: {fileID: 806850821942367028, guid: b6591a5002c70994ba44128e22a049c1,
         type: 3}
       insertIndex: -1
@@ -494,6 +509,18 @@ MonoBehaviour:
     rendererToFollow: {fileID: 6126754718899205769}
     positionOffsetFromRenderer: {x: 0, y: 0, z: 0.75}
     scaleMultiplier: 1
+--- !u!114 &6151965073277274035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2485910597872821029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e2115f8c7fb824c80561d601a874e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2485910598085769395 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4971687155546263698, guid: b6591a5002c70994ba44128e22a049c1,

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Cretin
   m_EditorClassIdentifier: 
   weaponClass: 0
-  runSpeed: 4
-  walkSpeed: 2
+  runSpeed: 3
+  walkSpeed: 1.5
   blockingLocomotion: 0
-  maxHP: 10
+  maxHP: 1
   maxStamina: 100
   staminaRecoveryRate: 0
   staminaDelay: 0
@@ -164,6 +164,9 @@ MonoBehaviour:
   reloadSoundEffects: []
   weaponModelData:
   - skinPrefab: {fileID: 2302478434333183616, guid: dcc7d25ddc4b5f54682aa566007ca39f,
+      type: 3}
+    data: []
+  - skinPrefab: {fileID: 835103555788447473, guid: 86d44238a93e6ee44ab1e39543e4d374,
       type: 3}
     data: []
   hitReactions:
