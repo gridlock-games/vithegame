@@ -754,7 +754,7 @@ namespace Vi.Core
 //            {
 //                foreach (var weaponOption in weaponOptions)
 //                {
-//                    if (!InventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
+//                    if (!inventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
 //                    {
 //                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
 //                    }

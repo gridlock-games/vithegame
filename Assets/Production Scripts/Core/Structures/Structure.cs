@@ -11,6 +11,7 @@ using Vi.Core.Weapons;
 namespace Vi.Core.Structures
 {
     [RequireComponent(typeof(ObjectiveHandler))]
+    [RequireComponent(typeof(ExplodableMeshController))]
     public class Structure : HittableAgent
     {
         [SerializeField] private float maxHP = 100;
@@ -21,13 +22,13 @@ namespace Vi.Core.Structures
 
         public ObjectiveHandler ObjectiveHandler { get; private set; }
 
-        private ExplodableMesh[] explodableMeshes;
+        private ExplodableMeshController explodableMeshController;
         protected override void Awake()
         {
             base.Awake();
             Colliders = GetComponentsInChildren<Collider>();
             ObjectiveHandler = GetComponent<ObjectiveHandler>();
-            explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
+            explodableMeshController = GetComponent<ExplodableMeshController>();
 
             List<Collider> networkPredictionLayerColliders = new List<Collider>();
             foreach (Collider col in Colliders)
@@ -40,7 +41,6 @@ namespace Vi.Core.Structures
             Colliders = networkPredictionLayerColliders.ToArray();
         }
 
-        private List<PooledObject> explodableMeshInstances = new List<PooledObject>();
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -79,10 +79,7 @@ namespace Vi.Core.Structures
                     r.forceRenderingOff = true;
                 }
 
-                foreach (ExplodableMesh explodableMesh in explodableMeshes)
-                {
-                    explodableMeshInstances.AddRange(explodableMesh.Explode());
-                }
+                explodableMeshController.Explode();
 
                 if (deathSound)
                 {
@@ -92,21 +89,13 @@ namespace Vi.Core.Structures
             else if (prev <= 0 & current > 0)
             {
                 IsDead = false;
-                foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
-                {
-                    ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
-                }
-                explodableMeshInstances.Clear();
+                explodableMeshController.ClearInstances();
             }
         }
 
         private void OnDisable()
         {
-            foreach (PooledObject explodableMeshInstance in explodableMeshInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(explodableMeshInstance);
-            }
-            explodableMeshInstances.Clear();
+            explodableMeshController.ClearInstances();
         }
 
         public override Weapon.ArmorType GetArmorType() { return armorType; }

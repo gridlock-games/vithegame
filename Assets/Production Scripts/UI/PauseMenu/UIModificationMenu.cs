@@ -29,32 +29,42 @@ namespace Vi.UI
 
             foreach (Transform child in playerUIPrefab.transform)
             {
+                if (child.name == "TextChat") { continue; }
+
                 GameObject copy = Instantiate(child.gameObject, UIMimicParent);
 
                 Transform[] copyChildren = copy.GetComponentsInChildren<Transform>(true);
                 Transform[] originalChildren = child.GetComponentsInChildren<Transform>(true);
 
-                copyChildren = System.Array.FindAll(copyChildren, item => System.Array.Exists(originalChildren, originalItem => item.name.Replace("(Clone)", "") == originalItem.name));
-
-                for (int childIndex = 0; childIndex < copyChildren.Length; childIndex++)
+                foreach (Transform copyChild in copyChildren)
                 {
-                    prefabCrosswalk.Add(copyChildren[childIndex].gameObject, originalChildren[childIndex].gameObject);
+                    int originalIndex = System.Array.FindIndex(originalChildren, originalItem => copyChild.name.Replace("(Clone)", "") == originalItem.name);
+                    if (originalIndex != -1)
+                    {
+                        prefabCrosswalk.Add(copyChild.gameObject, originalChildren[originalIndex].gameObject);
+                    }
+                }
 
-                    if (copyChildren[childIndex].TryGetComponent(out KillFeed killFeed))
+                foreach (KeyValuePair<GameObject, GameObject> kvp in prefabCrosswalk)
+                {
+                    GameObject copyChild = kvp.Key;
+                    GameObject originalChild = kvp.Value;
+
+                    if (copyChild.TryGetComponent(out KillFeed killFeed))
                     {
                         killFeed.SetPreviewOn();
                         continue;
                     }
-                    if (copyChildren[childIndex].TryGetComponent(out RuntimeWeaponCard weaponCard))
+                    if (copyChild.TryGetComponent(out RuntimeWeaponCard weaponCard))
                     {
                         weaponCard.SetPreviewOn(weaponCard.name.Contains("Primary") ? LoadoutManager.WeaponSlotType.Primary : LoadoutManager.WeaponSlotType.Secondary);
                         continue;
                     }
-                    if (copyChildren[childIndex].TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
-                    if (copyChildren[childIndex].TryGetComponent(out PotionCard potionCard)) { potionCard.SetPreviewOn(); }
-                    if (copyChildren[childIndex].GetComponent<KillFeedElement>()) { continue; }
+                    if (copyChild.TryGetComponent(out AbilityCard abilityCard)) { abilityCard.SetPreviewOn(); }
+                    if (copyChild.TryGetComponent(out PotionCard potionCard)) { potionCard.SetPreviewOn(); }
+                    if (copyChild.GetComponent<KillFeedElement>()) { continue; }
 
-                    foreach (Behaviour c in copyChildren[childIndex].GetComponents<Behaviour>())
+                    foreach (Behaviour c in copyChild.GetComponents<Behaviour>())
                     {
                         if (c is Graphic) { continue; }
                         if (c is Canvas) { continue; }
@@ -65,55 +75,52 @@ namespace Vi.UI
                         c.enabled = false;
                     }
 
-                    if (childIndex < originalChildren.Length)
+                    foreach (PlatformUIDefinition.UIDefinition platformUIDefinition in platformUIDefinitions)
                     {
-                        foreach (PlatformUIDefinition.UIDefinition platformUIDefinition in platformUIDefinitions)
+                        foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
                         {
-                            foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
+                            if (g == originalChild)
                             {
-                                if (g == originalChildren[childIndex].gameObject)
-                                {
-                                    copyChildren[childIndex].gameObject.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
-                                }
+                                copyChild.gameObject.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
                             }
+                        }
 
-                            foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
+                        foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
+                        {
+                            if (g == originalChild)
                             {
-                                if (g == originalChildren[childIndex].gameObject)
-                                {
-                                    copyChildren[childIndex].gameObject.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
-                                }
+                                copyChild.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
                             }
+                        }
 
-                            foreach (PlatformUIDefinition.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                        foreach (PlatformUIDefinition.MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
+                        {
+                            if (moveUIDefinition.gameObjectToMove == originalChild.gameObject)
                             {
-                                if (moveUIDefinition.gameObjectToMove == originalChildren[childIndex].gameObject)
+                                if (platformUIDefinition.platforms.Contains(Application.platform))
                                 {
-                                    if (platformUIDefinition.platforms.Contains(Application.platform))
+                                    RectTransform rt = (RectTransform)copyChild.transform;
+                                    if (moveUIDefinition.shouldOverrideAnchors)
                                     {
-                                        RectTransform rt = (RectTransform)copyChildren[childIndex];
-                                        if (moveUIDefinition.shouldOverrideAnchors)
-                                        {
-                                            rt.anchorMin = moveUIDefinition.anchorMinOverride;
-                                            rt.anchorMax = moveUIDefinition.anchorMaxOverride;
-                                            rt.pivot = moveUIDefinition.pivotOverride;
-                                        }
-                                        rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
+                                        rt.anchorMin = moveUIDefinition.anchorMinOverride;
+                                        rt.anchorMax = moveUIDefinition.anchorMaxOverride;
+                                        rt.pivot = moveUIDefinition.pivotOverride;
                                     }
+                                    rt.anchoredPosition = moveUIDefinition.newAnchoredPosition;
                                 }
                             }
+                        }
 
-                            foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                        foreach (GameObject g in platformUIDefinition.gameObjectsToDestroy)
+                        {
+                            if (g == originalChild.gameObject)
                             {
-                                if (g == originalChildren[childIndex].gameObject)
-                                {
-                                    if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(copyChildren[childIndex]); }
-                                }
+                                if (platformUIDefinition.platforms.Contains(Application.platform)) { Destroy(copyChild.gameObject); }
                             }
                         }
                     }
 
-                    if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChildren[childIndex].gameObject))
+                    if (PlatformUIDefinition.UIElementIsAbleToBeModified(copyChild.gameObject))
                     {
                         if (FasterPlayerPrefs.Singleton.HasString("UIOverrides"))
                         {
@@ -121,13 +128,13 @@ namespace Vi.UI
                             foreach (PlatformUIDefinition.PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                             {
                                 GameObject g = platformUIDefinitionComponent.GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
-                                if (g == originalChildren[childIndex].gameObject)
+                                if (g == originalChild)
                                 {
-                                    ((RectTransform)copyChildren[childIndex]).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
+                                    ((RectTransform)copyChild.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
                                 }
                             }
                         }
-                        DraggableUIObject draggableUIObject = copyChildren[childIndex].gameObject.AddComponent<DraggableUIObject>();
+                        DraggableUIObject draggableUIObject = copyChild.AddComponent<DraggableUIObject>();
                         draggableUIObject.Initialize(this);
                     }
                 }

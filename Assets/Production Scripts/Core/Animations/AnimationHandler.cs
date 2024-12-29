@@ -280,9 +280,9 @@ namespace Vi.Core
         {
             yield return new WaitForSeconds(deadRendererDisplayTime);
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = true;
+                r.forceRenderingOff = true;
                 foreach (var kvp in animatorReference.WearableEquipmentInstances)
                 {
                     if (kvp.Value)
@@ -295,9 +295,9 @@ namespace Vi.Core
                 }
             }
             yield return new WaitUntil(() => combatAgent.GetAilment() != ActionClip.Ailment.Death);
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = false;
+                r.forceRenderingOff = false;
                 foreach (var kvp in animatorReference.WearableEquipmentInstances)
                 {
                     if (kvp.Value)
@@ -341,6 +341,7 @@ namespace Vi.Core
                 combatAgent.ResetAilment();
                 combatAgent.StatusAgent.RemoveAllStatuses();
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+                combatAgent.WeaponHandler.GetWeapon().ResetDodgeCooldowns();
                 combatAgent.LoadoutManager.ReloadAllWeapons();
             }
             
@@ -365,6 +366,7 @@ namespace Vi.Core
             if (resetGameplayVariables)
             {
                 combatAgent.WeaponHandler.GetWeapon().ResetAllAbilityCooldowns();
+                combatAgent.WeaponHandler.GetWeapon().ResetDodgeCooldowns();
             }
         }
 
@@ -1572,8 +1574,6 @@ namespace Vi.Core
                 LimbReferences = modelInstance.GetComponent<LimbReferences>();
                 animatorReference = modelInstance.GetComponent<AnimatorReference>();
 
-                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
-
                 SetRagdollActive(false);
             }
 
@@ -1600,9 +1600,9 @@ namespace Vi.Core
         {
             if (animatorReference)
             {
-                foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+                foreach (Renderer r in animatorReference.Renderers)
                 {
-                    skinnedMeshRenderer.forceRenderingOff = false;
+                    r.forceRenderingOff = false;
                 }
 
                 if (animatorReference.TryGetComponent(out PooledObject pooledObject))
@@ -1613,28 +1613,11 @@ namespace Vi.Core
                         Animator = null;
                         LimbReferences = null;
                         animatorReference = null;
-                        explodableMeshes = null;
                     }
                 }
             }
 
             WaitingForActionClipToPlay = false;
-
-            foreach (PooledObject sliceInstance in sliceInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
-            }
-            sliceInstances.Clear();
-        }
-
-        private new void OnDestroy()
-        {
-            base.OnDestroy();
-            foreach (PooledObject sliceInstance in sliceInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
-            }
-            sliceInstances.Clear();
         }
 
         public void ChangeCharacter(WebRequestManager.Character character)
@@ -1666,8 +1649,6 @@ namespace Vi.Core
 
         private CombatAgent combatAgent;
 
-        private ExplodableMesh[] explodableMeshes;
-
         private void Awake()
         {
             lastClipPlayed = ScriptableObject.CreateInstance<ActionClip>();
@@ -1679,7 +1660,6 @@ namespace Vi.Core
                 this.animatorReference = animatorReference;
                 LimbReferences = animatorReference.GetComponent<LimbReferences>();
                 Animator = animatorReference.GetComponent<Animator>();
-                explodableMeshes = GetComponentsInChildren<ExplodableMesh>();
                 actionsLayerIndex = Animator.GetLayerIndex(actionsLayerName);
                 flinchLayerIndex = Animator.GetLayerIndex(flinchLayerName);
             }
@@ -1832,43 +1812,31 @@ namespace Vi.Core
             explosionCoroutine = StartCoroutine(ExplosionDelay(explosionDelay));
         }
 
-        private List<PooledObject> sliceInstances = new List<PooledObject>();
         private IEnumerator ExplosionDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
             if (combatAgent.GetAilment() != ActionClip.Ailment.Death) { yield break; }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = true;
+                r.forceRenderingOff = true;
             }
 
-            foreach (ExplodableMesh explodableMesh in explodableMeshes)
-            {
-                sliceInstances.AddRange(explodableMesh.Explode());
-            }
+            animatorReference.ExplodableMeshController.Explode();
 
             yield return new WaitForSeconds(deadRendererDisplayTime);
 
-            foreach (PooledObject sliceInstance in sliceInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
-            }
-            sliceInstances.Clear();
+            animatorReference.ExplodableMeshController.ClearInstances();
         }
 
         public void RemoveExplosion()
         {
             if (explosionCoroutine != null) { StopCoroutine(explosionCoroutine); }
-            foreach (SkinnedMeshRenderer skinnedMeshRenderer in animatorReference.SkinnedMeshRenderers)
+            foreach (Renderer r in animatorReference.Renderers)
             {
-                skinnedMeshRenderer.forceRenderingOff = false;
+                r.forceRenderingOff = false;
             }
 
-            foreach (PooledObject sliceInstance in sliceInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(sliceInstance);
-            }
-            sliceInstances.Clear();
+            animatorReference.ExplodableMeshController.ClearInstances();
         }
 
         private const int potionUsesPerGame = 10;

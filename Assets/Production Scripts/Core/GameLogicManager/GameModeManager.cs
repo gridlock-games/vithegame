@@ -325,6 +325,11 @@ namespace Vi.Core.GameModeManagers
             if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
+                if (killer.Master)
+                {
+                    killer = killer.Master;
+                }
+
                 if (killer is Attributes killerAttributes)
                 {
                     int killerIndex = scoreList.IndexOf(new PlayerScore(killerAttributes.GetPlayerDataId()));

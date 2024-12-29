@@ -9,7 +9,7 @@ namespace Vi.Core.VFX.Staff
     public class ExplosiveCretin : GameInteractiveActionVFX
     {
         private float serverSpawnTime;
-        private const float cretinDuration = 5;
+        private const float cretinDuration = 4;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();

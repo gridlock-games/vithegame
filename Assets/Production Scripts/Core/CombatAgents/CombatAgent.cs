@@ -1086,6 +1086,11 @@ namespace Vi.Core
                     Debug.LogError("Unsure how to handle death behavior in OnDeath() " + deathBehavior + " " + this);
                     break;
             }
+
+            if (Master)
+            {
+                Master.slaves.Remove(this);
+            }
         }
 
         protected bool CanProcessHit(bool isMeleeHit, CombatAgent attacker, ActionClip attack, RuntimeWeapon runtimeWeapon = null)

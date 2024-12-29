@@ -22,6 +22,8 @@ namespace Vi.UI
         [SerializeField] private Image backgroundImageSquare;
         [SerializeField] private Image backgroundImageCircle;
         [SerializeField] private Image circleMask;
+        [SerializeField] private GameObject stackVisualParent;
+        [SerializeField] private Text stackText;
 
         public ActionClip Ability { get; private set; }
 
@@ -93,6 +95,7 @@ namespace Vi.UI
             inactiveAbilityIcon.sprite = Ability.abilityImageIcon;
             keybindText.text = previewAbility.name.Replace("Ability", "");
             cooldownText.text = "";
+            stackVisualParent.gameObject.SetActive(false);
         }
 
         public void Initialize(ActionClip ability, string keybindText)
@@ -107,6 +110,8 @@ namespace Vi.UI
             float staminaCost = combatAgent.AnimationHandler.GetStaminaCostOfClip(Ability);
             staminaCostText.text = staminaCost.ToString("F0");
             lastStaminaCost = staminaCost;
+
+            stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
         }
 
         private Image borderImage;
@@ -123,6 +128,7 @@ namespace Vi.UI
 
         private int lastAbilityLevel = -1;
         private float lastStaminaCost = -1;
+        private int lastNumAbilitiesOffCooldown = -1;
         private void Update()
         {
             if (Ability == null) { return; }
@@ -133,6 +139,18 @@ namespace Vi.UI
                 staminaCostText.text = staminaCost.ToString("F0");
             }
             lastStaminaCost = staminaCost;
+
+            int numAbilitiesOffCooldown = combatAgent.WeaponHandler.GetWeapon().GetNumberOfAbilitiesOffCooldown(Ability);
+            if (numAbilitiesOffCooldown != lastNumAbilitiesOffCooldown)
+            {
+                stackText.text = numAbilitiesOffCooldown.ToString();
+                if (numAbilitiesOffCooldown > 0)
+                {
+                    stackText.text += "x";
+                }
+                stackText.color = StringUtility.SetColorAlpha(numAbilitiesOffCooldown > 0 ? Color.white : Color.red, lastOpacityEvaluated);
+            }
+            lastNumAbilitiesOffCooldown = numAbilitiesOffCooldown;
 
             bool canUpgrade = combatAgent.SessionProgressionHandler.CanUpgradeAbility(Ability, combatAgent.WeaponHandler.GetWeapon());
             upgradeIcon.rectTransform.position = Vector3.Lerp(upgradeIcon.transform.position,
