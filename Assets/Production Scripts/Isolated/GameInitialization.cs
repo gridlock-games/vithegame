@@ -53,6 +53,7 @@ namespace Vi.Core
                 if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
                 {
                     // Just updated, execute this code
+                    FasterPlayerPrefs.Singleton.DeleteKey("UIOverrides");
                 }
             }
 
@@ -60,6 +61,8 @@ namespace Vi.Core
 
             FasterPlayerPrefs.Singleton.SetString("LastApplicationVersion", Application.version);
 
+            if (!FasterPlayerPrefs.Singleton.HasBool("EnableAdaptivePerformance")) { FasterPlayerPrefs.Singleton.SetBool("EnableAdaptivePerformance", FasterPlayerPrefs.IsMobilePlatform); }
+            
             if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
 

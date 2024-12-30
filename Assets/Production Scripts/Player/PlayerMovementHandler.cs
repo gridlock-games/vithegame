@@ -950,26 +950,11 @@ namespace Vi.Player
             }
         }
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
         RaycastHit[] interactableHits = new RaycastHit[10];
         protected override void Update()
         {
             base.Update();
-
-            FindMainCamera();
 
             if (!IsSpawned) { return; }
 

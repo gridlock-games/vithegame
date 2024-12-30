@@ -92,7 +92,7 @@ namespace Vi.UI
 
         private void OnKeybindTextChange()
         {
-            cooldownText.rectTransform.offsetMax = new Vector2(0, string.IsNullOrWhiteSpace(keybindText.text) ? 0 : 20);
+            cooldownText.rectTransform.offsetMax = new Vector2(0, !keybindText.enabled | string.IsNullOrWhiteSpace(keybindText.text) ? 0 : 20);
         }
 
         private void Update()

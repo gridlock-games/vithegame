@@ -99,7 +99,7 @@ namespace Vi.Core.VFX
                             if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
                             {
                                 AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, whooshNearbySound.Length)], false, Weapon.projectileNearbyWhooshVolume);
-                                audioSource.maxDistance = 20;
+                                if (audioSource) { audioSource.maxDistance = 20; }
                                 nearbyWhooshPlayed = true;
                             }
                         }

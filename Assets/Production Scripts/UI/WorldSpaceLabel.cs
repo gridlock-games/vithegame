@@ -142,19 +142,6 @@ namespace Vi.UI
             healthFillImage.color = PlayerDataManager.Singleton.GetRelativeHealthBarColor(combatAgent.GetTeam());
         }
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         private CombatAgent localCombatAgent;
         private NetworkObject localSpectator;
         private void FindLocalWeaponHandlerOrSpectator()
@@ -192,7 +179,6 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
             FindLocalWeaponHandlerOrSpectator();
-            FindMainCamera();
         }
 
         private float lastHP = -1;
@@ -215,7 +201,7 @@ namespace Vi.UI
 
             Vector3 localScaleTarget = Vector3.zero;
             Vector3 healthBarLocalScaleTarget = Vector3.zero;
-            if ((localCombatAgent | localSpectator) & mainCamera)
+            if ((localCombatAgent | localSpectator) & FindMainCamera.MainCamera)
             {
                 Transform source = null;
                 if (localCombatAgent)
@@ -230,12 +216,12 @@ namespace Vi.UI
                 Vector3 pos = worldSpaceLabelTransformInfo.rendererToFollow.bounds.center + worldSpaceLabelTransformInfo.rendererToFollow.transform.rotation * worldSpaceLabelTransformInfo.positionOffsetFromRenderer;
                 transform.position = pos;
 
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - transform.position), Time.deltaTime * rotationSpeed);
 
                 float playerDistance = Vector3.Distance(source.transform.position, combatAgent.transform.position);
                 if (playerDistance > viewDistance)
                 {
-                    if (Physics.Raycast(mainCamera.transform.position + mainCamera.transform.forward * viewDistance, mainCamera.transform.forward, out RaycastHit hit, 100, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
+                    if (Physics.Raycast(FindMainCamera.MainCamera.transform.position + FindMainCamera.MainCamera.transform.forward * viewDistance, FindMainCamera.MainCamera.transform.forward, out RaycastHit hit, 100, LayerMask.GetMask("NetworkPrediction"), QueryTriggerInteraction.Ignore))
                     {
                         if (hit.transform.root == combatAgent.NetworkCollider.transform.root)
                         {

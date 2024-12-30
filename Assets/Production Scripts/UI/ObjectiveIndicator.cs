@@ -4,6 +4,7 @@ using Vi.Core;
 using Vi.Core.CombatAgents;
 using UnityEngine.UI;
 using Vi.Core.MovementHandlers;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -30,19 +31,6 @@ namespace Vi.UI
             }
         }
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         private void Start()
         {
             indicatorImage.enabled = false;
@@ -51,16 +39,15 @@ namespace Vi.UI
         private void Update()
         {
             FindObjectiveHandler();
-            FindMainCamera();
 
-            if (localObjectiveHandler & mainCamera)
+            if (localObjectiveHandler & FindMainCamera.MainCamera)
             {
                 if (localObjectiveHandler.Objective)
                 {
                     Vector3 newPosition = localObjectiveHandler.Objective.transform.position + localObjectiveHandler.MovementHandler.BodyHeightOffset;
-                    Quaternion newRot = Quaternion.LookRotation(mainCamera.transform.position - newPosition);
+                    Quaternion newRot = Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - newPosition);
 
-                    Vector3 viewportPos = mainCamera.WorldToViewportPoint(newPosition);
+                    Vector3 viewportPos = FindMainCamera.MainCamera.WorldToViewportPoint(newPosition);
 
                     bool remakeRotation = false;
                     if (viewportPos.z < 0) // Check if objective is behind
@@ -79,11 +66,11 @@ namespace Vi.UI
                     }
 
                     // Convert viewport position to world position for the UI
-                    Vector3 worldPos = mainCamera.ViewportToWorldPoint(viewportPos);
+                    Vector3 worldPos = FindMainCamera.MainCamera.ViewportToWorldPoint(viewportPos);
 
                     if (remakeRotation)
                     {
-                        newRot = Quaternion.LookRotation(mainCamera.transform.position - worldPos);
+                        newRot = Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - worldPos);
 
                         Vector2 viewportCenter = new Vector2(0.5f, 0.5f);
                         Vector2 direction = new Vector2(viewportPos.x, viewportPos.y) - viewportCenter;
