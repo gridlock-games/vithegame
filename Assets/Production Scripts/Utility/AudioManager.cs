@@ -405,10 +405,14 @@ namespace Vi.Utility
             }
 
             if (currentMusicClip == null) { isCrossfading = false; yield break; }
-            musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[Random.Range(0, currentMusicClip.songs.Length)];
-            musicSource.time = 0;
-            if (!musicSource.isPlaying) { musicSource.Play(); }
-
+            AudioClip newClip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[Random.Range(0, currentMusicClip.songs.Length)];
+            if (musicSource.clip  != newClip)
+            {
+                musicSource.clip = newClip;
+                musicSource.time = 0;
+                if (!musicSource.isPlaying) { musicSource.Play(); }
+            }
+            
             while (true)
             {
                 musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
@@ -457,9 +461,13 @@ namespace Vi.Utility
                         }
                         else
                         {
-                            musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex];
-                            musicSource.time = 0;
-                            if (!musicSource.isPlaying) { musicSource.Play(); }
+                            AudioClip newClip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex];
+                            if (newClip != musicSource.clip)
+                            {
+                                musicSource.clip = newClip;
+                                musicSource.time = 0;
+                                if (!musicSource.isPlaying) { musicSource.Play(); }
+                            }
                         }
                         break;
                     }
