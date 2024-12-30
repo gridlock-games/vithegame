@@ -59,25 +59,42 @@ public class DebugOverlay : MonoBehaviour
 
     void OnThermalEvent(ThermalMetrics ev)
     {
-        Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
-
         // TODO Store the original max values for these and move between them
-
-        SetDPIScale(Mathf.Max(0.6f, 1 - ev.TemperatureLevel));
+        SetDPIScale(Mathf.Max(0.7f, 1 - ev.TemperatureLevel));
         SetLODBias(1 - ev.TemperatureLevel);
 
-        if (ev.TemperatureLevel > 0.6f)
+        if (ev.TemperatureLevel >= 0.75f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 3;
+        }
+        else if (ev.TemperatureLevel >= 0.65f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (ev.TemperatureLevel >= 0.55f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 1;
+        }
+        else
+        {
+            QualitySettings.globalTextureMipmapLimit = 0;
+        }
+
+        if (ev.TemperatureLevel >= 0.7f)
         {
             SetTargetFrameRate(30);
         }
-        else if (ev.TemperatureLevel > 0.75f & ev.TemperatureTrend > 0.5f)
+        else if (ev.TemperatureLevel >= 0.6f)
         {
-            SetTargetFrameRate(20);
+            SetTargetFrameRate(Mathf.Min(Application.targetFrameRate, 40));
         }
         else
         {
             NetSceneManager.SetTargetFrameRate();
         }
+
+        Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
+        Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
         if (!thermalEventsEnabled) { return; }
 
