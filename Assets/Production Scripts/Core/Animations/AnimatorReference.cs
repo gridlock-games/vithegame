@@ -50,18 +50,19 @@ namespace Vi.Core
             }
 
             MaterialReplacementDefintion materialReplacementDefintion = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == characterMaterial.materialApplicationLocation);
+            Material newMat = new Material(characterMaterial.material);
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in materialReplacementDefintion.skinnedMeshRenderers)
             {
-                skinnedMeshRenderer.materials = new Material[] { characterMaterial.material };
+                skinnedMeshRenderer.materials = new Material[] { newMat };
             }
             
             if (appliedCharacterMaterials.ContainsKey(characterMaterial.materialApplicationLocation))
             {
-                appliedCharacterMaterials[characterMaterial.materialApplicationLocation] = characterMaterial.material;
+                appliedCharacterMaterials[characterMaterial.materialApplicationLocation] = newMat;
             }
             else
             {
-                appliedCharacterMaterials.Add(characterMaterial.materialApplicationLocation, characterMaterial.material);
+                appliedCharacterMaterials.Add(characterMaterial.materialApplicationLocation, newMat);
             }
 
             if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body)

@@ -125,6 +125,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
+      propertyPath: excludeFromKillFeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1544070057548558332, guid: 74547947c8c52264f9eba9178457359c,
+        type: 3}
       propertyPath: weaponOption.weapon
       value: 
       objectReference: {fileID: 11400000, guid: d0de9a7657e263b459c3e1f161443efc,
@@ -148,7 +153,7 @@ PrefabInstance:
     - target: {fileID: 3438530920036325063, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}
       propertyPath: m_Name
-      value: Cretin Green
+      value: Forest Cretin
       objectReference: {fileID: 0}
     - target: {fileID: 3702149485779398225, guid: 74547947c8c52264f9eba9178457359c,
         type: 3}

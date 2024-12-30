@@ -99,7 +99,10 @@ namespace Vi.Core
                     m.SetColor(_GlowColor, defaultColor);
                     if (glowMaterialInstances.ContainsKey(renderer))
                     {
-                        glowMaterialInstances[renderer].Add(m);
+                        if (!glowMaterialInstances[renderer].Contains(m))
+                        {
+                            glowMaterialInstances[renderer].Add(m);
+                        }
                     }
                     else
                     {

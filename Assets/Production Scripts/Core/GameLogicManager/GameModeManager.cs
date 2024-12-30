@@ -1,15 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections.Generic;
-using System.Collections;
-using System.Reflection;
-using System.Linq;
-using Vi.Utility;
-using Unity.Collections;
-using Vi.Core.CombatAgents;
-using Vi.ScriptableObjects;
-using Vi.Core.Structures;
 using UnityEngine.Events;
+using Vi.Core.CombatAgents;
+using Vi.Core.Structures;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core.GameModeManagers
 {
@@ -300,6 +300,8 @@ namespace Vi.Core.GameModeManagers
         {
             if (nextGameActionTimer.Value <= 0)
             {
+                if (victim.ExcludeFromKillFeed) { return; }
+
                 if (attacker is Attributes attackerAttributes)
                 {
                     int attackerIndex = scoreList.IndexOf(new PlayerScore(attackerAttributes.GetPlayerDataId()));
@@ -308,7 +310,7 @@ namespace Vi.Core.GameModeManagers
                     attackerScore.damageDealtThisRound += HPDamage;
                     scoreList[attackerIndex] = attackerScore;
                 }
-                
+
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -325,6 +327,8 @@ namespace Vi.Core.GameModeManagers
             if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
+                if (victim.ExcludeFromKillFeed) { return; }
+
                 if (killer.Master)
                 {
                     killer = killer.Master;
@@ -352,7 +356,7 @@ namespace Vi.Core.GameModeManagers
                     victimScore.deathsThisRound += 1;
                     scoreList[victimIndex] = victimScore;
                 }
-                
+
                 // Damage is in negative numbers
                 CombatAgent assist = victim.GetDamageMappingThisLife().Where(item => item.Key != killer & item.Key != victim & item.Value > minAssistDamage).OrderByDescending(item => item.Value).FirstOrDefault().Key;
                 if (assist)
@@ -396,6 +400,8 @@ namespace Vi.Core.GameModeManagers
             if (gameOver.Value) { return; }
             if (nextGameActionTimer.Value <= 0)
             {
+                if (victim.ExcludeFromKillFeed) { return; }
+
                 if (victim is Attributes victimAttributes)
                 {
                     int victimIndex = scoreList.IndexOf(new PlayerScore(victimAttributes.GetPlayerDataId()));
@@ -404,7 +410,7 @@ namespace Vi.Core.GameModeManagers
                     victimScore.deathsThisRound += 1;
                     scoreList[victimIndex] = victimScore;
                 }
-                
+
                 killHistory.Add(new KillHistoryElement(victim));
             }
         }
@@ -850,7 +856,7 @@ namespace Vi.Core.GameModeManagers
                 postGameStatus.Value = PostGameStatus.MVP;
                 yield return new WaitForSeconds(7.5f);
             }
-            
+
             // Scoreboard
             postGameStatus.Value = PostGameStatus.Scoreboard;
 

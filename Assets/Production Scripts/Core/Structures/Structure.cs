@@ -1,12 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
-using Vi.ScriptableObjects;
-using Vi.Utility;
+using UnityEngine;
+using Vi.Core.CombatAgents;
 using Vi.Core.GameModeManagers;
 using Vi.Core.MeshSlicing;
 using Vi.Core.Weapons;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core.Structures
 {
@@ -141,6 +141,8 @@ namespace Vi.Core.Structures
             {
                 StatusAgent.TryAddStatus(status);
             }
+
+            if (attacker is Attributes attributes) { attributes.AddHitToComboCounter(); }
 
             lastAttackingCombatAgent = attacker;
             return true;
