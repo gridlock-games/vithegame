@@ -5,6 +5,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using Newtonsoft.Json;
 using Unity.Netcode;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.Core
 {
@@ -17,6 +18,22 @@ namespace Vi.Core
         {
             _singleton = this;
             DontDestroyOnLoad(gameObject);
+        }
+
+        private void Start()
+        {
+            // If on performant
+            if (QualitySettings.GetQualityLevel() == 0)
+            {
+                StartCoroutine(CacheOpaqueTexture((UniversalRenderPipelineAsset)QualitySettings.renderPipeline));
+            }
+        }
+
+        private IEnumerator CacheOpaqueTexture(UniversalRenderPipelineAsset pipeline)
+        {
+            pipeline.supportsCameraOpaqueTexture = true;
+            for (int i = 0; i < 9; i++) { yield return null; }
+            pipeline.supportsCameraOpaqueTexture = false;
         }
 
         public List<NetSceneManager.ScenePayload> CurrentlyLoadedScenePayloads { get; private set; } = new List<NetSceneManager.ScenePayload>();

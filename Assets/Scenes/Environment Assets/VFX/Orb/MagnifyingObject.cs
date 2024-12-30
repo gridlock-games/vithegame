@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 using System.Collections;
 
 public class MagnifyingObject : MonoBehaviour
@@ -7,28 +6,10 @@ public class MagnifyingObject : MonoBehaviour
     Renderer _renderer;
     Camera _cam;
 
-    private UniversalRenderPipelineAsset pipeline;
-
     void Start()
     {
         _renderer = GetComponent<Renderer>();
         _cam = Camera.main;
-
-        pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
-
-        if (!pipeline.supportsCameraOpaqueTexture)
-        {
-            pipeline.supportsCameraOpaqueTexture = true;
-            StartCoroutine(DisableOpaqueTexture());
-        }
-    }
-
-    private IEnumerator DisableOpaqueTexture()
-    {
-        yield return null;
-        yield return null;
-        yield return null;
-        pipeline.supportsCameraOpaqueTexture = false;
     }
 
     private Camera mainCamera;
