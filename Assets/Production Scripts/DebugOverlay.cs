@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
+using UnityEngine.Rendering.Universal;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -57,13 +58,37 @@ public class DebugOverlay : MonoBehaviour
 
     private IAdaptivePerformance ap = null;
 
+    private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
+
+        switch (currentQuality)
+        {
+            case 0:
+                maxLODBias = 1;
+                break;
+            case 1:
+                maxLODBias = 1.5f;
+                break;
+            case 2:
+                maxLODBias = 2;
+                break;
+            default:
+                Debug.LogWarning("I don't know how to set the max LOD bias! " + currentQuality);
+                break;
+        }
+    }
+
+    private float maxLODBias = 1;
+
     void OnThermalEvent(ThermalMetrics ev)
     {
         if (adaptivePerformanceEnabled)
         {
-            // TODO Store the original max values for these and move between them
             SetDPIScale(Mathf.Lerp(0.7f, 1, 1 - ev.TemperatureLevel));
-            SetLODBias(1 - ev.TemperatureLevel);
+            SetLODBias(Mathf.Lerp(0, maxLODBias, 1 - ev.TemperatureLevel));
 
             if (ev.TemperatureLevel >= 0.75f)
             {
@@ -151,11 +176,13 @@ public class DebugOverlay : MonoBehaviour
     void OnEnable()
     {
         Application.logMessageReceived += Log;
+        QualitySettings.activeQualityLevelChanged += QualitySettings_activeQualityLevelChanged;
     }
 
     void OnDisable()
     {
         Application.logMessageReceived -= Log;
+        QualitySettings.activeQualityLevelChanged -= QualitySettings_activeQualityLevelChanged;
     }
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
