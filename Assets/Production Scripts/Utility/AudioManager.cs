@@ -405,8 +405,8 @@ namespace Vi.Utility
             }
 
             if (currentMusicClip == null) { isCrossfading = false; yield break; }
-            musicSource.time = 0;
             musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[Random.Range(0, currentMusicClip.songs.Length)];
+            musicSource.time = 0;
             if (!musicSource.isPlaying) { musicSource.Play(); }
 
             while (true)
@@ -457,8 +457,8 @@ namespace Vi.Utility
                         }
                         else
                         {
-                            musicSource.time = 0;
                             musicSource.clip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex];
+                            musicSource.time = 0;
                             if (!musicSource.isPlaying) { musicSource.Play(); }
                         }
                         break;
