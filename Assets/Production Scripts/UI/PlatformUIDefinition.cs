@@ -184,6 +184,8 @@ namespace Vi.UI
             }
 
             lastEvaluatedControlScheme = playerInput.currentControlScheme;
+
+            EvaluatePlayerPrefOverrides();
         }
 
         private void EvaluateUIDefinitionsOnFirstFrame()
@@ -262,6 +264,8 @@ namespace Vi.UI
             }
             lastWidthEvaluated = Screen.width;
             lastHeightEvaluated = Screen.height;
+
+            EvaluatePlayerPrefOverrides();
         }
 
         private Dictionary<RectTransform, Vector2> originalPositionMap = new Dictionary<RectTransform, Vector2>();
@@ -281,19 +285,27 @@ namespace Vi.UI
         {
             if (FasterPlayerPrefs.Singleton.HasString(customizablePlayerPrefName))
             {
-                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString(customizablePlayerPrefName));
-
-                foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
-                {
-                    GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
-                    ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
-                }
+                EvaluatePlayerPrefOverrides();
             }
             else
             {
                 foreach (KeyValuePair<RectTransform, Vector2> kvp in originalPositionMap)
                 {
                     kvp.Key.anchoredPosition = kvp.Value;
+                }
+            }
+        }
+
+        private void EvaluatePlayerPrefOverrides()
+        {
+            if (FasterPlayerPrefs.Singleton.HasString(customizablePlayerPrefName))
+            {
+                List<PositionOverrideDefinition> positionOverrideDefinitions = JsonConvert.DeserializeObject<List<PositionOverrideDefinition>>(FasterPlayerPrefs.Singleton.GetString(customizablePlayerPrefName));
+
+                foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
+                {
+                    GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                    ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
                 }
             }
         }
