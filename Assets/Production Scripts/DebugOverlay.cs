@@ -66,6 +66,19 @@ public class DebugOverlay : MonoBehaviour
         SetDPIScale(Mathf.Max(0.6f, 1 - ev.TemperatureLevel));
         SetLODBias(1 - ev.TemperatureLevel);
 
+        if (ev.TemperatureLevel > 0.6f)
+        {
+            SetTargetFrameRate(30);
+        }
+        else if (ev.TemperatureLevel > 0.75f & ev.TemperatureTrend > 0.5f)
+        {
+            SetTargetFrameRate(20);
+        }
+        else
+        {
+            NetSceneManager.SetTargetFrameRate();
+        }
+
         if (!thermalEventsEnabled) { return; }
 
         switch (ev.WarningLevel)
@@ -99,6 +112,14 @@ public class DebugOverlay : MonoBehaviour
 
         Debug.Log("Setting LOD Bias " + value);
         QualitySettings.lodBias = value;
+    }
+
+    private void SetTargetFrameRate(int value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting Target Frame Rate " + value);
+        Application.targetFrameRate = value;
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
