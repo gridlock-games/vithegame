@@ -1,17 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Unity.Netcode;
-using Vi.ScriptableObjects;
-using Vi.Utility;
+using System.Linq;
 using Unity.Collections;
+using Unity.Netcode;
+using Unity.Netcode.Components;
+using UnityEngine;
+using Vi.Core.CombatAgents;
+using Vi.Core.GameModeManagers;
 using Vi.Core.MovementHandlers;
 using Vi.Core.VFX;
-using Vi.Core.GameModeManagers;
-using System.Linq;
-using Vi.Core.CombatAgents;
 using Vi.Core.Weapons;
-using Unity.Netcode.Components;
+using Vi.ScriptableObjects;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -20,6 +20,9 @@ namespace Vi.Core
     [RequireComponent(typeof(SessionProgressionHandler))]
     public abstract class CombatAgent : HittableAgent
     {
+        public bool ExcludeFromKillFeed { get { return excludeFromKillFeed; } }
+        [SerializeField] private bool excludeFromKillFeed;
+
         public CombatAgent Master { get; private set; }
         public virtual void SetMaster(CombatAgent master)
         {
@@ -233,7 +236,7 @@ namespace Vi.Core
 
             LastAliveStartTime = Time.time;
 
-            if (!IsLocalPlayer) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
+            if (!IsLocalPlayer & !ExcludeFromKillFeed) { worldSpaceLabelInstance = ObjectPoolingManager.SpawnObject(worldSpaceLabelPrefab, transform); }
 
             PlayerDataManager.Singleton.AddCombatAgent(this);
 
@@ -347,7 +350,7 @@ namespace Vi.Core
         private float invincibilityEndTime;
         public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
 
-        public bool IsUninterruptable { get { return isUninterruptable.Value; }  }
+        public bool IsUninterruptable { get { return isUninterruptable.Value; } }
 
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
@@ -467,7 +470,7 @@ namespace Vi.Core
                     return MovementHandler.GetPosition();
                 }
             }
-            
+
             if (networkObject.TryGetComponent(out MovementHandler movementHandler))
             {
                 return movementHandler.GetPosition();
@@ -605,7 +608,7 @@ namespace Vi.Core
         private void ActivateRage()
         {
             if (!IsSpawned) { Debug.LogError("Calling CombatAgent.ActivateRage() before this object is spawned!"); return; }
-            
+
             if (!CanTryActivateRageOrPotions()) { return; }
 
             if (IsServer)
@@ -1072,7 +1075,7 @@ namespace Vi.Core
                     }
                 }
             }
-            
+
             switch (deathBehavior)
             {
                 case DeathBehavior.Ragdoll:
