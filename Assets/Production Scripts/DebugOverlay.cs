@@ -53,10 +53,16 @@ public class DebugOverlay : MonoBehaviour
             }
 
             ap.ThermalStatus.ThermalEvent += OnThermalEvent;
+            ap.PerformanceStatus.PerformanceBottleneckChangeEvent += PerformanceStatus_PerformanceBottleneckChangeEvent;
         }
     }
 
     private IAdaptivePerformance ap = null;
+
+    private void PerformanceStatus_PerformanceBottleneckChangeEvent(PerformanceBottleneckChangeEventArgs bottleneckEventArgs)
+    {
+        Debug.Log("Performance Bottleneck Changed " + bottleneckEventArgs.PerformanceBottleneck);
+    }
 
     private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
     {
