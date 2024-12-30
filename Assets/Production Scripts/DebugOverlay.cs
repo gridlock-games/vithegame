@@ -158,15 +158,15 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (temperatureLevel >= 0.7f)
+        if (temperatureLevel >= 0.8f)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (temperatureLevel >= 0.65f)
+        else if (temperatureLevel >= 0.7f)
         {
             QualitySettings.globalTextureMipmapLimit = 2;
         }
-        else if (temperatureLevel >= 0.55f)
+        else if (temperatureLevel >= 0.65f)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }
