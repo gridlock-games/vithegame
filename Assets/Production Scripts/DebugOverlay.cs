@@ -62,7 +62,8 @@ public class DebugOverlay : MonoBehaviour
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
         // TODO Store the original max values for these and move between them
-        SetDPIScale(StringUtility.NormalizeValue(1 - ev.TemperatureLevel, 0.5f, 1));
+
+        SetDPIScale(Mathf.Max(0.6f, 1 - ev.TemperatureLevel));
         SetLODBias(1 - ev.TemperatureLevel);
 
         if (!thermalEventsEnabled) { return; }
