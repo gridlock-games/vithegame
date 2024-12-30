@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using Vi.Core.GameModeManagers;
 using System.Linq;
+using UnityEngine;
+using Vi.Core.GameModeManagers;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -23,6 +22,25 @@ namespace Vi.UI
 
         private void Start()
         {
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                List<KillFeedElement> newList = new List<KillFeedElement>();
+                int counter = 1;
+                foreach (KillFeedElement ele in killFeedElementInstances)
+                {
+                    if (counter > 3)
+                    {
+                        ele.GetComponent<Canvas>().enabled = false;
+                    }
+                    else
+                    {
+                        newList.Add(ele);
+                    }
+                    counter++;
+                }
+                killFeedElementInstances = newList.ToArray();
+            }
+
             previewKillHistoryList = new List<GameModeManager.KillHistoryElement>()
             {
                 new GameModeManager.KillHistoryElement(GameModeManager.KillHistoryElement.KillType.Player),
