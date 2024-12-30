@@ -18,6 +18,11 @@ namespace Vi.Utility
             MainCamera = Camera.main;
         }
 
+        private void Awake()
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+
         private void Start()
         {
             GetMainCamera();
