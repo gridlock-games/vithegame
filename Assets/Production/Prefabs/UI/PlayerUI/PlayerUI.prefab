@@ -4901,7 +4901,7 @@ PrefabInstance:
     - target: {fileID: 5116326892268872488, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 49.5
+      value: 49
       objectReference: {fileID: 0}
     - target: {fileID: 6117385750501809473, guid: b6ba154c51138ee40b1debc0c893f0f5,
         type: 3}
@@ -7625,6 +7625,16 @@ PrefabInstance:
       propertyPath: onPointerDown.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Ability1
       objectReference: {fileID: 0}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7062514562923407540}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpgradeAbility1
+      objectReference: {fileID: 0}
     - target: {fileID: 7329671601234354843, guid: 9d6aa2de8614e75439360d484c73ef0b,
         type: 3}
       propertyPath: m_Name
@@ -8152,6 +8162,16 @@ PrefabInstance:
         type: 3}
       propertyPath: onPointerDown.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Ability2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7062514562923407540}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpgradeAbility2
       objectReference: {fileID: 0}
     - target: {fileID: 7329671601234354843, guid: 9d6aa2de8614e75439360d484c73ef0b,
         type: 3}
@@ -9109,6 +9129,16 @@ PrefabInstance:
         type: 3}
       propertyPath: onPointerDown.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: Ability3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 7062514562923407540}
+    - target: {fileID: 6270888416881175503, guid: 9d6aa2de8614e75439360d484c73ef0b,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UpgradeAbility3
       objectReference: {fileID: 0}
     - target: {fileID: 7329671601234354843, guid: 9d6aa2de8614e75439360d484c73ef0b,
         type: 3}

@@ -81,6 +81,15 @@ namespace Vi.Core.MovementHandlers
             else if (!combatAgent.ShouldPlayHitStop() & !disableBots)
             {
                 if (!targetFinder.GetTarget() & targetingConstrainedByDistance) { return transform.rotation; }
+                
+                if (targetFinder.GetTarget())
+                {
+                    if (Vector3.Distance(GetPosition(), Destination) < stoppingDistance)
+                    {
+                        return Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(targetFinder.GetTarget().transform.position - GetPosition()), Time.deltaTime * 3);
+                    }
+                }
+                
                 return Quaternion.Lerp(transform.rotation, camDirection == Vector3.zero ? Quaternion.identity : IsolateYRotation(Quaternion.LookRotation(camDirection)), Time.deltaTime * 3);
             }
 

@@ -709,7 +709,7 @@ namespace Vi.ScriptableObjects
             return Mathf.Clamp((Time.time - GetLastAbilityActivateTime(ability)) / abilityCooldownDuration, 0, 1);
         }
 
-        public float AbilityCooldownMultiplier { get; set; }
+        public float AbilityCooldownMultiplier { get; set; } = 1;
         private float GetAbilityCooldownDuration(ActionClip ability)
         {
             if (ability == ability1)

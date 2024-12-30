@@ -1,16 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.AdaptivePerformance;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
-using Vi.Player;
-using Unity.Netcode;
-using System.IO;
-using Vi.Core.CombatAgents;
-using Unity.Netcode.Transports.UTP;
-using UnityEngine.AdaptivePerformance;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -63,7 +59,42 @@ public class DebugOverlay : MonoBehaviour
 
     void OnThermalEvent(ThermalMetrics ev)
     {
-        Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
+        // TODO Store the original max values for these and move between them
+        SetDPIScale(Mathf.Max(0.7f, 1 - ev.TemperatureLevel));
+        SetLODBias(1 - ev.TemperatureLevel);
+
+        if (ev.TemperatureLevel >= 0.75f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 3;
+        }
+        else if (ev.TemperatureLevel >= 0.65f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (ev.TemperatureLevel >= 0.55f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 1;
+        }
+        else
+        {
+            QualitySettings.globalTextureMipmapLimit = 0;
+        }
+
+        if (ev.TemperatureLevel >= 0.7f)
+        {
+            SetTargetFrameRate(30);
+        }
+        else if (ev.TemperatureLevel >= 0.6f)
+        {
+            SetTargetFrameRate(Mathf.Min(Application.targetFrameRate, 40));
+        }
+        else
+        {
+            NetSceneManager.SetTargetFrameRate();
+        }
+
+        Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
+        Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
         if (!thermalEventsEnabled) { return; }
 
@@ -81,6 +112,31 @@ public class DebugOverlay : MonoBehaviour
                 thermalWarningImage.color = Color.red;
                 break;
         }
+    }
+
+    private void SetDPIScale(float value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting DPI Scale " + value);
+        QualitySettings.resolutionScalingFixedDPIFactor = value;
+        FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", value);
+    }
+
+    private void SetLODBias(float value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting LOD Bias " + value);
+        QualitySettings.lodBias = value;
+    }
+
+    private void SetTargetFrameRate(int value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting Target Frame Rate " + value);
+        Application.targetFrameRate = value;
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
@@ -203,7 +259,7 @@ public class DebugOverlay : MonoBehaviour
         }
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
-        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled | packetLossEnabled | jitterEnabled;
+        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled | packetLossEnabled | jitterEnabled | thermalEventsEnabled;
         consoleParent.enabled = consoleEnabled;
 
         if (!fpsEnabled) { fpsText.text = ""; }
