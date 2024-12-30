@@ -113,13 +113,9 @@ public class DebugOverlay : MonoBehaviour
                 QualitySettings.globalTextureMipmapLimit = 0;
             }
 
-            if (ev.TemperatureLevel >= 0.7f)
+            if (ev.TemperatureLevel >= 0.85f)
             {
                 SetTargetFrameRate(30);
-            }
-            else if (ev.TemperatureLevel >= 0.6f)
-            {
-                SetTargetFrameRate(Mathf.Min(Application.targetFrameRate, 40));
             }
             else
             {
