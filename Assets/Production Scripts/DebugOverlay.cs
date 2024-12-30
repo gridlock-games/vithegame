@@ -89,15 +89,15 @@ public class DebugOverlay : MonoBehaviour
 
     void OnThermalEvent(ThermalMetrics ev)
     {
-        if (adaptivePerformanceEnabled)
+        if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
         {
             // Adaptive resolution scale
-            SetDPIScale(Mathf.Lerp(0.7f, 1, 1 - ev.TemperatureLevel));
+            SetDPIScale(Mathf.Lerp(0.6f, 1, 1 - Mathf.Lerp(0.5f, 1, ev.TemperatureLevel)));
 
             // Adaptive LOD
             if (ev.TemperatureLevel > 0.7f)
             {
-                SetLODBias(Mathf.Lerp(0, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
+                SetLODBias(Mathf.Lerp(0.25f, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
             }
             else
             {
@@ -107,7 +107,12 @@ public class DebugOverlay : MonoBehaviour
             // Adaptive Render Distance
             if (ev.TemperatureLevel > 0.7f)
             {
-                ChangeRenderDistance(Mathf.RoundToInt(Mathf.Lerp(20, 200, 1 - ev.TemperatureLevel)));
+                ChangeRenderDistance(Mathf.RoundToInt(Mathf.Lerp(20, 100, 1 - ev.TemperatureLevel)));
+            }
+            else
+            {
+                // TODO set this to a maximum player pref
+                ChangeRenderDistance(200);
             }
 
             // Texture mip maps
