@@ -68,8 +68,6 @@ public class DebugOverlay : MonoBehaviour
     {
         Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
 
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
         switch (currentQuality)
         {
             case 0:
@@ -97,10 +95,23 @@ public class DebugOverlay : MonoBehaviour
             SetDPIScale(Mathf.Lerp(0.7f, 1, 1 - ev.TemperatureLevel));
 
             // Adaptive LOD
-            SetLODBias(Mathf.Lerp(0, maxLODBias, 1 - ev.TemperatureLevel));
+            if (ev.TemperatureLevel > 0.7f)
+            {
+                SetLODBias(Mathf.Lerp(0, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
+            }
+            else
+            {
+                SetLODBias(maxLODBias);
+            }
+            
+            // Adaptive Render Distance
+            if (ev.TemperatureLevel > 0.7f)
+            {
+                ChangeRenderDistance(Mathf.RoundToInt(Mathf.Lerp(20, 200, 1 - ev.TemperatureLevel)));
+            }
 
             // Texture mip maps
-            if (ev.TemperatureLevel >= 0.75f)
+            if (ev.TemperatureLevel >= 0.7f)
             {
                 QualitySettings.globalTextureMipmapLimit = 3;
             }
@@ -118,7 +129,7 @@ public class DebugOverlay : MonoBehaviour
             }
 
             // Adaptive frame rate
-            if (ev.TemperatureLevel >= 0.85f)
+            if (ev.TemperatureLevel >= 0.8f)
             {
                 SetTargetFrameRate(30);
             }
@@ -161,6 +172,18 @@ public class DebugOverlay : MonoBehaviour
                 thermalWarningImage.color = Color.red;
                 break;
         }
+    }
+
+    private void ChangeRenderDistance(int renderDistance)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        if (renderDistance < 10)
+        {
+            renderDistance = 10;
+        }
+        Debug.Log("Changing Render Distance " + renderDistance);
+        FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
     }
 
     private void SetDPIScale(float value)
