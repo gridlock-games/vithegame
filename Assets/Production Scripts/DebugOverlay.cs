@@ -1,16 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.AdaptivePerformance;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
-using Vi.Player;
-using Unity.Netcode;
-using System.IO;
-using Vi.Core.CombatAgents;
-using Unity.Netcode.Transports.UTP;
-using UnityEngine.AdaptivePerformance;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -203,7 +199,7 @@ public class DebugOverlay : MonoBehaviour
         }
 
         Debug.unityLogger.logEnabled = Application.isEditor | consoleEnabled | WebRequestManager.IsServerBuild();
-        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled | packetLossEnabled | jitterEnabled;
+        debugCanvas.enabled = consoleEnabled | fpsEnabled | pingEnabled | packetLossEnabled | jitterEnabled | thermalEventsEnabled;
         consoleParent.enabled = consoleEnabled;
 
         if (!fpsEnabled) { fpsText.text = ""; }
