@@ -94,6 +94,7 @@ namespace Vi.UI
             abilityIcon.sprite = Ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = Ability.abilityImageIcon;
             keybindText.text = previewAbility.name.Replace("Ability", "");
+            OnKeybindTextChange();
             cooldownText.text = "";
             stackVisualParent.gameObject.SetActive(false);
         }
@@ -104,6 +105,7 @@ namespace Vi.UI
             abilityIcon.sprite = ability.abilityImageIcon;
             inactiveAbilityIcon.sprite = ability.abilityImageIcon;
             this.keybindText.text = keybindText;
+            OnKeybindTextChange();
 
             lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
             
@@ -112,6 +114,11 @@ namespace Vi.UI
             lastStaminaCost = staminaCost;
 
             stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
+        }
+
+        private void OnKeybindTextChange()
+        {
+            cooldownText.rectTransform.offsetMax = new Vector2(0, string.IsNullOrWhiteSpace(keybindText.text) ? 0 : 20);
         }
 
         private Image borderImage;
