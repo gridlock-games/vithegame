@@ -59,40 +59,43 @@ public class DebugOverlay : MonoBehaviour
 
     void OnThermalEvent(ThermalMetrics ev)
     {
-        // TODO Store the original max values for these and move between them
-        SetDPIScale(Mathf.Max(0.7f, 1 - ev.TemperatureLevel));
-        SetLODBias(1 - ev.TemperatureLevel);
+        if (adaptivePerformanceEnabled)
+        {
+            // TODO Store the original max values for these and move between them
+            SetDPIScale(Mathf.Lerp(0.7f, 1, 1 - ev.TemperatureLevel));
+            SetLODBias(1 - ev.TemperatureLevel);
 
-        if (ev.TemperatureLevel >= 0.75f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 3;
-        }
-        else if (ev.TemperatureLevel >= 0.65f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 2;
-        }
-        else if (ev.TemperatureLevel >= 0.55f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 1;
-        }
-        else
-        {
-            QualitySettings.globalTextureMipmapLimit = 0;
-        }
+            if (ev.TemperatureLevel >= 0.75f)
+            {
+                QualitySettings.globalTextureMipmapLimit = 3;
+            }
+            else if (ev.TemperatureLevel >= 0.65f)
+            {
+                QualitySettings.globalTextureMipmapLimit = 2;
+            }
+            else if (ev.TemperatureLevel >= 0.55f)
+            {
+                QualitySettings.globalTextureMipmapLimit = 1;
+            }
+            else
+            {
+                QualitySettings.globalTextureMipmapLimit = 0;
+            }
 
-        if (ev.TemperatureLevel >= 0.7f)
-        {
-            SetTargetFrameRate(30);
+            if (ev.TemperatureLevel >= 0.7f)
+            {
+                SetTargetFrameRate(30);
+            }
+            else if (ev.TemperatureLevel >= 0.6f)
+            {
+                SetTargetFrameRate(Mathf.Min(Application.targetFrameRate, 40));
+            }
+            else
+            {
+                NetSceneManager.SetTargetFrameRate();
+            }
         }
-        else if (ev.TemperatureLevel >= 0.6f)
-        {
-            SetTargetFrameRate(Mathf.Min(Application.targetFrameRate, 40));
-        }
-        else
-        {
-            NetSceneManager.SetTargetFrameRate();
-        }
-
+        
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
         Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
@@ -240,6 +243,7 @@ public class DebugOverlay : MonoBehaviour
     }
 
     private bool thermalEventsEnabled;
+    private bool adaptivePerformanceEnabled;
 
     private void RefreshStatus()
     {
@@ -249,6 +253,7 @@ public class DebugOverlay : MonoBehaviour
         packetLossEnabled = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
+        adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
 
         if (!thermalEventsEnabled) { thermalWarningImage.enabled = false; }
 
