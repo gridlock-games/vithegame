@@ -7,7 +7,6 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
-using UnityEngine.Rendering.Universal;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -87,36 +86,31 @@ public class DebugOverlay : MonoBehaviour
 
     private float maxLODBias = 1;
 
+    [Header("Adaptive Performance, X is 1 - temperature level")]
+    [Header("Left is hot, Right is cold")]
+    [SerializeField] private AnimationCurve DPIScalingCurve;
+    [SerializeField] private AnimationCurve LODBiasCurve;
+    [SerializeField] private AnimationCurve renderDistanceCurve;
+    [SerializeField] private AnimationCurve audioCullingDistanceCurve;
+
     void OnThermalEvent(ThermalMetrics ev)
     {
         if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
         {
+            float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
+            
             // Adaptive resolution scale
-            SetDPIScale(Mathf.Lerp(0.4f, 1, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
+            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel));
 
             // Adaptive LOD
-            SetLODBias(Mathf.Lerp(0.25f, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
+            SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
 
             // Adaptive Render Distance
-            ChangeRenderDistance(Mathf.RoundToInt(Mathf.Lerp(20, 200, 1 - ev.TemperatureLevel)));
+            float maxRenderDistance = 200;
+            ChangeRenderDistance(Mathf.RoundToInt(renderDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxRenderDistance));
 
             // Texture mip maps
-            if (ev.TemperatureLevel >= 0.7f)
-            {
-                QualitySettings.globalTextureMipmapLimit = 3;
-            }
-            else if (ev.TemperatureLevel >= 0.65f)
-            {
-                QualitySettings.globalTextureMipmapLimit = 2;
-            }
-            else if (ev.TemperatureLevel >= 0.55f)
-            {
-                QualitySettings.globalTextureMipmapLimit = 1;
-            }
-            else
-            {
-                QualitySettings.globalTextureMipmapLimit = 0;
-            }
+            ChangeTextureMipMaps(ev.TemperatureLevel);
 
             // Adaptive frame rate
             if (ev.TemperatureLevel >= 0.8f)
@@ -128,25 +122,10 @@ public class DebugOverlay : MonoBehaviour
                 NetSceneManager.SetTargetFrameRate();
             }
 
-            // Adaptive Audio Culling (to help CPU)
-            if (ev.TemperatureLevel > 0.75f)
-            {
-                AudioManager.AudioCullingDistance = 20;
-            }
-            else if (ev.TemperatureLevel > 0.7f)
-            {
-                AudioManager.AudioCullingDistance = 35;
-            }
-            else if (ev.TemperatureLevel > 0.65f)
-            {
-                AudioManager.AudioCullingDistance = 50;
-            }
-            else
-            {
-                AudioManager.AudioCullingDistance = Mathf.Infinity;
-            }
+            float maxAudioCullingDistance = 100;
+            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxAudioCullingDistance;
         }
-        
+
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
         Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
@@ -168,6 +147,35 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
+    private void ChangeTextureMipMaps(float temperatureLevel)
+    {
+        if (NetSceneManager.DoesExist())
+        {
+            if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
+            {
+                QualitySettings.globalTextureMipmapLimit = 0;
+                return;
+            }
+        }
+
+        if (temperatureLevel >= 0.7f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 3;
+        }
+        else if (temperatureLevel >= 0.65f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (temperatureLevel >= 0.55f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 1;
+        }
+        else
+        {
+            QualitySettings.globalTextureMipmapLimit = 0;
+        }
+    }
+
     private void ChangeRenderDistance(int renderDistance)
     {
         if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
@@ -185,8 +193,29 @@ public class DebugOverlay : MonoBehaviour
         if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
 
         Debug.Log("Setting DPI Scale " + value);
+
+        if (NetSceneManager.DoesExist())
+        {
+            if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
+            {
+                value = Mathf.Max(value, 0.9f);
+            }
+        }
+
         QualitySettings.resolutionScalingFixedDPIFactor = value;
         FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", value);
+    }
+    
+    private void OnSceneUnload()
+    {
+        if (NetSceneManager.DoesExist())
+        {
+            if (!NetSceneManager.GetShouldSpawnPlayer())
+            {
+                SetDPIScale(0.9f);
+                ChangeTextureMipMaps(0);
+            }
+        }
     }
 
     private void SetLODBias(float value)
@@ -215,12 +244,14 @@ public class DebugOverlay : MonoBehaviour
     {
         Application.logMessageReceived += Log;
         QualitySettings.activeQualityLevelChanged += QualitySettings_activeQualityLevelChanged;
+        EventDelegateManager.sceneUnloaded += OnSceneUnload;
     }
 
     void OnDisable()
     {
         Application.logMessageReceived -= Log;
         QualitySettings.activeQualityLevelChanged -= QualitySettings_activeQualityLevelChanged;
+        EventDelegateManager.sceneUnloaded -= OnSceneUnload;
     }
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
