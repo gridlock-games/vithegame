@@ -288,6 +288,13 @@ public class DebugOverlay : MonoBehaviour
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
         adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
 
+        if (!adaptivePerformanceEnabled)
+        {
+            QualitySettings.lodBias = maxLODBias;
+            QualitySettings.globalTextureMipmapLimit = 0;
+            NetSceneManager.SetTargetFrameRate();
+        }
+
         if (!thermalEventsEnabled) { thermalWarningImage.enabled = false; }
 
         if (!consoleEnabled)
