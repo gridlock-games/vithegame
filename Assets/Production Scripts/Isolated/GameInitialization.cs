@@ -61,7 +61,7 @@ namespace Vi.Core
 
             FasterPlayerPrefs.Singleton.SetString("LastApplicationVersion", Application.version);
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("EnableAdaptivePerformance")) { FasterPlayerPrefs.Singleton.SetBool("EnableAdaptivePerformance", true); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("EnableAdaptivePerformance")) { FasterPlayerPrefs.Singleton.SetBool("EnableAdaptivePerformance", FasterPlayerPrefs.IsMobilePlatform); }
             
             if (!FasterPlayerPrefs.Singleton.HasBool("TutorialCompleted")) { FasterPlayerPrefs.Singleton.SetBool("TutorialCompleted", false); }
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);

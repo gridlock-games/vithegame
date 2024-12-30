@@ -66,9 +66,9 @@ public class DebugOverlay : MonoBehaviour
 
     private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
     {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
         Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
+
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
 
         switch (currentQuality)
         {
@@ -93,9 +93,13 @@ public class DebugOverlay : MonoBehaviour
     {
         if (adaptivePerformanceEnabled)
         {
+            // Adaptive resolution scale
             SetDPIScale(Mathf.Lerp(0.7f, 1, 1 - ev.TemperatureLevel));
+
+            // Adaptive LOD
             SetLODBias(Mathf.Lerp(0, maxLODBias, 1 - ev.TemperatureLevel));
 
+            // Texture mip maps
             if (ev.TemperatureLevel >= 0.75f)
             {
                 QualitySettings.globalTextureMipmapLimit = 3;
@@ -113,6 +117,7 @@ public class DebugOverlay : MonoBehaviour
                 QualitySettings.globalTextureMipmapLimit = 0;
             }
 
+            // Adaptive frame rate
             if (ev.TemperatureLevel >= 0.85f)
             {
                 SetTargetFrameRate(30);
@@ -120,6 +125,20 @@ public class DebugOverlay : MonoBehaviour
             else
             {
                 NetSceneManager.SetTargetFrameRate();
+            }
+
+            // Adaptive Audio Culling (to help CPU)
+            if (ev.TemperatureLevel > 0.75f)
+            {
+                AudioManager.AudioCullingDistance = 10;
+            }
+            else if (ev.TemperatureLevel > 0.7f)
+            {
+                AudioManager.AudioCullingDistance = 20;
+            }
+            else
+            {
+                AudioManager.AudioCullingDistance = Mathf.Infinity;
             }
         }
         

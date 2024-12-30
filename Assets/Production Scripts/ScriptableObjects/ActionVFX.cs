@@ -169,7 +169,10 @@ namespace Vi.ScriptableObjects
         {
             yield return new WaitForSeconds(awakeAudioClipDelay);
             AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, audioClipToPlayOnAwake, false, actionVFXSoundEffectVolume);
-            audioSource.time = awakeAudioClipStartTime;
+            if (audioSource)
+            {
+                audioSource.time = awakeAudioClipStartTime;
+            }
         }
 
         [SerializeField] private PooledObject[] VFXToPlayOnDestroy = new PooledObject[0];

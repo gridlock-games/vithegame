@@ -63,6 +63,14 @@ namespace Vi.Utility
             audioSource.maxDistance = defaultMaxDistance;
         }
 
+        public static float AudioCullingDistance { get; set; } = Mathf.Infinity;
+
+        private bool IsCameraWithinCullingDistance(Vector3 position)
+        {
+            if (!FindMainCamera.MainCamera) { return true; }
+            return Vector3.Distance(FindMainCamera.MainCamera.transform.position, position) < AudioCullingDistance;
+        }
+
         /// <summary>
         /// Plays a clip in 3D space, pass null for the first parameter if you want this to play completely before destruction
         /// </summary>
@@ -72,6 +80,8 @@ namespace Vi.Utility
         /// <param name="volume"></param>
         public AudioSource PlayClipAtPoint(GameObject objectToDestroyWith, AudioClip audioClip, Vector3 position, float volume)
         {
+            if (!IsCameraWithinCullingDistance(position)) { return null; }
+
             AudioSource audioSource = ObjectPoolingManager.SpawnObject(audioSourcePrefab, position, Quaternion.identity).GetComponent<AudioSource>();
             ResetAudioSourceProperties(audioSource);
             audioSource.volume *= volume;
@@ -117,6 +127,11 @@ namespace Vi.Utility
         /// </summary>
         public AudioSource PlayClipOnTransform(Transform transformToFollow, AudioClip audioClip, bool shouldLoop, float volume)
         {
+            if (!shouldLoop)
+            {
+                if (!IsCameraWithinCullingDistance(transformToFollow.position)) { return null; }
+            }
+
             AudioSource audioSource = ObjectPoolingManager.SpawnObject(audioSourcePrefab, transformToFollow.position, transformToFollow.rotation).GetComponent<AudioSource>();
             ResetAudioSourceProperties(audioSource);
             audioSource.volume *= volume;
@@ -230,7 +245,7 @@ namespace Vi.Utility
         {
             _singleton = this;
 
-#if !UNITY_SERVER
+#if !UNITY_SERVER || UNITY_EDITOR
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChange;
 
             bool shouldReset = false;
@@ -259,7 +274,7 @@ namespace Vi.Utility
 #endif
         }
 
-#if !UNITY_SERVER
+#if !UNITY_SERVER || UNITY_EDITOR
         private static void OnAudioConfigurationChange(bool deviceWasChanged)
         {
             FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode);

@@ -78,7 +78,7 @@ namespace Vi.Core.Weapons
             if (soundToPlayOnSpawn.Length > 0)
             {
                 AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnSpawn[Random.Range(0, soundToPlayOnSpawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
-                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
+                if (audioSource) { audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance; }
             }
         }
 
@@ -126,7 +126,7 @@ namespace Vi.Core.Weapons
                             if (Vector3.Distance(localPlayerKvp.Value.transform.position, transform.position) < Weapon.projectileNearbyWhooshDistanceThreshold)
                             {
                                 AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(transform, whooshNearbySound[Random.Range(0, whooshNearbySound.Length)], false, Weapon.projectileNearbyWhooshVolume);
-                                audioSource.maxDistance = 20;
+                                if (audioSource) { audioSource.maxDistance = 20; }
                                 nearbyWhooshPlayed = true;
                             }
                         }
@@ -245,7 +245,7 @@ namespace Vi.Core.Weapons
             if (soundToPlayOnDespawn.Length > 0)
             {
                 AudioSource audioSource = AudioManager.Singleton.PlayClipAtPoint(PlayerDataManager.Singleton.gameObject, soundToPlayOnDespawn[Random.Range(0, soundToPlayOnDespawn.Length)], transform.position, Weapon.attackSoundEffectVolume);
-                audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance;
+                if (audioSource) { audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance; }
             }
         }
 
