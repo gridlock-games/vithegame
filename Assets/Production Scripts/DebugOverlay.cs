@@ -61,6 +61,10 @@ public class DebugOverlay : MonoBehaviour
     {
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel + " Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
 
+        // TODO Store the original max values for these and move between them
+        SetDPIScale(StringUtility.NormalizeValue(1 - ev.TemperatureLevel, 0.5f, 1));
+        SetLODBias(1 - ev.TemperatureLevel);
+
         if (!thermalEventsEnabled) { return; }
 
         switch (ev.WarningLevel)
@@ -77,6 +81,23 @@ public class DebugOverlay : MonoBehaviour
                 thermalWarningImage.color = Color.red;
                 break;
         }
+    }
+
+    private void SetDPIScale(float value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting DPI Scale " + value);
+        QualitySettings.resolutionScalingFixedDPIFactor = value;
+        FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", value);
+    }
+
+    private void SetLODBias(float value)
+    {
+        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+
+        Debug.Log("Setting LOD Bias " + value);
+        QualitySettings.lodBias = value;
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
