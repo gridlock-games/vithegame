@@ -95,14 +95,7 @@ public class DebugOverlay : MonoBehaviour
             SetDPIScale(Mathf.Lerp(0.4f, 1, 1 - Mathf.Lerp(0.5f, 1, ev.TemperatureLevel)));
 
             // Adaptive LOD
-            if (ev.TemperatureLevel > 0.7f)
-            {
-                SetLODBias(Mathf.Lerp(0.25f, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
-            }
-            else
-            {
-                SetLODBias(maxLODBias);
-            }
+            SetLODBias(Mathf.Lerp(0.25f, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
 
             // Adaptive Render Distance
             ChangeRenderDistance(Mathf.RoundToInt(Mathf.Lerp(20, 200, 1 - ev.TemperatureLevel)));
@@ -138,11 +131,15 @@ public class DebugOverlay : MonoBehaviour
             // Adaptive Audio Culling (to help CPU)
             if (ev.TemperatureLevel > 0.75f)
             {
-                AudioManager.AudioCullingDistance = 10;
+                AudioManager.AudioCullingDistance = 20;
             }
             else if (ev.TemperatureLevel > 0.7f)
             {
-                AudioManager.AudioCullingDistance = 20;
+                AudioManager.AudioCullingDistance = 35;
+            }
+            else if (ev.TemperatureLevel > 0.65f)
+            {
+                AudioManager.AudioCullingDistance = 50;
             }
             else
             {
