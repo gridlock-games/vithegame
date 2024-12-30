@@ -147,7 +147,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition()) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -165,7 +165,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, GetPosition()) > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -185,7 +185,7 @@ namespace Vi.Core.MovementHandlers
                         distanceToStructure = Vector3.Distance(structure.transform.position, GetPosition());
                         if (targetingConstrainedByDistance)
                         {
-                            if (distanceToStructure > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -204,7 +204,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (dist > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -223,6 +223,15 @@ namespace Vi.Core.MovementHandlers
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
                         distanceToAgent = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
                         targetFinder.SetTarget(combatAgent);
                         break;
                     }
@@ -235,7 +244,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (dist > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -255,7 +264,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), GetPosition()) > maxTargetDistance)
+                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -453,10 +462,19 @@ namespace Vi.Core.MovementHandlers
         [SerializeField] private float HPRagePercent = 0.5f;
 
         private float spawnFixedTime = Mathf.NegativeInfinity;
+        private Vector3 spawnPosition;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             spawnFixedTime = Time.fixedTime;
+            spawnPosition = transform.position;
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            spawnFixedTime = Mathf.NegativeInfinity;
+            spawnPosition = default;
         }
 
         private void EvaluateAction()
