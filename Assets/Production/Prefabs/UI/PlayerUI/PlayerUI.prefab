@@ -6641,6 +6641,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4311925691747723503}
+    - targetCorrespondingSourceObject: {fileID: 8115495220623277460, guid: 7a4a98969b3273c478b7158c8b5b169a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4256611180235939177}
+    - targetCorrespondingSourceObject: {fileID: 6945499235385974707, guid: 7a4a98969b3273c478b7158c8b5b169a,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8146696179483538437}
   m_SourcePrefab: {fileID: 100100000, guid: 7a4a98969b3273c478b7158c8b5b169a, type: 3}
 --- !u!224 &5134903402201956660 stripped
 RectTransform:
@@ -6648,13 +6656,42 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 2819686236168183430}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5134903402201956661 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6945499235385974707, guid: 7a4a98969b3273c478b7158c8b5b169a,
+    type: 3}
+  m_PrefabInstance: {fileID: 2819686236168183430}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &8146696179483538437
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5134903402201956661}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!114 &5134903402201956665 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6945499235385974719, guid: 7a4a98969b3273c478b7158c8b5b169a,
     type: 3}
   m_PrefabInstance: {fileID: 2819686236168183430}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 5134903402201956661}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
@@ -6709,6 +6746,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   comboCounterText: {fileID: 5134903402201956665}
   comboNumberUI: {fileID: 5134903402201956660}
+--- !u!1 &6305477455687557906 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8115495220623277460, guid: 7a4a98969b3273c478b7158c8b5b169a,
+    type: 3}
+  m_PrefabInstance: {fileID: 2819686236168183430}
+  m_PrefabAsset: {fileID: 0}
+--- !u!223 &4256611180235939177
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6305477455687557906}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1001 &2867680468260877654
 PrefabInstance:
   m_ObjectHideFlags: 0
