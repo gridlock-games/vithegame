@@ -72,7 +72,7 @@ namespace Vi.UI
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
-            if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(); }
+            if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(FindObjectsInactive.Include); }
         }
 
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
