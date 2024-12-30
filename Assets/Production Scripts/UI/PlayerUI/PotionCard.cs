@@ -22,6 +22,7 @@ namespace Vi.UI
         {
             isPreview = true;
             keybindText.text = "";
+            OnKeybindTextChange();
             cooldownText.text = "";
 
             inactivePotionIcon.fillAmount = 0;
@@ -86,6 +87,12 @@ namespace Vi.UI
         public void Initialize(string keybindText)
         {
             this.keybindText.text = keybindText;
+            OnKeybindTextChange();
+        }
+
+        private void OnKeybindTextChange()
+        {
+            cooldownText.rectTransform.offsetMax = new Vector2(0, string.IsNullOrWhiteSpace(keybindText.text) ? 0 : 20);
         }
 
         private void Update()

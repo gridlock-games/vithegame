@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
-using Vi.Core.GameModeManagers;
-using Unity.Netcode;
 using Vi.Core;
-using Vi.Core.CombatAgents;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
