@@ -1696,19 +1696,6 @@ namespace Vi.Core
 
         private static readonly Vector3 cameraPivotLocalPosition = new Vector3(0.34f, 1.73f, 0);
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         private void Update()
         {
             if (IsAtRest())
@@ -1723,10 +1710,10 @@ namespace Vi.Core
 
             if (logoEffectWorldSpaceLabel)
             {
-                if (mainCamera)
+                if (FindMainCamera.MainCamera)
                 {
                     logoEffectWorldSpaceLabel.enabled = true;
-                    logoEffectWorldSpaceLabel.transform.rotation = Quaternion.Slerp(logoEffectWorldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - logoEffectWorldSpaceLabel.transform.position), Time.deltaTime * 15);
+                    logoEffectWorldSpaceLabel.transform.rotation = Quaternion.Slerp(logoEffectWorldSpaceLabel.transform.rotation, Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - logoEffectWorldSpaceLabel.transform.position), Time.deltaTime * 15);
                 }
                 else
                 {
@@ -1777,17 +1764,15 @@ namespace Vi.Core
         private static readonly Vector3 aimTargetOffset = new Vector3(0, 0, 10);
         private void RefreshAimPoint()
         {
-            FindMainCamera();
-
             if (!IsSpawned) { return; }
             if (!LimbReferences.aimTargetIKSolver) { return; }
 
             if (IsOwner)
             {
-                if (NetworkObject.IsPlayerObject & mainCamera & !UseGenericAimPoint)
+                if (NetworkObject.IsPlayerObject & FindMainCamera.MainCamera & !UseGenericAimPoint)
                 {
-                    aimPoint.Value = mainCamera.transform.position + mainCamera.transform.rotation * aimTargetOffset;
-                    cameraForwardDir.Value = mainCamera.transform.forward;
+                    aimPoint.Value = FindMainCamera.MainCamera.transform.position + FindMainCamera.MainCamera.transform.rotation * aimTargetOffset;
+                    cameraForwardDir.Value = FindMainCamera.MainCamera.transform.forward;
                 }
                 else
                 {

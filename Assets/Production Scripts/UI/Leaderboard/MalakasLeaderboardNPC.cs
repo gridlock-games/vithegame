@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vi.Core;
 using Vi.Player;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -78,29 +79,13 @@ namespace Vi.UI
         private const float scalingSpeed = 8;
         private const float rotationSpeed = 15;
 
-        private Camera mainCamera;
-
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         private void Update()
         {
-            FindMainCamera();
-
             worldSpaceLabel.transform.localScale = Vector3.Lerp(worldSpaceLabel.transform.localScale, localPlayerInRange ? originalScale : Vector3.zero, Time.deltaTime * scalingSpeed);
 
-            if (mainCamera)
+            if (FindMainCamera.MainCamera)
             {
-                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(mainCamera.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
+                worldSpaceLabel.transform.rotation = Quaternion.Slerp(worldSpaceLabel.transform.rotation, Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - worldSpaceLabel.transform.position), Time.deltaTime * rotationSpeed);
             }
         }
     }

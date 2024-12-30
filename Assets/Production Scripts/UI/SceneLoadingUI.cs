@@ -47,19 +47,6 @@ namespace Vi.UI
             Canvas.ForceUpdateCanvases();
         }
 
-        private Camera mainCamera;
-        private void FindMainCamera()
-        {
-            if (mainCamera)
-            {
-                if (mainCamera.gameObject.CompareTag("MainCamera"))
-                {
-                    return;
-                }
-            }
-            mainCamera = Camera.main;
-        }
-
         NetworkCallbackManager networkCallbackManager;
         private void Start()
         {
@@ -84,8 +71,6 @@ namespace Vi.UI
         public static bool IsDisplaying { get; private set; }
         private void UpdateUI(bool fade)
         {
-            FindMainCamera();
-
             string topText = "";
             if (NetworkManager.Singleton)
             {
@@ -96,7 +81,7 @@ namespace Vi.UI
                 }
                 else if (NetworkManager.Singleton.IsConnectedClient & NetSceneManager.DoesExist())
                 {
-                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayerCached & !mainCamera);
+                    spawningPlayerObjectParent.SetActive(NetSceneManager.Singleton.ShouldSpawnPlayerCached & !FindMainCamera.MainCamera);
 
                     if (PlayerDataManager.DoesExist())
                     {
