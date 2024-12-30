@@ -92,7 +92,7 @@ public class DebugOverlay : MonoBehaviour
         if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
         {
             // Adaptive resolution scale
-            SetDPIScale(Mathf.Lerp(0.4f, 1, 1 - Mathf.Lerp(0.5f, 1, ev.TemperatureLevel)));
+            SetDPIScale(Mathf.Lerp(0.4f, 1, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
 
             // Adaptive LOD
             SetLODBias(Mathf.Lerp(0.25f, maxLODBias, 1 - Mathf.Lerp(0.7f, 1, ev.TemperatureLevel)));
