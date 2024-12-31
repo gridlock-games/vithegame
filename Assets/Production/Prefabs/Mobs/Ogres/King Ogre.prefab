@@ -156,6 +156,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5737665917497646393, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
+      propertyPath: disableHitReactions
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5737665917497646393, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+        type: 3}
       propertyPath: weaponOption.weapon
       value: 
       objectReference: {fileID: 11400000, guid: d3b12e71473af6540935a2f8d2a248ab,
@@ -294,7 +299,7 @@ PrefabInstance:
     - target: {fileID: 9120088022840818652, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1404366228
+      value: 1481636509
       objectReference: {fileID: 0}
     - target: {fileID: 9120088022840818652, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
