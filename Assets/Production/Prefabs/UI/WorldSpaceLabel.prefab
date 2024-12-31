@@ -298,7 +298,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -573,6 +573,7 @@ GameObject:
   - component: {fileID: 7095846274849915266}
   - component: {fileID: 8622354700707930082}
   - component: {fileID: 1504964273508476828}
+  - component: {fileID: -2620644170083930722}
   m_Layer: 7
   m_Name: WorldSpaceLabel
   m_TagString: Untagged
@@ -676,6 +677,18 @@ MonoBehaviour:
   numberOfObjectsToPool: 15
   pooledObjectIndex: 12
   isPrewarmObject: 1
+--- !u!114 &-2620644170083930722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7095846274849915327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e150eb54c2edf9740a9c1101450e1d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8045324453081175400
 GameObject:
   m_ObjectHideFlags: 0
@@ -813,7 +826,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0.27450982}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:

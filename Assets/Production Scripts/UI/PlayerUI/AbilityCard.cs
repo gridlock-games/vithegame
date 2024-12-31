@@ -114,6 +114,11 @@ namespace Vi.UI
             lastStaminaCost = staminaCost;
 
             stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
+
+            if (GameModeManager.Singleton)
+            {
+                upgradeAnimationAnimator.gameObject.SetActive(GameModeManager.Singleton.LevelingEnabled);
+            }
         }
 
         private void OnKeybindTextChange()

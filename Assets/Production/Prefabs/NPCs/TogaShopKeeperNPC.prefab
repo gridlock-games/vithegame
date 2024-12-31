@@ -10061,6 +10061,7 @@ GameObject:
   - component: {fileID: 7952205394485598758}
   - component: {fileID: 843864254522680378}
   - component: {fileID: 4059681917432237431}
+  - component: {fileID: 442785449015417006}
   m_Layer: 6
   m_Name: WorldSpaceLabel
   m_TagString: Untagged
@@ -10134,6 +10135,18 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 1
+--- !u!114 &442785449015417006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4195338354673226359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e150eb54c2edf9740a9c1101450e1d17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4201586997898491533
 GameObject:
   m_ObjectHideFlags: 0

@@ -72,7 +72,18 @@ namespace Vi.UI
 
             Attributes localPlayer = PlayerDataManager.Singleton.GetLocalPlayerObject().Value;
             if (localPlayer) { playerInput = localPlayer.GetComponent<PlayerInput>(); }
-            if (!playerInput) { playerInput = FindFirstObjectByType<PlayerInput>(); }
+
+            if (!playerInput)
+            {
+                foreach (PlayerInput pi in FindObjectsByType<PlayerInput>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    if (pi.name.Contains("Controller"))
+                    {
+                        playerInput = pi;
+                        break;
+                    }
+                }
+            }
         }
 
         private List<GameObject> rebindingElementObjects = new List<GameObject>();
@@ -161,7 +172,7 @@ namespace Vi.UI
             if (playerUI) { playerUI.OnRebinding(); }
         }
 
-        private string lastControlScheme;
+        private string lastControlScheme = "PLACEHOLDER";
         private void Update()
         {
             if (playerInput.currentControlScheme == null) { return; }
