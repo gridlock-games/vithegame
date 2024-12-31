@@ -175,6 +175,7 @@ namespace Vi.UI
         private string lastControlScheme = "PLACEHOLDER";
         private void Update()
         {
+            if (!playerInput) { return; }
             if (playerInput.currentControlScheme == null) { return; }
 
             if (playerInput.currentControlScheme != lastControlScheme)
