@@ -225,10 +225,14 @@ namespace Vi.Core
             }
         }
 
+        public Vector3 SpawnPosition { get; private set; }
+
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            SpawnPosition = transform.position;
+
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
@@ -269,6 +273,8 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
+            SpawnPosition = default;
+
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
             spirit.OnValueChanged -= OnSpiritChanged;
@@ -1182,6 +1188,7 @@ namespace Vi.Core
             return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
+        [SerializeField] private bool disableHitReactions;
         protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
             if (!CanProcessHit(isMeleeHit, attacker, attack, runtimeWeapon)) { return HitResult.False; }
@@ -1326,7 +1333,7 @@ namespace Vi.Core
 
                 if (hitReaction.ailment == ActionClip.Ailment.None)
                 {
-                    if (!IsGrabbed & !IsRaging)
+                    if (!IsGrabbed & !IsRaging & !disableHitReactions)
                     {
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks

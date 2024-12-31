@@ -168,7 +168,7 @@ namespace Vi.Core.GameModeManagers
             lastOgreSpawnEventTime = Time.time;
             bearerId.Value = newBearer.GetPlayerDataId();
 
-            (bool, int) tuple = newBearer.StatusAgent.AddConditionalStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.35f, true, 0, 0, false));
+            (bool, int) tuple = newBearer.StatusAgent.AddConditionalStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedDecrease, 0.3f, true, 0, 0, false));
             if (tuple.Item1)
             {
                 bearerMovementSpeedDecreaseStatusId = tuple.Item2;

@@ -156,7 +156,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -174,7 +174,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -194,7 +194,7 @@ namespace Vi.Core.MovementHandlers
                         distanceToStructure = Vector3.Distance(structure.transform.position, GetPosition());
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -213,7 +213,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -235,7 +235,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -253,7 +253,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -273,7 +273,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), spawnPosition) > maxTargetDistance)
+                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -471,19 +471,28 @@ namespace Vi.Core.MovementHandlers
         [SerializeField] private float HPRagePercent = 0.5f;
 
         private float spawnFixedTime = Mathf.NegativeInfinity;
-        private Vector3 spawnPosition;
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             spawnFixedTime = Time.fixedTime;
-            spawnPosition = transform.position;
+        }
+
+        private Vector3 RoamStartPosition
+        {
+            get
+            {
+                if (mob.Master)
+                {
+                    return mob.Master.SpawnPosition;
+                }
+                return mob.SpawnPosition;
+            }
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
             spawnFixedTime = Mathf.NegativeInfinity;
-            spawnPosition = default;
         }
 
         private void EvaluateAction()
