@@ -25,6 +25,7 @@ namespace Vi.UI
         [SerializeField] private Image limitsImage;
         [SerializeField] private Image stickImage;
         [SerializeField] private RectTransform parent;
+        [SerializeField] private RectTransform repositionReferenceRect;
 
         private bool shouldRepositionPlayerPrefValue;
 
@@ -150,13 +151,8 @@ namespace Vi.UI
 
                             if (raycastResults.Count == 0)
                             {
-                                Vector3 worldPosition = canvas.worldCamera.ScreenToWorldPoint(touch.startScreenPosition);
-                                worldPosition.z = rt.position.z;
-                                rt.position = worldPosition;
-                                rt.anchoredPosition -= new Vector2(movementRange / 2, movementRange / 2);
-
-                                //RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
-                                //rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
+                                RectTransformUtility.ScreenPointToLocalPointInRectangle(repositionReferenceRect, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
+                                rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
 
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
