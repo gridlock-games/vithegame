@@ -24,6 +24,8 @@ namespace Vi.UI
         [SerializeField] private RectTransform limits;
         [SerializeField] private Image limitsImage;
         [SerializeField] private Image stickImage;
+        [SerializeField] private RectTransform parent;
+        [SerializeField] private RectTransform repositionReferenceRect;
 
         private bool shouldRepositionPlayerPrefValue;
 
@@ -102,10 +104,9 @@ namespace Vi.UI
 
         private void OnEnable()
         {
-            RectTransform rt = (RectTransform)transform.parent;
-            joystickParentOriginalAnchoredPosition = rt.anchoredPosition;
+            joystickParentOriginalAnchoredPosition = parent.anchoredPosition;
 
-            rt = (RectTransform)transform;
+            RectTransform rt = (RectTransform)transform;
             joystickOriginalAnchoredPosition = rt.anchoredPosition;
 
             RefreshStatus();
@@ -114,10 +115,9 @@ namespace Vi.UI
 
         private void OnDisable()
         {
-            RectTransform rt = (RectTransform)transform.parent;
-            rt.anchoredPosition = joystickParentOriginalAnchoredPosition;
+            parent.anchoredPosition = joystickParentOriginalAnchoredPosition;
 
-            rt = (RectTransform)transform;
+            RectTransform rt = (RectTransform)transform;
             rt.anchoredPosition = joystickOriginalAnchoredPosition;
 
             InputSystem.onBeforeUpdate -= UpdateJoystick;
@@ -131,7 +131,7 @@ namespace Vi.UI
             if (EnhancedTouchSupport.enabled)
             {
                 bool joystickMoving = false;
-                RectTransform rt = (RectTransform)transform.parent;
+                RectTransform rt = parent;
                 foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches)
                 {
                     if (interactingTouchId != -1 & touch.touchId != interactingTouchId) { continue; }
@@ -147,12 +147,13 @@ namespace Vi.UI
                             pointerEventData.position = touch.screenPosition;
 
                             EventSystem.current.RaycastAll(pointerEventData, raycastResults);
-                            raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(transform.parent));
+                            raycastResults.RemoveAll(item => item.gameObject.transform.IsChildOf(parent));
 
                             if (raycastResults.Count == 0)
                             {
-                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
+                                RectTransformUtility.ScreenPointToLocalPointInRectangle(repositionReferenceRect, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
                                 rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
+
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
                             }
@@ -167,7 +168,7 @@ namespace Vi.UI
                     {
                         if (interactingTouchId == -1)
                         {
-                            if (RectTransformUtility.RectangleContainsScreenPoint((RectTransform)transform.parent, touch.startScreenPosition, canvas.worldCamera))
+                            if (RectTransformUtility.RectangleContainsScreenPoint(parent, touch.startScreenPosition, canvas.worldCamera))
                             {
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;

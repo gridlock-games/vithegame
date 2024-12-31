@@ -90,32 +90,32 @@ public class DebugOverlay : MonoBehaviour
     [Header("Left is hot, Right is cold")]
     [SerializeField] private AnimationCurve DPIScalingCurve;
     [SerializeField] private AnimationCurve LODBiasCurve;
-    [SerializeField] private AnimationCurve renderDistanceCurve;
     [SerializeField] private AnimationCurve audioCullingDistanceCurve;
 
+    private WarningLevel thermalWarningLevel = WarningLevel.NoWarning;
     void OnThermalEvent(ThermalMetrics ev)
     {
+        thermalWarningLevel = ev.WarningLevel;
+
         if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
         {
             float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
             
             // Adaptive resolution scale
-            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel));
+            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * DPIScale);
 
             // Adaptive LOD
             SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
 
-            // Adaptive Render Distance
-            float maxRenderDistance = 200;
-            ChangeRenderDistance(Mathf.RoundToInt(renderDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxRenderDistance));
-
             // Texture mip maps
-            ChangeTextureMipMaps(ev.TemperatureLevel);
+            ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
 
             // Adaptive frame rate
-            if (ev.TemperatureLevel >= 0.8f)
+            if (ev.WarningLevel == WarningLevel.Throttling)
             {
-                SetTargetFrameRate(30);
+                int newTargetFrameRate = 30;
+                if (targetFrameRate > 60) { newTargetFrameRate = 60; }
+                SetTargetFrameRate(newTargetFrameRate);
             }
             else
             {
@@ -147,7 +147,7 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
-    private void ChangeTextureMipMaps(float temperatureLevel)
+    private void ChangeTextureMipMaps(WarningLevel warningLevel, float temperatureLevel)
     {
         if (NetSceneManager.DoesExist())
         {
@@ -158,15 +158,11 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (temperatureLevel >= 0.8f)
+        if (warningLevel == WarningLevel.Throttling)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (temperatureLevel >= 0.7f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 2;
-        }
-        else if (temperatureLevel >= 0.65f)
+        else if (warningLevel == WarningLevel.ThrottlingImminent)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }
@@ -174,18 +170,6 @@ public class DebugOverlay : MonoBehaviour
         {
             QualitySettings.globalTextureMipmapLimit = 0;
         }
-    }
-
-    private void ChangeRenderDistance(int renderDistance)
-    {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
-        if (renderDistance < 10)
-        {
-            renderDistance = 10;
-        }
-        Debug.Log("Changing Render Distance " + renderDistance);
-        FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
     }
 
     private void SetDPIScale(float value)
@@ -203,7 +187,6 @@ public class DebugOverlay : MonoBehaviour
         }
 
         QualitySettings.resolutionScalingFixedDPIFactor = value;
-        FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", value);
     }
     
     private void OnSceneUnload()
@@ -213,7 +196,7 @@ public class DebugOverlay : MonoBehaviour
             if (!NetSceneManager.GetShouldSpawnPlayer())
             {
                 SetDPIScale(0.9f);
-                ChangeTextureMipMaps(0);
+                ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
             }
         }
     }
@@ -340,6 +323,8 @@ public class DebugOverlay : MonoBehaviour
 
     private bool thermalEventsEnabled;
     private bool adaptivePerformanceEnabled;
+    private float DPIScale;
+    private int targetFrameRate;
 
     private void RefreshStatus()
     {
@@ -350,6 +335,8 @@ public class DebugOverlay : MonoBehaviour
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
         adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
+        DPIScale = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
+        targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
 
         if (!adaptivePerformanceEnabled)
         {
@@ -358,7 +345,20 @@ public class DebugOverlay : MonoBehaviour
             NetSceneManager.SetTargetFrameRate();
         }
 
-        if (!thermalEventsEnabled) { thermalWarningImage.enabled = false; }
+        if (!thermalEventsEnabled)
+        {
+            thermalWarningImage.enabled = false;
+        }
+        else if (thermalWarningLevel == WarningLevel.ThrottlingImminent)
+        {
+            thermalWarningImage.enabled = true;
+            thermalWarningImage.color = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        }
+        else if (thermalWarningLevel == WarningLevel.Throttling)
+        {
+            thermalWarningImage.enabled = true;
+            thermalWarningImage.color = Color.red;
+        }
 
         if (!consoleEnabled)
         {

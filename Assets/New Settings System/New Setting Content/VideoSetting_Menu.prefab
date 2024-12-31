@@ -56,6 +56,7 @@ MonoBehaviour:
   dpiScaleSlider: {fileID: 3384187359603943680}
   fieldOfViewSlider: {fileID: 8082233473823661296}
   renderDistanceInput: {fileID: 7250550673175039016}
+  adaptivePerformanceToggle: {fileID: 2475553162723198666}
   graphicsPresetDropdown: {fileID: 7089394052932959034}
   vsyncToggle: {fileID: 1517080504705826163}
   hdrToggle: {fileID: 6296483330934826655}
@@ -1310,19 +1311,31 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5801513350295928791, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2221905044141686495}
+      addedObject: {fileID: 6588445070770537032}
     - targetCorrespondingSourceObject: {fileID: 6661791734916958381, guid: 1889e6e410ae9e8448da9f0f5b18b130,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6607160831188471531}
   m_SourcePrefab: {fileID: 100100000, guid: 1889e6e410ae9e8448da9f0f5b18b130, type: 3}
+--- !u!114 &2475553162723198666 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3687873420993875340, guid: 1889e6e410ae9e8448da9f0f5b18b130,
+    type: 3}
+  m_PrefabInstance: {fileID: 1258504488416168774}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5549678716241314795}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4752430711864358033 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5801513350295928791, guid: 1889e6e410ae9e8448da9f0f5b18b130,
     type: 3}
   m_PrefabInstance: {fileID: 1258504488416168774}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2221905044141686495
+--- !u!114 &6588445070770537032
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

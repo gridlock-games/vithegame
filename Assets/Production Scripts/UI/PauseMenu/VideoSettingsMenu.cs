@@ -23,6 +23,7 @@ namespace Vi.UI
         [SerializeField] private Slider fieldOfViewSlider;
         [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
+        [SerializeField] private Toggle adaptivePerformanceToggle;
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private Toggle hdrToggle;
@@ -86,7 +87,7 @@ namespace Vi.UI
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
 
-            fpsWarningText.text = "";
+            adaptivePerformanceToggle.onValueChanged.AddListener((isOn) => fpsWarningText.text = isOn ? adapativePerformanceMessage : "");
 
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
@@ -153,6 +154,12 @@ namespace Vi.UI
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
 
             SetOriginalVariables();
+        }
+
+        private const string adapativePerformanceMessage = "Some Settings Driven By Adaptive Performance";
+        private void OnEnable()
+        {
+            fpsWarningText.text = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance") ? adapativePerformanceMessage : "";
         }
 
         private void SetFieldOfView(float value)
@@ -225,8 +232,6 @@ namespace Vi.UI
             vsyncToggle.interactable = true;
 
             SetOriginalVariables();
-
-            fpsWarningText.text = "IF THE GAME FEELS CHOPPY AFTER CHANGES, RESTART YOUR GAME";
         }
 
         public void DiscardChanges()
