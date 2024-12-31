@@ -43,6 +43,16 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2666222892416121919, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+        type: 3}
+      propertyPath: blacklistedStatuses.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2666222892416121919, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
+        type: 3}
+      propertyPath: 'blacklistedStatuses.Array.data[0]'
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 2768406129323296739, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
       propertyPath: m_Controller
@@ -284,7 +294,7 @@ PrefabInstance:
     - target: {fileID: 9120088022840818652, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1481636509
+      value: 1404366228
       objectReference: {fileID: 0}
     - target: {fileID: 9120088022840818652, guid: b3d1bfdbe2f7bc34e80124acdafd119e,
         type: 3}
