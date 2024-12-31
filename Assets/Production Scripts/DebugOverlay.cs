@@ -90,11 +90,13 @@ public class DebugOverlay : MonoBehaviour
     [Header("Left is hot, Right is cold")]
     [SerializeField] private AnimationCurve DPIScalingCurve;
     [SerializeField] private AnimationCurve LODBiasCurve;
-    [SerializeField] private AnimationCurve renderDistanceCurve;
     [SerializeField] private AnimationCurve audioCullingDistanceCurve;
 
+    private WarningLevel thermalWarningLevel = WarningLevel.NoWarning;
     void OnThermalEvent(ThermalMetrics ev)
     {
+        thermalWarningLevel = ev.WarningLevel;
+
         if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
         {
             float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
@@ -105,15 +107,11 @@ public class DebugOverlay : MonoBehaviour
             // Adaptive LOD
             SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
 
-            // Adaptive Render Distance
-            float maxRenderDistance = 200;
-            ChangeRenderDistance(Mathf.RoundToInt(renderDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxRenderDistance));
-
             // Texture mip maps
-            ChangeTextureMipMaps(ev.TemperatureLevel);
+            ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
 
             // Adaptive frame rate
-            if (ev.TemperatureLevel >= 0.8f)
+            if (ev.WarningLevel == WarningLevel.Throttling)
             {
                 SetTargetFrameRate(30);
             }
@@ -147,7 +145,7 @@ public class DebugOverlay : MonoBehaviour
         }
     }
 
-    private void ChangeTextureMipMaps(float temperatureLevel)
+    private void ChangeTextureMipMaps(WarningLevel warningLevel, float temperatureLevel)
     {
         if (NetSceneManager.DoesExist())
         {
@@ -158,15 +156,11 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (temperatureLevel >= 0.8f)
+        if (warningLevel == WarningLevel.Throttling)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (temperatureLevel >= 0.7f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 2;
-        }
-        else if (temperatureLevel >= 0.65f)
+        else if (warningLevel == WarningLevel.ThrottlingImminent)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }
@@ -174,18 +168,6 @@ public class DebugOverlay : MonoBehaviour
         {
             QualitySettings.globalTextureMipmapLimit = 0;
         }
-    }
-
-    private void ChangeRenderDistance(int renderDistance)
-    {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
-        if (renderDistance < 10)
-        {
-            renderDistance = 10;
-        }
-        Debug.Log("Changing Render Distance " + renderDistance);
-        FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
     }
 
     private void SetDPIScale(float value)
@@ -198,7 +180,7 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
             {
-                value = Mathf.Max(value, 0.9f);
+                value = Mathf.Max(value, 1);
             }
         }
 
@@ -212,8 +194,8 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.GetShouldSpawnPlayer())
             {
-                SetDPIScale(0.9f);
-                ChangeTextureMipMaps(0);
+                SetDPIScale(1);
+                ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
             }
         }
     }
@@ -358,7 +340,20 @@ public class DebugOverlay : MonoBehaviour
             NetSceneManager.SetTargetFrameRate();
         }
 
-        if (!thermalEventsEnabled) { thermalWarningImage.enabled = false; }
+        if (!thermalEventsEnabled)
+        {
+            thermalWarningImage.enabled = false;
+        }
+        else if (thermalWarningLevel == WarningLevel.ThrottlingImminent)
+        {
+            thermalWarningImage.enabled = true;
+            thermalWarningImage.color = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
+        }
+        else if (thermalWarningLevel == WarningLevel.Throttling)
+        {
+            thermalWarningImage.enabled = true;
+            thermalWarningImage.color = Color.red;
+        }
 
         if (!consoleEnabled)
         {
