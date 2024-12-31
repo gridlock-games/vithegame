@@ -305,6 +305,7 @@ namespace Vi.UI
                 foreach (PositionOverrideDefinition positionOverrideDefinition in positionOverrideDefinitions)
                 {
                     GameObject g = GetGameObjectFromPath(positionOverrideDefinition.gameObjectPath);
+                    Debug.Log(g + " " + new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY) + " " + positionOverrideDefinition.gameObjectPath);
                     ((RectTransform)g.transform).anchoredPosition = new Vector2(positionOverrideDefinition.newAnchoredX, positionOverrideDefinition.newAnchoredY);
                 }
             }
