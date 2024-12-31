@@ -24,16 +24,18 @@ namespace Vi.UI
                 item.SetActive(false);
             }
 
+            errorText.text = "";
+
             currentSelection = defaultUI;
             uiList[defaultUI].SetActive(true);
-
-            errorText.text = "";
         }
 
         public void changeObject(int selectionObject)
         {
             if (selectionObject != currentSelection)
             {
+                errorText.text = "";
+
                 //Turn off current selection
                 uiList[currentSelection].SetActive(false);
 
@@ -42,8 +44,6 @@ namespace Vi.UI
 
                 //Set new ID
                 currentSelection = selectionObject;
-
-                errorText.text = "";
             }
         }
 

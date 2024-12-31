@@ -102,7 +102,7 @@ public class DebugOverlay : MonoBehaviour
             float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
             
             // Adaptive resolution scale
-            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel));
+            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * DPIScale);
 
             // Adaptive LOD
             SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
@@ -113,7 +113,9 @@ public class DebugOverlay : MonoBehaviour
             // Adaptive frame rate
             if (ev.WarningLevel == WarningLevel.Throttling)
             {
-                SetTargetFrameRate(30);
+                int newTargetFrameRate = 30;
+                if (targetFrameRate > 60) { newTargetFrameRate = 60; }
+                SetTargetFrameRate(newTargetFrameRate);
             }
             else
             {
@@ -180,12 +182,11 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
             {
-                value = Mathf.Max(value, 1);
+                value = Mathf.Max(value, 0.9f);
             }
         }
 
         QualitySettings.resolutionScalingFixedDPIFactor = value;
-        FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", value);
     }
     
     private void OnSceneUnload()
@@ -194,7 +195,7 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.GetShouldSpawnPlayer())
             {
-                SetDPIScale(1);
+                SetDPIScale(0.9f);
                 ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
             }
         }
@@ -322,6 +323,8 @@ public class DebugOverlay : MonoBehaviour
 
     private bool thermalEventsEnabled;
     private bool adaptivePerformanceEnabled;
+    private float DPIScale;
+    private int targetFrameRate;
 
     private void RefreshStatus()
     {
@@ -332,6 +335,8 @@ public class DebugOverlay : MonoBehaviour
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
         adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
+        DPIScale = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
+        targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
 
         if (!adaptivePerformanceEnabled)
         {
