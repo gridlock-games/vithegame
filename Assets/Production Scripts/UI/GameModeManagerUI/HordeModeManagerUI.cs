@@ -14,21 +14,15 @@ namespace Vi.UI
     {
         [Header("Horde Mode Specific")]
         [SerializeField] private Text wavesLeftText;
-        [SerializeField] private GameObject structureHealthBarParent;
-        [SerializeField] private Image structureHPImage;
-        [SerializeField] private Image structureIntermHPImage;
-        [Header("Structure Status UI")]
-        [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
+        [SerializeField] private OnScreenHittableAgentHealthBar structureHealthBar;
 
         private HordeModeManager hordeModeManager;
-        private Structure structure;
 
         private new void Start()
         {
             base.Start();
             hordeModeManager = GameModeManager.Singleton.GetComponent<HordeModeManager>();
             EvaluateWavesText();
-            structureHealthBarParent.SetActive(false);
         }
 
         protected override void UpdateDiscordRichPresence()
@@ -41,8 +35,6 @@ namespace Vi.UI
         private int lastRoundCount = -1;
         private int lastWavesCompleted = -1;
 
-        private float lastHP = -1;
-        private float lastMaxHP = -1;
         protected new void Update()
         {
             base.Update();
@@ -66,29 +58,7 @@ namespace Vi.UI
                 EvaluateWavesText();
             }
 
-            if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame | PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { FindStructure(); }
-
-            if (structure)
-            {
-                float HP = structure.GetHP();
-                if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-
-                float maxHP = structure.GetMaxHP();
-
-                if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
-                {
-                    structureHPImage.fillAmount = HP / maxHP;
-                }
-
-                lastHP = HP;
-                lastMaxHP = maxHP;
-
-                structureIntermHPImage.fillAmount = Mathf.Lerp(structureIntermHPImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
-            }
-            else
-            {
-                FindStructure();
-            }
+            FindStructure();
 
             // Display essence menu
             if (lastEssenceUIState != hordeModeManager.ShouldDisplayEssenceUI)
@@ -126,20 +96,11 @@ namespace Vi.UI
 
         private void FindStructure()
         {
+            if (structureHealthBar.HittableAgent) { return; }
             Structure[] structures = PlayerDataManager.Singleton.GetActiveStructures();
             if (structures.Length > 0)
             {
-                structure = structures[0];
-                structureHealthBarParent.SetActive(true);
-                structureHPImage.color = PlayerDataManager.Singleton.GetRelativeTeamColor(structure.GetTeam());
-
-                float HP = structure.GetHP();
-                if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-                float maxHP = structure.GetMaxHP();
-                structureHPImage.fillAmount = HP / maxHP;
-                structureIntermHPImage.fillAmount = HP / maxHP;
-
-                statusIconLayoutGroup.Initialize(structure.StatusAgent);
+                structureHealthBar.Initialize(structures[0]);
             }
         }
     }
