@@ -225,10 +225,14 @@ namespace Vi.Core
             }
         }
 
+        public Vector3 SpawnPosition { get; private set; }
+
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
+            SpawnPosition = transform.position;
+
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
@@ -269,6 +273,8 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
+            SpawnPosition = default;
+
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
             spirit.OnValueChanged -= OnSpiritChanged;
