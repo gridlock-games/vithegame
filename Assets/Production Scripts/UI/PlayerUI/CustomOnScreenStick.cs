@@ -150,8 +150,14 @@ namespace Vi.UI
 
                             if (raycastResults.Count == 0)
                             {
-                                RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
-                                rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
+                                Vector3 worldPosition = canvas.worldCamera.ScreenToWorldPoint(touch.startScreenPosition);
+                                worldPosition.z = rt.position.z;
+                                rt.position = worldPosition;
+                                rt.anchoredPosition -= new Vector2(movementRange / 2, movementRange / 2);
+
+                                //RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, touch.startScreenPosition, canvas.worldCamera, out Vector2 localPoint);
+                                //rt.anchoredPosition = localPoint - new Vector2(movementRange / 2, movementRange / 2);
+
                                 OnTouchDown(touch);
                                 interactingTouchId = touch.touchId;
                             }

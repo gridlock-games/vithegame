@@ -245,6 +245,8 @@ namespace Vi.UI
         private void EvaluateUIDefinitionsInUpdate()
         {
             if (Screen.width == lastWidthEvaluated & Screen.height == lastHeightEvaluated) { return; }
+            if (Mathf.Approximately(Screen.width / (float)Screen.height, lastWidthEvaluated / (float)lastHeightEvaluated)) { return; }
+
             foreach (UIDefinition platformUIDefinition in platformUIDefinitions)
             {
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)
