@@ -182,20 +182,53 @@ namespace Vi.UI
                     return;
                 }
             }
-            
-            float timeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
-            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
-            abilityIcon.fillAmount = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
 
-            if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
+            float cooldownTimeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
+            float bufferTimeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityBufferTimeLeft(Ability);
+
+            float timeLeft;
+            float progressLeft;
+            if (cooldownTimeLeft >= bufferTimeLeft)
             {
-                borderImage.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
-                staminaCostText.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                progressLeft = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+                timeLeft = cooldownTimeLeft;
             }
             else
             {
-                borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
-                staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
+                progressLeft = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityBufferProgress(Ability);
+                timeLeft = bufferTimeLeft;
+            }
+
+            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
+            abilityIcon.fillAmount = progressLeft;
+
+            if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
+            {
+                Color borderColor = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                if (borderImage.color != borderColor)
+                {
+                    borderImage.color = borderColor;
+                }
+
+                Color staminaColor = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                if (staminaCostText.color != staminaColor)
+                {
+                    staminaCostText.color = staminaColor;
+                }
+            }
+            else
+            {
+                Color borderColor = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
+                if (borderImage.color != borderColor)
+                {
+                    borderImage.color = borderColor;
+                }
+
+                Color staminaColor = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
+                if (staminaCostText.color != staminaColor)
+                {
+                    staminaCostText.color = staminaColor;
+                }
             }
 
             int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);

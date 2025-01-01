@@ -432,6 +432,7 @@ namespace Vi.Core
             else if (actionClip.GetClipType() == ActionClip.ClipType.Ability)
             {
                 if (combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(actionClip) < 1) { return default; }
+                if (combatAgent.WeaponHandler.GetWeapon().GetAbilityBufferProgress(actionClip) < 1) { return default; }
             }
 
             // Don't allow any clips to be played unless it's a hit reaction if we are in the middle of the grab ailment
