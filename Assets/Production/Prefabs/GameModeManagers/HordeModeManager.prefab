@@ -92,7 +92,7 @@ MonoBehaviour:
     requiredEssenceCount: 3
     stackable: 1
   - title: Increased Move Speed
-    description: Run Faster, Attack Faster
+    description: Run Faster
     iconColor: {r: 1, g: 0.77254903, b: 0.23921569, a: 1}
     iconSprite: {fileID: 21300000, guid: 1251bd587dabc4051a70757824678340, type: 3}
     requiredEssenceCount: 3
@@ -119,6 +119,36 @@ MonoBehaviour:
     description: Automatically heal after taking a hit
     iconColor: {r: 0.105882354, g: 0.9490196, b: 0.019607844, a: 1}
     iconSprite: {fileID: 21300000, guid: c236ffc3fe18443b08dadfedde013dc4, type: 3}
+    requiredEssenceCount: 3
+    stackable: 1
+  - title: Increased Attack Speed
+    description: Attack Faster
+    iconColor: {r: 0.92941177, g: 0.33333334, b: 0.32941177, a: 1}
+    iconSprite: {fileID: 21300000, guid: 036e0a9856c214f478367a052def8fea, type: 3}
+    requiredEssenceCount: 4
+    stackable: 0
+  - title: Increased Damage
+    description: Melt Your Enemies
+    iconColor: {r: 0.92941177, g: 0.33333334, b: 0.32941177, a: 1}
+    iconSprite: {fileID: 21300000, guid: 9fdcb59ed84ac4990ac903e44a89c803, type: 3}
+    requiredEssenceCount: 4
+    stackable: 0
+  - title: Stamina Regeneration
+    description: Cast More Abilities
+    iconColor: {r: 1, g: 0.77254903, b: 0.23921569, a: 1}
+    iconSprite: {fileID: 21300000, guid: 18b0c2085b88a4087b58177aaa58fec1, type: 3}
+    requiredEssenceCount: 4
+    stackable: 1
+  - title: Spirit Regeneration
+    description: Play Less Hit Reactions
+    iconColor: {r: 0.019607844, g: 0.62352943, b: 0.9490196, a: 1}
+    iconSprite: {fileID: 21300000, guid: 88c2eb61a16f14d969fbd87c5f9f01aa, type: 3}
+    requiredEssenceCount: 2
+    stackable: 1
+  - title: Ability Cooldown Reduction
+    description: Cast Abilities Faster
+    iconColor: {r: 1, g: 0.77254903, b: 0.23921569, a: 1}
+    iconSprite: {fileID: 21300000, guid: e7f5a71bd6daf41e5805acf4a7610a72, type: 3}
     requiredEssenceCount: 3
     stackable: 1
   waves:
