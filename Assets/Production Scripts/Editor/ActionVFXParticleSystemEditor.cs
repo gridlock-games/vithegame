@@ -23,6 +23,7 @@ namespace Vi.Editor
         private SerializedProperty spBoundsLocalAxis;
 
         private SerializedProperty spLatchToFirstTarget;
+        private SerializedProperty spLatchPositionOffset;
 
         private new void OnEnable()
         {
@@ -39,6 +40,7 @@ namespace Vi.Editor
             spBoundsLocalAxis = serializedObject.FindProperty("boundsLocalAxis");
 
             spLatchToFirstTarget = serializedObject.FindProperty("latchToFirstTarget");
+            spLatchPositionOffset = serializedObject.FindProperty("latchPositionOffset");
         }
 
         public override void OnInspectorGUI()
@@ -62,6 +64,10 @@ namespace Vi.Editor
             }
 
             EditorGUILayout.PropertyField(spLatchToFirstTarget);
+            if (spLatchToFirstTarget.boolValue)
+            {
+                EditorGUILayout.PropertyField(spLatchPositionOffset);
+            }
 
             serializedObject.ApplyModifiedProperties();
         }

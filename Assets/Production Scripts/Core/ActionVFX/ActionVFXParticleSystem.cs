@@ -27,6 +27,7 @@ namespace Vi.Core.VFX
         [SerializeField] private Vector3 boundsPoint = new Vector3(0, 0, 2.5f);
         [SerializeField] private Vector3 boundsLocalAxis = new Vector3(0, -1, 0);
         [SerializeField] private bool latchToFirstTarget;
+        [SerializeField] private Vector3 latchPositionOffset;
 
         private new void Awake()
         {
@@ -128,8 +129,8 @@ namespace Vi.Core.VFX
         {
             if (latchTarget)
             {
-                transform.position = latchTarget.transform.position;
                 transform.rotation = Quaternion.identity;
+                transform.position = latchTarget.transform.position + transform.rotation * latchPositionOffset;
             }
         }
 
