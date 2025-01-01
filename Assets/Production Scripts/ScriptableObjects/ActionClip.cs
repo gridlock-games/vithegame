@@ -287,6 +287,7 @@ namespace Vi.ScriptableObjects
 
         public Sprite abilityImageIcon;
         public float abilityCooldownTime = 5;
+        public float abilityBufferTime = 0;
 
         [System.Serializable]
         private class ActionClipSoundEffect

@@ -499,6 +499,12 @@ namespace Vi.ScriptableObjects
         private float[] lastAbility3ActivateTimes;
         private float[] lastAbility4ActivateTimes;
 
+        // For buffering stacks
+        private float lastAbility1ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility2ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility3ActivateTime = Mathf.NegativeInfinity;
+        private float lastAbility4ActivateTime = Mathf.NegativeInfinity;
+
         public void ResetAllAbilityCooldowns()
         {
             lastAbility1ActivateTimes = new float[maxAbility1Count];
@@ -506,24 +512,28 @@ namespace Vi.ScriptableObjects
             {
                 lastAbility1ActivateTimes[i] = Mathf.NegativeInfinity;
             }
+            lastAbility1ActivateTime = Mathf.NegativeInfinity;
 
             lastAbility2ActivateTimes = new float[maxAbility2Count];
             for (int i = 0; i < lastAbility2ActivateTimes.Length; i++)
             {
                 lastAbility2ActivateTimes[i] = Mathf.NegativeInfinity;
             }
+            lastAbility2ActivateTime = Mathf.NegativeInfinity;
 
             lastAbility3ActivateTimes = new float[maxAbility3Count];
             for (int i = 0; i < lastAbility3ActivateTimes.Length; i++)
             {
                 lastAbility3ActivateTimes[i] = Mathf.NegativeInfinity;
             }
+            lastAbility3ActivateTime = Mathf.NegativeInfinity;
 
             lastAbility4ActivateTimes = new float[maxAbility4Count];
             for (int i = 0; i < lastAbility4ActivateTimes.Length; i++)
             {
                 lastAbility4ActivateTimes[i] = Mathf.NegativeInfinity;
             }
+            lastAbility4ActivateTime = Mathf.NegativeInfinity;
         }
 
         public void StartAbilityCooldown(ActionClip ability)
@@ -539,6 +549,7 @@ namespace Vi.ScriptableObjects
                 else
                 {
                     lastAbility1ActivateTimes[index] = Time.time;
+                    lastAbility1ActivateTime = Time.time;
                 }
             }
             else if (ability == ability2)
@@ -552,6 +563,7 @@ namespace Vi.ScriptableObjects
                 else
                 {
                     lastAbility2ActivateTimes[index] = Time.time;
+                    lastAbility2ActivateTime = Time.time;
                 }
             }
             else if (ability == ability3)
@@ -565,6 +577,7 @@ namespace Vi.ScriptableObjects
                 else
                 {
                     lastAbility3ActivateTimes[index] = Time.time;
+                    lastAbility3ActivateTime = Time.time;
                 }
             }
             else if (ability == ability4)
@@ -578,6 +591,7 @@ namespace Vi.ScriptableObjects
                 else
                 {
                     lastAbility4ActivateTimes[index] = Time.time;
+                    lastAbility4ActivateTime = Time.time;
                 }
             }
             else
@@ -643,6 +657,31 @@ namespace Vi.ScriptableObjects
             return 0;
         }
 
+        private float GetLastAbilityActivateTimeForBuffering(ActionClip ability)
+        {
+            if (ability == ability1)
+            {
+                return lastAbility1ActivateTime;
+            }
+            else if (ability == ability2)
+            {
+                return lastAbility2ActivateTime;
+            }
+            else if (ability == ability3)
+            {
+                return lastAbility3ActivateTime;
+            }
+            else if (ability == ability4)
+            {
+                return lastAbility4ActivateTime;
+            }
+            else
+            {
+                Debug.LogError(ability + " is not one of this weapon's abilities! " + this);
+                return 0;
+            }
+        }
+
         private float GetLastAbilityActivateTime(ActionClip ability)
         {
             if (ability == ability1)
@@ -696,10 +735,28 @@ namespace Vi.ScriptableObjects
             }
         }
 
+        private float GetAbilityBufferDuration(ActionClip ability)
+        {
+            return ability.abilityBufferTime;
+        }
+
+        public float GetAbilityBufferTimeLeft(ActionClip ability)
+        {
+            float abilityBufferDuration = GetAbilityBufferDuration(ability);
+            return Mathf.Max(0, abilityBufferDuration - (Time.time - GetLastAbilityActivateTimeForBuffering(ability)));
+        }
+
+        public float GetAbilityBufferProgress(ActionClip ability)
+        {
+            float abilityBufferDuration = GetAbilityBufferDuration(ability);
+            if (Mathf.Approximately(abilityBufferDuration, 0)) { return 1; }
+            return Mathf.Clamp((Time.time - GetLastAbilityActivateTimeForBuffering(ability)) / abilityBufferDuration, 0, 1);
+        }
+
         public float GetAbilityCooldownTimeLeft(ActionClip ability)
         {
             float abilityCooldownDuration = GetAbilityCooldownDuration(ability);
-            return abilityCooldownDuration - (Time.time - GetLastAbilityActivateTime(ability));
+            return Mathf.Max(0, abilityCooldownDuration - (Time.time - GetLastAbilityActivateTime(ability)));
         }
 
         public float GetAbilityCooldownProgress(ActionClip ability)
