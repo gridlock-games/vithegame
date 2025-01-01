@@ -159,14 +159,8 @@ namespace Vi.Core.MovementHandlers
                         {
                             if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
-                                Debug.Log(combatAgent.GetName() + " out of bounds");
                                 continue;
                             }
-                        }
-
-                        if (name.Contains("Cretin"))
-                        {
-                            Debug.Log(name + " " + combatAgent);
                         }
 
                         targetFinder.SetTarget(combatAgent);
