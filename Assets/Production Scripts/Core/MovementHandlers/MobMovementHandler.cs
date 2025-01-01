@@ -112,7 +112,8 @@ namespace Vi.Core.MovementHandlers
             Structures,
             StructuresThenPlayers,
             PlayersThenStructures,
-            HighestKillPlayer
+            HighestKillPlayer,
+            HighestDamageInflictedToSelf
         }
 
         protected override void FixedUpdate()
@@ -286,6 +287,25 @@ namespace Vi.Core.MovementHandlers
                         }
 
                         targetFinder.SetTarget(attributes);
+                        break;
+                    }
+                    break;
+                case TargetingType.HighestDamageInflictedToSelf:
+                    foreach (KeyValuePair<CombatAgent, float> kvp in combatAgent.GetDamageMappingThisLifeFromAliveAgents().OrderByDescending(item => item.Value))
+                    {
+                        if (kvp.Key == combatAgent) { continue; }
+                        if (kvp.Key.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, kvp.Key)) { continue; }
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(kvp.Key.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
+                        targetFinder.SetTarget(kvp.Key);
                         break;
                     }
                     break;
