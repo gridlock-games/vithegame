@@ -333,7 +333,6 @@ namespace Vi.Core
 
         private void OnSpawnFromPool()
         {
-            Debug.Log(transform.root.name);
             glowRenderer.RegisterChildRenderers();
         }
 

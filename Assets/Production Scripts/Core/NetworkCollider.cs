@@ -122,6 +122,23 @@ namespace Vi.Core
 
         public void OnNetworkDespawn() { }
 
+        public Vector3 GetClosestPoint(Vector3 sourcePosition)
+        {
+            float minDist = 0;
+            Vector3 destinationPoint = Vector3.zero;
+            for (int i = 0; i < Colliders.Length; i++)
+            {
+                Vector3 closestPoint = Colliders[i].ClosestPoint(sourcePosition);
+                float dist = Vector3.Distance(sourcePosition, closestPoint);
+                if (dist < minDist | i == 0)
+                {
+                    minDist = dist;
+                    destinationPoint = closestPoint;
+                }
+            }
+            return destinationPoint;
+        }
+
         private void OnReturnToPool()
         {
             forceUseStaticWallCollisions = default;
