@@ -468,7 +468,8 @@ namespace Vi.Core
                                     {
                                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, networkCollider.CombatAgent)) { continue; }
 
-                                        Quaternion targetRot = Quaternion.LookRotation(networkCollider.transform.position - transform.position, Vector3.up);
+                                        Vector3 rel = networkCollider.transform.position - transform.position;
+                                        Quaternion targetRot = rel == Vector3.zero ? Quaternion.identity : Quaternion.LookRotation(rel, Vector3.up);
                                         float angle = Mathf.Abs(targetRot.eulerAngles.y - transform.rotation.eulerAngles.y);
                                         if (angle >= ActionClip.maximumLungeAngle) { continue; }
 
