@@ -333,6 +333,7 @@ namespace Vi.Core
 
         private void OnSpawnFromPool()
         {
+            Debug.Log(transform.root.name);
             glowRenderer.RegisterChildRenderers();
         }
 
@@ -457,7 +458,8 @@ namespace Vi.Core
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
 
-            if (TryGetComponent(out PooledObject pooledObject))
+            PooledObject pooledObject = GetComponentInParent<PooledObject>();
+            if (pooledObject)
             {
                 pooledObject.OnSpawnFromPool += OnSpawnFromPool;
                 pooledObject.OnReturnToPool += OnReturnToPool;
