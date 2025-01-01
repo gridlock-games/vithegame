@@ -29,10 +29,12 @@ namespace Vi.Core.VFX
         [SerializeField] private bool latchToFirstTarget;
         [SerializeField] private Vector3 latchPositionOffset;
 
+        private NetworkTransform networkTransform;
         private new void Awake()
         {
             base.Awake();
             GetComponent<Rigidbody>().useGravity = false;
+            networkTransform = GetComponent<NetworkTransform>();
 
             if (particleSystemType == ParticleSystemType.ParticleCollisions)
             {
@@ -127,16 +129,37 @@ namespace Vi.Core.VFX
 
         private void LateUpdate()
         {
-            if (latchTarget)
+            if (!IsSpawned) { return; }
+
+            if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(latchTargetNetObjId.Value, out NetworkObject latchTarget))
             {
+                networkTransform.SyncPositionX = false;
+                networkTransform.SyncPositionY = false;
+                networkTransform.SyncPositionZ = false;
+
+                networkTransform.SyncRotAngleX = false;
+                networkTransform.SyncRotAngleY = false;
+                networkTransform.SyncRotAngleZ = false;
+
                 transform.rotation = Quaternion.identity;
                 transform.position = latchTarget.transform.position + transform.rotation * latchPositionOffset;
+            }
+            else
+            {
+                networkTransform.SyncPositionX = true;
+                networkTransform.SyncPositionY = true;
+                networkTransform.SyncPositionZ = true;
+
+                networkTransform.SyncRotAngleX = true;
+                networkTransform.SyncRotAngleY = true;
+                networkTransform.SyncRotAngleZ = true;
             }
         }
 
         private const string layersToHit = "NetworkPrediction";
 
-        private Transform latchTarget;
+        private NetworkVariable<ulong> latchTargetNetObjId = new NetworkVariable<ulong>();
+
         protected override void OnTriggerEnter(Collider other)
         {
             base.OnTriggerEnter(other);
@@ -167,15 +190,15 @@ namespace Vi.Core.VFX
                         }
                     }
 
-                    if (latchToFirstTarget)
+                    if (latchToFirstTarget & !latchAssigned)
                     {
                         if (networkCollider)
                         {
-                            if (!latchTarget)
+                            if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(latchTargetNetObjId.Value))
                             {
                                 if (ShouldAffect(networkCollider.CombatAgent))
                                 {
-                                    latchTarget = networkCollider.MovementHandler.transform;
+                                    latchTargetNetObjId.Value = networkCollider.CombatAgent.NetworkObjectId;
                                 }
                             }
                         }
@@ -187,13 +210,13 @@ namespace Vi.Core.VFX
                 if (other.isTrigger) { return; }
                 if (other.transform.root.TryGetComponent(out NetworkCollider networkCollider))
                 {
-                    if (latchToFirstTarget)
+                    if (latchToFirstTarget & !latchAssigned)
                     {
-                        if (!latchTarget)
+                        if (!NetworkManager.SpawnManager.SpawnedObjects.ContainsKey(latchTargetNetObjId.Value))
                         {
                             if (ShouldAffect(networkCollider.CombatAgent))
                             {
-                                latchTarget = networkCollider.MovementHandler.transform;
+                                latchTargetNetObjId.Value = networkCollider.CombatAgent.NetworkObjectId;
                             }
                         }
                     }
@@ -212,6 +235,8 @@ namespace Vi.Core.VFX
                 }
             }
         }
+
+        private bool latchAssigned;
 
         protected void OnTriggerStay(Collider other)
         {
@@ -273,7 +298,7 @@ namespace Vi.Core.VFX
                 }
                 ps.Stop(false, ParticleSystemStopBehavior.StopEmittingAndClear);
             }
-            latchTarget = null;
+            latchAssigned = default;
         }
 
         List<ParticleSystem.Particle> enter = new List<ParticleSystem.Particle>();
