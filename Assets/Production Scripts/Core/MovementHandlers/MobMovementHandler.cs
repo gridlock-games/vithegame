@@ -156,8 +156,9 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
+                                Debug.Log(combatAgent.GetName() + " out of bounds");
                                 continue;
                             }
                         }
@@ -179,7 +180,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -199,7 +200,7 @@ namespace Vi.Core.MovementHandlers
                         distanceToStructure = Vector3.Distance(structure.GetClosestPoint(GetPosition()), GetPosition());
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -218,7 +219,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -240,7 +241,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -258,7 +259,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -278,7 +279,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(attributes.NetworkCollider.GetClosestPoint(GetPosition()), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(attributes.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -480,19 +481,18 @@ namespace Vi.Core.MovementHandlers
         {
             base.OnNetworkSpawn();
             spawnFixedTime = Time.fixedTime;
-        }
 
-        private Vector3 RoamStartPosition
-        {
-            get
+            if (mob.Master)
             {
-                if (mob.Master)
-                {
-                    return mob.Master.SpawnPosition;
-                }
-                return mob.SpawnPosition;
+                roamStartPosition = mob.Master.transform.position;
+            }
+            else
+            {
+                roamStartPosition = transform.position;
             }
         }
+
+        private Vector3 roamStartPosition;
 
         public override void OnNetworkDespawn()
         {
@@ -580,7 +580,7 @@ namespace Vi.Core.MovementHandlers
             if (targetingConstrainedByDistance)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(transform.position, maxTargetDistance);
+                Gizmos.DrawWireSphere(Application.isPlaying ? roamStartPosition : transform.position, maxTargetDistance);
             }
 
             Gizmos.color = Color.red;

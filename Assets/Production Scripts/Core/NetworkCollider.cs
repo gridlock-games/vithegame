@@ -125,7 +125,7 @@ namespace Vi.Core
         public Vector3 GetClosestPoint(Vector3 sourcePosition)
         {
             float minDist = 0;
-            Vector3 destinationPoint = Vector3.zero;
+            Vector3 destinationPoint = sourcePosition;
             for (int i = 0; i < Colliders.Length; i++)
             {
                 Vector3 closestPoint = Colliders[i].ClosestPoint(sourcePosition);
