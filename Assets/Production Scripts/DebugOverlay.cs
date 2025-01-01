@@ -158,11 +158,15 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (warningLevel == WarningLevel.Throttling)
+        if (temperatureLevel > 0.95f)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (warningLevel == WarningLevel.ThrottlingImminent)
+        else if (temperatureLevel > 0.9f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (temperatureLevel > 0.8f)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }
