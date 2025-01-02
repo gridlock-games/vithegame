@@ -111,7 +111,7 @@ public class DebugOverlay : MonoBehaviour
             ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
 
             // Adaptive frame rate
-            if (ev.WarningLevel == WarningLevel.Throttling)
+            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
             {
                 int newTargetFrameRate = 30;
                 if (targetFrameRate > 60) { newTargetFrameRate = 60; }
@@ -158,11 +158,15 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (warningLevel == WarningLevel.Throttling)
+        if (temperatureLevel > 0.95f)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (warningLevel == WarningLevel.ThrottlingImminent)
+        else if (temperatureLevel > 0.9f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (temperatureLevel > 0.8f)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }

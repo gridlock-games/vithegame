@@ -112,7 +112,8 @@ namespace Vi.Core.MovementHandlers
             Structures,
             StructuresThenPlayers,
             PlayersThenStructures,
-            HighestKillPlayer
+            HighestKillPlayer,
+            HighestDamageInflictedToSelf
         }
 
         protected override void FixedUpdate()
@@ -148,7 +149,7 @@ namespace Vi.Core.MovementHandlers
             switch (targetingType)
             {
                 case TargetingType.Players:
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
@@ -156,7 +157,7 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -167,14 +168,14 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.Structures:
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -186,15 +187,15 @@ namespace Vi.Core.MovementHandlers
                     break;
                 case TargetingType.StructuresThenPlayers:
                     float distanceToStructure = Mathf.Infinity;
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
 
-                        distanceToStructure = Vector3.Distance(structure.transform.position, GetPosition());
+                        distanceToStructure = Vector3.Distance(structure.GetClosestPoint(GetPosition()), GetPosition());
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -204,16 +205,16 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
-                        float dist = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
+                        float dist = Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition());
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -226,16 +227,16 @@ namespace Vi.Core.MovementHandlers
                     break;
                 case TargetingType.PlayersThenStructures:
                     float distanceToAgent = Mathf.Infinity;
-                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.MovementHandler.GetPosition(), GetPosition())))
+                    foreach (CombatAgent combatAgent in targetFinder.ActiveCombatAgents.OrderBy(item => Vector3.Distance(item.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (combatAgent == this.combatAgent) { continue; }
                         if (combatAgent.GetAilment() == ActionClip.Ailment.Death) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(this.combatAgent, combatAgent)) { continue; }
-                        distanceToAgent = Vector3.Distance(combatAgent.MovementHandler.GetPosition(), GetPosition());
+                        distanceToAgent = Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition());
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(combatAgent.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(combatAgent.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -245,15 +246,15 @@ namespace Vi.Core.MovementHandlers
                         break;
                     }
 
-                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Structure structure in targetFinder.ActiveStructures.OrderBy(item => Vector3.Distance(item.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (structure.IsDead) { continue; }
                         if (!PlayerDataManager.Singleton.CanHit(combatAgent, structure)) { continue; }
-                        float dist = Vector3.Distance(structure.transform.position, GetPosition());
+                        float dist = Vector3.Distance(structure.GetClosestPoint(GetPosition()), GetPosition());
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(structure.transform.position, RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(structure.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
@@ -265,7 +266,7 @@ namespace Vi.Core.MovementHandlers
                     }
                     break;
                 case TargetingType.HighestKillPlayer:
-                    foreach (Attributes attributes in targetFinder.ActivePlayers.OrderByDescending(item => GameModeManager.Singleton.GetPlayerScore(item.GetPlayerDataId()).killsThisRound).ThenBy(item => Vector3.Distance(item.transform.position, GetPosition())))
+                    foreach (Attributes attributes in targetFinder.ActivePlayers.OrderByDescending(item => GameModeManager.Singleton.GetPlayerScore(item.GetPlayerDataId()).killsThisRound).ThenBy(item => Vector3.Distance(item.NetworkCollider.GetClosestPoint(GetPosition()), GetPosition())))
                     {
                         if (attributes == combatAgent) { continue; }
                         if (attributes.GetAilment() == ActionClip.Ailment.Death) { continue; }
@@ -273,13 +274,32 @@ namespace Vi.Core.MovementHandlers
 
                         if (targetingConstrainedByDistance)
                         {
-                            if (Vector3.Distance(attributes.MovementHandler.GetPosition(), RoamStartPosition) > maxTargetDistance)
+                            if (Vector3.Distance(attributes.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
                             {
                                 continue;
                             }
                         }
 
                         targetFinder.SetTarget(attributes);
+                        break;
+                    }
+                    break;
+                case TargetingType.HighestDamageInflictedToSelf:
+                    foreach (KeyValuePair<CombatAgent, float> kvp in combatAgent.GetDamageMappingThisLifeFromAliveAgents().OrderByDescending(item => item.Value))
+                    {
+                        if (kvp.Key == combatAgent) { continue; }
+                        if (kvp.Key.GetAilment() == ActionClip.Ailment.Death) { continue; }
+                        if (!PlayerDataManager.Singleton.CanHit(combatAgent, kvp.Key)) { continue; }
+
+                        if (targetingConstrainedByDistance)
+                        {
+                            if (Vector3.Distance(kvp.Key.NetworkCollider.GetClosestPoint(GetPosition()), roamStartPosition) > maxTargetDistance)
+                            {
+                                continue;
+                            }
+                        }
+
+                        targetFinder.SetTarget(kvp.Key);
                         break;
                     }
                     break;
@@ -475,19 +495,18 @@ namespace Vi.Core.MovementHandlers
         {
             base.OnNetworkSpawn();
             spawnFixedTime = Time.fixedTime;
-        }
 
-        private Vector3 RoamStartPosition
-        {
-            get
+            if (mob.Master)
             {
-                if (mob.Master)
-                {
-                    return mob.Master.SpawnPosition;
-                }
-                return mob.SpawnPosition;
+                roamStartPosition = mob.Master.transform.position;
+            }
+            else
+            {
+                roamStartPosition = transform.position;
             }
         }
+
+        private Vector3 roamStartPosition;
 
         public override void OnNetworkDespawn()
         {
@@ -575,7 +594,7 @@ namespace Vi.Core.MovementHandlers
             if (targetingConstrainedByDistance)
             {
                 Gizmos.color = Color.blue;
-                Gizmos.DrawWireSphere(transform.position, maxTargetDistance);
+                Gizmos.DrawWireSphere(Application.isPlaying ? roamStartPosition : transform.position, maxTargetDistance);
             }
 
             Gizmos.color = Color.red;

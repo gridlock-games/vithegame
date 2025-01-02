@@ -225,14 +225,10 @@ namespace Vi.Core
             }
         }
 
-        public Vector3 SpawnPosition { get; private set; }
-
         [SerializeField] private PooledObject worldSpaceLabelPrefab;
         protected PooledObject worldSpaceLabelInstance;
         public override void OnNetworkSpawn()
         {
-            SpawnPosition = transform.position;
-
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
             spirit.OnValueChanged += OnSpiritChanged;
@@ -273,8 +269,6 @@ namespace Vi.Core
 
         public override void OnNetworkDespawn()
         {
-            SpawnPosition = default;
-
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
             spirit.OnValueChanged -= OnSpiritChanged;
@@ -326,7 +320,7 @@ namespace Vi.Core
             invincibilityEndTime = default;
             uninterruptableEndTime = default;
 
-            damageMappingThisLife.Clear();
+            ClearDamageMapping();
 
             knockupHitCounter = default;
             lastAttackingCombatAgent = default;
@@ -651,14 +645,39 @@ namespace Vi.Core
                 rage.Value = 0;
         }
 
-        protected Dictionary<CombatAgent, float> damageMappingThisLife = new Dictionary<CombatAgent, float>();
+        private Dictionary<CombatAgent, float> damageMappingThisLifeFromAliveAgents = new Dictionary<CombatAgent, float>();
+
+        private static Dictionary<CombatAgent, HashSet<CombatAgent>> damageMappingCrosswalk = new Dictionary<CombatAgent, HashSet<CombatAgent>>();
+
+        private Dictionary<CombatAgent, float> damageMappingThisLife = new Dictionary<CombatAgent, float>();
 
         public Dictionary<CombatAgent, float> GetDamageMappingThisLife()
         {
-            return damageMappingThisLife.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
+            if (damageMappingThisLife.Count(item => !item.Key.IsSpawned) > 0)
+            {
+                Debug.LogWarning("Damage mapping this life has keys that aren't spawned in it, this should never happen");
+                return damageMappingThisLife.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
+            }
+            else
+            {
+                return damageMappingThisLife;
+            }
         }
 
-        protected void AddDamageToMapping(CombatAgent attacker, float damage)
+        public Dictionary<CombatAgent, float> GetDamageMappingThisLifeFromAliveAgents()
+        {
+            if (damageMappingThisLifeFromAliveAgents.Count(item => !item.Key.IsSpawned) > 0)
+            {
+                Debug.LogWarning("Damage mapping this life has keys that aren't spawned in it, this should never happen");
+                return damageMappingThisLifeFromAliveAgents.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
+            }
+            else
+            {
+                return damageMappingThisLifeFromAliveAgents;
+            }
+        }
+
+        private void AddDamageToMapping(CombatAgent attacker, float damage)
         {
             if (damageMappingThisLife.ContainsKey(attacker))
             {
@@ -667,6 +686,49 @@ namespace Vi.Core
             else
             {
                 damageMappingThisLife.Add(attacker, damage);
+            }
+
+            if (damageMappingThisLifeFromAliveAgents.ContainsKey(attacker))
+            {
+                damageMappingThisLifeFromAliveAgents[attacker] += damage;
+            }
+            else
+            {
+                damageMappingThisLifeFromAliveAgents.Add(attacker, damage);
+            }
+
+            if (damageMappingCrosswalk.ContainsKey(attacker))
+            {
+                damageMappingCrosswalk[attacker].Add(this);
+            }
+            else
+            {
+                damageMappingCrosswalk.Add(attacker, new HashSet<CombatAgent>() { this });
+            }
+        }
+
+        private void RemoveDamageMapping(CombatAgent attacker)
+        {
+            if (!attacker.IsSpawned)
+            {
+                damageMappingThisLife.Remove(attacker);
+            }
+
+            damageMappingThisLifeFromAliveAgents.Remove(attacker);
+        }
+
+        private void ClearDamageMapping()
+        {
+            damageMappingThisLife.Clear();
+            damageMappingThisLifeFromAliveAgents.Clear();
+
+            if (damageMappingCrosswalk.TryGetValue(this, out HashSet<CombatAgent> victimSet))
+            {
+                foreach (CombatAgent combatAgent in victimSet)
+                {
+                    combatAgent.RemoveDamageMapping(this);
+                }
+                damageMappingCrosswalk.Remove(this);
             }
         }
 
@@ -1421,7 +1483,7 @@ namespace Vi.Core
         private IEnumerator ClearDamageMappingAfter1Frame()
         {
             yield return null;
-            damageMappingThisLife.Clear();
+            ClearDamageMapping();
             lastAttackingCombatAgent = null;
         }
 

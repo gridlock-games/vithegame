@@ -126,41 +126,38 @@ namespace Vi.Core
                         }
                         break;
                     case "Rage":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            attributes.AddRage(attributes.GetMaxRage(), false);
-                            attributes.OnActivateRage();
-                        }
+                        combatAgent.AddRage(combatAgent.GetMaxRage(), false);
+                        combatAgent.OnActivateRage();
                         break;
                     case "Increased Move Speed":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedIncrease, 0.2f, true, buffDuration, 0, false));
-                        }
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.movementSpeedIncrease, 0.2f, true, buffDuration, 0, false));
                         break;
                     case "Resist Ailments":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToAilments, 0, false, buffDuration, 0, false));
-                        }
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToAilments, 0, false, buffDuration, 0, false));
                         break;
                     case "Resist Statuses":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToNegativeStatuses, 0, false, buffDuration, 0, false));
-                        }
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.immuneToNegativeStatuses, 0, false, buffDuration, 0, false));
                         break;
                     case "Damage Resistance":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.damageReductionMultiplier, 0.7f, false, buffDuration, 0, false));
-                        }
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.damageReductionMultiplier, 0.7f, false, buffDuration, 0, false));
                         break;
                     case "Health Regeneration":
-                        foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
-                        {
-                            RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.healing, 0.1f, false, buffDuration, 0, false));
-                        }
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.healing, 0.1f, false, buffDuration, 0, false));
+                        break;
+                    case "Increased Attack Speed":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.attackSpeedIncrease, 0.2f, true, buffDuration, 0, false));
+                        break;
+                    case "Increased Damage":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.damageMultiplier, 1.2f, false, buffDuration, 0, false));
+                        break;
+                    case "Stamina Regeneration":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.staminaRegeneration, 2, true, buffDuration, 0, false));
+                        break;
+                    case "Spirit Regeneration":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.spiritRegeneration, 2, true, buffDuration, 0, false));
+                        break;
+                    case "Ability Cooldown Reduction":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.abilityCooldownDecrease, 2, true, buffDuration, 0, false));
                         break;
                     default:
                         Debug.LogError("Unsure how to handle essence buff option titled: " + GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
