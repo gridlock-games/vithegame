@@ -54,7 +54,8 @@ namespace Vi.UI
         {
             transform.localScale = Vector3.zero;
             healthBarParent.localScale = Vector3.zero;
-            
+            healthText.enabled = false;
+
             if (!combatAgent)
             {
                 combatAgent = GetComponentInParent<CombatAgent>();
@@ -263,6 +264,7 @@ namespace Vi.UI
                 }
             }
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
+            healthText.enabled = team != PlayerDataManager.Team.Peaceful;
 
             float HP = combatAgent.GetHP();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
