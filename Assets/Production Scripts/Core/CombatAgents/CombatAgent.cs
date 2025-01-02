@@ -255,7 +255,7 @@ namespace Vi.Core
         private IEnumerator WaitForAnimator()
         {
             yield return new WaitUntil(() => AnimationHandler.Animator);
-            OnAilmentChanged(ActionClip.Ailment.None, ailment.Value);
+            OnAilmentChanged(ActionClip.Ailment.Death, ailment.Value);
         }
 
         private IEnumerator InitStats()
