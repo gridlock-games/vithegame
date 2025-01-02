@@ -87,6 +87,22 @@ namespace Vi.UI
             }
         }
 
+        private void OnEnable()
+        {
+            if (combatAgent)
+            {
+                combatAgent.SessionProgressionHandler.OnAbilityUpgrade += OnAbilityUpgrade;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (combatAgent)
+            {
+                combatAgent.SessionProgressionHandler.OnAbilityUpgrade -= OnAbilityUpgrade;
+            }
+        }
+
         public void SetPreviewOn()
         {
             if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
@@ -107,8 +123,8 @@ namespace Vi.UI
             this.keybindText.text = keybindText;
             OnKeybindTextChange();
 
-            lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
-            
+            abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
+
             float staminaCost = combatAgent.AnimationHandler.GetStaminaCostOfClip(Ability);
             staminaCostText.text = staminaCost.ToString("F0");
             lastStaminaCost = staminaCost;
@@ -138,7 +154,7 @@ namespace Vi.UI
             keybindText.enabled = !FasterPlayerPrefs.IsMobilePlatform;
         }
 
-        private int lastAbilityLevel = -1;
+        private int abilityLevel;
         private float lastStaminaCost = -1;
         private int lastNumAbilitiesOffCooldown = -1;
         private void Update()
@@ -173,7 +189,7 @@ namespace Vi.UI
 
             if (GameModeManager.Singleton.LevelingEnabled)
             {
-                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
+                if (abilityLevel == -1)
                 {
                     borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
                     staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
@@ -230,14 +246,16 @@ namespace Vi.UI
                     staminaCostText.color = staminaColor;
                 }
             }
+        }
 
-            int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
-            if (abilityLevel != lastAbilityLevel)
-            {
-                upgradeAnimationAnimator.Play("AbilityCardUpgradeAnimation", 0, 0);
-                AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
-            }
-            lastAbilityLevel = abilityLevel;
+        private void OnAbilityUpgrade(ActionClip ability, int newAbilityLevel)
+        {
+            if (ability != Ability) { return; }
+
+            abilityLevel = newAbilityLevel;
+
+            upgradeAnimationAnimator.Play("AbilityCardUpgradeAnimation", 0, 0);
+            AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
         }
 
         [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;
