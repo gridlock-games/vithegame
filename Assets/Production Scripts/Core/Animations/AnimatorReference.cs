@@ -334,6 +334,8 @@ namespace Vi.Core
         private void OnSpawnFromPool()
         {
             glowRenderer.RegisterChildRenderers();
+            animator.enabled = true;
+            SetRagdollActive(false);
         }
 
         private void OnDestroy()

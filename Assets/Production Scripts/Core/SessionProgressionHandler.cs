@@ -151,13 +151,13 @@ namespace Vi.Core
                         RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.damageMultiplier, 1.2f, false, buffDuration, 0, false));
                         break;
                     case "Stamina Regeneration":
-                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.staminaRegeneration, 2, true, buffDuration, 0, false));
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.staminaRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
                     case "Spirit Regeneration":
-                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.spiritRegeneration, 2, true, buffDuration, 0, false));
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.spiritRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
                     case "Ability Cooldown Reduction":
-                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.abilityCooldownDecrease, 2, true, buffDuration, 0, false));
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.abilityCooldownDecrease, 0.2f, true, buffDuration, 0, false));
                         break;
                     default:
                         Debug.LogError("Unsure how to handle essence buff option titled: " + GameModeManager.Singleton.EssenceBuffOptions[essenceBuffIndex].title);
