@@ -655,7 +655,7 @@ namespace Vi.Core
         {
             if (damageMappingThisLife.Count(item => !item.Key.IsSpawned) > 0)
             {
-                Debug.LogWarning("Damage mapping this life has keys that aren't spawned in it, this should never happen");
+                //Debug.LogWarning("Damage mapping this life has keys that aren't spawned in it, this should never happen");
                 return damageMappingThisLife.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
             }
             else
@@ -668,7 +668,7 @@ namespace Vi.Core
         {
             if (damageMappingThisLifeFromAliveAgents.Count(item => !item.Key.IsSpawned) > 0)
             {
-                Debug.LogWarning("Damage mapping this life has keys that aren't spawned in it, this should never happen");
+                //Debug.LogWarning("Damage mapping this life from alive agents has keys that aren't spawned in it, this should never happen");
                 return damageMappingThisLifeFromAliveAgents.Where(item => item.Key.IsSpawned).ToDictionary(x => x.Key, x => x.Value);
             }
             else
