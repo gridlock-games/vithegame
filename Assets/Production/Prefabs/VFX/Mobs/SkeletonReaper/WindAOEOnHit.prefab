@@ -8,6 +8,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 339578187803465151, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 339578187803465151, guid: 3f3c91c75da07684a8cc217816a7f708,
+        type: 3}
+      propertyPath: lengthInSec
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 576309817373078997, guid: 3f3c91c75da07684a8cc217816a7f708,
         type: 3}
       propertyPath: TriggerModule.enabled
@@ -176,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 616798116
+  GlobalObjectIdHash: 279767910
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -289,6 +299,8 @@ MonoBehaviour:
   scaleVFXBasedOnEdges: 0
   boundsPoint: {x: 0, y: 0, z: 2.5}
   boundsLocalAxis: {x: 0, y: -1, z: 0}
+  latchToFirstTarget: 0
+  latchPositionOffset: {x: 0, y: 0, z: 0}
 --- !u!135 &4152335042471454828
 SphereCollider:
   m_ObjectHideFlags: 0
