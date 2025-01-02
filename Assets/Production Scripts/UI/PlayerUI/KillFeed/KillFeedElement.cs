@@ -96,6 +96,10 @@ namespace Vi.UI
                 }
             }
             initializationTime = Time.time;
+
+            causeOfDeathImage.transform.SetSiblingIndex(causeOfDeathImageOriginalSiblingIndex);
+            contentSizeFitter.enabled = true;
+            horizontalLayoutGroup.enabled = true;
         }
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
@@ -105,6 +109,11 @@ namespace Vi.UI
 
         private RectTransform rt;
         private Material materialInstance;
+        private HorizontalLayoutGroup horizontalLayoutGroup;
+        private ContentSizeFitter contentSizeFitter;
+
+        private int causeOfDeathImageOriginalSiblingIndex;
+
         private void Start()
         {
             foreach (Graphic graphic in GetComponentsInChildren<Graphic>())
@@ -120,8 +129,13 @@ namespace Vi.UI
                 graphic.material.color = newColor;
             }
 
+            horizontalLayoutGroup = GetComponentInChildren<HorizontalLayoutGroup>();
+            contentSizeFitter = GetComponentInChildren<ContentSizeFitter>();
+
             rt = (RectTransform)transform;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
+
+            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
         }
 
         private const float fadeTime = 4;
@@ -144,6 +158,11 @@ namespace Vi.UI
             {
                 rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
                 lastWidthEvaluated = targetWidth;
+
+                // Disable for sibling reordering
+                contentSizeFitter.enabled = false;
+                horizontalLayoutGroup.enabled = false;
+                causeOfDeathImage.transform.SetAsFirstSibling();
             }
         }
 
