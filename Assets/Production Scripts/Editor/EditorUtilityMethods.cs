@@ -363,16 +363,15 @@ namespace Vi.Editor
                     if (textureIsInSpriteAtlas)
                     {
                         var ds = importer.GetDefaultPlatformTextureSettings();
-                        if (ds.crunchedCompression)
-                        {
-                            ds.crunchedCompression = false;
-                            shouldReimport = true;
-                            importer.SetPlatformTextureSettings(ds);
-                        }
+                        ds.crunchedCompression = false;
+                        shouldReimport = true;
+                        importer.SetPlatformTextureSettings(ds);
 
                         importer.ClearPlatformTextureSettings("Android");
+                        shouldReimport = true;
 
                         importer.ClearPlatformTextureSettings("iPhone");
+                        shouldReimport = true;
 
                         if (shouldReimport) { importer.SaveAndReimport(); }
                         continue;
@@ -422,38 +421,28 @@ namespace Vi.Editor
                     bool shouldReimport = false;
 
                     var standaloneSettings = atlasImporter.GetPlatformSettings("Standalone");
-
-                    if (!standaloneSettings.crunchedCompression)
-                    {
-                        standaloneSettings.crunchedCompression = true;
-                        standaloneSettings.compressionQuality = 100;
-                        standaloneSettings.maxTextureSize = 2048;
-                        standaloneSettings.overridden = true;
-                        atlasImporter.SetPlatformSettings(standaloneSettings);
-                        shouldReimport = true;
-                    }
+                    standaloneSettings.crunchedCompression = true;
+                    standaloneSettings.compressionQuality = 100;
+                    standaloneSettings.maxTextureSize = 2048;
+                    standaloneSettings.overridden = true;
+                    atlasImporter.SetPlatformSettings(standaloneSettings);
+                    shouldReimport = true;
 
                     var androidSettings = atlasImporter.GetPlatformSettings("Android");
-                    if (!androidSettings.crunchedCompression)
-                    {
-                        androidSettings.crunchedCompression = true;
-                        androidSettings.compressionQuality = 100;
-                        androidSettings.maxTextureSize = 256;
-                        androidSettings.overridden = true;
-                        atlasImporter.SetPlatformSettings(androidSettings);
-                        shouldReimport = true;
-                    }
+                    androidSettings.crunchedCompression = true;
+                    androidSettings.compressionQuality = 100;
+                    androidSettings.maxTextureSize = 256;
+                    androidSettings.overridden = true;
+                    atlasImporter.SetPlatformSettings(androidSettings);
+                    shouldReimport = true;
 
                     var iPhoneSettings = atlasImporter.GetPlatformSettings("iPhone");
-                    if (!iPhoneSettings.crunchedCompression)
-                    {
-                        iPhoneSettings.crunchedCompression = true;
-                        iPhoneSettings.compressionQuality = 100;
-                        iPhoneSettings.maxTextureSize = 256;
-                        iPhoneSettings.overridden = true;
-                        atlasImporter.SetPlatformSettings(iPhoneSettings);
-                        shouldReimport = true;
-                    }
+                    iPhoneSettings.crunchedCompression = true;
+                    iPhoneSettings.compressionQuality = 100;
+                    iPhoneSettings.maxTextureSize = 256;
+                    iPhoneSettings.overridden = true;
+                    atlasImporter.SetPlatformSettings(iPhoneSettings);
+                    shouldReimport = true;
 
                     if (shouldReimport) { atlasImporter.SaveAndReimport(); }
                 }
