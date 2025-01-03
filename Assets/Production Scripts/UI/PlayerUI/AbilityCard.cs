@@ -4,6 +4,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using System.Collections;
 
 namespace Vi.UI
 {
@@ -18,7 +19,7 @@ namespace Vi.UI
         [SerializeField] private Image upgradeIcon;
         [SerializeField] private RectTransform upgradeIconActivePosition;
         [SerializeField] private RectTransform upgradeIconInactivePosition;
-        [SerializeField] private Animator upgradeAnimationAnimator;
+        [SerializeField] private Image viLogoUpgradeIcon;
         [SerializeField] private Image backgroundImageSquare;
         [SerializeField] private Image backgroundImageCircle;
         [SerializeField] private Image circleMask;
@@ -130,11 +131,6 @@ namespace Vi.UI
             lastStaminaCost = staminaCost;
 
             stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
-
-            if (GameModeManager.Singleton)
-            {
-                upgradeAnimationAnimator.gameObject.SetActive(GameModeManager.Singleton.LevelingEnabled);
-            }
         }
 
         private void OnKeybindTextChange()
@@ -254,8 +250,38 @@ namespace Vi.UI
 
             abilityLevel = newAbilityLevel;
 
-            upgradeAnimationAnimator.Play("AbilityCardUpgradeAnimation", 0, 0);
+            if (upgradeAbilityAnimationCoroutine != null) { StopCoroutine(upgradeAbilityAnimationCoroutine); }
+            upgradeAbilityAnimationCoroutine = StartCoroutine(UpgradeAbilityAnimation());
+
             AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
+        }
+
+        private Coroutine upgradeAbilityAnimationCoroutine;
+        private static readonly Color originalAnimColor = new Color(1, 197 / 255f, 61 / 255f, 0);
+        private static readonly Color visibleAnimColor = new Color(1, 197 / 255f, 61 / 255f, 1);
+        private IEnumerator UpgradeAbilityAnimation()
+        {
+            viLogoUpgradeIcon.color = originalAnimColor;
+
+            float lerpProgress = 0;
+            while (true)
+            {
+                lerpProgress += Time.deltaTime * 1.5f;
+                viLogoUpgradeIcon.color = Color.Lerp(originalAnimColor, visibleAnimColor, lerpProgress);
+                yield return null;
+
+                if (viLogoUpgradeIcon.color == visibleAnimColor) { break; }
+            }
+
+            lerpProgress = 0;
+            while (true)
+            {
+                lerpProgress += Time.deltaTime * 1.5f;
+                viLogoUpgradeIcon.color = Color.Lerp(visibleAnimColor, originalAnimColor, lerpProgress);
+                yield return null;
+
+                if (viLogoUpgradeIcon.color == originalAnimColor) { break; }
+            }
         }
 
         [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;

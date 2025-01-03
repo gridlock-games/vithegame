@@ -463,6 +463,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5345764717886939372}
+  - component: {fileID: 5430132325753495475}
   m_Layer: 5
   m_Name: StaminaCostParent
   m_TagString: Untagged
@@ -492,6 +493,29 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 35}
   m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 0.5, y: 1}
+--- !u!223 &5430132325753495475
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4188159168625263653}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
 --- !u!1 &5028955343095011438
 GameObject:
   m_ObjectHideFlags: 0
@@ -1050,7 +1074,7 @@ MonoBehaviour:
   upgradeIcon: {fileID: 8152708190092062513}
   upgradeIconActivePosition: {fileID: 808760766366482613}
   upgradeIconInactivePosition: {fileID: 5634383444065376687}
-  upgradeAnimationAnimator: {fileID: 2935158550498544879}
+  viLogoUpgradeIcon: {fileID: 5532930140809065281}
   backgroundImageSquare: {fileID: 1943295676689200726}
   backgroundImageCircle: {fileID: 981814404425274627}
   circleMask: {fileID: 4942488809615053355}
@@ -1537,9 +1561,8 @@ GameObject:
   - component: {fileID: 4045139113036306162}
   - component: {fileID: 2934973500809622651}
   - component: {fileID: 5532930140809065281}
-  - component: {fileID: 2935158550498544879}
   m_Layer: 5
-  m_Name: UpgradeAnimationImage
+  m_Name: ViLogoUpgradeIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1602,28 +1625,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!95 &2935158550498544879
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8621196432899124143}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 2a04ecc8147249c4584a312c25383649, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &8875903227808546151
 GameObject:
   m_ObjectHideFlags: 0
