@@ -62,14 +62,14 @@ RectTransform:
   m_GameObject: {fileID: 2155489697819290085}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5857397915111518823}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -70, y: -10}
   m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &8040683465083565140
@@ -216,14 +216,14 @@ RectTransform:
   m_GameObject: {fileID: 3212742151873959798}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5345764717886939372}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -28.125, y: 91.25}
   m_SizeDelta: {x: 75, y: 75}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &8865178563213577238
@@ -454,68 +454,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!1 &4188159168625263653
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5345764717886939372}
-  - component: {fileID: 5430132325753495475}
-  m_Layer: 5
-  m_Name: StaminaCostParent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &5345764717886939372
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4188159168625263653}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
-  m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 5896972213680806563}
-  - {fileID: 3232286996532399435}
-  - {fileID: 6824045417369541163}
-  m_Father: {fileID: 9219607089194463244}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 35}
-  m_SizeDelta: {x: 75, y: 75}
-  m_Pivot: {x: 0.5, y: 1}
---- !u!223 &5430132325753495475
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4188159168625263653}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 2
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_TargetDisplay: 0
 --- !u!1 &5028955343095011438
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +466,7 @@ GameObject:
   - component: {fileID: 6291514061978458130}
   - component: {fileID: 5608657845262798837}
   m_Layer: 5
-  m_Name: Background
+  m_Name: StaminaBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -543,15 +481,15 @@ RectTransform:
   m_GameObject: {fileID: 5028955343095011438}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5345764717886939372}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 63.125}
+  m_SizeDelta: {x: -45, y: -45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6291514061978458130
 CanvasRenderer:
@@ -603,7 +541,7 @@ GameObject:
   - component: {fileID: 7639894394348096342}
   - component: {fileID: 1168342669608124450}
   m_Layer: 5
-  m_Name: Background
+  m_Name: StackBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -618,15 +556,15 @@ RectTransform:
   m_GameObject: {fileID: 5464409067392822491}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5857397915111518823}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -40, y: -40}
+  m_SizeDelta: {x: -45, y: -45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7639894394348096342
 CanvasRenderer:
@@ -678,7 +616,7 @@ GameObject:
   - component: {fileID: 8903908359378927167}
   - component: {fileID: 6767416638099451812}
   m_Layer: 5
-  m_Name: CircleBackground
+  m_Name: StackCircleBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -693,14 +631,14 @@ RectTransform:
   m_GameObject: {fileID: 5877107904905874069}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5857397915111518823}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -40, y: -40}
   m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8903908359378927167
@@ -1000,10 +938,14 @@ RectTransform:
   - {fileID: 5562295584534913287}
   - {fileID: 4205916390080573745}
   - {fileID: 1785146376292005531}
+  - {fileID: 5896972213680806563}
+  - {fileID: 3232286996532399435}
+  - {fileID: 5627621305685001900}
+  - {fileID: 5850501689406909575}
   - {fileID: 7867492759484940024}
   - {fileID: 8008950894318836351}
-  - {fileID: 5345764717886939372}
-  - {fileID: 5857397915111518823}
+  - {fileID: 6824045417369541163}
+  - {fileID: 2149187419593710746}
   - {fileID: 808760766366482613}
   - {fileID: 5634383444065376687}
   m_Father: {fileID: 0}
@@ -1078,7 +1020,8 @@ MonoBehaviour:
   backgroundImageSquare: {fileID: 1943295676689200726}
   backgroundImageCircle: {fileID: 981814404425274627}
   circleMask: {fileID: 4942488809615053355}
-  stackVisualParent: {fileID: 9116173890473884696}
+  stackBackground: {fileID: 6767416638099451812}
+  stackCircleBackground: {fileID: 1168342669608124450}
   stackText: {fileID: 1290285490856502970}
   abilityUpgradeSoundEffects:
   - {fileID: 8300000, guid: 1ec74bef2e2314f69932cbc43dffe22b, type: 3}
@@ -1487,7 +1430,7 @@ GameObject:
   - component: {fileID: 6035604683317448325}
   - component: {fileID: 261146879872543535}
   m_Layer: 5
-  m_Name: CircleBackground
+  m_Name: StaminaCircleBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1502,14 +1445,14 @@ RectTransform:
   m_GameObject: {fileID: 8607343311091821261}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5345764717886939372}
+  m_Father: {fileID: 9219607089194463244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 63.125}
   m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6035604683317448325
@@ -1660,41 +1603,3 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 105}
   m_SizeDelta: {x: 90, y: 90}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &9116173890473884696
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5857397915111518823}
-  m_Layer: 5
-  m_Name: StackParent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &5857397915111518823
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9116173890473884696}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
-  m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 5627621305685001900}
-  - {fileID: 5850501689406909575}
-  - {fileID: 2149187419593710746}
-  m_Father: {fileID: 9219607089194463244}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -10, y: -10}
-  m_SizeDelta: {x: 75, y: 75}
-  m_Pivot: {x: 0, y: 0}

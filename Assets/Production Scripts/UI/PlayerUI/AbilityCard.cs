@@ -23,7 +23,8 @@ namespace Vi.UI
         [SerializeField] private Image backgroundImageSquare;
         [SerializeField] private Image backgroundImageCircle;
         [SerializeField] private Image circleMask;
-        [SerializeField] private GameObject stackVisualParent;
+        [SerializeField] private Image stackBackground;
+        [SerializeField] private Image stackCircleBackground;
         [SerializeField] private Text stackText;
 
         public ActionClip Ability { get; private set; }
@@ -113,7 +114,10 @@ namespace Vi.UI
             keybindText.text = previewAbility.name.Replace("Ability", "");
             OnKeybindTextChange();
             cooldownText.text = "";
-            stackVisualParent.gameObject.SetActive(false);
+
+            stackCircleBackground.enabled = false;
+            stackBackground.enabled = false;
+            stackText.enabled = false;
         }
 
         public void Initialize(ActionClip ability, string keybindText)
@@ -130,7 +134,10 @@ namespace Vi.UI
             staminaCostText.text = staminaCost.ToString("F0");
             lastStaminaCost = staminaCost;
 
-            stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
+            bool stackIsVisible = combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1;
+            stackCircleBackground.enabled = stackIsVisible;
+            stackBackground.enabled = stackIsVisible;
+            stackText.enabled = stackIsVisible;
         }
 
         private void OnKeybindTextChange()
