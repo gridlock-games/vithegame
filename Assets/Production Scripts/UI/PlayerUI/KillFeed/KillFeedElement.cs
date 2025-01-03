@@ -100,7 +100,11 @@ namespace Vi.UI
             causeOfDeathImage.transform.SetSiblingIndex(causeOfDeathImageOriginalSiblingIndex);
             contentSizeFitter.enabled = true;
             horizontalLayoutGroup.enabled = true;
+            setSiblingIndexNextFrame = true;
+            Debug.Log("Setting original index");
         }
+
+        private bool setSiblingIndexNextFrame;
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
         private static readonly Color localDeathBackgroundColor = new Color(200 / 255f, 0, 0, 200 / 255f);
@@ -111,6 +115,7 @@ namespace Vi.UI
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
+            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
         }
 
         private RectTransform rt;
@@ -140,8 +145,6 @@ namespace Vi.UI
 
             rt = (RectTransform)transform;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
-
-            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
         }
 
         private const float fadeTime = 4;
@@ -169,7 +172,13 @@ namespace Vi.UI
                 // Disable for sibling reordering
                 contentSizeFitter.enabled = false;
                 horizontalLayoutGroup.enabled = false;
+            }
+
+            if (setSiblingIndexNextFrame)
+            {
+                Debug.Log("Setting optimized index");
                 causeOfDeathImage.transform.SetAsFirstSibling();
+                setSiblingIndexNextFrame = false;
             }
         }
 
