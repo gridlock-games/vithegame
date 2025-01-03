@@ -1219,6 +1219,7 @@ MonoBehaviour:
   roundWinThresholdText: {fileID: 242903032943073472}
   canvasGroupsToAffectOpacity:
   - {fileID: 5128843092965117886}
+  MVPCanvas: {fileID: 5687098141108174964}
   MVPCanvasGroup: {fileID: 6586609542806520557}
   MVPAccountCard: {fileID: 128043014532040495}
   MVPPresentationCamera: {fileID: 3645638171360608121}
@@ -1254,6 +1255,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!223 &5687098141108174964 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 7114400852570474424, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3195247040199821260}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5790898815753181590 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8938145026568379994, guid: 7314c07a3d8a63949ae8ae9b21ff2076,

@@ -149,6 +149,26 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 130.48285
       objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6691586421158717059, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7288108083942770003, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_SizeDelta.x
@@ -158,6 +178,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 53.494286
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7713731193809939359, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7757707048149690145, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
@@ -397,6 +437,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!223 &6045618182926444883 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 7114400852570474424, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &6116117941187681418 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7331267047892496993, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -443,6 +489,7 @@ MonoBehaviour:
   roundWinThresholdText: {fileID: 2185388288731214311}
   canvasGroupsToAffectOpacity:
   - {fileID: 6496362794858210969}
+  MVPCanvas: {fileID: 6045618182926444883}
   MVPCanvasGroup: {fileID: 5071807923183610826}
   MVPAccountCard: {fileID: 2075066947893440008}
   MVPPresentationCamera: {fileID: 3430916691335124574}
