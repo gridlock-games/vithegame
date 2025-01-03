@@ -318,23 +318,6 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Set Texture Import Overrides")]
         static void SetTextureImportOverrides()
         {
-            List<Sprite> allSpritesInAtlases = new List<Sprite>();
-
-            // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
-            string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
-            List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
-            foreach (string spriteAtlasGuid in spriteAtlasPaths)
-            {
-                SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
-                spriteAtlases.Add(spriteAtlas);
-
-                Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
-                for (int i = 0; i < spriteAtlas.GetSprites(sprites); i++)
-                {
-                    allSpritesInAtlases.Add(sprites[i]);
-                }
-            }
-
             string[] textures = AssetDatabase.FindAssets("t:Texture");
             for (int i = 0; i < textures.Length; i++)
             {
@@ -345,17 +328,38 @@ namespace Vi.Editor
                 string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
                 if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
+
+                // TODO Remove when Genie finishes the player hub map
                 if (assetPath.Contains("Player Hub")) { continue; }
 
                 Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                 bool textureIsInSpriteAtlas = false;
                 if (sprite)
                 {
+                    List<Sprite> allSpritesInAtlases = new List<Sprite>();
+
+                    // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
+                    string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
+                    List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
+                    foreach (string spriteAtlasGuid in spriteAtlasPaths)
+                    {
+                        SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
+                        spriteAtlases.Add(spriteAtlas);
+
+                        Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
+                        for (int j = 0; j < spriteAtlas.GetSprites(sprites); j++)
+                        {
+                            allSpritesInAtlases.Add(sprites[j]);
+                        }
+                    }
+
                     if (allSpritesInAtlases.Exists(item => item.name.Replace("(Clone)", "") == sprite.name))
                     {
                         textureIsInSpriteAtlas = true;
                     }
                 }
+
+                EditorUtility.UnloadUnusedAssetsImmediate();
 
                 if (AssetImporter.GetAtPath(assetPath) is TextureImporter importer)
                 {
