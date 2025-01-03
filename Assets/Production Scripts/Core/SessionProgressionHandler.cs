@@ -8,6 +8,7 @@ using Vi.ScriptableObjects;
 using Vi.Core.GameModeManagers;
 using Vi.Core.CombatAgents;
 using Vi.Core.Structures;
+using UnityEngine.Events;
 
 namespace Vi.Core
 {
@@ -322,10 +323,19 @@ namespace Vi.Core
             {
                 abilityLevelTracker.Add(key, 0);
             }
-            combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName),
+
+            int newAbilityLevel = abilityLevelTracker[key];
+
+            ActionClip ability = combatAgent.WeaponHandler.GetWeapon().GetActionClipByName(abilityName);
+            combatAgent.WeaponHandler.GetWeapon().PermanentlyReduceAbilityCooldownTime(ability,
                 GetAbilityLevelCooldownReduction(weaponName, abilityName));
+
+            OnAbilityUpgrade?.Invoke(ability, newAbilityLevel);
+
             return true;
         }
+
+        public UnityAction<ActionClip, int> OnAbilityUpgrade;
 
         public void SyncAbilityCooldowns(Weapon weapon)
         {

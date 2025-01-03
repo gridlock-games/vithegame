@@ -102,10 +102,10 @@ public class DebugOverlay : MonoBehaviour
             float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
             
             // Adaptive resolution scale
-            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * DPIScale);
+            SetDPIScale(DPIScalingCurve.Evaluate(invertedTemperatureLevel) * DPIScale);
 
             // Adaptive LOD
-            SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
+            SetLODBias(LODBiasCurve.Evaluate(invertedTemperatureLevel) * maxLODBias);
 
             // Texture mip maps
             ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
@@ -123,7 +123,7 @@ public class DebugOverlay : MonoBehaviour
             }
 
             float maxAudioCullingDistance = 100;
-            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxAudioCullingDistance;
+            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.Evaluate(invertedTemperatureLevel) * maxAudioCullingDistance;
         }
 
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
