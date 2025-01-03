@@ -100,12 +100,22 @@ namespace Vi.UI
             causeOfDeathImage.transform.SetSiblingIndex(causeOfDeathImageOriginalSiblingIndex);
             contentSizeFitter.enabled = true;
             horizontalLayoutGroup.enabled = true;
+            setSiblingIndexNextFrame = true;
         }
+
+        private bool setSiblingIndexNextFrame;
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
         private static readonly Color localDeathBackgroundColor = new Color(200 / 255f, 0, 0, 200 / 255f);
 
         public bool IsNotRunning() { return Time.time - initializationTime > 5; }
+
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
+        }
 
         private RectTransform rt;
         private Material materialInstance;
@@ -134,8 +144,6 @@ namespace Vi.UI
 
             rt = (RectTransform)transform;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
-
-            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
         }
 
         private const float fadeTime = 4;
@@ -145,6 +153,7 @@ namespace Vi.UI
         {
             Color targetColor = Color.white;
             if (IsNotRunning()) { targetColor.a = 0; }
+            else { canvas.enabled = true; }
 
             if (lastTargetColor != targetColor)
             {
@@ -162,7 +171,12 @@ namespace Vi.UI
                 // Disable for sibling reordering
                 contentSizeFitter.enabled = false;
                 horizontalLayoutGroup.enabled = false;
+            }
+
+            if (setSiblingIndexNextFrame)
+            {
                 causeOfDeathImage.transform.SetAsFirstSibling();
+                setSiblingIndexNextFrame = false;
             }
         }
 
@@ -175,7 +189,14 @@ namespace Vi.UI
                 Color colorResult = Vector4.MoveTowards(materialInstance.color, targetColor, Time.deltaTime * fadeTime);
                 materialInstance.color = colorResult;
                 colorList.Add(colorResult);
-                if (colorList.TrueForAll(item => item == targetColor)) { break; }
+                if (colorList.TrueForAll(item => item == targetColor))
+                {
+                    if (IsNotRunning())
+                    {
+                        canvas.enabled = false;
+                    }
+                    break;
+                }
                 yield return null;
             }
         }

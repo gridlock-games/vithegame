@@ -71,6 +71,7 @@ namespace Vi.UI
                         if (c is GraphicRaycaster) { continue; }
                         if (c is LayoutGroup) { continue; }
                         if (c is ContentSizeFitter) { continue; }
+                        if (c is Mask) { continue; }
                         if (c.GetType().ToString() == "DuloGames.UI.UIHighlightTransition") { continue; }
                         c.enabled = false;
                     }

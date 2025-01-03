@@ -318,15 +318,22 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Set Texture Import Overrides")]
         static void SetTextureImportOverrides()
         {
+            List<Sprite> allSpritesInAtlases = new List<Sprite>();
+
             // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
             string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
             List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
-            foreach (string spriteAtlasPath in spriteAtlasPaths)
+            foreach (string spriteAtlasGuid in spriteAtlasPaths)
             {
-                spriteAtlases.Add(AssetDatabase.LoadAssetAtPath<SpriteAtlas>(spriteAtlasPath));
-            }
+                SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
+                spriteAtlases.Add(spriteAtlas);
 
-            Sprite[] sprites = new Sprite[1000];
+                Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
+                for (int i = 0; i < spriteAtlas.GetSprites(sprites); i++)
+                {
+                    allSpritesInAtlases.Add(sprites[i]);
+                }
+            }
 
             string[] textures = AssetDatabase.FindAssets("t:Texture");
             for (int i = 0; i < textures.Length; i++)
@@ -338,21 +345,15 @@ namespace Vi.Editor
                 string assetPath = AssetDatabase.GUIDToAssetPath(textures[i]);
                 if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
+                if (assetPath.Contains("Player Hub")) { continue; }
 
-                Texture texture = AssetDatabase.LoadAssetAtPath<Texture>(textures[i]);
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                 bool textureIsInSpriteAtlas = false;
-                if (texture)
+                if (sprite)
                 {
-                    foreach (SpriteAtlas spriteAtlas in spriteAtlases)
+                    if (allSpritesInAtlases.Exists(item => item.name.Replace("(Clone)", "") == sprite.name))
                     {
-                        for (int spriteIndex = 0; spriteIndex < spriteAtlas.GetSprites(sprites); spriteIndex++)
-                        {
-                            if (sprites[i].texture == texture)
-                            {
-                                textureIsInSpriteAtlas = true;
-                                break;
-                            }
-                        }
+                        textureIsInSpriteAtlas = true;
                     }
                 }
 
@@ -363,15 +364,31 @@ namespace Vi.Editor
                     if (textureIsInSpriteAtlas)
                     {
                         var ds = importer.GetDefaultPlatformTextureSettings();
-                        ds.crunchedCompression = false;
-                        shouldReimport = true;
-                        importer.SetPlatformTextureSettings(ds);
 
-                        importer.ClearPlatformTextureSettings("Android");
-                        shouldReimport = true;
+                        if (ds.crunchedCompression)
+                        {
+                            ds.crunchedCompression = false;
+                            shouldReimport = true;
+                            importer.SetPlatformTextureSettings(ds);
+                        }
 
-                        importer.ClearPlatformTextureSettings("iPhone");
-                        shouldReimport = true;
+                        if (importer.GetPlatformTextureSettings("Android").overridden)
+                        {
+                            importer.ClearPlatformTextureSettings("Android");
+                            shouldReimport = true;
+                        }
+
+                        if (importer.GetPlatformTextureSettings("iPhone").overridden)
+                        {
+                            importer.ClearPlatformTextureSettings("iPhone");
+                            shouldReimport = true;
+                        }
+
+                        if (importer.textureCompression != TextureImporterCompression.Uncompressed)
+                        {
+                            importer.textureCompression = TextureImporterCompression.Uncompressed;
+                            shouldReimport = true;
+                        }
 
                         if (shouldReimport) { importer.SaveAndReimport(); }
                         continue;
@@ -414,39 +431,39 @@ namespace Vi.Editor
             AssetDatabase.SaveAssets();
             EditorUtility.UnloadUnusedAssetsImmediate();
 
-            foreach (SpriteAtlas spriteAtlas in spriteAtlases)
-            {
-                if (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(spriteAtlas)) is SpriteAtlasImporter atlasImporter)
-                {
-                    bool shouldReimport = false;
+            //foreach (SpriteAtlas spriteAtlas in spriteAtlases)
+            //{
+            //    if (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(spriteAtlas)) is SpriteAtlasImporter atlasImporter)
+            //    {
+            //        bool shouldReimport = false;
 
-                    var standaloneSettings = atlasImporter.GetPlatformSettings("Standalone");
-                    standaloneSettings.crunchedCompression = true;
-                    standaloneSettings.compressionQuality = 100;
-                    standaloneSettings.maxTextureSize = 2048;
-                    standaloneSettings.overridden = true;
-                    atlasImporter.SetPlatformSettings(standaloneSettings);
-                    shouldReimport = true;
+            //        var standaloneSettings = atlasImporter.GetPlatformSettings("Standalone");
+            //        standaloneSettings.crunchedCompression = true;
+            //        standaloneSettings.compressionQuality = 100;
+            //        standaloneSettings.maxTextureSize = 2048;
+            //        standaloneSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(standaloneSettings);
+            //        shouldReimport = true;
 
-                    var androidSettings = atlasImporter.GetPlatformSettings("Android");
-                    androidSettings.crunchedCompression = true;
-                    androidSettings.compressionQuality = 100;
-                    androidSettings.maxTextureSize = 256;
-                    androidSettings.overridden = true;
-                    atlasImporter.SetPlatformSettings(androidSettings);
-                    shouldReimport = true;
+            //        var androidSettings = atlasImporter.GetPlatformSettings("Android");
+            //        androidSettings.crunchedCompression = true;
+            //        androidSettings.compressionQuality = 100;
+            //        androidSettings.maxTextureSize = 256;
+            //        androidSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(androidSettings);
+            //        shouldReimport = true;
 
-                    var iPhoneSettings = atlasImporter.GetPlatformSettings("iPhone");
-                    iPhoneSettings.crunchedCompression = true;
-                    iPhoneSettings.compressionQuality = 100;
-                    iPhoneSettings.maxTextureSize = 256;
-                    iPhoneSettings.overridden = true;
-                    atlasImporter.SetPlatformSettings(iPhoneSettings);
-                    shouldReimport = true;
+            //        var iPhoneSettings = atlasImporter.GetPlatformSettings("iPhone");
+            //        iPhoneSettings.crunchedCompression = true;
+            //        iPhoneSettings.compressionQuality = 100;
+            //        iPhoneSettings.maxTextureSize = 256;
+            //        iPhoneSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(iPhoneSettings);
+            //        shouldReimport = true;
 
-                    if (shouldReimport) { atlasImporter.SaveAndReimport(); }
-                }
-            }
+            //        if (shouldReimport) { atlasImporter.SaveAndReimport(); }
+            //    }
+            //}
         }
 
         [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]

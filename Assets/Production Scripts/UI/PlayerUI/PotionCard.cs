@@ -15,7 +15,6 @@ namespace Vi.UI
         [SerializeField] private Text potionsLeftText;
         [SerializeField] private Image backgroundImageSquare;
         [SerializeField] private Image backgroundImageCircle;
-        [SerializeField] private Image circleMask;
 
         private bool isPreview;
         public void SetPreviewOn()
@@ -69,13 +68,11 @@ namespace Vi.UI
             {
                 backgroundImageSquare.gameObject.SetActive(false);
                 backgroundImageCircle.gameObject.SetActive(true);
-                circleMask.enabled = true;
             }
             else
             {
                 backgroundImageSquare.gameObject.SetActive(true);
                 backgroundImageCircle.gameObject.SetActive(false);
-                circleMask.enabled = false;
             }
         }
 
