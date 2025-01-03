@@ -101,7 +101,6 @@ namespace Vi.UI
             contentSizeFitter.enabled = true;
             horizontalLayoutGroup.enabled = true;
             setSiblingIndexNextFrame = true;
-            Debug.Log("Setting original index");
         }
 
         private bool setSiblingIndexNextFrame;
@@ -176,7 +175,6 @@ namespace Vi.UI
 
             if (setSiblingIndexNextFrame)
             {
-                Debug.Log("Setting optimized index");
                 causeOfDeathImage.transform.SetAsFirstSibling();
                 setSiblingIndexNextFrame = false;
             }
