@@ -107,6 +107,12 @@ namespace Vi.UI
 
         public bool IsNotRunning() { return Time.time - initializationTime > 5; }
 
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
+
         private RectTransform rt;
         private Material materialInstance;
         private HorizontalLayoutGroup horizontalLayoutGroup;
@@ -145,6 +151,7 @@ namespace Vi.UI
         {
             Color targetColor = Color.white;
             if (IsNotRunning()) { targetColor.a = 0; }
+            else { canvas.enabled = true; }
 
             if (lastTargetColor != targetColor)
             {
@@ -175,7 +182,14 @@ namespace Vi.UI
                 Color colorResult = Vector4.MoveTowards(materialInstance.color, targetColor, Time.deltaTime * fadeTime);
                 materialInstance.color = colorResult;
                 colorList.Add(colorResult);
-                if (colorList.TrueForAll(item => item == targetColor)) { break; }
+                if (colorList.TrueForAll(item => item == targetColor))
+                {
+                    if (IsNotRunning())
+                    {
+                        canvas.enabled = false;
+                    }
+                    break;
+                }
                 yield return null;
             }
         }
