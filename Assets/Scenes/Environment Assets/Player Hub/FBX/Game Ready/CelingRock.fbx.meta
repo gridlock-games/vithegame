@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 9b8dfc64419e41646b7390367d47cd5b
+guid: af2a186c9f0853e4883ee49643722368
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,13 +7,8 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: T_Trimsheet_Bridge
-    second: {fileID: 2100000, guid: 965c188f76187ad4c809daa2cf12329e, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: T_Trimsheet_Bridge.002
-    second: {fileID: 2100000, guid: 965c188f76187ad4c809daa2cf12329e, type: 2}
+      name: T_Rock_Ceiling
+    second: {fileID: 2100000, guid: c1a9d66f040face46bf95e3a9096f4a5, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -24,7 +19,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 0
+    removeConstantScaleCurves: 1
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: 
@@ -42,7 +37,9 @@ ModelImporter:
     clipAnimations: []
     isReadable: 0
   meshes:
-    lODScreenPercentages: []
+    lODScreenPercentages:
+    - 0.25
+    - 0.01
     globalScale: 1
     meshCompression: 0
     addColliders: 0
@@ -109,7 +106,7 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
-  importBlendShapeDeformPercent: 1
+  importBlendShapeDeformPercent: 0
   remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
