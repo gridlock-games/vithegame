@@ -58,6 +58,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8281724557233800901, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8281724557233800901, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+        type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8281724557233800901, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+        type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8281724557233800901, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+        type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
         type: 3}
       propertyPath: m_LightProbeUsage
@@ -97,24 +117,24 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5622922051259220306, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+    - targetCorrespondingSourceObject: {fileID: -8144648952643149536, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2199934953111862103}
+      addedObject: {fileID: 7456977269994797094}
   m_SourcePrefab: {fileID: 100100000, guid: e910c75d1080e9e4aa1c2aa2229d8e3a, type: 3}
---- !u!1 &5383632968401700305 stripped
+--- !u!1 &740354605537076643 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5622922051259220306, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
+  m_CorrespondingSourceObject: {fileID: -8144648952643149536, guid: e910c75d1080e9e4aa1c2aa2229d8e3a,
     type: 3}
   m_PrefabInstance: {fileID: 341746327193781379}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &2199934953111862103
+--- !u!64 &7456977269994797094
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5383632968401700305}
+  m_GameObject: {fileID: 740354605537076643}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -129,4 +149,4 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 3686452558192738640, guid: e910c75d1080e9e4aa1c2aa2229d8e3a, type: 3}
+  m_Mesh: {fileID: -8222545476593203211, guid: e910c75d1080e9e4aa1c2aa2229d8e3a, type: 3}
