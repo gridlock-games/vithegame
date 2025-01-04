@@ -1577,7 +1577,8 @@ namespace Vi.Core
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
-            RenderHitGlowOnly();
+
+            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(); }
             AddHP(damage);
             return true;
         }
