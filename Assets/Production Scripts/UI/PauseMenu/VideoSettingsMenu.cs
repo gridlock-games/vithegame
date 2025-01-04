@@ -318,7 +318,7 @@ namespace Vi.UI
             }
 
             FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
-            NetSceneManager.SetTargetFrameRate();
+            //NetSceneManager.SetTargetFrameRate();
         }
     }
 }

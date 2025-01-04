@@ -66,7 +66,7 @@ public class DebugOverlay : MonoBehaviour
     private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
     {
         Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
-
+        
         switch (currentQuality)
         {
             case 0:
@@ -235,6 +235,8 @@ public class DebugOverlay : MonoBehaviour
         Application.logMessageReceived += Log;
         QualitySettings.activeQualityLevelChanged += QualitySettings_activeQualityLevelChanged;
         EventDelegateManager.sceneUnloaded += OnSceneUnload;
+
+        QualitySettings_activeQualityLevelChanged(0, QualitySettings.GetQualityLevel());
     }
 
     void OnDisable()
@@ -341,11 +343,14 @@ public class DebugOverlay : MonoBehaviour
         packetLossEnabled = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
+
+        bool previousAdaptivePerformanceState = adaptivePerformanceEnabled;
         adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
+
         DPIScale = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
         targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
 
-        if (!adaptivePerformanceEnabled)
+        if (!adaptivePerformanceEnabled & previousAdaptivePerformanceState)
         {
             QualitySettings.lodBias = maxLODBias;
             QualitySettings.globalTextureMipmapLimit = 0;
