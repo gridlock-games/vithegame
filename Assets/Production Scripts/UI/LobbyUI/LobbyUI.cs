@@ -776,8 +776,6 @@ namespace Vi.UI
                 }
             }
 
-            RefreshPlayerCards();
-
             lastDataString = dataString;
 
             if (IsClient)
@@ -815,6 +813,8 @@ namespace Vi.UI
 
             backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
             mapPreview.sprite = backgroundImage.sprite;
+
+            RefreshPlayerCards();
         }
 
         private GameObject previewObject;
