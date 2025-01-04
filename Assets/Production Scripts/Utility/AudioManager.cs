@@ -14,10 +14,19 @@ namespace Vi.Utility
         [SerializeField] private MusicClip[] musicClips;
 
         [System.Serializable]
-        private class MusicClip
+        private class MusicClip : System.IEquatable<MusicClip>
         {
             public string[] sceneNamesToPlay;
             public AssetReferenceT<AudioClip>[] songs;
+
+            public bool Equals(MusicClip other)
+            {
+                if (this == null) { return false; }
+                if (other == null) { return false; }
+                if (sceneNamesToPlay == null) { return false; }
+                if (other.sceneNamesToPlay == null) { return false; }
+                return sceneNamesToPlay.SequenceEqual(other.sceneNamesToPlay);
+            }
         }
 
         private static AudioManager _singleton;
@@ -420,9 +429,9 @@ namespace Vi.Utility
 
                         if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
 
-                        // If the clip we are changing to is not the same as the previous clip, and there is already a clip assigned to the music source
+                        // If the clip we are changing to is not the same as the previous clip or there is no clip assigned to the music source
                         int randomIndex = Random.Range(0, musicClip.songs.Length);
-                        if (currentMusicIndex != randomIndex | !musicSource.clip)
+                        if (!musicClip.Equals(currentMusicClip) | currentMusicIndex != randomIndex | !musicSource.clip)
                         {
                             if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
                             crossFadeCoroutine = StartCoroutine(CrossfadeSongs(musicClip, randomIndex));
