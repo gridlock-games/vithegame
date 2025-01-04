@@ -288,13 +288,11 @@ namespace Vi.Utility
         private void OnEnable()
         {
             EventDelegateManager.sceneLoaded += OnSceneLoad;
-            EventDelegateManager.sceneUnloaded += OnSceneUnload;
         }
 
         private void OnDisable()
         {
             EventDelegateManager.sceneLoaded -= OnSceneLoad;
-            EventDelegateManager.sceneUnloaded -= OnSceneUnload;
         }
 
         private AudioSource musicSource;
@@ -402,11 +400,6 @@ namespace Vi.Utility
             {
                 RefreshMusicClip();
             }
-        }
-
-        private void OnSceneUnload()
-        {
-            RefreshMusicClip();
         }
 
         private MusicClip currentMusicClip;
