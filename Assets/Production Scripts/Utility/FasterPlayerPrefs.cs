@@ -36,7 +36,7 @@ namespace Vi.Utility
 
         public static bool IsMobilePlatform
         {
-            get { return Application.platform == RuntimePlatform.WindowsEditor | Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
+            get { return Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
         }
 
         private void Awake()

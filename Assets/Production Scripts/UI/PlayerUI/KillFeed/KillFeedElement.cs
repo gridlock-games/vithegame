@@ -100,10 +100,10 @@ namespace Vi.UI
             causeOfDeathImage.transform.SetSiblingIndex(causeOfDeathImageOriginalSiblingIndex);
             contentSizeFitter.enabled = true;
             horizontalLayoutGroup.enabled = true;
-            setSiblingIndexNextFrame = true;
+            setSiblingIndexNextFrameCount = 3;
         }
 
-        private bool setSiblingIndexNextFrame;
+        private int setSiblingIndexNextFrameCount;
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
         private static readonly Color localDeathBackgroundColor = new Color(200 / 255f, 0, 0, 200 / 255f);
@@ -168,15 +168,20 @@ namespace Vi.UI
                 rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
                 lastWidthEvaluated = targetWidth;
 
-                // Disable for sibling reordering
-                contentSizeFitter.enabled = false;
-                horizontalLayoutGroup.enabled = false;
             }
 
-            if (setSiblingIndexNextFrame)
+            if (setSiblingIndexNextFrameCount > 0)
             {
-                causeOfDeathImage.transform.SetAsFirstSibling();
-                setSiblingIndexNextFrame = false;
+                setSiblingIndexNextFrameCount--;
+
+                if (setSiblingIndexNextFrameCount == 0)
+                {
+                    // Disable for sibling reordering
+                    contentSizeFitter.enabled = false;
+                    horizontalLayoutGroup.enabled = false;
+
+                    causeOfDeathImage.transform.SetAsFirstSibling();
+                }
             }
         }
 

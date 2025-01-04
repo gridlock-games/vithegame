@@ -320,6 +320,26 @@ namespace Vi.Core.MovementHandlers
 
         private bool ShouldStop { get { return Vector3.Distance(GetPosition(), Destination) < stoppingDistance; } }
 
+
+        private NetworkVariable<bool> lastMovementWasZeroSynced = new NetworkVariable<bool>();
+
+        private void OnLastMovementWasZeroSyncedChanged(bool prev, bool current)
+        {
+            LastMovementWasZero = current;
+        }
+
+        private void SetLastMovement(Vector3 lastMovement)
+        {
+            bool value = lastMovement == Vector3.zero;
+
+            LastMovementWasZero = value;
+
+            if (IsServer)
+            {
+                lastMovementWasZeroSynced.Value = value;
+            }
+        }
+
         private void Move()
         {
             Vector3 rootMotion = combatAgent.AnimationHandler.ApplyRootMotion();
@@ -329,7 +349,11 @@ namespace Vi.Core.MovementHandlers
                 rootMotion.z = 0;
             }
 
-            if (!IsSpawned) { return; }
+            if (!IsSpawned)
+            {
+                SetLastMovement(Vector3.zero);
+                return;
+            }
 
             CalculatePath(Rigidbody.position);
 
@@ -337,15 +361,22 @@ namespace Vi.Core.MovementHandlers
             {
                 transform.position = Rigidbody.position;
                 Rigidbody.Sleep();
+                SetLastMovement(Vector3.zero);
                 return;
             }
             else if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
             {
                 Rigidbody.Sleep();
+                SetLastMovement(Vector3.zero);
                 return;
             }
 
-            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing) { Rigidbody.isKinematic = false; return; }
+            if (IsAffectedByExternalForce & !combatAgent.IsGrabbed & !combatAgent.IsGrabbing)
+            {
+                Rigidbody.isKinematic = false;
+                SetLastMovement(Vector3.zero);
+                return;
+            }
 
             Vector2 moveInput = GetPathMoveInput(false);
             Quaternion newRotation = transform.rotation;
@@ -355,6 +386,7 @@ namespace Vi.Core.MovementHandlers
             if (combatAgent.IsGrabbing)
             {
                 Rigidbody.isKinematic = true;
+                SetLastMovement(Vector3.zero);
                 return;
             }
             else if (combatAgent.IsGrabbed & combatAgent.GetAilment() == ActionClip.Ailment.None)
@@ -364,6 +396,7 @@ namespace Vi.Core.MovementHandlers
                 {
                     Rigidbody.isKinematic = true;
                     Rigidbody.MovePosition(grabAssailant.MovementHandler.GetPosition() + (grabAssailant.MovementHandler.GetRotation() * Vector3.forward));
+                    SetLastMovement(Vector3.zero);
                     return;
                 }
             }
@@ -462,6 +495,7 @@ namespace Vi.Core.MovementHandlers
             }
             Rigidbody.AddForce(new Vector3(0, stairMovement * stairStepForceMultiplier, 0), ForceMode.VelocityChange);
             Rigidbody.AddForce(Physics.gravity * gravityScale, ForceMode.Acceleration);
+            SetLastMovement(movement);
         }
 
         private float flightTime;
@@ -504,6 +538,11 @@ namespace Vi.Core.MovementHandlers
             {
                 roamStartPosition = transform.position;
             }
+
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged += OnLastMovementWasZeroSyncedChanged;
+            }
         }
 
         private Vector3 roamStartPosition;
@@ -512,6 +551,11 @@ namespace Vi.Core.MovementHandlers
         {
             base.OnNetworkDespawn();
             spawnFixedTime = Mathf.NegativeInfinity;
+
+            if (!IsServer & !IsOwner)
+            {
+                lastMovementWasZeroSynced.OnValueChanged -= OnLastMovementWasZeroSyncedChanged;
+            }
         }
 
         private void EvaluateAction()

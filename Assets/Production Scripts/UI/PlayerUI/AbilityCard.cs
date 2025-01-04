@@ -51,6 +51,10 @@ namespace Vi.UI
                         graphic.color = StringUtility.SetColorAlpha(graphic.color, alpha);
                     }
                 }
+                else if (graphic == viLogoUpgradeIcon)
+                {
+                    graphic.color = StringUtility.SetColorAlpha(graphic.color, 0);
+                }
                 else
                 {
                     graphic.color = StringUtility.SetColorAlpha(graphic.color, Mathf.MoveTowards(graphic.color.a, alpha, Time.deltaTime * 5));
@@ -95,6 +99,8 @@ namespace Vi.UI
             {
                 combatAgent.SessionProgressionHandler.OnAbilityUpgrade += OnAbilityUpgrade;
             }
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
         private void OnDisable()
@@ -138,6 +144,9 @@ namespace Vi.UI
             stackCircleBackground.enabled = stackIsVisible;
             stackBackground.enabled = stackIsVisible;
             stackText.enabled = stackIsVisible;
+
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
         private void OnKeybindTextChange()
