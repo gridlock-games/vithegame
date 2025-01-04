@@ -199,7 +199,10 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.GetShouldSpawnPlayer())
             {
-                SetDPIScale(0.9f);
+                if (QualitySettings.resolutionScalingFixedDPIFactor < 0.9f)
+                {
+                    SetDPIScale(0.9f);
+                }
                 ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
             }
         }

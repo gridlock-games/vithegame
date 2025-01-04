@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.Utility
 {
@@ -15,7 +17,7 @@ namespace Vi.Utility
         private class MusicClip
         {
             public string[] sceneNamesToPlay;
-            public AudioClip[] songs;
+            public AssetReferenceT<AudioClip>[] songs;
         }
 
         private static AudioManager _singleton;
@@ -244,6 +246,7 @@ namespace Vi.Utility
         private void Awake()
         {
             _singleton = this;
+            musicSource = GetComponent<AudioSource>();
 
 #if !UNITY_SERVER || UNITY_EDITOR
             AudioSettings.OnAudioConfigurationChanged += OnAudioConfigurationChange;
@@ -300,11 +303,8 @@ namespace Vi.Utility
             RefreshStatus();
 
             // This is for music
-            if (TryGetComponent(out musicSource))
-            {
-                musicSource.volume = musicVolume;
-                musicSource.spatialBlend = 0;
-            }
+            musicSource.volume = musicVolume;
+            musicSource.spatialBlend = 0;
 
             foreach (AudioSource audioSource in FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
@@ -319,6 +319,11 @@ namespace Vi.Utility
         private void RefreshStatus()
         {
             musicVolume = FasterPlayerPrefs.Singleton.GetFloat("MusicVolume");
+
+            if (!isCrossfading)
+            {
+                musicSource.volume = musicVolume;
+            }
         }
 
         private const float musicFadeSpeed = 0.5f;
@@ -391,38 +396,6 @@ namespace Vi.Utility
             }
         }
 
-        private bool isCrossfading;
-        private Coroutine crossFadeCoroutine;
-        private IEnumerator CrossFadeBetweenSongs()
-        {
-            isCrossfading = true;
-
-            while (true)
-            {
-                musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0, Time.deltaTime * musicFadeSpeed);
-                if (musicSource.volume == 0) { break; }
-                yield return null;
-            }
-
-            if (currentMusicClip == null) { isCrossfading = false; yield break; }
-            AudioClip newClip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[Random.Range(0, currentMusicClip.songs.Length)];
-            if (musicSource.clip  != newClip)
-            {
-                musicSource.clip = newClip;
-                musicSource.time = 0;
-                if (!musicSource.isPlaying) { musicSource.Play(); }
-            }
-            
-            while (true)
-            {
-                musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
-                if (Mathf.Approximately(musicSource.volume, musicVolume)) { break; }
-                yield return null;
-            }
-
-            isCrossfading = false;
-        }
-
         private void OnSceneLoad(Scene scene)
         {
             if (System.Array.Exists(musicClips, item => item.sceneNamesToPlay.Contains(scene.name)))
@@ -437,6 +410,7 @@ namespace Vi.Utility
         }
 
         private MusicClip currentMusicClip;
+        private int currentMusicIndex = -1;
         private void RefreshMusicClip()
         {
             bool musicClipFound = false;
@@ -450,31 +424,86 @@ namespace Vi.Utility
                     if (scene.isLoaded)
                     {
                         musicClipFound = true;
-                        currentMusicClip = musicClip;
+
+                        if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
 
                         // If the clip we are changing to is not the same as the previous clip, and there is already a clip assigned to the music source
-                        int randomIndex = Random.Range(0, currentMusicClip.songs.Length);
-                        if (musicSource.clip != (currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex]) & musicSource.clip)
+                        int randomIndex = Random.Range(0, musicClip.songs.Length);
+                        if (currentMusicIndex != randomIndex | !musicSource.clip)
                         {
                             if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
-                            crossFadeCoroutine = StartCoroutine(CrossFadeBetweenSongs());
+                            crossFadeCoroutine = StartCoroutine(CrossfadeSongs(musicClip, randomIndex));
                         }
-                        else
-                        {
-                            AudioClip newClip = currentMusicClip.songs.Length == 0 ? null : currentMusicClip.songs[randomIndex];
-                            if (newClip != musicSource.clip)
-                            {
-                                musicSource.clip = newClip;
-                                musicSource.time = 0;
-                                if (!musicSource.isPlaying) { musicSource.Play(); }
-                            }
-                        }
+
+                        currentMusicClip = musicClip;
+                        currentMusicIndex = randomIndex;
                         break;
                     }
                 }
             }
 
-            if (!musicClipFound) { currentMusicClip = null; }
+            if (!musicClipFound)
+            {
+                if (crossFadeCoroutine != null) { StopCoroutine(crossFadeCoroutine); }
+                crossFadeCoroutine = StartCoroutine(CrossfadeSongs(null, -1));
+                currentMusicClip = null;
+                currentMusicIndex = -1;
+            }
+        }
+
+        private AsyncOperationHandle<AudioClip> musicHandle;
+        private bool isCrossfading;
+        private Coroutine crossFadeCoroutine;
+        private IEnumerator CrossfadeSongs(MusicClip newMusicClip, int musicIndex)
+        {
+            isCrossfading = true;
+
+            // Fade music out
+            if (musicSource.clip)
+            {
+                while (true)
+                {
+                    musicSource.volume = Mathf.MoveTowards(musicSource.volume, 0, Time.deltaTime * musicFadeSpeed);
+                    if (Mathf.Approximately(musicSource.volume, 0) | musicSource.volume <= 0) { break; }
+                    yield return null;
+                }
+            }
+            
+            // Release old clip
+            if (musicHandle.IsValid())
+            {
+                musicHandle.Release();
+            }
+
+            // If the new clip is null, just exit here
+            if (newMusicClip == null)
+            {
+                isCrossfading = false;
+                yield break;
+            }
+
+            // Load the new clip into memory
+            musicHandle = newMusicClip.songs[musicIndex].LoadAssetAsync();
+            yield return musicHandle;
+
+            if (!musicHandle.Result.preloadAudioData)
+            {
+                if (!musicHandle.Result.LoadAudioData()) { Debug.LogWarning("Music clip failed to load audio data! " + musicHandle.Result); }
+            }
+
+            // Assign new clip to audio source
+            musicSource.clip = musicHandle.Result;
+            musicSource.time = 0;
+            
+            // Fade music back in
+            while (true)
+            {
+                musicSource.volume = Mathf.MoveTowards(musicSource.volume, musicVolume, Time.deltaTime * musicFadeSpeed);
+                if (Mathf.Approximately(musicSource.volume, musicVolume) | musicSource.volume >= musicVolume) { break; }
+                yield return null;
+            }
+
+            isCrossfading = false;
         }
     }
 }
