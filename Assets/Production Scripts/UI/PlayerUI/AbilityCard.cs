@@ -95,6 +95,8 @@ namespace Vi.UI
             {
                 combatAgent.SessionProgressionHandler.OnAbilityUpgrade += OnAbilityUpgrade;
             }
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
         private void OnDisable()
@@ -138,6 +140,9 @@ namespace Vi.UI
             stackCircleBackground.enabled = stackIsVisible;
             stackBackground.enabled = stackIsVisible;
             stackText.enabled = stackIsVisible;
+
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
         private void OnKeybindTextChange()
