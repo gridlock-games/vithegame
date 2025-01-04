@@ -1577,7 +1577,8 @@ namespace Vi.Core
                     if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
-            RenderHitGlowOnly();
+
+            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(); }
             AddHP(damage);
             return true;
         }
@@ -1609,7 +1610,10 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
+            if (!Mathf.Approximately(damage, 0))
+            {
+                RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
+            }
             AddHP(damage);
             return true;
         }
