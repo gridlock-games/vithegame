@@ -1610,10 +1610,7 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            if (!Mathf.Approximately(damage, 0))
-            {
-                RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
-            }
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
             AddHP(damage);
             return true;
         }
