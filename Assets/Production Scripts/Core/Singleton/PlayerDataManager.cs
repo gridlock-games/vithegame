@@ -75,8 +75,16 @@ namespace Vi.Core
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }
 
+        private bool CanSwapGameModes()
+        {
+            if (GameModeManager.Singleton) { return false; }
+            return true;
+        }
+
         public void SetGameMode(GameMode newGameMode)
         {
+            if (!CanSwapGameModes()) { return; }
+
             if (IsServer)
             {
                 gameMode.Value = newGameMode;
