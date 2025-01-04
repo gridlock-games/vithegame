@@ -396,8 +396,6 @@ namespace Vi.UI
                     }
                 }
             }
-
-            RefreshPlayerCards();
         }
 
         private IEnumerator Init()
@@ -445,8 +443,6 @@ namespace Vi.UI
             lockCharacterButton.GetComponentInChildren<Text>().text = "LOCK";
 
             RefreshGameMode(true);
-
-            RefreshPlayerCards();
 
             if (IsSpawned)
             {
@@ -561,7 +557,6 @@ namespace Vi.UI
             inputField.text = Regex.Replace(inputField.text, @"[^0-9]", "");
         }
 
-        private string lastPlayersString;
         private string lastDataString;
         private PlayerDataManager.GameMode lastGameMode;
         private Dictionary<PlayerDataManager.Team, Transform> teamParentDict = new Dictionary<PlayerDataManager.Team, Transform>();
@@ -766,26 +761,23 @@ namespace Vi.UI
             leftTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & leftTeamParent.teamTitleText.gameObject.activeSelf & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             rightTeamParent.editTeamNameButton.gameObject.SetActive(isLobbyLeader & rightTeamParent.teamTitleText.gameObject.activeSelf & teamParentDict.ContainsValue(leftTeamParent.transformParent) & teamParentDict.ContainsValue(rightTeamParent.transformParent));
             
-            string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
             string dataString = "";
             foreach (PlayerDataManager.PlayerData data in playerDataListWithSpectators)
             {
-                playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
                 dataString += data.id.ToString() + data.character._id.ToString();
             }
 
-            if (lastPlayersString != playersString)
+            if (IsServer)
             {
-                UpdateRichPresence();
-
-                RefreshPlayerCards();
-                if (IsServer & dataString != lastDataString)
+                if (dataString != lastDataString)
                 {
                     characterLockTimer.Value = characterLockTime;
                     startGameTimer.Value = startGameTime;
                 }
             }
-            lastPlayersString = playersString;
+
+            RefreshPlayerCards();
+
             lastDataString = dataString;
 
             if (IsClient)
@@ -858,8 +850,21 @@ namespace Vi.UI
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
         }
 
+        private string lastPlayersString;
         private void RefreshPlayerCards()
         {
+            string playersString = PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId).ToString();
+            playersString += PlayerDataManager.Singleton.GetGameMode().ToString();
+            foreach (PlayerDataManager.PlayerData data in PlayerDataManager.Singleton.GetPlayerDataListWithSpectators())
+            {
+                playersString += data.id.ToString() + data.team.ToString() + data.character._id.ToString() + lockedClients.Contains((ulong)data.id).ToString();
+            }
+
+            if (lastPlayersString == playersString) { return; }
+            lastPlayersString = playersString;
+
+            UpdateRichPresence();
+
             foreach (Transform child in leftTeamParent.transformParent)
             {
                 Destroy(child.gameObject);
@@ -896,6 +901,10 @@ namespace Vi.UI
                     }
 
                     accountCardCounter[playerData.team] += 1;
+                }
+                else
+                {
+                    Debug.LogWarning("Can't find parent for team " + playerData.team);
                 }
             }
 

@@ -108,7 +108,7 @@ namespace Vi.UI
             {
                 if (teamToChangeTo != PlayerDataManager.Team.Environment)
                 {
-                    if (!PlayerDataManager.Singleton.CanPlayersChangeTeams(teamToChangeTo))
+                    if (!PlayerDataManager.Singleton.CanPlayersChangeTeams(PlayerDataManager.Singleton.LocalPlayerData.team, teamToChangeTo))
                     {
                         changeTeamImage.gameObject.SetActive(false);
                     }
