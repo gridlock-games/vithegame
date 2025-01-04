@@ -186,11 +186,11 @@ namespace Vi.Core
 
         private static void EvaluateContactPairAsMovementCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
-            if (pair.GetNormal(i).y > 0.7f)
-            {
-                pair.IgnoreContact(i);
-                return;
-            }
+            //if (pair.GetNormal(i).y > 0.7f)
+            //{
+            //    pair.IgnoreContact(i);
+            //    return;
+            //}
 
             if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
             {
@@ -215,11 +215,11 @@ namespace Vi.Core
 
         private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
-            if (pair.GetNormal(i).y > 0.7f)
-            {
-                pair.IgnoreContact(i);
-                return;
-            }
+            //if (pair.GetNormal(i).y > 0.7f)
+            //{
+            //    pair.IgnoreContact(i);
+            //    return;
+            //}
 
             // Phase through other players if we are dodging out of an ailment like knockdown
             if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
