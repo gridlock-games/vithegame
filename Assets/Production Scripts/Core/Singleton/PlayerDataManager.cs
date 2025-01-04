@@ -811,7 +811,7 @@ namespace Vi.Core
         {
             if (team == Team.Spectator) { Debug.LogError("Trying to add a bot as a spectator!"); return; }
 
-            if (!CanPlayersChangeTeams(Team.Environment, team)) { return; }
+            if (!CanPlayersChangeTeams(team)) { return; }
 
             if (IsServer)
             {
@@ -890,19 +890,23 @@ namespace Vi.Core
             return new PlayerData();
         }
 
-        public bool CanPlayersChangeTeams(PlayerDataManager.Team previousTeam, PlayerDataManager.Team teamToChangeTo)
+        public bool CanPlayersChangeTeams(PlayerDataManager.Team teamToChangeTo)
         {
             if (GetGameMode() == GameMode.None) { return true; }
             if (GameModeManager.Singleton) { return false; }
 
-            if (teamToChangeTo != Team.Spectator)
-            {
-                if (!GetGameModeInfo().possibleTeams.Contains(teamToChangeTo)) { return false; }
-                if (!GetGameModeInfo().possibleTeams.Contains(previousTeam)) { return true; }
-            }
-
             int limitTotalNumberOfPlayersOnTeam = PlayerDataManager.Singleton.GetMaxPlayersForMap() / PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length;
             return GetPlayerDataListWithoutSpectators().Where(item => item.team == teamToChangeTo).ToArray().Length < limitTotalNumberOfPlayersOnTeam;
+        }
+
+        public void SetPlayerDataWithServerAuth(PlayerData playerData)
+        {
+            if (!IsServer) { Debug.LogError("SetPlayerDataWithServerAuth should only be called on the server!"); return; }
+
+            int index = playerDataList.IndexOf(playerData);
+            if (index == -1) { return; }
+
+            playerDataList[index] = playerData;
         }
 
         public void SetPlayerData(PlayerData playerData)
@@ -910,9 +914,9 @@ namespace Vi.Core
             int index = playerDataList.IndexOf(playerData);
             if (index == -1) { return; }
 
-            if (playerData.team != playerDataList[index].team)
+            if (!CanPlayersChangeTeams(playerData.team))
             {
-                if (!CanPlayersChangeTeams(playerDataList[index].team, playerData.team)) { return; }
+                if (playerData.team != playerDataList[index].team) { return; }
             }
             
             if (IsServer)

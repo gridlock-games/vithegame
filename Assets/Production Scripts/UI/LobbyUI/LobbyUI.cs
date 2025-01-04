@@ -374,7 +374,7 @@ namespace Vi.UI
                         // Get the team with the lowest player count
                         newPlayerData.team = teamCounts.Aggregate((l, r) => l.Value <= r.Value ? l : r).Key;
 
-                        PlayerDataManager.Singleton.SetPlayerData(newPlayerData);
+                        PlayerDataManager.Singleton.SetPlayerDataWithServerAuth(newPlayerData);
 
                         if (teamCounts.ContainsKey(playerData.team)) { teamCounts[playerData.team]--; }
                         teamCounts[newPlayerData.team]++;
