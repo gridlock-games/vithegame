@@ -51,6 +51,10 @@ namespace Vi.UI
                         graphic.color = StringUtility.SetColorAlpha(graphic.color, alpha);
                     }
                 }
+                else if (graphic == viLogoUpgradeIcon)
+                {
+                    graphic.color = StringUtility.SetColorAlpha(graphic.color, 0);
+                }
                 else
                 {
                     graphic.color = StringUtility.SetColorAlpha(graphic.color, Mathf.MoveTowards(graphic.color.a, alpha, Time.deltaTime * 5));
