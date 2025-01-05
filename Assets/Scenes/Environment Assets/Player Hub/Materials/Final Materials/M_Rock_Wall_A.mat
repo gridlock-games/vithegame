@@ -39,8 +39,8 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BASE:
-        m_Texture: {fileID: 2800000, guid: 6ce4efa110740764784307cead30bf15, type: 3}
-        m_Scale: {x: 5, y: 5}
+        m_Texture: {fileID: 2800000, guid: 52335c4f45327e44787951ba67f76afa, type: 3}
+        m_Scale: {x: 6, y: 6}
         m_Offset: {x: 0, y: 0}
     - _Baked_Normal:
         m_Texture: {fileID: 2800000, guid: 8a494781a99e2484186e372cb69e6ee1, type: 3}
@@ -52,10 +52,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _Base_Normal:
         m_Texture: {fileID: 2800000, guid: 7e57d3507c649134a88bcb6dc4945baa, type: 3}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 6, y: 6}
         m_Offset: {x: 0, y: 0}
     - _CURVATURE:
-        m_Texture: {fileID: 2800000, guid: 52335c4f45327e44787951ba67f76afa, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6ce4efa110740764784307cead30bf15, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Curvature:
@@ -104,10 +104,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _A_Normal_Strength: 0.39
+    - _B_Normal_Strength: 1
     - _Base_Color: 0
+    - _Base_Normal_Strength: 1
+    - _C_Normal_Strength: 1
     - _Curvature: 0
     - _Normal: 0
     - _Normal_Strength: 1
+    - _Normal_Strength_1: 0
+    - _Normal_Strength_2: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _RGB_Mask: 0
@@ -115,5 +121,6 @@ Material:
     - _Secondary: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Secondary_Color: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
