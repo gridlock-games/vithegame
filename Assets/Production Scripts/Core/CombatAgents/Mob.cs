@@ -103,9 +103,12 @@ namespace Vi.Core.CombatAgents
         {
             base.OnAilmentChanged(prev, current);
 
-            if (current == ActionClip.Ailment.Death & IsServer)
+            if (IsServer)
             {
-                StartCoroutine(DespawnAfterDuration());
+                if (current == ActionClip.Ailment.Death)
+                {
+                    StartCoroutine(DespawnAfterDuration());
+                }
             }
         }
 
@@ -114,39 +117,26 @@ namespace Vi.Core.CombatAgents
             yield return new WaitForSeconds(AnimationHandler.deadRendererDisplayTime);
             yield return new WaitForSeconds(0.5f);
 
+            while (true)
+            {
+                bool isPlayerKiller = false;
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    if (attributes.GetAilment() == ActionClip.Ailment.Death)
+                    {
+                        if (attributes.TryGetKiller(out NetworkObject killer))
+                        {
+                            if (killer == NetworkObject) { isPlayerKiller = true; break; }
+                        }
+                    }
+                }
+
+                if (!isPlayerKiller) { break; }
+
+                yield return new WaitForSeconds(0.5f);
+            }
+
             NetworkObject.Despawn(true);
         }
-
-        // Uncomment to make mobs respawn automatically
-        //protected override void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
-        //{
-        //    base.OnAilmentChanged(prev, current);
-
-        //    if (current == ActionClip.Ailment.Death)
-        //    {
-        //        respawnCoroutine = StartCoroutine(RespawnSelf());
-        //    }
-        //    else if (prev == ActionClip.Ailment.Death)
-        //    {
-        //        if (respawnCoroutine != null)
-        //        {
-        //            IsRespawning = false;
-        //            StopCoroutine(respawnCoroutine);
-        //        }
-        //    }
-        //}
-
-        //public bool IsRespawning { get; private set; }
-        //[HideInInspector] public bool isWaitingForSpawnPoint;
-        //private Coroutine respawnCoroutine;
-        //private float respawnSelfCalledTime;
-        //private IEnumerator RespawnSelf()
-        //{
-        //    yield return new WaitForSeconds(5);
-        //    ResetStats(1, true, true, false);
-        //    AnimationHandler.CancelAllActions(0, true);
-        //    MovementHandler.SetOrientation(new Vector3(0, 5, 0), Quaternion.identity);
-        //    LoadoutManager.SwapLoadoutOnRespawn();
-        //}
     }
 }

@@ -4,6 +4,7 @@ using Vi.Core;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using System.Collections;
 
 namespace Vi.UI
 {
@@ -18,11 +19,12 @@ namespace Vi.UI
         [SerializeField] private Image upgradeIcon;
         [SerializeField] private RectTransform upgradeIconActivePosition;
         [SerializeField] private RectTransform upgradeIconInactivePosition;
-        [SerializeField] private Animator upgradeAnimationAnimator;
+        [SerializeField] private Image viLogoUpgradeIcon;
         [SerializeField] private Image backgroundImageSquare;
         [SerializeField] private Image backgroundImageCircle;
         [SerializeField] private Image circleMask;
-        [SerializeField] private GameObject stackVisualParent;
+        [SerializeField] private Image stackBackground;
+        [SerializeField] private Image stackCircleBackground;
         [SerializeField] private Text stackText;
 
         public ActionClip Ability { get; private set; }
@@ -48,6 +50,10 @@ namespace Vi.UI
                     {
                         graphic.color = StringUtility.SetColorAlpha(graphic.color, alpha);
                     }
+                }
+                else if (graphic == viLogoUpgradeIcon)
+                {
+                    graphic.color = StringUtility.SetColorAlpha(graphic.color, 0);
                 }
                 else
                 {
@@ -87,6 +93,24 @@ namespace Vi.UI
             }
         }
 
+        private void OnEnable()
+        {
+            if (combatAgent)
+            {
+                combatAgent.SessionProgressionHandler.OnAbilityUpgrade += OnAbilityUpgrade;
+            }
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
+        }
+
+        private void OnDisable()
+        {
+            if (combatAgent)
+            {
+                combatAgent.SessionProgressionHandler.OnAbilityUpgrade -= OnAbilityUpgrade;
+            }
+        }
+
         public void SetPreviewOn()
         {
             if (previewAbility.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Preview ability is not of clip type ability! " + this); return; }
@@ -96,7 +120,10 @@ namespace Vi.UI
             keybindText.text = previewAbility.name.Replace("Ability", "");
             OnKeybindTextChange();
             cooldownText.text = "";
-            stackVisualParent.gameObject.SetActive(false);
+
+            stackCircleBackground.enabled = false;
+            stackBackground.enabled = false;
+            stackText.enabled = false;
         }
 
         public void Initialize(ActionClip ability, string keybindText)
@@ -107,18 +134,19 @@ namespace Vi.UI
             this.keybindText.text = keybindText;
             OnKeybindTextChange();
 
-            lastAbilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
-            
+            abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
+
             float staminaCost = combatAgent.AnimationHandler.GetStaminaCostOfClip(Ability);
             staminaCostText.text = staminaCost.ToString("F0");
             lastStaminaCost = staminaCost;
 
-            stackVisualParent.SetActive(combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1);
+            bool stackIsVisible = combatAgent.WeaponHandler.GetWeapon().GetMaxAbilityStacks(Ability) > 1;
+            stackCircleBackground.enabled = stackIsVisible;
+            stackBackground.enabled = stackIsVisible;
+            stackText.enabled = stackIsVisible;
 
-            if (GameModeManager.Singleton)
-            {
-                upgradeAnimationAnimator.gameObject.SetActive(GameModeManager.Singleton.LevelingEnabled);
-            }
+            viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
         private void OnKeybindTextChange()
@@ -138,7 +166,7 @@ namespace Vi.UI
             keybindText.enabled = !FasterPlayerPrefs.IsMobilePlatform;
         }
 
-        private int lastAbilityLevel = -1;
+        private int abilityLevel;
         private float lastStaminaCost = -1;
         private int lastNumAbilitiesOffCooldown = -1;
         private void Update()
@@ -173,7 +201,7 @@ namespace Vi.UI
 
             if (GameModeManager.Singleton.LevelingEnabled)
             {
-                if (combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability) == -1)
+                if (abilityLevel == -1)
                 {
                     borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
                     staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
@@ -182,29 +210,94 @@ namespace Vi.UI
                     return;
                 }
             }
-            
-            float timeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
-            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
-            abilityIcon.fillAmount = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
 
-            if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
+            float cooldownTimeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownTimeLeft(Ability);
+            float bufferTimeLeft = combatAgent.WeaponHandler.GetWeapon().GetAbilityBufferTimeLeft(Ability);
+
+            float timeLeft;
+            float progressLeft;
+            if (cooldownTimeLeft >= bufferTimeLeft)
             {
-                borderImage.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
-                staminaCostText.color = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                progressLeft = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityCooldownProgress(Ability);
+                timeLeft = cooldownTimeLeft;
             }
             else
             {
-                borderImage.color = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
-                staminaCostText.color = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
+                progressLeft = 1 - combatAgent.WeaponHandler.GetWeapon().GetAbilityBufferProgress(Ability);
+                timeLeft = bufferTimeLeft;
             }
 
-            int abilityLevel = combatAgent.SessionProgressionHandler.GetAbilityLevel(combatAgent.WeaponHandler.GetWeapon(), Ability);
-            if (abilityLevel != lastAbilityLevel)
+            cooldownText.text = timeLeft <= 0 ? "" : StringUtility.FormatDynamicFloatForUI(timeLeft, 1);
+            abilityIcon.fillAmount = progressLeft;
+
+            if (!combatAgent.AnimationHandler.AreActionClipRequirementsMet(Ability) | combatAgent.StatusAgent.IsSilenced())
             {
-                upgradeAnimationAnimator.Play("AbilityCardUpgradeAnimation", 0, 0);
-                AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
+                Color borderColor = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                if (borderImage.color != borderColor)
+                {
+                    borderImage.color = borderColor;
+                }
+
+                Color staminaColor = StringUtility.SetColorAlpha(Color.red, lastOpacityEvaluated);
+                if (staminaCostText.color != staminaColor)
+                {
+                    staminaCostText.color = staminaColor;
+                }
             }
-            lastAbilityLevel = abilityLevel;
+            else
+            {
+                Color borderColor = StringUtility.SetColorAlpha(originalBorderImageColor, lastOpacityEvaluated);
+                if (borderImage.color != borderColor)
+                {
+                    borderImage.color = borderColor;
+                }
+
+                Color staminaColor = StringUtility.SetColorAlpha(originalStaminaCostColor, lastOpacityEvaluated);
+                if (staminaCostText.color != staminaColor)
+                {
+                    staminaCostText.color = staminaColor;
+                }
+            }
+        }
+
+        private void OnAbilityUpgrade(ActionClip ability, int newAbilityLevel)
+        {
+            if (ability != Ability) { return; }
+
+            abilityLevel = newAbilityLevel;
+
+            if (upgradeAbilityAnimationCoroutine != null) { StopCoroutine(upgradeAbilityAnimationCoroutine); }
+            upgradeAbilityAnimationCoroutine = StartCoroutine(UpgradeAbilityAnimation());
+
+            AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
+        }
+
+        private Coroutine upgradeAbilityAnimationCoroutine;
+        private static readonly Color originalAnimColor = new Color(1, 197 / 255f, 61 / 255f, 0);
+        private static readonly Color visibleAnimColor = new Color(1, 197 / 255f, 61 / 255f, 1);
+        private IEnumerator UpgradeAbilityAnimation()
+        {
+            viLogoUpgradeIcon.color = originalAnimColor;
+
+            float lerpProgress = 0;
+            while (true)
+            {
+                lerpProgress += Time.deltaTime * 1.5f;
+                viLogoUpgradeIcon.color = Color.Lerp(originalAnimColor, visibleAnimColor, lerpProgress);
+                yield return null;
+
+                if (viLogoUpgradeIcon.color == visibleAnimColor) { break; }
+            }
+
+            lerpProgress = 0;
+            while (true)
+            {
+                lerpProgress += Time.deltaTime * 1.5f;
+                viLogoUpgradeIcon.color = Color.Lerp(visibleAnimColor, originalAnimColor, lerpProgress);
+                yield return null;
+
+                if (viLogoUpgradeIcon.color == originalAnimColor) { break; }
+            }
         }
 
         [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;

@@ -334,6 +334,8 @@ namespace Vi.Core
         private void OnSpawnFromPool()
         {
             glowRenderer.RegisterChildRenderers();
+            animator.enabled = true;
+            SetRagdollActive(false);
         }
 
         private void OnDestroy()
@@ -457,7 +459,8 @@ namespace Vi.Core
             actionsLayerIndex = animator.GetLayerIndex(actionsLayerName);
             flinchLayerIndex = animator.GetLayerIndex(flinchLayerName);
 
-            if (TryGetComponent(out PooledObject pooledObject))
+            PooledObject pooledObject = GetComponentInParent<PooledObject>();
+            if (pooledObject)
             {
                 pooledObject.OnSpawnFromPool += OnSpawnFromPool;
                 pooledObject.OnReturnToPool += OnReturnToPool;

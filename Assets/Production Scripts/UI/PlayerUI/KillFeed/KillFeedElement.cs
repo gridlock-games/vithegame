@@ -96,15 +96,34 @@ namespace Vi.UI
                 }
             }
             initializationTime = Time.time;
+
+            causeOfDeathImage.transform.SetSiblingIndex(causeOfDeathImageOriginalSiblingIndex);
+            contentSizeFitter.enabled = true;
+            horizontalLayoutGroup.enabled = true;
+            setSiblingIndexNextFrameCount = 3;
         }
+
+        private int setSiblingIndexNextFrameCount;
 
         private static readonly Color nonLocalDeathBackgroundColor = new Color(23 / 255f, 32 / 255f, 44 / 255f, 200 / 255f);
         private static readonly Color localDeathBackgroundColor = new Color(200 / 255f, 0, 0, 200 / 255f);
 
         public bool IsNotRunning() { return Time.time - initializationTime > 5; }
 
+        private Canvas canvas;
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+            causeOfDeathImageOriginalSiblingIndex = causeOfDeathImage.transform.GetSiblingIndex();
+        }
+
         private RectTransform rt;
         private Material materialInstance;
+        private HorizontalLayoutGroup horizontalLayoutGroup;
+        private ContentSizeFitter contentSizeFitter;
+
+        private int causeOfDeathImageOriginalSiblingIndex;
+
         private void Start()
         {
             foreach (Graphic graphic in GetComponentsInChildren<Graphic>())
@@ -120,6 +139,9 @@ namespace Vi.UI
                 graphic.material.color = newColor;
             }
 
+            horizontalLayoutGroup = GetComponentInChildren<HorizontalLayoutGroup>();
+            contentSizeFitter = GetComponentInChildren<ContentSizeFitter>();
+
             rt = (RectTransform)transform;
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, transformToCopyWidthFrom.sizeDelta.x);
         }
@@ -131,6 +153,7 @@ namespace Vi.UI
         {
             Color targetColor = Color.white;
             if (IsNotRunning()) { targetColor.a = 0; }
+            else { canvas.enabled = true; }
 
             if (lastTargetColor != targetColor)
             {
@@ -144,6 +167,21 @@ namespace Vi.UI
             {
                 rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, targetWidth);
                 lastWidthEvaluated = targetWidth;
+
+            }
+
+            if (setSiblingIndexNextFrameCount > 0)
+            {
+                setSiblingIndexNextFrameCount--;
+
+                if (setSiblingIndexNextFrameCount == 0)
+                {
+                    // Disable for sibling reordering
+                    contentSizeFitter.enabled = false;
+                    horizontalLayoutGroup.enabled = false;
+
+                    causeOfDeathImage.transform.SetAsFirstSibling();
+                }
             }
         }
 
@@ -156,7 +194,14 @@ namespace Vi.UI
                 Color colorResult = Vector4.MoveTowards(materialInstance.color, targetColor, Time.deltaTime * fadeTime);
                 materialInstance.color = colorResult;
                 colorList.Add(colorResult);
-                if (colorList.TrueForAll(item => item == targetColor)) { break; }
+                if (colorList.TrueForAll(item => item == targetColor))
+                {
+                    if (IsNotRunning())
+                    {
+                        canvas.enabled = false;
+                    }
+                    break;
+                }
                 yield return null;
             }
         }

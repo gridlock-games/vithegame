@@ -66,7 +66,7 @@ public class DebugOverlay : MonoBehaviour
     private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
     {
         Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
-
+        
         switch (currentQuality)
         {
             case 0:
@@ -102,16 +102,16 @@ public class DebugOverlay : MonoBehaviour
             float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
             
             // Adaptive resolution scale
-            SetDPIScale(DPIScalingCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * DPIScale);
+            SetDPIScale(DPIScalingCurve.Evaluate(invertedTemperatureLevel) * DPIScale);
 
             // Adaptive LOD
-            SetLODBias(LODBiasCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxLODBias);
+            SetLODBias(LODBiasCurve.Evaluate(invertedTemperatureLevel) * maxLODBias);
 
             // Texture mip maps
             ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
 
             // Adaptive frame rate
-            if (ev.WarningLevel == WarningLevel.Throttling)
+            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
             {
                 int newTargetFrameRate = 30;
                 if (targetFrameRate > 60) { newTargetFrameRate = 60; }
@@ -123,7 +123,7 @@ public class DebugOverlay : MonoBehaviour
             }
 
             float maxAudioCullingDistance = 100;
-            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.EvaluateNormalizedTime(invertedTemperatureLevel) * maxAudioCullingDistance;
+            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.Evaluate(invertedTemperatureLevel) * maxAudioCullingDistance;
         }
 
         Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
@@ -158,11 +158,15 @@ public class DebugOverlay : MonoBehaviour
             }
         }
 
-        if (warningLevel == WarningLevel.Throttling)
+        if (temperatureLevel > 0.95f)
         {
             QualitySettings.globalTextureMipmapLimit = 3;
         }
-        else if (warningLevel == WarningLevel.ThrottlingImminent)
+        else if (temperatureLevel > 0.9f)
+        {
+            QualitySettings.globalTextureMipmapLimit = 2;
+        }
+        else if (temperatureLevel > 0.8f)
         {
             QualitySettings.globalTextureMipmapLimit = 1;
         }
@@ -195,7 +199,10 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.GetShouldSpawnPlayer())
             {
-                SetDPIScale(0.9f);
+                if (QualitySettings.resolutionScalingFixedDPIFactor < 0.9f)
+                {
+                    SetDPIScale(0.9f);
+                }
                 ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
             }
         }
@@ -228,6 +235,8 @@ public class DebugOverlay : MonoBehaviour
         Application.logMessageReceived += Log;
         QualitySettings.activeQualityLevelChanged += QualitySettings_activeQualityLevelChanged;
         EventDelegateManager.sceneUnloaded += OnSceneUnload;
+
+        QualitySettings_activeQualityLevelChanged(0, QualitySettings.GetQualityLevel());
     }
 
     void OnDisable()
@@ -334,11 +343,14 @@ public class DebugOverlay : MonoBehaviour
         packetLossEnabled = FasterPlayerPrefs.Singleton.GetBool("PacketLossEnabled");
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
+
+        bool previousAdaptivePerformanceState = adaptivePerformanceEnabled;
         adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
+
         DPIScale = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
         targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
 
-        if (!adaptivePerformanceEnabled)
+        if (!adaptivePerformanceEnabled & previousAdaptivePerformanceState)
         {
             QualitySettings.lodBias = maxLODBias;
             QualitySettings.globalTextureMipmapLimit = 0;

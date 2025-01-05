@@ -87,6 +87,12 @@ namespace Vi.ArtificialIntelligence
         {
             if (IsServer)
             {
+                if (combatAgent.GetAilment() == ActionClip.Ailment.Death)
+                {
+                    SetDestination(Rigidbody.position);
+                    return;
+                }
+
                 if (disableBots) { SetDestination(Rigidbody.position); return; }
 
                 targetFinder.ActiveCombatAgents.Sort((x, y) => Vector3.Distance(x.transform.position, Rigidbody.position).CompareTo(Vector3.Distance(y.transform.position, Rigidbody.position)));

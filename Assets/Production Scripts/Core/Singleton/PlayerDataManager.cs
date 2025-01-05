@@ -75,8 +75,16 @@ namespace Vi.Core
         private NetworkVariable<GameMode> gameMode = new NetworkVariable<GameMode>();
         public GameMode GetGameMode() { return gameMode.Value; }
 
+        private bool CanSwapGameModes()
+        {
+            if (GameModeManager.Singleton) { return false; }
+            return true;
+        }
+
         public void SetGameMode(GameMode newGameMode)
         {
+            if (!CanSwapGameModes()) { return; }
+
             if (IsServer)
             {
                 gameMode.Value = newGameMode;
@@ -884,11 +892,21 @@ namespace Vi.Core
 
         public bool CanPlayersChangeTeams(PlayerDataManager.Team teamToChangeTo)
         {
-            if (PlayerDataManager.Singleton.GetGameMode() == GameMode.None) { return true; }
+            if (GetGameMode() == GameMode.None) { return true; }
             if (GameModeManager.Singleton) { return false; }
 
             int limitTotalNumberOfPlayersOnTeam = PlayerDataManager.Singleton.GetMaxPlayersForMap() / PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length;
             return GetPlayerDataListWithoutSpectators().Where(item => item.team == teamToChangeTo).ToArray().Length < limitTotalNumberOfPlayersOnTeam;
+        }
+
+        public void SetPlayerDataWithServerAuth(PlayerData playerData)
+        {
+            if (!IsServer) { Debug.LogError("SetPlayerDataWithServerAuth should only be called on the server!"); return; }
+
+            int index = playerDataList.IndexOf(playerData);
+            if (index == -1) { return; }
+
+            playerDataList[index] = playerData;
         }
 
         public void SetPlayerData(PlayerData playerData)
@@ -898,10 +916,7 @@ namespace Vi.Core
 
             if (!CanPlayersChangeTeams(playerData.team))
             {
-                if (playerData.team != playerDataList[index].team)
-                {
-                    return;
-                }
+                if (playerData.team != playerDataList[index].team) { return; }
             }
             
             if (IsServer)

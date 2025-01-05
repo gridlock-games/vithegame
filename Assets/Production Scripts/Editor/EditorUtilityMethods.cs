@@ -15,6 +15,8 @@ using Vi.Core.MeshSlicing;
 using Vi.Core.Weapons;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using UnityEngine.U2D;
+using UnityEditor.U2D;
 
 namespace Vi.Editor
 {
@@ -327,9 +329,74 @@ namespace Vi.Editor
                 if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
 
+                // TODO Remove when Genie finishes the player hub map
+                if (assetPath.Contains("Player Hub")) { continue; }
+
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+                bool textureIsInSpriteAtlas = false;
+                if (sprite)
+                {
+                    List<Sprite> allSpritesInAtlases = new List<Sprite>();
+
+                    // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
+                    string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
+                    List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
+                    foreach (string spriteAtlasGuid in spriteAtlasPaths)
+                    {
+                        SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
+                        spriteAtlases.Add(spriteAtlas);
+
+                        Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
+                        for (int j = 0; j < spriteAtlas.GetSprites(sprites); j++)
+                        {
+                            allSpritesInAtlases.Add(sprites[j]);
+                        }
+                    }
+
+                    if (allSpritesInAtlases.Exists(item => item.name.Replace("(Clone)", "") == sprite.name))
+                    {
+                        textureIsInSpriteAtlas = true;
+                    }
+                }
+
+                EditorUtility.UnloadUnusedAssetsImmediate();
+
                 if (AssetImporter.GetAtPath(assetPath) is TextureImporter importer)
                 {
                     bool shouldReimport = false;
+
+                    if (textureIsInSpriteAtlas)
+                    {
+                        var ds = importer.GetDefaultPlatformTextureSettings();
+
+                        if (ds.crunchedCompression)
+                        {
+                            ds.crunchedCompression = false;
+                            shouldReimport = true;
+                            importer.SetPlatformTextureSettings(ds);
+                        }
+
+                        if (importer.GetPlatformTextureSettings("Android").overridden)
+                        {
+                            importer.ClearPlatformTextureSettings("Android");
+                            shouldReimport = true;
+                        }
+
+                        if (importer.GetPlatformTextureSettings("iPhone").overridden)
+                        {
+                            importer.ClearPlatformTextureSettings("iPhone");
+                            shouldReimport = true;
+                        }
+
+                        if (importer.textureCompression != TextureImporterCompression.Uncompressed)
+                        {
+                            importer.textureCompression = TextureImporterCompression.Uncompressed;
+                            shouldReimport = true;
+                        }
+
+                        if (shouldReimport) { importer.SaveAndReimport(); }
+                        continue;
+                    }
 
                     TextureImporterPlatformSettings defaultSettings = importer.GetDefaultPlatformTextureSettings();
                     if (!defaultSettings.crunchedCompression & !importer.isReadable)
@@ -367,6 +434,40 @@ namespace Vi.Editor
             EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
             EditorUtility.UnloadUnusedAssetsImmediate();
+
+            //foreach (SpriteAtlas spriteAtlas in spriteAtlases)
+            //{
+            //    if (AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(spriteAtlas)) is SpriteAtlasImporter atlasImporter)
+            //    {
+            //        bool shouldReimport = false;
+
+            //        var standaloneSettings = atlasImporter.GetPlatformSettings("Standalone");
+            //        standaloneSettings.crunchedCompression = true;
+            //        standaloneSettings.compressionQuality = 100;
+            //        standaloneSettings.maxTextureSize = 2048;
+            //        standaloneSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(standaloneSettings);
+            //        shouldReimport = true;
+
+            //        var androidSettings = atlasImporter.GetPlatformSettings("Android");
+            //        androidSettings.crunchedCompression = true;
+            //        androidSettings.compressionQuality = 100;
+            //        androidSettings.maxTextureSize = 256;
+            //        androidSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(androidSettings);
+            //        shouldReimport = true;
+
+            //        var iPhoneSettings = atlasImporter.GetPlatformSettings("iPhone");
+            //        iPhoneSettings.crunchedCompression = true;
+            //        iPhoneSettings.compressionQuality = 100;
+            //        iPhoneSettings.maxTextureSize = 256;
+            //        iPhoneSettings.overridden = true;
+            //        atlasImporter.SetPlatformSettings(iPhoneSettings);
+            //        shouldReimport = true;
+
+            //        if (shouldReimport) { atlasImporter.SaveAndReimport(); }
+            //    }
+            //}
         }
 
         [MenuItem("Tools/Production/Generate Dropped Weapon Variants")]

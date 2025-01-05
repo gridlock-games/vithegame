@@ -96,6 +96,7 @@ namespace Vi.Editor
 
         private SerializedProperty spAbilityImageIcon;
         private SerializedProperty spAbilityCooldownTime;
+        private SerializedProperty spAbilityBufferTime;
 
         private SerializedProperty spActionClipSoundEffects;
 
@@ -210,6 +211,7 @@ namespace Vi.Editor
             spDodgeLock = serializedObject.FindProperty("dodgeLock");
             spAbilityImageIcon = serializedObject.FindProperty("abilityImageIcon");
             spAbilityCooldownTime = serializedObject.FindProperty("abilityCooldownTime");
+            spAbilityBufferTime = serializedObject.FindProperty("abilityBufferTime");
 
             spCanCancelLightAttacks = serializedObject.FindProperty("canCancelLightAttacks");
             spCanCancelHeavyAttacks = serializedObject.FindProperty("canCancelHeavyAttacks");
@@ -722,6 +724,7 @@ namespace Vi.Editor
                 EditorGUILayout.PropertyField(spCanBeCancelledByHeavyAttacks);
                 EditorGUILayout.PropertyField(spCanBeCancelledByAbilities);
                 EditorGUILayout.PropertyField(spAbilityCooldownTime);
+                EditorGUILayout.PropertyField(spAbilityBufferTime);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("Attack Phase Settings", EditorStyles.whiteLargeLabel);
                 EditorGUILayout.LabelField("Normalized time is progress of an animation on a scale of 0 - 1", EditorStyles.whiteLabel);

@@ -122,6 +122,23 @@ namespace Vi.Core
 
         public void OnNetworkDespawn() { }
 
+        public Vector3 GetClosestPoint(Vector3 sourcePosition)
+        {
+            float minDist = 0;
+            Vector3 destinationPoint = sourcePosition;
+            for (int i = 0; i < Colliders.Length; i++)
+            {
+                Vector3 closestPoint = Colliders[i].ClosestPoint(sourcePosition);
+                float dist = Vector3.Distance(sourcePosition, closestPoint);
+                if (dist < minDist | i == 0)
+                {
+                    minDist = dist;
+                    destinationPoint = closestPoint;
+                }
+            }
+            return destinationPoint;
+        }
+
         private void OnReturnToPool()
         {
             forceUseStaticWallCollisions = default;
@@ -169,11 +186,11 @@ namespace Vi.Core
 
         private static void EvaluateContactPairAsMovementCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
-            if (pair.GetNormal(i).y > 0.7f)
-            {
-                pair.IgnoreContact(i);
-                return;
-            }
+            //if (pair.GetNormal(i).y > 0.7f)
+            //{
+            //    pair.IgnoreContact(i);
+            //    return;
+            //}
 
             if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
             {
@@ -198,11 +215,11 @@ namespace Vi.Core
 
         private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
-            if (pair.GetNormal(i).y > 0.7f)
-            {
-                pair.IgnoreContact(i);
-                return;
-            }
+            //if (pair.GetNormal(i).y > 0.7f)
+            //{
+            //    pair.IgnoreContact(i);
+            //    return;
+            //}
 
             // Phase through other players if we are dodging out of an ailment like knockdown
             if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())

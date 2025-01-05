@@ -25,6 +25,7 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
         [Header("MVP Presentation")]
+        [SerializeField] private Canvas MVPCanvas;
         [SerializeField] private CanvasGroup MVPCanvasGroup;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
@@ -52,6 +53,8 @@ namespace Vi.UI
             rightScoreTeamColorImage.enabled = false;
 
             MVPPresentationCamera.enabled = false;
+
+            MVPCanvas.enabled = false;
         }
 
         private void OnDestroy()
@@ -187,15 +190,18 @@ namespace Vi.UI
             switch (gameModeManager.GetPostGameStatus())
             {
                 case GameModeManager.PostGameStatus.None:
+                    MVPCanvas.enabled = false;
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.MVP:
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview()); }
+                    MVPCanvas.enabled = true;
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
+                    MVPCanvas.enabled = MVPCanvasGroup.alpha == 0;
 
                     if (actionMapHandler)
                     {

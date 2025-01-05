@@ -20,6 +20,23 @@ namespace Vi.Core.Structures
 
         public Collider[] Colliders { get; private set; }
 
+        public Vector3 GetClosestPoint(Vector3 sourcePosition)
+        {
+            float minDist = Mathf.Infinity;
+            Vector3 destinationPoint = transform.position;
+            for (int i = 0; i < Colliders.Length; i++)
+            {
+                Vector3 closestPoint = Colliders[i].ClosestPoint(sourcePosition);
+                float dist = Vector3.Distance(sourcePosition, closestPoint);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    destinationPoint = closestPoint;
+                }
+            }
+            return destinationPoint;
+        }
+
         public ObjectiveHandler ObjectiveHandler { get; private set; }
 
         private ExplodableMeshController explodableMeshController;

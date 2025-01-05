@@ -123,20 +123,9 @@ namespace Vi.Core.MovementHandlers
 			if (!combatAgent) { Debug.LogError("Combat agent is null! " + combatAgent); return false; }
             if (combatAgent.NetworkCollider)
             {
-				float minDist = 0;
-				Vector3 destinationPoint = Vector3.zero;
-				for (int i = 0; i < combatAgent.NetworkCollider.Colliders.Length; i++)
-                {
-					Vector3 closestPoint = combatAgent.NetworkCollider.Colliders[i].ClosestPoint(GetPosition());
-					float dist = Vector3.Distance(GetPosition(), closestPoint);
-					if (dist < minDist | i == 0)
-					{
-						minDist = dist;
-						destinationPoint = closestPoint;
-					}
-				}
-				
-				if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
+				Vector3 destinationPoint = combatAgent.NetworkCollider.GetClosestPoint(GetPosition());
+
+                if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 				{
 					destination.Value = myNavHit.position;
 					return true;
@@ -158,18 +147,8 @@ namespace Vi.Core.MovementHandlers
 		public bool SetDestination(Structure structure)
         {
 			if (!structure) { Debug.LogError("Structure is null! " + structure); return false; }
-			float minDist = Mathf.Infinity;
-			Vector3 destinationPoint = structure.transform.position;
-			for (int i = 0; i < structure.Colliders.Length; i++)
-			{
-				Vector3 closestPoint = structure.Colliders[i].ClosestPoint(GetPosition());
-				float dist = Vector3.Distance(GetPosition(), closestPoint);
-				if (dist < minDist)
-				{
-					minDist = dist;
-					destinationPoint = closestPoint;
-				}
-			}
+			
+			Vector3 destinationPoint = structure.GetClosestPoint(GetPosition());
 
 			if (NavMesh.SamplePosition(destinationPoint, out NavMeshHit myNavHit, destinationNavMeshDistanceThreshold, navMeshQueryFilter))
 			{
