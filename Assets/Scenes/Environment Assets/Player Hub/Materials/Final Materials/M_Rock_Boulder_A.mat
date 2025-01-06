@@ -104,7 +104,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _A_Normal_Strength: 1
+    - _B_Normal_Strength: 1
     - _Base_Color: 0
+    - _Base_Normal_Strength: 1
+    - _C_Normal_Strength: 1
     - _Curvature: 0
     - _Normal: 0
     - _QueueControl: 0
@@ -113,6 +117,7 @@ Material:
     - _Roughness: -13.38
     - _Secondary: 0
     m_Colors:
-    - _Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Secondary_Color: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
