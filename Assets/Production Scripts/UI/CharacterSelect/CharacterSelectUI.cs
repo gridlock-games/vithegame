@@ -171,8 +171,6 @@ namespace Vi.UI
             if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted")) { tutorialAlertBox.DestroyAlert(); }
             else { tutorialAlertBox.gameObject.SetActive(true); }
 
-            codeInputBoxParent.SetActive(false);
-
             OpenStats();
 
             originalSelectionBarGlowColor = selectionBarGlowImage.color;
@@ -1114,16 +1112,6 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
 
-            if (!FasterPlayerPrefs.Singleton.GetBool("IsDiscordVerified"))
-            {
-                codeInputBoxParent.SetActive(true);
-
-                yield return new WaitUntil(() => codeInputField.text == connectToServerCode);
-
-                codeInputBoxParent.SetActive(false);
-                FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", true);
-            }
-
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (!WebRequestManager.Singleton.GameIsUpToDate) { yield break; }
@@ -1138,18 +1126,6 @@ namespace Vi.UI
                 Instantiate(alertBoxPrefab.gameObject).GetComponent<AlertBox>().SetText("Servers are currently offline for maintenance.");
             }
 
-            selectCharacterButton.interactable = true;
-            goToTrainingRoomButton.interactable = true;
-            trainingRoomSettingsButton.interactable = true;
-        }
-
-        [SerializeField] private GameObject codeInputBoxParent;
-        [SerializeField] private InputField codeInputField;
-
-        public void CloseCodeInputBox()
-        {
-            codeInputBoxParent.SetActive(false);
-            if (autoConnectToHubServerCoroutine != null) { StopCoroutine(autoConnectToHubServerCoroutine); }
             selectCharacterButton.interactable = true;
             goToTrainingRoomButton.interactable = true;
             trainingRoomSettingsButton.interactable = true;
