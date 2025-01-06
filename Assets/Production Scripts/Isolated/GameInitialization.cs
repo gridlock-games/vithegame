@@ -53,6 +53,7 @@ namespace Vi.Core
                 if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
                 {
                     // Just updated, execute this code
+                    if (FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.DeleteKey("IsDiscordVerified"); }
                 }
             }
 
