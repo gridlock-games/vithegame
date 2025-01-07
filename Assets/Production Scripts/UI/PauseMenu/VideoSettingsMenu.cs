@@ -19,6 +19,7 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
+        [SerializeField] private TMP_Dropdown targetFrameRateDropdown;
         [SerializeField] private Slider dpiScaleSlider;
         [SerializeField] private Slider fieldOfViewSlider;
         [SerializeField] private InputField renderDistanceInput;
@@ -152,6 +153,29 @@ namespace Vi.UI
             hdrToggle.isOn = pipeline.supportsHDR;
 
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+
+            List<int> fpsOptionsAsInt = new List<int>();
+            List<string> fpsOptions = new List<string>();
+            for (int i = 30; i <= 120; i+=30)
+            {
+                if (i > 60)
+                {
+                    if (i > Screen.currentResolution.refreshRateRatio.value) { break; }
+                }
+
+                fpsOptions.Add(i.ToString());
+                fpsOptionsAsInt.Add(i);
+            }
+
+            targetFrameRateDropdown.ClearOptions();
+            targetFrameRateDropdown.AddOptions(fpsOptions);
+
+            int closestValue = fpsOptionsAsInt.Aggregate((x, y) => Math.Abs(x - FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate")) < Math.Abs(y - FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate")) ? x : y);
+            int closestIndex = fpsOptionsAsInt.IndexOf(closestValue);
+            
+            targetFrameRateDropdown.value = closestIndex;
+
+            targetFrameRateDropdown.onValueChanged.AddListener(ChangeTargetFrameRateFromDropdown);
 
             SetOriginalVariables();
         }
@@ -305,6 +329,13 @@ namespace Vi.UI
         public void ValidateTargetFrameRate()
         {
             targetFrameRateInput.text = Regex.Replace(targetFrameRateInput.text, @"[^0-9]", "");
+        }
+
+        public void ChangeTargetFrameRateFromDropdown(int index)
+        {
+            int targetFrameRate = int.Parse(targetFrameRateDropdown.options[targetFrameRateDropdown.value].text);
+
+            FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
         }
 
         public void ChangeTargetFrameRate()
