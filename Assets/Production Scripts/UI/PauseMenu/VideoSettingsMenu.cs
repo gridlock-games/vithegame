@@ -22,7 +22,6 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown targetFrameRateDropdown;
         [SerializeField] private Slider dpiScaleSlider;
         [SerializeField] private Slider fieldOfViewSlider;
-        [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private Toggle adaptivePerformanceToggle;
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
@@ -126,7 +125,6 @@ namespace Vi.UI
             resolutionDropdown.value = currentResIndex;
 
             targetFrameRateInput.text = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate").ToString();
-            renderDistanceInput.text = FasterPlayerPrefs.Singleton.GetInt("RenderDistance").ToString();
 
             // Full screen mode dropdown
             // Dropdown Options are assigned in inspector since these don't vary
@@ -255,6 +253,22 @@ namespace Vi.UI
 
             vsyncToggle.interactable = true;
 
+            int renderDistance = 200;
+            switch (graphicsPresetDropdown.value)
+            {
+                case 0:
+                    renderDistance = 100;
+                    break;
+                case 1:
+                    renderDistance = Application.isMobilePlatform ? 150 : 500;
+                    break;
+                case 2:
+                    renderDistance = Application.isMobilePlatform ? 200 : 1000;
+                    break;
+            }
+
+            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
+
             SetOriginalVariables();
         }
 
@@ -308,22 +322,6 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = true;
-        }
-
-        public void ValidateRenderDistance()
-        {
-            renderDistanceInput.text = Regex.Replace(renderDistanceInput.text, @"[^0-9]", "");
-        }
-
-        public void ChangeRenderDistance()
-        {
-            int renderDistance = int.Parse(renderDistanceInput.text);
-            if (renderDistance < 10)
-            {
-                renderDistance = 10;
-                renderDistanceInput.text = "10";
-            }
-            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
         }
 
         public void ValidateTargetFrameRate()
