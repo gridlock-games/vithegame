@@ -265,6 +265,9 @@ namespace Vi.UI
                 case 2:
                     renderDistance = Application.isMobilePlatform ? 200 : 1000;
                     break;
+                default:
+                    Debug.LogWarning("Unsure what render distance to assign! " + graphicsPresetDropdown.value);
+                    break;
             }
 
             FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
