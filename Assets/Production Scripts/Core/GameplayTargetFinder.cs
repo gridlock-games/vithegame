@@ -27,6 +27,11 @@ namespace Vi.Core
             UpdateStructureList();
         }
 
+        private void OnDisable()
+        {
+            ClearTarget();
+        }
+
         private void Update()
         {
             if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame)
