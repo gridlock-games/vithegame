@@ -7,6 +7,7 @@ using Vi.Core;
 using Vi.Utility;
 using UnityEngine.Rendering.Universal;
 using Vi.Core.MovementHandlers;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Player
 {
@@ -14,8 +15,8 @@ namespace Vi.Player
     {
         [SerializeField] private float moveSpeed = 7;
 
-        private List<CombatAgent> playerList = new List<CombatAgent>();
-        public void SetPlayerList(List<CombatAgent> playerList)
+        private List<Attributes> playerList = new List<Attributes>();
+        public void SetPlayerList(List<Attributes> playerList)
         {
             this.playerList = playerList;
         }
@@ -327,7 +328,7 @@ namespace Vi.Player
             followTargetOffset = defaultFollowTargetOffset;
         }
 
-        private CombatAgent followTarget;
+        private Attributes followTarget;
         private float followCamAngleOffset;
         private UIDeadZoneElement[] joysticks = new UIDeadZoneElement[0];
 
