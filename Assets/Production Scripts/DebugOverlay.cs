@@ -93,8 +93,10 @@ public class DebugOverlay : MonoBehaviour
     [SerializeField] private AnimationCurve audioCullingDistanceCurve;
 
     private WarningLevel thermalWarningLevel = WarningLevel.NoWarning;
+    private ThermalMetrics lastEV;
     void OnThermalEvent(ThermalMetrics ev)
     {
+        lastEV = ev;
         thermalWarningLevel = ev.WarningLevel;
 
         if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
@@ -354,7 +356,13 @@ public class DebugOverlay : MonoBehaviour
         {
             QualitySettings.lodBias = maxLODBias;
             QualitySettings.globalTextureMipmapLimit = 0;
+            QualitySettings.resolutionScalingFixedDPIFactor = DPIScale;
             NetSceneManager.SetTargetFrameRate();
+        }
+
+        if (adaptivePerformanceEnabled)
+        {
+            OnThermalEvent(lastEV);
         }
 
         if (!thermalEventsEnabled)
