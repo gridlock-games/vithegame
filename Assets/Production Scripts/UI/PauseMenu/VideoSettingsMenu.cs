@@ -251,8 +251,6 @@ namespace Vi.UI
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
 
-            vsyncToggle.interactable = true;
-
             int renderDistance = 200;
             switch (graphicsPresetDropdown.value)
             {
@@ -269,7 +267,6 @@ namespace Vi.UI
                     Debug.LogWarning("Unsure what render distance to assign! " + graphicsPresetDropdown.value);
                     break;
             }
-
             FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
 
             if (FasterPlayerPrefs.IsMobilePlatform)
@@ -291,8 +288,6 @@ namespace Vi.UI
                 }
                 SetDPIScale(dpiScaleSlider.value);
             }
-
-
 
             SetOriginalVariables();
         }
@@ -333,7 +328,6 @@ namespace Vi.UI
 
             // Graphics Settings
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
-            vsyncToggle.interactable = true;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
@@ -343,10 +337,24 @@ namespace Vi.UI
         {
             UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
             
-            vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = true;
+
+            switch (graphicsPresetDropdown.value)
+            {
+                case 0:
+                    postProcessingToggle.isOn = false;
+                    break;
+                case 1:
+                    postProcessingToggle.isOn = true;
+                    break;
+                case 2:
+                    postProcessingToggle.isOn = true;
+                    break;
+                default:
+                    Debug.LogWarning("Unsure what post processing values to assign! " + graphicsPresetDropdown.value);
+                    break;
+            }
         }
 
         public void ValidateTargetFrameRate()
