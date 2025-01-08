@@ -178,7 +178,23 @@ namespace Vi.UI
 
             shadowsDropdown.ClearOptions();
             shadowsDropdown.AddOptions(shadowsOptions);
-            shadowsDropdown.value = 0;
+
+            // TODO Find shadows dropdown value
+            int shadowsValue = 0;
+            if (pipeline.shadowCascadeCount == 4)
+            {
+                shadowsValue = 3;
+            }
+            else if (pipeline.mainLightShadowmapResolution == 1024)
+            {
+                shadowsValue = 2;
+            }
+            else if (pipeline.mainLightShadowmapResolution == 256 && pipeline.shadowDistance > 0)
+            {
+                shadowsValue = 1;
+            }
+
+            shadowsDropdown.value = shadowsValue;
 
             SetOriginalVariables();
         }
@@ -306,8 +322,46 @@ namespace Vi.UI
                 SetDPIScale(dpiScaleSlider.value);
             }
 
-            // TODO Apply shadows quality
-            //shadowsDropdown.value = originalShadowsState;
+            // Apply shadows quality
+            switch (shadowsDropdown.value)
+            {
+                case 0: // Off
+                    pipeline.mainLightShadowmapResolution = 256;
+                    pipeline.additionalLightsShadowmapResolution = 256;
+
+                    pipeline.shadowDistance = 0;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 1: // Low
+                    pipeline.mainLightShadowmapResolution = 256;
+                    pipeline.additionalLightsShadowmapResolution = 256;
+
+                    pipeline.shadowDistance = 50;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 2: // Medium
+                    pipeline.mainLightShadowmapResolution = 1024;
+                    pipeline.additionalLightsShadowmapResolution = 512;
+
+                    pipeline.shadowDistance = 50;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 3: // High
+                    pipeline.mainLightShadowmapResolution = 4096;
+                    pipeline.additionalLightsShadowmapResolution = 4096;
+
+                    pipeline.shadowDistance = 100;
+                    pipeline.shadowCascadeCount = 4;
+                    pipeline.cascade4Split = new Vector3(6.466667f, 10.13333f, 76.46667f);
+                    pipeline.cascadeBorder = 23.53333f;
+                    break;
+                default:
+                    Debug.LogWarning("Unsure what shadows quality to assign! " + shadowsDropdown.value);
+                    break;
+            }
 
             SetOriginalVariables();
         }
@@ -315,6 +369,8 @@ namespace Vi.UI
         public void DiscardChanges()
         {
             // Display settings
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+
             fullscreenModeDropdown.value = Array.IndexOf(fsModes, originalFullScreenMode);
 
             int currentResIndex = -1;
