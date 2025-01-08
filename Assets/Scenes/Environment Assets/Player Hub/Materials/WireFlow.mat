@@ -29,6 +29,18 @@ Material:
         m_Texture: {fileID: 2800000, guid: 95de66c1f57018141837e20dcb10a4a3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FlowImage_A:
+        m_Texture: {fileID: 2800000, guid: 95de66c1f57018141837e20dcb10a4a3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowImage_B:
+        m_Texture: {fileID: 2800000, guid: 95de66c1f57018141837e20dcb10a4a3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowImage_C:
+        m_Texture: {fileID: 2800000, guid: 95de66c1f57018141837e20dcb10a4a3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -44,9 +56,13 @@ Material:
     m_Ints: []
     m_Floats:
     - _FlowSpeed: -0.2
+    - _FlowSpeed_A: 0.2
+    - _FlowSpeed_B: 0.3
+    - _FlowSpeed_C: 0.5
     - _QueueControl: 0
     - _QueueOffset: 0
-    m_Colors: []
+    m_Colors:
+    - _Color: {r: 0.4013897, g: 0.27446848, b: 0.22152166, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3511726097131061873
