@@ -335,10 +335,10 @@ namespace Vi.UI
 
         public void OnQualitySettingsDropdownChange()
         {
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
             
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
-            hdrToggle.isOn = pipeline.supportsHDR;
+            hdrToggle.isOn = graphicsPresetDropdown.value > 0;
 
             switch (graphicsPresetDropdown.value)
             {
