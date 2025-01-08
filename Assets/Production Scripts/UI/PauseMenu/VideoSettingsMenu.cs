@@ -19,9 +19,9 @@ namespace Vi.UI
         [SerializeField] private TMP_Dropdown fullscreenModeDropdown;
         [SerializeField] private TMP_Dropdown resolutionDropdown;
         [SerializeField] private InputField targetFrameRateInput;
+        [SerializeField] private TMP_Dropdown targetFrameRateDropdown;
         [SerializeField] private Slider dpiScaleSlider;
         [SerializeField] private Slider fieldOfViewSlider;
-        [SerializeField] private InputField renderDistanceInput;
         [Header("Graphics Settings")]
         [SerializeField] private Toggle adaptivePerformanceToggle;
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
@@ -125,7 +125,6 @@ namespace Vi.UI
             resolutionDropdown.value = currentResIndex;
 
             targetFrameRateInput.text = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate").ToString();
-            renderDistanceInput.text = FasterPlayerPrefs.Singleton.GetInt("RenderDistance").ToString();
 
             // Full screen mode dropdown
             // Dropdown Options are assigned in inspector since these don't vary
@@ -152,6 +151,29 @@ namespace Vi.UI
             hdrToggle.isOn = pipeline.supportsHDR;
 
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+
+            List<int> fpsOptionsAsInt = new List<int>();
+            List<string> fpsOptions = new List<string>();
+            for (int i = 30; i <= 120; i+=30)
+            {
+                if (i > 60)
+                {
+                    if (i > Screen.currentResolution.refreshRateRatio.value) { break; }
+                }
+
+                fpsOptions.Add(i.ToString());
+                fpsOptionsAsInt.Add(i);
+            }
+
+            targetFrameRateDropdown.ClearOptions();
+            targetFrameRateDropdown.AddOptions(fpsOptions);
+
+            int closestValue = fpsOptionsAsInt.Aggregate((x, y) => Math.Abs(x - FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate")) < Math.Abs(y - FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate")) ? x : y);
+            int closestIndex = fpsOptionsAsInt.IndexOf(closestValue);
+            
+            targetFrameRateDropdown.value = closestIndex;
+
+            targetFrameRateDropdown.onValueChanged.AddListener(ChangeTargetFrameRateFromDropdown);
 
             SetOriginalVariables();
         }
@@ -229,7 +251,43 @@ namespace Vi.UI
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
 
-            vsyncToggle.interactable = true;
+            int renderDistance = 200;
+            switch (graphicsPresetDropdown.value)
+            {
+                case 0:
+                    renderDistance = 100;
+                    break;
+                case 1:
+                    renderDistance = Application.isMobilePlatform ? 150 : 500;
+                    break;
+                case 2:
+                    renderDistance = Application.isMobilePlatform ? 200 : 1000;
+                    break;
+                default:
+                    Debug.LogWarning("Unsure what render distance to assign! " + graphicsPresetDropdown.value);
+                    break;
+            }
+            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
+
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                switch (graphicsPresetDropdown.value)
+                {
+                    case 0:
+                        dpiScaleSlider.value = 0.5f;
+                        break;
+                    case 1:
+                        dpiScaleSlider.value = 0.7f;
+                        break;
+                    case 2:
+                        dpiScaleSlider.value = 1;
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
+                        break;
+                }
+                SetDPIScale(dpiScaleSlider.value);
+            }
 
             SetOriginalVariables();
         }
@@ -270,7 +328,6 @@ namespace Vi.UI
 
             // Graphics Settings
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
-            vsyncToggle.interactable = true;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
@@ -280,31 +337,36 @@ namespace Vi.UI
         {
             UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
             
-            vsyncToggle.interactable = QualitySettings.GetQualityLevel() == graphicsPresetDropdown.value;
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
-            postProcessingToggle.isOn = true;
-        }
 
-        public void ValidateRenderDistance()
-        {
-            renderDistanceInput.text = Regex.Replace(renderDistanceInput.text, @"[^0-9]", "");
-        }
-
-        public void ChangeRenderDistance()
-        {
-            int renderDistance = int.Parse(renderDistanceInput.text);
-            if (renderDistance < 10)
+            switch (graphicsPresetDropdown.value)
             {
-                renderDistance = 10;
-                renderDistanceInput.text = "10";
+                case 0:
+                    postProcessingToggle.isOn = false;
+                    break;
+                case 1:
+                    postProcessingToggle.isOn = true;
+                    break;
+                case 2:
+                    postProcessingToggle.isOn = true;
+                    break;
+                default:
+                    Debug.LogWarning("Unsure what post processing values to assign! " + graphicsPresetDropdown.value);
+                    break;
             }
-            FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
         }
 
         public void ValidateTargetFrameRate()
         {
             targetFrameRateInput.text = Regex.Replace(targetFrameRateInput.text, @"[^0-9]", "");
+        }
+
+        public void ChangeTargetFrameRateFromDropdown(int index)
+        {
+            int targetFrameRate = int.Parse(targetFrameRateDropdown.options[targetFrameRateDropdown.value].text);
+
+            FasterPlayerPrefs.Singleton.SetInt("TargetFrameRate", targetFrameRate);
         }
 
         public void ChangeTargetFrameRate()

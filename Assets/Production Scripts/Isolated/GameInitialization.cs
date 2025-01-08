@@ -54,6 +54,7 @@ namespace Vi.Core
                 {
                     // Just updated, execute this code
                     if (FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.DeleteKey("IsDiscordVerified"); }
+                    if (FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.DeleteKey("RenderDistance"); }
                 }
             }
 
@@ -168,7 +169,27 @@ namespace Vi.Core
                 if (!FasterPlayerPrefs.Singleton.HasColor(kvp.Key)) { FasterPlayerPrefs.Singleton.SetColor(kvp.Key, kvp.Value); }
             }
 
-            if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.SetInt("RenderDistance", 200); }
+            if (!FasterPlayerPrefs.Singleton.HasInt("RenderDistance"))
+            {
+                int renderDistance = 200;
+                switch (QualitySettings.GetQualityLevel())
+                {
+                    case 0:
+                        renderDistance = 100;
+                        break;
+                    case 1:
+                        renderDistance = Application.isMobilePlatform ? 150 : 500;
+                        break;
+                    case 2:
+                        renderDistance = Application.isMobilePlatform ? 200 : 1000;
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure what render distance to assign! " + QualitySettings.GetQualityLevel());
+                        break;
+                }
+
+                FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
+            }
 
             if (!FasterPlayerPrefs.Singleton.HasString("LightAttackMode")) { FasterPlayerPrefs.Singleton.SetString("LightAttackMode", "HOLD"); }
 
