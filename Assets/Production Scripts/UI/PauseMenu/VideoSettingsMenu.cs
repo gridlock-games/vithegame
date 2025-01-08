@@ -272,6 +272,28 @@ namespace Vi.UI
 
             FasterPlayerPrefs.Singleton.SetInt("RenderDistance", renderDistance);
 
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                switch (graphicsPresetDropdown.value)
+                {
+                    case 0:
+                        dpiScaleSlider.value = 0.5f;
+                        break;
+                    case 1:
+                        dpiScaleSlider.value = 0.7f;
+                        break;
+                    case 2:
+                        dpiScaleSlider.value = 1;
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
+                        break;
+                }
+                SetDPIScale(dpiScaleSlider.value);
+            }
+
+
+
             SetOriginalVariables();
         }
 
