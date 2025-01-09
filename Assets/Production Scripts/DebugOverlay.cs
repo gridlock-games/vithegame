@@ -2,11 +2,11 @@ using System.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
-using UnityEngine.AdaptivePerformance;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Utility;
+using UnityEngine.AdaptivePerformance;
 
 public class DebugOverlay : MonoBehaviour
 {
@@ -41,96 +41,28 @@ public class DebugOverlay : MonoBehaviour
         StartCoroutine(RefreshStatusAfter1Frame());
 
         thermalWarningImage.enabled = false;
-
-        ap = Holder.Instance;
-        if (ap != null)
-        {
-            if (!ap.Active)
-            {
-                Debug.LogWarning("Adapative Performance is Disabled!");
-                return;
-            }
-
-            ap.ThermalStatus.ThermalEvent += OnThermalEvent;
-            ap.PerformanceStatus.PerformanceBottleneckChangeEvent += PerformanceStatus_PerformanceBottleneckChangeEvent;
-        }
     }
 
-    private IAdaptivePerformance ap = null;
-
-    private void PerformanceStatus_PerformanceBottleneckChangeEvent(PerformanceBottleneckChangeEventArgs bottleneckEventArgs)
+    private IEnumerator RefreshStatusAfter1Frame()
     {
-        Debug.Log("Performance Bottleneck Changed " + bottleneckEventArgs.PerformanceBottleneck);
+        yield return null;
+        RefreshStatus();
     }
 
-    private void QualitySettings_activeQualityLevelChanged(int previousQuality, int currentQuality)
+    void OnEnable()
     {
-        Debug.Log($"Quality Level has been changed from {QualitySettings.names[previousQuality]} to {QualitySettings.names[currentQuality]}");
-        
-        switch (currentQuality)
-        {
-            case 0:
-                maxLODBias = 1;
-                break;
-            case 1:
-                maxLODBias = 1.5f;
-                break;
-            case 2:
-                maxLODBias = 2;
-                break;
-            default:
-                Debug.LogWarning("I don't know how to set the max LOD bias! " + currentQuality);
-                break;
-        }
+        Application.logMessageReceived += Log;
+        AdaptivePerformanceManager.OnThermalChange += OnThermalEvent;
     }
 
-    private float maxLODBias = 1;
-
-    [Header("Adaptive Performance, X is 1 - temperature level")]
-    [Header("Left is hot, Right is cold")]
-    [SerializeField] private AnimationCurve DPIScalingCurve;
-    [SerializeField] private AnimationCurve LODBiasCurve;
-    [SerializeField] private AnimationCurve audioCullingDistanceCurve;
-
-    private WarningLevel thermalWarningLevel = WarningLevel.NoWarning;
-    private ThermalMetrics lastEV;
-    void OnThermalEvent(ThermalMetrics ev)
+    void OnDisable()
     {
-        lastEV = ev;
-        thermalWarningLevel = ev.WarningLevel;
+        Application.logMessageReceived -= Log;
+        AdaptivePerformanceManager.OnThermalChange -= OnThermalEvent;
+    }
 
-        if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
-        {
-            float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
-            
-            // Adaptive resolution scale
-            SetDPIScale(DPIScalingCurve.Evaluate(invertedTemperatureLevel) * DPIScale);
-
-            // Adaptive LOD
-            SetLODBias(LODBiasCurve.Evaluate(invertedTemperatureLevel) * maxLODBias);
-
-            // Texture mip maps
-            ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
-
-            // Adaptive frame rate
-            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
-            {
-                int newTargetFrameRate = 30;
-                if (targetFrameRate > 60) { newTargetFrameRate = 60; }
-                SetTargetFrameRate(newTargetFrameRate);
-            }
-            else
-            {
-                NetSceneManager.SetTargetFrameRate();
-            }
-
-            float maxAudioCullingDistance = 100;
-            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.Evaluate(invertedTemperatureLevel) * maxAudioCullingDistance;
-        }
-
-        Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
-        Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
-
+    private void OnThermalEvent(ThermalMetrics ev)
+    {
         if (!thermalEventsEnabled) { return; }
 
         switch (ev.WarningLevel)
@@ -147,105 +79,6 @@ public class DebugOverlay : MonoBehaviour
                 thermalWarningImage.color = Color.red;
                 break;
         }
-    }
-
-    private void ChangeTextureMipMaps(WarningLevel warningLevel, float temperatureLevel)
-    {
-        if (NetSceneManager.DoesExist())
-        {
-            if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
-            {
-                QualitySettings.globalTextureMipmapLimit = 0;
-                return;
-            }
-        }
-
-        if (temperatureLevel > 0.95f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 3;
-        }
-        else if (temperatureLevel > 0.9f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 2;
-        }
-        else if (temperatureLevel > 0.8f)
-        {
-            QualitySettings.globalTextureMipmapLimit = 1;
-        }
-        else
-        {
-            QualitySettings.globalTextureMipmapLimit = 0;
-        }
-    }
-
-    private void SetDPIScale(float value)
-    {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
-        Debug.Log("Setting DPI Scale " + value);
-
-        if (NetSceneManager.DoesExist())
-        {
-            if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
-            {
-                value = Mathf.Max(value, 1);
-            }
-        }
-
-        QualitySettings.resolutionScalingFixedDPIFactor = value;
-    }
-    
-    private void OnSceneUnload()
-    {
-        if (NetSceneManager.DoesExist())
-        {
-            if (!NetSceneManager.GetShouldSpawnPlayer())
-            {
-                if (QualitySettings.resolutionScalingFixedDPIFactor < 0.9f)
-                {
-                    SetDPIScale(0.9f);
-                }
-                ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
-            }
-        }
-    }
-
-    private void SetLODBias(float value)
-    {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
-        Debug.Log("Setting LOD Bias " + value);
-        QualitySettings.lodBias = value;
-    }
-
-    private void SetTargetFrameRate(int value)
-    {
-        if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
-
-        Debug.Log("Setting Target Frame Rate " + value);
-        Application.targetFrameRate = value;
-    }
-
-    private IEnumerator RefreshStatusAfter1Frame()
-    {
-        yield return null;
-        RefreshStatus();
-    }
-
-    void OnEnable()
-    {
-        Application.logMessageReceived += Log;
-        QualitySettings.activeQualityLevelChanged += QualitySettings_activeQualityLevelChanged;
-        EventDelegateManager.sceneUnloaded += OnSceneUnload;
-
-        QualitySettings_activeQualityLevelChanged(0, QualitySettings.GetQualityLevel());
-    }
-
-    void OnDisable()
-    {
-        Application.logMessageReceived -= Log;
-        QualitySettings.activeQualityLevelChanged -= QualitySettings_activeQualityLevelChanged;
-        EventDelegateManager.sceneUnloaded -= OnSceneUnload;
     }
 
     private void RefreshFps() { fpsValue = (int)(1f / Time.unscaledDeltaTime); }
@@ -333,9 +166,6 @@ public class DebugOverlay : MonoBehaviour
     }
 
     private bool thermalEventsEnabled;
-    private bool adaptivePerformanceEnabled;
-    private float DPIScale;
-    private int targetFrameRate;
 
     private void RefreshStatus()
     {
@@ -346,35 +176,16 @@ public class DebugOverlay : MonoBehaviour
         jitterEnabled = FasterPlayerPrefs.Singleton.GetBool("JitterEnabled");
         thermalEventsEnabled = FasterPlayerPrefs.Singleton.GetBool("ThermalEventsEnabled");
 
-        bool previousAdaptivePerformanceState = adaptivePerformanceEnabled;
-        adaptivePerformanceEnabled = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance");
-
-        DPIScale = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
-        targetFrameRate = FasterPlayerPrefs.Singleton.GetInt("TargetFrameRate");
-
-        if (!adaptivePerformanceEnabled & previousAdaptivePerformanceState)
-        {
-            QualitySettings.lodBias = maxLODBias;
-            QualitySettings.globalTextureMipmapLimit = 0;
-            QualitySettings.resolutionScalingFixedDPIFactor = DPIScale;
-            NetSceneManager.SetTargetFrameRate();
-        }
-
-        if (adaptivePerformanceEnabled)
-        {
-            OnThermalEvent(lastEV);
-        }
-
         if (!thermalEventsEnabled)
         {
             thermalWarningImage.enabled = false;
         }
-        else if (thermalWarningLevel == WarningLevel.ThrottlingImminent)
+        else if (AdaptivePerformanceManager.thermalWarningLevel == WarningLevel.ThrottlingImminent)
         {
             thermalWarningImage.enabled = true;
             thermalWarningImage.color = new Color(239 / (float)255, 91 / (float)255, 37 / (float)255);
         }
-        else if (thermalWarningLevel == WarningLevel.Throttling)
+        else if (AdaptivePerformanceManager.thermalWarningLevel == WarningLevel.Throttling)
         {
             thermalWarningImage.enabled = true;
             thermalWarningImage.color = Color.red;
@@ -418,7 +229,6 @@ public class DebugOverlay : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(QualitySettings.resolutionScalingFixedDPIFactor);
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
