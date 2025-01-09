@@ -792,6 +792,8 @@ namespace Vi.Player
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 actionMapHandler.enabled = true;
+
+                AdaptivePerformanceManager.Singleton.RefreshThermalSettings();
             }
             else
             {

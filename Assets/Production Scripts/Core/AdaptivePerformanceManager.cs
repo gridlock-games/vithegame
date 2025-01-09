@@ -71,8 +71,6 @@ namespace Vi.Core
 
         private void Update()
         {
-            Debug.Log(QualitySettings.resolutionScalingFixedDPIFactor);
-
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
         }
 
