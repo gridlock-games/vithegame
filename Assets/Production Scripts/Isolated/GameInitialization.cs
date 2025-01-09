@@ -158,11 +158,9 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
-            if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", 1); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", FasterPlayerPrefs.IsMobilePlatform ? 0.5f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
-
-            if (!FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
 
             foreach (KeyValuePair<string, Color> kvp in FasterPlayerPrefs.GetDefaultColorPrefs())
             {

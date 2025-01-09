@@ -157,11 +157,6 @@ namespace Vi.UI
             List<string> fpsOptions = new List<string>();
             for (int i = 30; i <= 120; i+=30)
             {
-                if (i > 60)
-                {
-                    if (i > Screen.currentResolution.refreshRateRatio.value) { break; }
-                }
-
                 fpsOptions.Add(i.ToString());
                 fpsOptionsAsInt.Add(i);
             }
@@ -279,7 +274,7 @@ namespace Vi.UI
             }
 
             // Graphics settings
-            if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
+            if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, false); }
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
