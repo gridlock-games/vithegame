@@ -371,7 +371,11 @@ namespace Vi.Core.MovementHandlers
 
 			bool shouldUseZoomSensMultiplier = false;
             if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }
-            return shouldUseZoomSensMultiplier ? lookInput * lookSensitivity * zoomSensitivityMultiplier: lookInput * lookSensitivity;
+            
+			Vector2 adjustedLookInput = shouldUseZoomSensMultiplier ? lookInput * zoomSensitivityMultiplier : lookInput;
+			adjustedLookInput *= lookSensitivity;
+			adjustedLookInput /= QualitySettings.resolutionScalingFixedDPIFactor > 0 ? QualitySettings.resolutionScalingFixedDPIFactor : 1;
+            return adjustedLookInput;
         }
 
 		public void ResetLookInput()

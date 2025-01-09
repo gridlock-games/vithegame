@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using Vi.Utility;
 
 namespace Vi.UI
 {
@@ -36,15 +37,18 @@ namespace Vi.UI
 
         private static Camera mainCamera;
         private static UniversalAdditionalCameraData mainCameraData;
-        private void FindMainCamera()
+        private void FindMainCameraForThis()
         {
             if (mainCamera)
             {
+                if (!mainCamera.enabled) { mainCamera = null; return; }
+
                 if (mainCamera.gameObject.CompareTag("MainCamera"))
                 {
                     return;
                 }
             }
+
             mainCamera = Camera.main;
             if (mainCamera)
             {
@@ -74,7 +78,7 @@ namespace Vi.UI
         private bool lastCamState;
         private void Update()
         {
-            FindMainCamera();
+            FindMainCameraForThis();
 
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { attachedUICamera.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
@@ -86,7 +90,7 @@ namespace Vi.UI
                 if (attachedUICamera.enabled)
                 {
                     attachedUICamera.depth = 0;
-                    if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
+                    if (!audioListener & !FindMainCamera.MainCamera) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 }
                 else
                 {
@@ -112,7 +116,7 @@ namespace Vi.UI
             }
             else if (attachedUICamera.enabled)
             {
-                if (!audioListener) { audioListener = gameObject.AddComponent<AudioListener>(); }
+                if (!audioListener & !FindMainCamera.MainCamera) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 
                 if (cameraData.renderType == CameraRenderType.Overlay)
                 {

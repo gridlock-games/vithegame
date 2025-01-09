@@ -17,6 +17,8 @@ namespace Vi.Player
         [SerializeField] private CameraController cameraController;
         [SerializeField] private Rigidbody interpolationRigidbody;
 
+        public CameraController CameraController { get { return cameraController; } }
+
         public override void SetOrientation(Vector3 newPosition, Quaternion newRotation)
         {
             base.SetOrientation(newPosition, newRotation);
@@ -790,6 +792,8 @@ namespace Vi.Player
                 playerInput.actions.LoadBindingOverridesFromJson(rebinds);
 
                 actionMapHandler.enabled = true;
+
+                AdaptivePerformanceManager.Singleton.RefreshThermalSettings();
             }
             else
             {

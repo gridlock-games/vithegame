@@ -4,18 +4,27 @@ namespace Vi.Utility
 {
     public class FindMainCamera : MonoBehaviour
     {
-        public static Camera MainCamera { get; private set; }
-
-        private void GetMainCamera()
+        public static Camera MainCamera
         {
-            if (MainCamera)
+            get
             {
-                if (MainCamera.gameObject.CompareTag("MainCamera"))
+                if (!_mainCamera) { GetMainCamera(); }
+                return _mainCamera;
+            }
+        }
+
+        private static Camera _mainCamera;
+
+        private static void GetMainCamera()
+        {
+            if (_mainCamera)
+            {
+                if (_mainCamera.gameObject.CompareTag("MainCamera"))
                 {
                     return;
                 }
             }
-            MainCamera = Camera.main;
+            _mainCamera = Camera.main;
         }
 
         private void Awake()

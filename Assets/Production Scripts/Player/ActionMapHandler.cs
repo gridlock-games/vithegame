@@ -25,8 +25,6 @@ namespace Vi.Player
 
         private const CursorLockMode PlayerActiveLockMode = CursorLockMode.Locked;
 
-        private int FrameRateLimit { get { return FasterPlayerPrefs.IsMobilePlatform ? 30 : Application.targetFrameRate; } }
-
         public void SetExternalUI(ExternalUI externalUI)
         {
             this.externalUI = externalUI;
@@ -41,7 +39,6 @@ namespace Vi.Player
                 if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = FrameRateLimit;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 playerInput.SwitchCurrentActionMap("UI");
@@ -57,7 +54,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
@@ -86,7 +82,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
             }
             else if (playerInput.defaultActionMap == "Spectator")
@@ -96,7 +91,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
             }
             else
@@ -151,7 +145,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
                 if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
             }
@@ -197,7 +190,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
                 pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
@@ -209,7 +201,6 @@ namespace Vi.Player
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = FrameRateLimit;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 if (spectatorUIInstance)
@@ -234,7 +225,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
                 }
                 inventoryInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
@@ -246,7 +236,6 @@ namespace Vi.Player
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = FrameRateLimit;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 if (spectatorUIInstance)

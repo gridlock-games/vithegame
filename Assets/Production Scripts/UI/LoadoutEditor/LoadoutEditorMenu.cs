@@ -44,8 +44,9 @@ namespace Vi.UI
         [SerializeField] private Sprite defaultSprite;
 
         private Attributes attributes;
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             attributes = GetComponentInParent<Attributes>();
 
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
