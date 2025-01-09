@@ -85,8 +85,10 @@ namespace Vi.Core
             {
                 QualitySettings.lodBias = maxLODBias;
                 QualitySettings.globalTextureMipmapLimit = 0;
-                QualitySettings.resolutionScalingFixedDPIFactor = DPIScale;
-                NetSceneManager.SetTargetFrameRate();
+
+                // Don't set these cause we're in a menu
+                //QualitySettings.resolutionScalingFixedDPIFactor = DPIScale;
+                //NetSceneManager.SetTargetFrameRate();
             }
 
             if (adaptivePerformanceEnabled)
