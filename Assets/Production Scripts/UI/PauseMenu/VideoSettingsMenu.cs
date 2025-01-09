@@ -176,7 +176,11 @@ namespace Vi.UI
 
             // TODO Find shadows dropdown value
             int shadowsValue = 0;
-            if (pipeline.shadowCascadeCount == 4)
+            if (!pipeline.supportsMainLightShadows)
+            {
+                shadowsValue = 0;
+            }
+            else if (pipeline.shadowCascadeCount == 4)
             {
                 shadowsValue = 3;
             }
