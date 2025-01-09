@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Vi.Utility;
+using Vi.Core;
 
 namespace Vi.Player
 {
@@ -9,6 +10,14 @@ namespace Vi.Player
     {
         protected GameObject childMenu;
         protected GameObject lastMenu;
+
+        protected virtual void Awake()
+        {
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                Application.targetFrameRate = 30;
+            }
+        }
 
         public void QuitGame()
         {
@@ -29,6 +38,7 @@ namespace Vi.Player
 
         public void DestroyAllMenus(string message = "")
         {
+            NetSceneManager.SetTargetFrameRate();
             if (message != "")
             {
                 try

@@ -85,8 +85,9 @@ namespace Vi.UI
             if (!AudioSettings.Reset(audioConfiguration)) { errorText.text = errorMessage; }
         }
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             errorText.text = "";
             volumeSlider.value = FasterPlayerPrefs.Singleton.GetFloat("MasterVolume");
 

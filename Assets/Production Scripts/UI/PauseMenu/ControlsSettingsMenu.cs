@@ -49,8 +49,9 @@ namespace Vi.UI
 
         private PlayerInput playerInput;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             resetBindingsButtonParent.gameObject.SetActive(false);
 
             mobileLookJoystickActLikeButtonToggle.onValueChanged.AddListener(delegate { mobileLookJoystickSensitivityParent.gameObject.SetActive(!mobileLookJoystickActLikeButtonToggle.isOn); });

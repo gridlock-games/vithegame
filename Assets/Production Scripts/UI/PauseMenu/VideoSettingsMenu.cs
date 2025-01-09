@@ -54,8 +54,9 @@ namespace Vi.UI
             RuntimePlatform.LinuxEditor
         };
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             if (platformsToAllowResolutionChangesOn.Contains(Application.platform))
             {
                 dpiScalingElement.SetActive(false);

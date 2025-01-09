@@ -25,10 +25,6 @@ namespace Vi.Player
 
         private const CursorLockMode PlayerActiveLockMode = CursorLockMode.Locked;
 
-        private int UIFrameRateLimit { get { return FasterPlayerPrefs.IsMobilePlatform ? 30 : Application.targetFrameRate; } }
-        private float UIResolutionScalingFactor { get { return 1; } }
-        private float normalResolutionScalingFactor { get { return FasterPlayerPrefs.IsMobilePlatform ? FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor") : 1; } }
-
         public void SetExternalUI(ExternalUI externalUI)
         {
             this.externalUI = externalUI;
@@ -43,8 +39,6 @@ namespace Vi.Player
                 if (playerCameraController) { playerCameraController.SetOrbitalCameraState(false); }
 
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = UIFrameRateLimit;
-                QualitySettings.resolutionScalingFixedDPIFactor = UIResolutionScalingFactor;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 playerInput.SwitchCurrentActionMap("UI");
@@ -60,8 +54,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
                 if (playerUIInstance)
                     playerUIInstance.SetActive(true);
@@ -90,8 +82,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
             }
             else if (playerInput.defaultActionMap == "Spectator")
@@ -101,8 +91,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
             }
             else
@@ -157,8 +145,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
                 if (scoreboardInstance) { ObjectPoolingManager.ReturnObjectToPool(ref scoreboardInstance); }
             }
@@ -204,8 +190,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
                 pauseInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
@@ -217,8 +201,6 @@ namespace Vi.Player
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = UIFrameRateLimit;
-                QualitySettings.resolutionScalingFixedDPIFactor = UIResolutionScalingFactor;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 if (spectatorUIInstance)
@@ -243,8 +225,6 @@ namespace Vi.Player
                 if (networkObject.IsSpawned)
                 {
                     Cursor.lockState = PlayerActiveLockMode;
-                    NetSceneManager.SetTargetFrameRate();
-                    QualitySettings.resolutionScalingFixedDPIFactor = normalResolutionScalingFactor;
                 }
                 inventoryInstance.GetComponent<Menu>().DestroyAllMenus();
                 if (playerUIInstance)
@@ -256,8 +236,6 @@ namespace Vi.Player
             else
             {
                 Cursor.lockState = CursorLockMode.None;
-                Application.targetFrameRate = UIFrameRateLimit;
-                QualitySettings.resolutionScalingFixedDPIFactor = UIResolutionScalingFactor;
                 if (playerUIInstance)
                     playerUIInstance.SetActive(false);
                 if (spectatorUIInstance)
