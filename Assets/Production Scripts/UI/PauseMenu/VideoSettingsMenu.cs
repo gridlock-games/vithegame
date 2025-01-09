@@ -25,6 +25,7 @@ namespace Vi.UI
         [Header("Graphics Settings")]
         [SerializeField] private Toggle adaptivePerformanceToggle;
         [SerializeField] private TMP_Dropdown graphicsPresetDropdown;
+        [SerializeField] private TMP_Dropdown shadowsDropdown;
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private Toggle hdrToggle;
         [SerializeField] private Toggle postProcessingToggle;
@@ -175,8 +176,36 @@ namespace Vi.UI
 
             targetFrameRateDropdown.onValueChanged.AddListener(ChangeTargetFrameRateFromDropdown);
 
+            shadowsDropdown.ClearOptions();
+            shadowsDropdown.AddOptions(shadowsOptions);
+
+            // TODO Find shadows dropdown value
+            int shadowsValue = 0;
+            if (pipeline.shadowCascadeCount == 4)
+            {
+                shadowsValue = 3;
+            }
+            else if (pipeline.mainLightShadowmapResolution == 1024)
+            {
+                shadowsValue = 2;
+            }
+            else if (pipeline.mainLightShadowmapResolution == 256 && pipeline.shadowDistance > 0)
+            {
+                shadowsValue = 1;
+            }
+
+            shadowsDropdown.value = shadowsValue;
+
             SetOriginalVariables();
         }
+
+        List<string> shadowsOptions = new List<string>()
+        {
+            "Off",
+            "Low",
+            "Medium",
+            "High"
+        };
 
         private const string adapativePerformanceMessage = "Some Settings Driven By Adaptive Performance";
         private void OnEnable()
@@ -204,7 +233,8 @@ namespace Vi.UI
                 | originalGraphicsPreset != graphicsPresetDropdown.value
                 | originalVSyncState != (vsyncToggle.isOn ? 1 : 0)
                 | originalHDR != hdrToggle.isOn
-                | originalPostProcessing != postProcessingToggle.isOn;
+                | originalPostProcessing != postProcessingToggle.isOn
+                | originalShadowsState != shadowsDropdown.value;
 
             applyChangesButton.interactable = changesPresent;
             discardChangesButton.interactable = changesPresent;
@@ -219,6 +249,7 @@ namespace Vi.UI
         private int originalVSyncState;
         private bool originalHDR;
         private bool originalPostProcessing;
+        private int originalShadowsState;
         private void SetOriginalVariables()
         {
             originalFullScreenMode = fsModes[fullscreenModeDropdown.value];
@@ -229,6 +260,8 @@ namespace Vi.UI
             originalVSyncState = QualitySettings.vSyncCount;
             originalHDR = pipeline.supportsHDR;
             originalPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+
+            originalShadowsState = shadowsDropdown.value;
         }
 
         public void ApplyChanges()
@@ -289,12 +322,55 @@ namespace Vi.UI
                 SetDPIScale(dpiScaleSlider.value);
             }
 
+            // Apply shadows quality
+            switch (shadowsDropdown.value)
+            {
+                case 0: // Off
+                    pipeline.mainLightShadowmapResolution = 256;
+                    pipeline.additionalLightsShadowmapResolution = 256;
+
+                    pipeline.shadowDistance = 0;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 1: // Low
+                    pipeline.mainLightShadowmapResolution = 256;
+                    pipeline.additionalLightsShadowmapResolution = 256;
+
+                    pipeline.shadowDistance = 50;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 2: // Medium
+                    pipeline.mainLightShadowmapResolution = 1024;
+                    pipeline.additionalLightsShadowmapResolution = 512;
+
+                    pipeline.shadowDistance = 50;
+                    pipeline.shadowCascadeCount = 1;
+                    pipeline.cascadeBorder = 5;
+                    break;
+                case 3: // High
+                    pipeline.mainLightShadowmapResolution = 4096;
+                    pipeline.additionalLightsShadowmapResolution = 4096;
+
+                    pipeline.shadowDistance = 100;
+                    pipeline.shadowCascadeCount = 4;
+                    pipeline.cascade4Split = new Vector3(6.466667f, 10.13333f, 76.46667f);
+                    pipeline.cascadeBorder = 23.53333f;
+                    break;
+                default:
+                    Debug.LogWarning("Unsure what shadows quality to assign! " + shadowsDropdown.value);
+                    break;
+            }
+
             SetOriginalVariables();
         }
 
         public void DiscardChanges()
         {
             // Display settings
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
+
             fullscreenModeDropdown.value = Array.IndexOf(fsModes, originalFullScreenMode);
 
             int currentResIndex = -1;
@@ -331,24 +407,29 @@ namespace Vi.UI
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
             hdrToggle.isOn = pipeline.supportsHDR;
             postProcessingToggle.isOn = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+
+            shadowsDropdown.value = originalShadowsState;
         }
 
         public void OnQualitySettingsDropdownChange()
         {
-            UniversalRenderPipelineAsset pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
+            pipeline = (UniversalRenderPipelineAsset)QualitySettings.GetRenderPipelineAssetAt(graphicsPresetDropdown.value);
             
             vsyncToggle.isOn = QualitySettings.vSyncCount != 0;
-            hdrToggle.isOn = pipeline.supportsHDR;
+            hdrToggle.isOn = graphicsPresetDropdown.value > 0;
 
             switch (graphicsPresetDropdown.value)
             {
                 case 0:
+                    shadowsDropdown.value = 0;
                     postProcessingToggle.isOn = false;
                     break;
                 case 1:
+                    shadowsDropdown.value = 1;
                     postProcessingToggle.isOn = true;
                     break;
                 case 2:
+                    shadowsDropdown.value = 2;
                     postProcessingToggle.isOn = true;
                     break;
                 default:

@@ -66,7 +66,7 @@ namespace Vi.UI
         private void UpdateAttributesList()
         {
             PlayerDataManager.GameModeInfo gameModeInfo = PlayerDataManager.Singleton.GetGameModeInfo();
-            List<CombatAgent> initializedAttributesList = new List<CombatAgent>();
+            List<Attributes> initializedAttributesList = new List<Attributes>();
 
             foreach (PlayerCard playerCard in leftPlayerCards)
             {
@@ -80,7 +80,7 @@ namespace Vi.UI
 
             if (gameModeInfo.possibleTeams.Length == 1)
             {
-                List<CombatAgent> attributesList = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(gameModeInfo.possibleTeams[0]);
+                List<Attributes> attributesList = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(gameModeInfo.possibleTeams[0]);
                 for (int i = 0; i < attributesList.Count; i++)
                 {
                     if (i % 2 == 0)
@@ -105,7 +105,7 @@ namespace Vi.UI
             {
                 for (int teamIndex = 0; teamIndex < gameModeInfo.possibleTeams.Length; teamIndex++)
                 {
-                    List<CombatAgent> attributesList = PlayerDataManager.Singleton.GetCombatAgentsOnTeam(gameModeInfo.possibleTeams[teamIndex]);
+                    List<Attributes> attributesList = PlayerDataManager.Singleton.GetPlayerObjectsOnTeam(gameModeInfo.possibleTeams[teamIndex]);
                     for (int i = 0; i < attributesList.Count; i++)
                     {
                         if (teamIndex == 0)
