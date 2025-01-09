@@ -219,7 +219,6 @@ namespace Vi.UI
 
         private void SetDPIScale(float sliderValue)
         {
-            QualitySettings.resolutionScalingFixedDPIFactor = sliderValue;
             FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", sliderValue);
         }
 

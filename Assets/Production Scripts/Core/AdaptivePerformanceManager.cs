@@ -12,6 +12,7 @@ namespace Vi.Core
 
         private void Start()
         {
+            DontDestroyOnLoad(gameObject);
             StartCoroutine(RefreshStatusAfter1Frame());
 
             ap = Holder.Instance;
@@ -226,9 +227,9 @@ namespace Vi.Core
             {
                 if (!NetSceneManager.GetShouldSpawnPlayer())
                 {
-                    if (QualitySettings.resolutionScalingFixedDPIFactor < 0.9f)
+                    if (QualitySettings.resolutionScalingFixedDPIFactor < 1)
                     {
-                        SetDPIScale(0.9f);
+                        SetDPIScale(1);
                     }
                     ChangeTextureMipMaps(WarningLevel.NoWarning, 0);
                 }
