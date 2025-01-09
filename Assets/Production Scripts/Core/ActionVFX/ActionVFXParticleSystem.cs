@@ -127,6 +127,17 @@ namespace Vi.Core.VFX
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (IsServer)
+            {
+                latchTargetNetObjId.Value = default;
+            }
+        }
+
+        private NetworkVariable<ulong> latchTargetNetObjId = new NetworkVariable<ulong>();
+
         private void LateUpdate()
         {
             if (!IsSpawned) { return; }
@@ -157,8 +168,6 @@ namespace Vi.Core.VFX
         }
 
         private const string layersToHit = "NetworkPrediction";
-
-        private NetworkVariable<ulong> latchTargetNetObjId = new NetworkVariable<ulong>();
 
         protected override void OnTriggerEnter(Collider other)
         {
