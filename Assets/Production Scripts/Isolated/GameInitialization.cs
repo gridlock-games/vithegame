@@ -160,7 +160,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", FasterPlayerPrefs.IsMobilePlatform ? 0.5f : 1); }
-            QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
+            QualitySettings.resolutionScalingFixedDPIFactor = 1;
 
             foreach (KeyValuePair<string, Color> kvp in FasterPlayerPrefs.GetDefaultColorPrefs())
             {
