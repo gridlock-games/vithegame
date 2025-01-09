@@ -188,7 +188,7 @@ public class DebugOverlay : MonoBehaviour
         {
             if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
             {
-                value = Mathf.Max(value, 0.9f);
+                value = Mathf.Max(value, 1);
             }
         }
 
@@ -418,6 +418,7 @@ public class DebugOverlay : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(QualitySettings.resolutionScalingFixedDPIFactor);
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
