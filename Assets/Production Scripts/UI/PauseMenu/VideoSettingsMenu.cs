@@ -139,7 +139,7 @@ namespace Vi.UI
             fieldOfViewSlider.value = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             fieldOfViewSlider.onValueChanged.AddListener(SetFieldOfView);
 
-            dpiScaleSlider.value = QualitySettings.resolutionScalingFixedDPIFactor;
+            dpiScaleSlider.value = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
             dpiScaleSlider.GetComponent<SliderEndEditEvent>().EndDrag += SetDPIScale;
 
             // Graphics Quality dropdown
@@ -303,21 +303,6 @@ namespace Vi.UI
 
             if (FasterPlayerPrefs.IsMobilePlatform)
             {
-                switch (graphicsPresetDropdown.value)
-                {
-                    case 0:
-                        dpiScaleSlider.value = 0.5f;
-                        break;
-                    case 1:
-                        dpiScaleSlider.value = 0.7f;
-                        break;
-                    case 2:
-                        dpiScaleSlider.value = 1;
-                        break;
-                    default:
-                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
-                        break;
-                }
                 SetDPIScale(dpiScaleSlider.value);
             }
 
@@ -434,6 +419,25 @@ namespace Vi.UI
                 default:
                     Debug.LogWarning("Unsure what post processing values to assign! " + graphicsPresetDropdown.value);
                     break;
+            }
+
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                switch (graphicsPresetDropdown.value)
+                {
+                    case 0:
+                        dpiScaleSlider.value = 0.5f;
+                        break;
+                    case 1:
+                        dpiScaleSlider.value = 0.7f;
+                        break;
+                    case 2:
+                        dpiScaleSlider.value = 1;
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
+                        break;
+                }
             }
         }
 
