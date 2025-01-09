@@ -8,6 +8,22 @@ namespace Vi.Core
 {
     public class AdaptivePerformanceManager : MonoBehaviour
     {
+        public static AdaptivePerformanceManager Singleton
+        {
+            get
+            {
+                if (_singleton == null) { Debug.LogError("Adaptive Performance Manager is null"); }
+                return _singleton;
+            }
+        }
+
+        private static AdaptivePerformanceManager _singleton;
+
+        private void Awake()
+        {
+            _singleton = this;
+        }
+
         private IAdaptivePerformance ap = null;
 
         private void Start()
@@ -55,7 +71,7 @@ namespace Vi.Core
 
         private void Update()
         {
-            //Debug.Log(QualitySettings.resolutionScalingFixedDPIFactor);
+            Debug.Log(QualitySettings.resolutionScalingFixedDPIFactor);
 
             if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
         }
@@ -77,8 +93,13 @@ namespace Vi.Core
 
             if (adaptivePerformanceEnabled)
             {
-                OnThermalEvent(lastEV);
+                RefreshThermalSettings();
             }
+        }
+
+        public void RefreshThermalSettings()
+        {
+            OnThermalEvent(lastEV);
         }
 
         private void PerformanceStatus_PerformanceBottleneckChangeEvent(PerformanceBottleneckChangeEventArgs bottleneckEventArgs)
@@ -119,40 +140,44 @@ namespace Vi.Core
         public static ThermalMetrics lastEV { get; private set; }
         void OnThermalEvent(ThermalMetrics ev)
         {
+            Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
+            Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
+
             lastEV = ev;
             thermalWarningLevel = ev.WarningLevel;
 
-            if (adaptivePerformanceEnabled & FasterPlayerPrefs.IsMobilePlatform)
+            if (!adaptivePerformanceEnabled) { return; }
+            if (!FasterPlayerPrefs.IsMobilePlatform) { return; }
+            if (FindMainCamera.MainCamera)
             {
-                float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
-
-                // Adaptive resolution scale
-                SetDPIScale(DPIScalingCurve.Evaluate(invertedTemperatureLevel) * DPIScale);
-
-                // Adaptive LOD
-                SetLODBias(LODBiasCurve.Evaluate(invertedTemperatureLevel) * maxLODBias);
-
-                // Texture mip maps
-                ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
-
-                // Adaptive frame rate
-                if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
-                {
-                    int newTargetFrameRate = 30;
-                    if (targetFrameRate > 60) { newTargetFrameRate = 60; }
-                    SetTargetFrameRate(newTargetFrameRate);
-                }
-                else
-                {
-                    NetSceneManager.SetTargetFrameRate();
-                }
-
-                float maxAudioCullingDistance = 100;
-                AudioManager.AudioCullingDistance = audioCullingDistanceCurve.Evaluate(invertedTemperatureLevel) * maxAudioCullingDistance;
+                if (!FindMainCamera.MainCamera.enabled) { return; }
             }
 
-            Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
-            Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
+            float invertedTemperatureLevel = 1 - ev.TemperatureLevel;
+
+            // Adaptive resolution scale
+            SetDPIScale(DPIScalingCurve.Evaluate(invertedTemperatureLevel) * DPIScale);
+
+            // Adaptive LOD
+            SetLODBias(LODBiasCurve.Evaluate(invertedTemperatureLevel) * maxLODBias);
+
+            // Texture mip maps
+            ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
+
+            // Adaptive frame rate
+            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
+            {
+                int newTargetFrameRate = 30;
+                if (targetFrameRate > 60) { newTargetFrameRate = 60; }
+                SetTargetFrameRate(newTargetFrameRate);
+            }
+            else
+            {
+                NetSceneManager.SetTargetFrameRate();
+            }
+
+            float maxAudioCullingDistance = 100;
+            AudioManager.AudioCullingDistance = audioCullingDistanceCurve.Evaluate(invertedTemperatureLevel) * maxAudioCullingDistance;
 
             OnThermalChange?.Invoke(ev);
         }

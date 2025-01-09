@@ -41,6 +41,9 @@ namespace Vi.Player
                     spectatorCamera.enabled = false;
                 }
             }
+
+            QualitySettings.resolutionScalingFixedDPIFactor = 1;
+            QualitySettings.globalTextureMipmapLimit = 0;
         }
 
         public void QuitGame()
@@ -73,6 +76,8 @@ namespace Vi.Player
             {
                 spectatorCamera.enabled = true;
             }
+
+            AdaptivePerformanceManager.Singleton.RefreshThermalSettings();
 
             if (message != "")
             {
