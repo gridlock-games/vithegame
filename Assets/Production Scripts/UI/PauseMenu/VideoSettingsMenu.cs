@@ -32,7 +32,6 @@ namespace Vi.UI
         [Header("Action Buttons")]
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
-        [SerializeField] private Text fpsWarningText;
         [Header("Display Settings Resizing By Platform")]
         //[SerializeField] private GridLayoutGroup scrollGrid;
         [SerializeField] private RectTransform displaySettingsGroup;
@@ -88,8 +87,6 @@ namespace Vi.UI
 
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
-
-            adaptivePerformanceToggle.onValueChanged.AddListener((isOn) => fpsWarningText.text = isOn ? adapativePerformanceMessage : "");
 
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
@@ -206,12 +203,6 @@ namespace Vi.UI
             "Medium",
             "High"
         };
-
-        private const string adapativePerformanceMessage = "Some Settings Driven By Adaptive Performance";
-        private void OnEnable()
-        {
-            fpsWarningText.text = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance") ? adapativePerformanceMessage : "";
-        }
 
         private void SetFieldOfView(float value)
         {
