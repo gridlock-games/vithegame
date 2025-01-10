@@ -1,0 +1,126 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1687757146745350764
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 9
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: M_Rock_CaveHole
+  m_Shader: {fileID: -6465566751694194690, guid: e79ea99b59625cf4d8cf215a817bfc53,
+    type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 2
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BASE:
+        m_Texture: {fileID: 2800000, guid: 52335c4f45327e44787951ba67f76afa, type: 3}
+        m_Scale: {x: 6, y: 6}
+        m_Offset: {x: 0, y: 0}
+    - _Baked_Normal:
+        m_Texture: {fileID: 2800000, guid: cb3fe29936ee90a418251263c4df72ad, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Base:
+        m_Texture: {fileID: 2800000, guid: 70d3d834578f91a4dbaa81a693d2b69a, type: 3}
+        m_Scale: {x: 2, y: 2}
+        m_Offset: {x: 0, y: 0}
+    - _Base_Normal:
+        m_Texture: {fileID: 2800000, guid: 7e57d3507c649134a88bcb6dc4945baa, type: 3}
+        m_Scale: {x: 6, y: 6}
+        m_Offset: {x: 0, y: 0}
+    - _CURVATURE:
+        m_Texture: {fileID: 2800000, guid: 6ce4efa110740764784307cead30bf15, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Curvature:
+        m_Texture: {fileID: 2800000, guid: 117da036a2a98e6488ee2a52214cc251, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Curvature_normal:
+        m_Texture: {fileID: 2800000, guid: 92fc40ef92a0921428610b5eb279a738, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal:
+        m_Texture: {fileID: 2800000, guid: abfabf5f5f1c6a54985861b4094525bd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RGB_Mask:
+        m_Texture: {fileID: 2800000, guid: 8923184088e710f439f9ff928d458553, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_007ec4ddff694093b31fa5f87f8fedb0_Texture_1_Texture2D:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SampleTexture2D_8a0e65050d704e6ba3bbafd0a579d6c4_Texture_1_Texture2D:
+        m_Texture: {fileID: 2800000, guid: 9cf32cc44ae39cf409a36da498e858fd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Secondary:
+        m_Texture: {fileID: 2800000, guid: bdd04a9609628c743a03f4c4054193d3, type: 3}
+        m_Scale: {x: 5, y: 5}
+        m_Offset: {x: 0, y: 0}
+    - _Secondary_Normal:
+        m_Texture: {fileID: 2800000, guid: f7f3c1f592683224893c0887898802de, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _A_Normal_Strength: 0.39
+    - _B_Normal_Strength: 1
+    - _Base_Color: 0
+    - _Base_Normal_Strength: 1
+    - _C_Normal_Strength: 1
+    - _Curvature: 0
+    - _Normal: 0
+    - _Normal_Strength: 1
+    - _Normal_Strength_1: 0
+    - _Normal_Strength_2: 0
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _RGB_Mask: 0
+    - _Roughness: 0
+    - _Secondary: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Secondary_Color: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 0}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
