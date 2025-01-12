@@ -29,6 +29,8 @@ namespace Vi.UI
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private Toggle hdrToggle;
         [SerializeField] private Toggle postProcessingToggle;
+        [SerializeField] private GameObject shadowsWarning;
+        [SerializeField] private GameObject graphicsRestartWarning;
         [Header("Action Buttons")]
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
@@ -52,6 +54,9 @@ namespace Vi.UI
             RuntimePlatform.OSXEditor,
             RuntimePlatform.LinuxEditor
         };
+
+
+        private int originalGraphicsDropdownValue;
 
         protected override void Awake()
         {
@@ -142,6 +147,7 @@ namespace Vi.UI
             // Graphics Quality dropdown
             graphicsPresetDropdown.AddOptions(QualitySettings.names.ToList());
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
+            originalGraphicsDropdownValue = graphicsPresetDropdown.value;
 
             pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
 
@@ -192,7 +198,9 @@ namespace Vi.UI
             }
 
             shadowsDropdown.value = shadowsValue;
+            shadowsDropdown.onValueChanged.AddListener((value) => RefreshWarningDisplays());
 
+            RefreshWarningDisplays();
             SetOriginalVariables();
         }
 
@@ -297,8 +305,18 @@ namespace Vi.UI
                 SetDPIScale(dpiScaleSlider.value);
             }
 
+            int shadowsValue = shadowsDropdown.value;
+            if (graphicsPresetDropdown.value == 0)
+            {
+                shadowsValue = 0;
+                if (shadowsDropdown.value != shadowsValue)
+                {
+                    shadowsDropdown.value = shadowsValue;
+                }
+            }
+
             // Apply shadows quality
-            switch (shadowsDropdown.value)
+            switch (shadowsValue)
             {
                 case 0: // Off
                     pipeline.mainLightShadowmapResolution = 256;
@@ -338,6 +356,7 @@ namespace Vi.UI
                     break;
             }
 
+            RefreshWarningDisplays();
             SetOriginalVariables();
         }
 
@@ -430,6 +449,14 @@ namespace Vi.UI
                         break;
                 }
             }
+
+            RefreshWarningDisplays();
+        }
+
+        private void RefreshWarningDisplays()
+        {
+            graphicsRestartWarning.SetActive(graphicsPresetDropdown.value != originalGraphicsDropdownValue);
+            shadowsWarning.SetActive(graphicsPresetDropdown.value == 0 & shadowsDropdown.value > 0);
         }
 
         public void ValidateTargetFrameRate()
