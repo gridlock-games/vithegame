@@ -30,6 +30,7 @@ namespace Vi.UI
         private void Start()
         {
             RefreshButtonInteractability();
+            if (dropdownValue >= dropdown.options.Count) { gameObject.SetActive(false); }
         }
 
         private void SetDropdown()
