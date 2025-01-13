@@ -8,6 +8,8 @@ namespace Vi.Core
 {
     public class SpawnPoints : MonoBehaviour
     {
+        public float MinRenderDistance { get { return minimumRenderDistance; } }
+        [SerializeField] private float minimumRenderDistance = 100;
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
