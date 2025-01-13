@@ -162,7 +162,7 @@
                     "name": "TextChat",
                     "type": "Button",
                     "id": "fb07bda3-2ac6-4e49-a16c-29b52291bfcb",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -945,7 +945,7 @@
                     "name": "Pause",
                     "type": "Button",
                     "id": "d849a84c-a16c-404f-b664-c13e9ef20835",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -1199,6 +1199,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "TextChat",
+                    "type": "Button",
+                    "id": "ba825b20-3e9c-4765-9199-1682fb54e330",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1694,6 +1703,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5ebb8a6e-9eea-4f82-8c2c-eea70680d5f7",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TextChat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
