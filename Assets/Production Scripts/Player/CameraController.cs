@@ -160,14 +160,24 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            thisCam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            float renderDistance;
+            if (PlayerDataManager.Singleton.HasPlayerSpawnPoints())
+            {
+                renderDistance = Mathf.Max(PlayerDataManager.Singleton.GetPlayerSpawnPoints().MinRenderDistance, FasterPlayerPrefs.Singleton.GetInt("RenderDistance"));
+            }
+            else
+            {
+                renderDistance = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            }
+
+            thisCam.farClipPlane = renderDistance;
             thisCam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             if (thisCam.TryGetComponent(out UniversalAdditionalCameraData data))
             {
                 data.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             }
 
-            orbitalCam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            orbitalCam.farClipPlane = renderDistance;
             orbitalCam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             if (orbitalCam.TryGetComponent(out data))
             {

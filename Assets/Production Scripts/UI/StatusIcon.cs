@@ -11,8 +11,6 @@ namespace Vi.UI
         [SerializeField] private StatusImageReference statusImageReference;
         [SerializeField] private Image iconImage;
 
-        private Image image;
-
         public ActionClip.Status Status { get; private set; }
 
         public void InitializeStatusIcon(ActionClip.Status status)
@@ -21,17 +19,18 @@ namespace Vi.UI
             iconImage.sprite = statusImageReference.GetStatusIcon(Status);
         }
 
-        private Canvas canvas;
+        private Image[] images;
         private void Awake()
         {
-            canvas = GetComponent<Canvas>();
-            image = GetComponent<Image>();
+            images = GetComponentsInChildren<Image>();
         }
 
         public void SetActive(bool isActive)
         {
-            canvas.enabled = isActive;
-            image.enabled = isActive;
+            foreach (Image image in images)
+            {
+                image.enabled = isActive;
+            }
         }
     }
 }
