@@ -315,6 +315,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            wasIncapacitatedThisLife = default;
+
             lastRecoveryFixedTime = Mathf.NegativeInfinity;
 
             GlowRenderer = null;
@@ -970,6 +972,7 @@ namespace Vi.Core
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 OnAlive();
+                wasIncapacitatedThisLife = false;
             }
 
             if (IsServer)
@@ -1250,6 +1253,8 @@ namespace Vi.Core
             return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
+        private bool wasIncapacitatedThisLife;
+
         [SerializeField] private bool canBeIncapacitated;
         [SerializeField] private bool disableHitReactions;
         protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
@@ -1384,7 +1389,7 @@ namespace Vi.Core
             }
             else if (AddHPWithoutApply(HPDamage) <= 0)
             {
-                if (GameModeManager.Singleton.IncapacitatedPlayerStateEnabled & canBeIncapacitated)
+                if (GameModeManager.Singleton.IncapacitatedPlayerStateEnabled & canBeIncapacitated & !wasIncapacitatedThisLife)
                 {
                     attackAilment = ActionClip.Ailment.Incapacitated;
                     hitReaction = WeaponHandler.GetWeapon().GetIncapacitatedReaction();
@@ -1397,6 +1402,8 @@ namespace Vi.Core
 
                     AnimationHandler.PlayAction(hitReaction);
                     hitReactionWasPlayed = true;
+
+                    wasIncapacitatedThisLife = true;
                 }
                 else
                 {
