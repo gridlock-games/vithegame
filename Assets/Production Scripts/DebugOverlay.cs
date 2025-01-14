@@ -41,6 +41,24 @@ public class DebugOverlay : MonoBehaviour
         StartCoroutine(RefreshStatusAfter1Frame());
 
         thermalWarningImage.enabled = false;
+
+        // Uncomment for development build profiling
+        //if (Debug.isDebugBuild)
+        //{
+        //    if (!Application.isEditor)
+        //    {
+        //        if (!UnityEngine.Profiling.Profiler.enabled)
+        //        {
+        //            Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
+        //            UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+        //            UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+        //            UnityEngine.Profiling.Profiler.enabled = true;
+
+        //            // Optional, if more memory is needed for the buffer
+        //            //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+        //        }
+        //    }
+        //}
     }
 
     private IEnumerator RefreshStatusAfter1Frame()
