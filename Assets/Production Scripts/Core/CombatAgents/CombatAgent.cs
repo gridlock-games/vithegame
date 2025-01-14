@@ -493,6 +493,49 @@ namespace Vi.Core
             }
         }
 
+        private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
+
+        protected virtual void FixedUpdate()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
+            {
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    if (attributes == this) { continue; }
+                    if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
+
+                    Vector3 a = attributes.NetworkCollider.GetClosestPoint(MovementHandler.GetPosition());
+                    Vector3 b = NetworkCollider.GetClosestPoint(attributes.MovementHandler.GetPosition());
+
+                    if (Vector3.Distance(a, b) < 1)
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
+                        {
+                            incapacitatedReviveTimeTracker[attributes] += Time.fixedDeltaTime;
+                        }
+                        else
+                        {
+                            incapacitatedReviveTimeTracker.Add(attributes, Time.fixedDeltaTime);
+                        }
+
+                        if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                        {
+                            AddHP(GetMaxHP() * 0.25f);
+                            ResetAilment();
+                            break;
+                        }
+                    }
+                    else if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
+                    {
+                        incapacitatedReviveTimeTracker.Remove(attributes);
+                    }
+                }
+            }
+        }
+
         protected virtual void Update()
         {
             if (IsServer & IsSpawned)
