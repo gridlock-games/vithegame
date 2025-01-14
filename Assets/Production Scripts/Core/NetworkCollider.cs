@@ -192,7 +192,7 @@ namespace Vi.Core
             //    return;
             //}
 
-            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
             {
                 pair.IgnoreContact(i);
             }
@@ -222,7 +222,7 @@ namespace Vi.Core
             //}
 
             // Phase through other players if we are dodging out of an ailment like knockdown
-            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
             {
                 pair.IgnoreContact(i);
             }
@@ -298,13 +298,6 @@ namespace Vi.Core
             if (other.MovementHandler.LastMovementWasZero) { return true; }
 
             return false;
-        }
-
-        private bool ShouldApplyRecoveryDodgeLogic()
-        {
-            return CombatAgent.CanRecoveryDodge
-                & CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge
-                & !CombatAgent.AnimationHandler.IsAtRest();
         }
 
         private void OnDestroy()
