@@ -460,7 +460,7 @@ namespace Vi.UI
                 CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    bool isOnLeftSide = false;
+                    bool isOnLeftSide = true;
 
                     buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
 
