@@ -318,6 +318,8 @@ namespace Vi.UI
             }
         }
 
+        private List<CharacterCustomizationRow> customizationRowList = new List<CharacterCustomizationRow>();
+
         private void ClearMaterialsAndEquipmentOptions()
         {
             foreach (MaterialCustomizationParent materialCustomizationParent in characterMaterialParents)
@@ -343,6 +345,8 @@ namespace Vi.UI
                 Destroy(buttonInfo.button.gameObject);
             }
             customizationButtonReference.Clear();
+
+            customizationRowList.Clear();
         }
 
         private void RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender raceAndGender)
@@ -426,6 +430,7 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     buttonParent.GetComponent<CharacterCustomizationRow>().GetLayoutGroup().childAlignment = childAlignment;
+                    customizationRowList.Add(buttonParent.GetComponent<CharacterCustomizationRow>());
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
@@ -472,6 +477,7 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    customizationRowList.Add(rowElement);
                     rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
                     rowElement.SetAsArrowGroup(PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Where(item => item.equipmentType == equipmentOption.equipmentType));
                     //rowElement.GetLayoutGroup().childAlignment = childAlignment;
@@ -1067,6 +1073,14 @@ namespace Vi.UI
         {
             if (UIElementHighlightInstance) { Destroy(UIElementHighlightInstance); }
             UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
+        }
+
+        public void RandomizeCharacter()
+        {
+            foreach (CharacterCustomizationRow row in customizationRowList)
+            {
+                row.SelectRandom();
+            }
         }
 
         public void StartTutorial()
