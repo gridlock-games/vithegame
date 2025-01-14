@@ -37,6 +37,8 @@ namespace Vi.UI
             characterParent.SetActive(false);
             addParent.SetActive(true);
             lockedParent.SetActive(false);
+
+            SetSelectedState(true);
         }
 
         public void InitializeAsLockedCharacter()
@@ -47,6 +49,8 @@ namespace Vi.UI
             characterParent.SetActive(false);
             addParent.SetActive(false);
             lockedParent.SetActive(true);
+
+            SetSelectedState(true);
         }
 
         public void InitializeAsCharacter(WebRequestManager.Character character)
@@ -60,6 +64,8 @@ namespace Vi.UI
 
             nameText.text = character.name.ToString();
             levelText.text = "Lv." + character.experience.ToString();
+
+            SetSelectedState(true);
         }
 
         public void SetSelectedState(bool isNotSelected)

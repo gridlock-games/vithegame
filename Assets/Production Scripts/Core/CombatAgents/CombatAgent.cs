@@ -315,6 +315,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            lastRecoveryFixedTime = Mathf.NegativeInfinity;
+
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -491,8 +493,6 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
-            CanRecoveryDodge = Time.time - lastRecoveryStartTime <= 1.7f;
-
             if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
@@ -903,10 +903,8 @@ namespace Vi.Core
             }
         }
 
-        // 2 second buffer after ailment is set to none to dodge and phase through enemies
-        public bool CanRecoveryDodge { get; private set; }
-        private float lastRecoveryStartTime;
-        private const float recoveryTimeInvincibilityBuffer = 1;
+        public float lastRecoveryFixedTime { get; private set; } = Mathf.NegativeInfinity;
+        public const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible, bool shouldMakeInvincibleDuringRecovery)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
@@ -945,10 +943,11 @@ namespace Vi.Core
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (current == ActionClip.Ailment.None)
+            if (prev == ActionClip.Ailment.Knockdown)
             {
-                lastRecoveryStartTime = Time.time;
+                lastRecoveryFixedTime = Time.fixedTime;
             }
+
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
             if (current == ActionClip.Ailment.Death)

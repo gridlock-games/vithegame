@@ -354,38 +354,38 @@ namespace Vi.UI
             leftQueuedSpacing = 0;
             rightQueuedSpacing = 0;
 
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
-            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int raceCount = 2;
-            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
-            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
-            raceRowElement.rowHeaderText.text = "Race";
-            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
+            //Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
+            //CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
+            //otherCustomizationRowParents.Add(raceButtonParent.gameObject);
+            //leftYLocalPosition += spacing + leftQueuedSpacing;
+            //int raceCount = 2;
+            //leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
+            //raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
+            //raceRowElement.rowHeaderText.text = "Race";
+            //raceButtonParent = raceRowElement.GetLayoutGroup().transform;
 
-            foreach (string race in new List<string>() { "Human" })
-            {
-                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
+            //foreach (string race in new List<string>() { "Human" })
+            //{
+            //    CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
 
-                switch (race)
-                {
-                    case "Human":
-                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
-                        break;
+            //    switch (race)
+            //    {
+            //        case "Human":
+            //            buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
+            //            break;
 
-                    case "Orc":
-                        buttonElement.InitializeAsColor(Color.green);
-                        break;
+            //        case "Orc":
+            //            buttonElement.InitializeAsColor(Color.green);
+            //            break;
 
-                    default:
-                        Debug.LogError("Not sure how to handle race string " + race);
-                        break;
-                }
+            //        default:
+            //            Debug.LogError("Not sure how to handle race string " + race);
+            //            break;
+            //    }
 
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
-            }
+            //    buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
+            //    customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
+            //}
 
             Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
             CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
