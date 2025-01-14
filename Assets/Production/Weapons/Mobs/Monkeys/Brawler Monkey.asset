@@ -171,88 +171,47 @@ MonoBehaviour:
       weaponBone: 18
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 17
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 6
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
+      persistentNonWeaponPrefabs: []
     - weaponPrefab: {fileID: 2001834763269464374, guid: 31d9902bf50eed84a9f64f1cf9e62312,
         type: 3}
       weaponBone: 5
       weaponPositionOffset: {x: 0, y: 0, z: 0}
       weaponRotationOffset: {x: 0, y: 0, z: 0}
+      stowedParentType: 7
       stowedWeaponPositionOffset: {x: 0, y: 0, z: 0}
       stowedWeaponRotationOffset: {x: 0, y: 0, z: 0}
-  hitReactions:
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: 360bbc05b0e12e440809e3dfe88cdb61, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 2
-    reactionClip: {fileID: 11400000, guid: 05b1171e4538c0e43b5db798c2e1911d, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 3
-    reactionClip: {fileID: 11400000, guid: 9dc8643244347494dadf539f987fd495, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 4
-    reactionClip: {fileID: 11400000, guid: 49ece318b9e7d4747adcf8bd4b4595f4, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: 5ea22a3e631747f40b1d6a2cbe07247e, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: 1789c1d6050919045b4fd84c10954a42, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: a114819f2c0ea204fbef7303261d6fba, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: 19b2b3ef7f2225645a1c7d2cb4fb8da3, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: 5e4f61032e6e9d54380f051fd2315a83, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: 107e27049db271f4fb9e47f250223348, type: 2}
-    shouldAlreadyHaveAilment: 0
-  - hitLocation: 4
-    reactionClip: {fileID: 11400000, guid: 788768a60d1b40e48945404237a0978e, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: eda370bfd1557fa43a556f1efcbad27c, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 2
-    reactionClip: {fileID: 11400000, guid: cb61798929dd974468c2eae5d29522bf, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 3
-    reactionClip: {fileID: 11400000, guid: c0ec34330d54bfe428a47a06f0641b36, type: 2}
-    shouldAlreadyHaveAilment: 1
-  - hitLocation: 0
-    reactionClip: {fileID: 11400000, guid: b896f757d35339a408512cb7b113cc8c, type: 2}
-    shouldAlreadyHaveAilment: 0
-  flinchReactions:
-  - hitLocation: 1
-    reactionClip: {fileID: 11400000, guid: 2afc9ce2a09f51b4b9e171293b106eb3, type: 2}
-  - hitLocation: 2
-    reactionClip: {fileID: 11400000, guid: a3259634df2538042adf746c77cbfee8, type: 2}
-  - hitLocation: 3
-    reactionClip: {fileID: 11400000, guid: a786d61f2ab48e849bcc031192248e2f, type: 2}
-  - hitLocation: 4
-    reactionClip: {fileID: 11400000, guid: 10d10f42e33f5b849bb448dd0bcc1e7e, type: 2}
+      persistentNonWeaponPrefabs: []
+  sharedWeaponReferences: {fileID: 11400000, guid: 0c3a65ecc4cd4384bb8f026a6acba069,
+    type: 2}
   ability1: {fileID: 11400000, guid: 95b486ea2f89f22478c2ef9c38acbf24, type: 2}
   ability2: {fileID: 0}
   ability3: {fileID: 0}
   ability4: {fileID: 0}
+  maxAbility1Count: 1
+  maxAbility2Count: 1
+  maxAbility3Count: 1
+  maxAbility4Count: 1
   flashAttack: {fileID: 0}
   attackList:
   - inputs: 00000000
@@ -271,7 +230,6 @@ MonoBehaviour:
     comboCondition: 0
     attackClip: {fileID: 11400000, guid: 6b5fa918f2fb8ad488251f50bd95b96e, type: 2}
   grabAttackClipList: []
-  dodgeCooldownDuration: 0
   dodgeF: {fileID: 0}
   dodgeFL: {fileID: 0}
   dodgeFR: {fileID: 0}
@@ -286,3 +244,4 @@ MonoBehaviour:
     type: 2}
   animationClipLookupKeys: []
   animationClipLookupValues: []
+  animationRootMotion: []

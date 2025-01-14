@@ -29,6 +29,7 @@ namespace Vi.Core.GameModeManagers
         [SerializeField] private float respawnTime = 5;
         [SerializeField] protected RespawnType respawnType = RespawnType.Respawn;
         [SerializeField] private bool levelingEnabled = false;
+        [SerializeField] private bool incapacitatedPlayerStateEnabled = false;
 
         public float RoundDuration { get { return roundDuration; } }
 
@@ -46,6 +47,8 @@ namespace Vi.Core.GameModeManagers
         }
 
         public bool LevelingEnabled { get { return levelingEnabled; } }
+
+        public bool IncapacitatedPlayerStateEnabled { get { return incapacitatedPlayerStateEnabled; } }
 
         public RespawnType GetRespawnType() { return respawnType; }
 

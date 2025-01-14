@@ -68,6 +68,24 @@ namespace Vi.UI
             return null;
         }
 
+        public void SelectRandom()
+        {
+            if (buttonLayoutGroup.gameObject.activeInHierarchy)
+            {
+                List<CharacterCustomizationButton> options = new List<CharacterCustomizationButton>();
+                options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & item.gameObject.activeInHierarchy));
+
+                if (options.Count == 0) { Debug.LogWarning(this + " option count is 0"); return; }
+
+                options[Random.Range(0, options.Count)].Button.onClick.Invoke();
+            }
+            else
+            {
+                CounterIndex = Random.Range(0, optionList.Length);
+                IncrementOption();
+            }
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {

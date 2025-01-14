@@ -39,7 +39,8 @@ namespace Vi.ScriptableObjects
             Stagger,
             Pull,
             Death,
-            Grab
+            Grab,
+            Incapacitated
         }
 
         public enum AvatarLayer
