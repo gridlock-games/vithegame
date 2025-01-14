@@ -524,7 +524,7 @@ namespace Vi.Core
 
                         if (incapacitatedReviveTimeTracker[attributes] >= 3)
                         {
-                            ResetStats(0.25f, true, false, false);
+                            ResetStats(0.25f, false, false, false);
                             ResetAilment();
                             break;
                         }
@@ -588,6 +588,11 @@ namespace Vi.Core
             if (GameModeManager.Singleton)
             {
                 canRegenStats = !GameModeManager.Singleton.WaitingToPlayGame();
+            }
+
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
+            {
+                canRegenStats = false;
             }
 
             if (canRegenStats)
