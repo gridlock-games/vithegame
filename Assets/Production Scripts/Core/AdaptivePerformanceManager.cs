@@ -235,6 +235,9 @@ namespace Vi.Core
 
             Debug.Log("Setting DPI Scale " + value);
 
+            // DPI must remain above 0.5
+            value = Mathf.Max(value, 0.5f);
+
             if (NetSceneManager.DoesExist())
             {
                 if (!NetSceneManager.Singleton.ShouldSpawnPlayerCached)
