@@ -279,20 +279,7 @@ namespace Vi.Core
             {
                 if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                 {
-                    if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return true;
-
-                        //Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
-                        //if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
-                        //{
-                        //    return true;
-                        //}
-                    }
+                    return true;
                 }
                 else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
