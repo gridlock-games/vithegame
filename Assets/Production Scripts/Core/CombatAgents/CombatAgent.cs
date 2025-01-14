@@ -315,6 +315,7 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            incapacitatedReviveTimeTracker.Clear();
             wasIncapacitatedThisLife = default;
 
             lastRecoveryFixedTime = Mathf.NegativeInfinity;
@@ -1016,6 +1017,7 @@ namespace Vi.Core
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 OnAlive();
                 wasIncapacitatedThisLife = false;
+                incapacitatedReviveTimeTracker.Clear();
             }
 
             if (IsServer)
