@@ -525,7 +525,6 @@ namespace Vi.Core
                         if (incapacitatedReviveTimeTracker[attributes] >= 3)
                         {
                             ResetStats(0.25f, true, false, false);
-                            AddSpirit(GetMaxSpirit() * 0.25f);
                             ResetAilment();
                             break;
                         }
