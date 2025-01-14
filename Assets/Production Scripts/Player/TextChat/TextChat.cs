@@ -83,9 +83,15 @@ namespace Vi.Player.TextChat
         private int unreadMessageCount;
         public void OnTextChat()
         {
-            if (playerInput & textChatAction != null)
+            if (playerInput)
             {
-                if (!textChatAction.enabled & playerInput.currentActionMap.name == playerInput.defaultActionMap) { return; }
+                if (playerInput.currentActionMap == null) { return; }
+                if (playerInput.currentActionMap.name == "UI") { return; }
+            }
+
+            if (textChatAction != null)
+            {
+                if (!textChatAction.enabled) { return; }
             }
 
             textChatParentCanvas.enabled = !textChatParentCanvas.enabled;

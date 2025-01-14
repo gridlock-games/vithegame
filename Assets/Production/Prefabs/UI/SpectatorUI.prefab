@@ -66,6 +66,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6184979859513668798}
+  - {fileID: 7280594388594957380}
   - {fileID: 6306353261998002608}
   - {fileID: 4230377561939408426}
   - {fileID: 5099845048838361560}
@@ -113,7 +114,7 @@ RectTransform:
   m_Children:
   - {fileID: 5028828182725201807}
   - {fileID: 8372092569723120777}
-  - {fileID: 8022372675629311892}
+  - {fileID: 8263641228826366323}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -230,19 +231,7 @@ MonoBehaviour:
     - {fileID: 3144451764282779984}
     gameObjectsToDisable: []
     gameObjectsToDestroy: []
-    objectsToMove:
-    - gameObjectToMove: {fileID: 0}
-      newAnchoredPosition: {x: -525, y: -25}
-      shouldOverrideAnchors: 1
-      anchorMinOverride: {x: 1, y: 1}
-      anchorMaxOverride: {x: 1, y: 1}
-      pivotOverride: {x: 1, y: 1}
-    - gameObjectToMove: {fileID: 0}
-      newAnchoredPosition: {x: 525, y: -25}
-      shouldOverrideAnchors: 1
-      anchorMinOverride: {x: 0, y: 1}
-      anchorMaxOverride: {x: 0, y: 1}
-      pivotOverride: {x: 0, y: 1}
+    objectsToMove: []
   controlSchemeTextDefinitions: []
   controlSchemeDefinitions: []
 --- !u!225 &6305162074582589495
@@ -269,6 +258,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 074948244ca7b024a8f5ca68ad1a20d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &6438361682650489932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7280594388594957380}
+  m_Layer: 5
+  m_Name: RepositionReference
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7280594388594957380
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6438361682650489932}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8372092569723120777}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 150, y: 100}
+  m_SizeDelta: {x: 400, y: 400}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &6747863617797486114
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,8 +305,6 @@ GameObject:
   - component: {fileID: 480512220718420288}
   - component: {fileID: 1383455704916491912}
   - component: {fileID: 7691897003562541}
-  - component: {fileID: 4108199300549661458}
-  - component: {fileID: 581831918702925805}
   m_Layer: 5
   m_Name: MoveJoystick
   m_TagString: Untagged
@@ -361,54 +383,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joystickActionType: 0
   movementRange: 125
-  shouldRepositionPlayerPref: 
+  shouldRepositionPlayerPref: MobileMoveJoystickShouldReposition
   shouldReposition: 1
   joystickValueMultiplierPlayerPref: 
   joystickValueMultiplier: 1
   actLikeButtonPlayerPref: 
   limits: {fileID: 3582757192039560226}
-  limitsImage: {fileID: 0}
-  stickImage: {fileID: 0}
---- !u!223 &4108199300549661458
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6747863617797486114}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 2
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_TargetDisplay: 0
---- !u!114 &581831918702925805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6747863617797486114}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  limitsImage: {fileID: 5636797300757422022}
+  stickImage: {fileID: 1383455704916491912}
+  parent: {fileID: 6184979859513668798}
+  repositionReferenceRect: {fileID: 7280594388594957380}
 --- !u!1 &7452032538359885697
 GameObject:
   m_ObjectHideFlags: 0
@@ -421,8 +405,6 @@ GameObject:
   - component: {fileID: 3328276752283431858}
   - component: {fileID: 2181146598061015510}
   - component: {fileID: 12020681689512478}
-  - component: {fileID: 6936371370571803090}
-  - component: {fileID: 2152952212225610631}
   m_Layer: 5
   m_Name: LookJoystick
   m_TagString: Untagged
@@ -503,52 +485,14 @@ MonoBehaviour:
   movementRange: 125
   shouldRepositionPlayerPref: 
   shouldReposition: 0
-  joystickValueMultiplierPlayerPref: 
+  joystickValueMultiplierPlayerPref: MobileLookJoystickSensitivity
   joystickValueMultiplier: 4
   actLikeButtonPlayerPref: 
   limits: {fileID: 4077336050427970810}
-  limitsImage: {fileID: 0}
-  stickImage: {fileID: 0}
---- !u!223 &6936371370571803090
-Canvas:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7452032538359885697}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_RenderMode: 2
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
-  m_PixelPerfect: 0
-  m_ReceivesEvents: 1
-  m_OverrideSorting: 0
-  m_OverridePixelPerfect: 0
-  m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 0
-  m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
-  m_TargetDisplay: 0
---- !u!114 &2152952212225610631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7452032538359885697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  limitsImage: {fileID: 1629402035447515705}
+  stickImage: {fileID: 2181146598061015510}
+  parent: {fileID: 6306353261998002608}
+  repositionReferenceRect: {fileID: 0}
 --- !u!1 &8400070427144414092
 GameObject:
   m_ObjectHideFlags: 0
@@ -3700,7 +3644,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c048147a016cf2f47aff91701dbda92a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &8189488332961970920
+--- !u!1001 &7808538772064160783
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -3828,9 +3772,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 707a130969d64604997e621e0480f39e, type: 3}
---- !u!224 &8022372675629311892 stripped
+--- !u!224 &8263641228826366323 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2230365171401366908, guid: 707a130969d64604997e621e0480f39e,
     type: 3}
-  m_PrefabInstance: {fileID: 8189488332961970920}
+  m_PrefabInstance: {fileID: 7808538772064160783}
   m_PrefabAsset: {fileID: 0}
