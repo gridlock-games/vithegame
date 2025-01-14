@@ -880,6 +880,7 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Death:
+                        case ActionClip.Ailment.Incapacitated:
                             break;
                         default:
                             if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
@@ -1249,6 +1250,7 @@ namespace Vi.Core
             return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
+        [SerializeField] private bool canBeIncapacitated;
         [SerializeField] private bool disableHitReactions;
         protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
@@ -1366,7 +1368,7 @@ namespace Vi.Core
             if (IsRaging) { HPDamage *= rageDamageMultiplier; }
 
             bool hitReactionWasPlayed = false;
-            if (AddHPWithoutApply(HPDamage) <= 0)
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
@@ -1379,6 +1381,37 @@ namespace Vi.Core
 
                 AnimationHandler.PlayAction(hitReaction);
                 hitReactionWasPlayed = true;
+            }
+            else if (AddHPWithoutApply(HPDamage) <= 0)
+            {
+                if (GameModeManager.Singleton.IncapacitatedPlayerStateEnabled & canBeIncapacitated)
+                {
+                    attackAilment = ActionClip.Ailment.Incapacitated;
+                    hitReaction = WeaponHandler.GetWeapon().GetIncapacitatedReaction();
+
+                    if (IsGrabbed)
+                    {
+                        if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+                        CancelGrab();
+                    }
+
+                    AnimationHandler.PlayAction(hitReaction);
+                    hitReactionWasPlayed = true;
+                }
+                else
+                {
+                    attackAilment = ActionClip.Ailment.Death;
+                    hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
+
+                    if (IsGrabbed)
+                    {
+                        if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+                        CancelGrab();
+                    }
+
+                    AnimationHandler.PlayAction(hitReaction);
+                    hitReactionWasPlayed = true;
+                }
             }
             else if (!IsUninterruptable)
             {

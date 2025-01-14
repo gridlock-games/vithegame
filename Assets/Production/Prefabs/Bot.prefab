@@ -113,6 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20176c6a7394596408b95d672a28319b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  excludeFromKillFeed: 0
   rageStartAudio: {fileID: 8300000, guid: 60cef9975a14343e7804f5bd15d9c4fb, type: 3}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
@@ -135,6 +136,8 @@ MonoBehaviour:
   deathExplosionDelay: 0
   deathVFX: {fileID: 0}
   deathVFXAttack: {fileID: 0}
+  canBeIncapacitated: 1
+  disableHitReactions: 0
   wasStaggeredThisFrame: 0
   teamIndicatorPrefab: {fileID: -9076160948696418514, guid: eac704ebbf678b243822e8816fda0732,
     type: 3}
@@ -188,6 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blacklistedStatuses: 
 --- !u!114 &2946962623116814342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -412,6 +416,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   physicMaterial: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
   staticWallBody: {fileID: 6774424101548841814}
+  radiusMultiplier: 1
 --- !u!1 &5744401724571899970
 GameObject:
   m_ObjectHideFlags: 0

@@ -302,19 +302,13 @@ namespace Vi.ScriptableObjects
             Right
         }
 
-        [System.Serializable]
-        private class HitReaction
-        {
-            public HitLocation hitLocation = HitLocation.Front;
-            public ActionClip reactionClip;
-            public bool shouldAlreadyHaveAilment;
-        }
+        [SerializeField] private SharedWeaponReferences sharedWeaponReferences;
 
-        [SerializeField] private List<HitReaction> hitReactions = new List<HitReaction>();
+        public ActionClip GetDeathReaction() { return CreateCopyOfActionClip(sharedWeaponReferences.HitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip); }
 
-        public ActionClip GetDeathReaction() { return CreateCopyOfActionClip(hitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Death).reactionClip); }
+        public ActionClip GetIncapacitatedReaction() { return CreateCopyOfActionClip(sharedWeaponReferences.HitReactions.Find(item => item.reactionClip.ailment == ActionClip.Ailment.Incapacitated).reactionClip); }
 
-        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return CreateCopyOfActionClip(hitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip); }
+        public ActionClip GetHitReactionByDirection(HitLocation hitLocation) { return CreateCopyOfActionClip(sharedWeaponReferences.HitReactions.Find(item => item.hitLocation == hitLocation & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal).reactionClip); }
 
         private ActionClip CreateCopyOfActionClip(ActionClip actionClip)
         {
@@ -343,11 +337,11 @@ namespace Vi.ScriptableObjects
                 hitLocation = HitLocation.Back;
             }
 
-            HitReaction hitReaction = null;
+            SharedWeaponReferences.HitReaction hitReaction = null;
             if (isBlocking & attack.isBlockable)
             {
                 // Block the attack
-                hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
+                hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking);
             }
 
             if (hitReaction == null) // If attack wasn't blocked
@@ -355,42 +349,42 @@ namespace Vi.ScriptableObjects
                 if (currentAilment != attackAilment & attackAilment != ActionClip.Ailment.None)
                 {
                     // Find the start reaction for the attack's ailment
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                    hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
 
                     // Find a hit reaction for an in progress ailment
                     if (hitReaction == null)
                     {
-                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
+                        hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
                     }
 
                     // Find a normal hit reaction if there isn't a special hit reaction for this ailment
                     if (hitReaction == null)
                     {
-                        hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                        hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
                     }
                 }
                 else if (currentAilment != ActionClip.Ailment.None)
                 {
                     // Find a hit reaction for an in progress ailment
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
+                    hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == currentAilment & item.shouldAlreadyHaveAilment);
 
                     // If we can't find an in progress reaction, just get a normal reaction
                     if (hitReaction == null)
                     {
                         if (applyAilmentRegardless)
                         {
-                            hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
+                            hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.ailment == attackAilment & !item.shouldAlreadyHaveAilment);
                         }
                         else
                         {
-                            hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                            hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
                         }
                     }
                 }
                 else
                 {
                     // Find a normal hit reaction
-                    hitReaction = hitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
+                    hitReaction = sharedWeaponReferences.HitReactions.Find(item => (item.hitLocation == hitLocation | item.hitLocation == HitLocation.AllDirections) & item.reactionClip.GetHitReactionType() == ActionClip.HitReactionType.Normal);
                 }
             }
 
@@ -402,15 +396,6 @@ namespace Vi.ScriptableObjects
 
             return CreateCopyOfActionClip(hitReaction.reactionClip);
         }
-
-        [System.Serializable]
-        private class FlinchReaction
-        {
-            public HitLocation hitLocation = HitLocation.Front;
-            public ActionClip reactionClip;
-        }
-
-        [SerializeField] private List<FlinchReaction> flinchReactions = new List<FlinchReaction>();
 
         public ActionClip GetFlinchClip(float attackAngle)
         {
@@ -431,7 +416,7 @@ namespace Vi.ScriptableObjects
             {
                 hitLocation = HitLocation.Back;
             }
-            return flinchReactions.Find(item => item.hitLocation == hitLocation).reactionClip;
+            return sharedWeaponReferences.FlinchReactions.Find(item => item.hitLocation == hitLocation).reactionClip;
         }
 
         public enum InputAttackType
@@ -1113,18 +1098,21 @@ namespace Vi.ScriptableObjects
 
             if (flashAttack) { actionClipLookup.TryAdd(flashAttack.name, flashAttack); }
 
-            foreach (HitReaction hitReaction in hitReactions)
+            if (sharedWeaponReferences)
             {
-                if (!hitReaction.reactionClip) { continue; }
-                actionClipLookup.TryAdd(hitReaction.reactionClip.name, hitReaction.reactionClip);
-            }
+                foreach (SharedWeaponReferences.HitReaction hitReaction in sharedWeaponReferences.HitReactions)
+                {
+                    if (!hitReaction.reactionClip) { continue; }
+                    actionClipLookup.TryAdd(hitReaction.reactionClip.name, hitReaction.reactionClip);
+                }
 
-            foreach (FlinchReaction flinchReaction in flinchReactions)
-            {
-                if (!flinchReaction.reactionClip) { continue; }
-                actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
+                foreach (SharedWeaponReferences.FlinchReaction flinchReaction in sharedWeaponReferences.FlinchReactions)
+                {
+                    if (!flinchReaction.reactionClip) { continue; }
+                    actionClipLookup.TryAdd(flinchReaction.reactionClip.name, flinchReaction.reactionClip);
+                }
             }
-
+            
             foreach (Attack attack in attackList)
             {
                 if (!attack.attackClip) { continue; }
@@ -1299,12 +1287,12 @@ namespace Vi.ScriptableObjects
                         }
                     }
                 }
-                else if (propertyInfo.FieldType == typeof(List<HitReaction>))
+                else if (propertyInfo.FieldType == typeof(List<SharedWeaponReferences.HitReaction>))
                 {
                     var HitReactionListObject = propertyInfo.GetValue(this);
-                    List<HitReaction> hitReactions = (List<HitReaction>)HitReactionListObject;
+                    List<SharedWeaponReferences.HitReaction> hitReactions = (List<SharedWeaponReferences.HitReaction>)HitReactionListObject;
 
-                    foreach (HitReaction hitReaction in hitReactions)
+                    foreach (SharedWeaponReferences.HitReaction hitReaction in hitReactions)
                     {
                         if (hitReaction.reactionClip)
                         {
@@ -1317,12 +1305,12 @@ namespace Vi.ScriptableObjects
                         }
                     }
                 }
-                else if (propertyInfo.FieldType == typeof(List<FlinchReaction>))
+                else if (propertyInfo.FieldType == typeof(List<SharedWeaponReferences.FlinchReaction>))
                 {
                     var FlinchReactionListObject = propertyInfo.GetValue(this);
-                    List<FlinchReaction> hitReactions = (List<FlinchReaction>)FlinchReactionListObject;
+                    List<SharedWeaponReferences.FlinchReaction> hitReactions = (List<SharedWeaponReferences.FlinchReaction>)FlinchReactionListObject;
 
-                    foreach (FlinchReaction flinchReaction in hitReactions)
+                    foreach (SharedWeaponReferences.FlinchReaction flinchReaction in hitReactions)
                     {
                         if (flinchReaction.reactionClip)
                         {
