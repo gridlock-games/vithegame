@@ -183,7 +183,6 @@ namespace Vi.Core
                 }
             }
         }
-
         private static void EvaluateContactPairAsMovementCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
             //if (pair.GetNormal(i).y > 0.7f)
@@ -193,6 +192,10 @@ namespace Vi.Core
             //}
 
             if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
             {
                 pair.IgnoreContact(i);
             }
@@ -212,7 +215,7 @@ namespace Vi.Core
                 }
             }
         }
-
+        
         private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
             //if (pair.GetNormal(i).y > 0.7f)
@@ -223,6 +226,10 @@ namespace Vi.Core
 
             // Phase through other players if we are dodging out of an ailment like knockdown
             if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
             {
                 pair.IgnoreContact(i);
             }
