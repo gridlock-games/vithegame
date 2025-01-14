@@ -315,6 +315,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            lastRecoveryFixedTime = Mathf.NegativeInfinity;
+
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -901,7 +903,8 @@ namespace Vi.Core
             }
         }
 
-        private const float recoveryTimeInvincibilityBuffer = 1;
+        public float lastRecoveryFixedTime { get; private set; } = Mathf.NegativeInfinity;
+        public const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible, bool shouldMakeInvincibleDuringRecovery)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
@@ -940,6 +943,11 @@ namespace Vi.Core
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
+            if (prev == ActionClip.Ailment.Knockdown)
+            {
+                lastRecoveryFixedTime = Time.fixedTime;
+            }
+
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
             if (current == ActionClip.Ailment.Death)
