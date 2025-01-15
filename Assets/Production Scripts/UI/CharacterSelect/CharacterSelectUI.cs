@@ -411,6 +411,21 @@ namespace Vi.UI
             girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
             customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
 
+            if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanMale)
+            {
+                genderRowElement.CounterIndex = 1;
+            }
+            else if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
+            {
+                genderRowElement.CounterIndex = 0;
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to set initial counter index from " + selectedCharacter.raceAndGender);
+            }
+
+            genderRowElement.SetAsArrowGroupUsingButtons(new Color[] { Color.blue, Color.magenta });
+
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
