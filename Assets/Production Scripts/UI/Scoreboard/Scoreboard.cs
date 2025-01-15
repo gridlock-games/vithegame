@@ -47,11 +47,11 @@ namespace Vi.UI
             {
                 if (NetSceneManager.Singleton.IsSceneGroupLoaded("Training Room"))
                 {
-                    scoreboardHeaderText.text = "Training Room | " + PlayerDataManager.Singleton.GetMapName();
+                    scoreboardHeaderText.text = "Training Room";
                 }
                 else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Player Hub"))
                 {
-                    scoreboardHeaderText.text = "Player Hub | " + PlayerDataManager.Singleton.GetMapName();
+                    scoreboardHeaderText.text = "Player Hub";
                 }
                 else
                 {

@@ -211,15 +211,15 @@ namespace Vi.Core
                 }
             }
 
-            if (temperatureLevel > 0.95f)
+            if (temperatureLevel > 1.75f)
             {
                 QualitySettings.globalTextureMipmapLimit = 3;
             }
-            else if (temperatureLevel > 0.9f)
+            else if (temperatureLevel > 1.4f)
             {
                 QualitySettings.globalTextureMipmapLimit = 2;
             }
-            else if (temperatureLevel > 0.8f)
+            else if (temperatureLevel > 1)
             {
                 QualitySettings.globalTextureMipmapLimit = 1;
             }
