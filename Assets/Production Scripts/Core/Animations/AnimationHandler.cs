@@ -1673,6 +1673,7 @@ namespace Vi.Core
             SetRagdollActive(false);
             if (logoImage) { logoImage.color = Color.clear; }
             if (logoEffectWorldSpaceLabel) { logoEffectWorldSpaceLabel.enabled = false; }
+            if (reviveCanvas) { reviveCanvas.enabled = false; }
         }
 
         private void OnDisable()
@@ -1720,6 +1721,19 @@ namespace Vi.Core
                 else
                 {
                     logoEffectWorldSpaceLabel.enabled = false;
+                }
+            }
+
+            if (reviveCanvas)
+            {
+                if (FindMainCamera.MainCamera)
+                {
+                    reviveCanvas.enabled = true;
+                    reviveCanvas.transform.rotation = Quaternion.Slerp(reviveCanvas.transform.rotation, Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - reviveCanvas.transform.position), Time.deltaTime * 15);
+                }
+                else
+                {
+                    reviveCanvas.enabled = false;
                 }
             }
         }
@@ -2018,5 +2032,23 @@ namespace Vi.Core
         [SerializeField] private PooledObject staminaPotionVFXPrefab;
         [SerializeField] private AudioClip healthPotionAudio;
         [SerializeField] private AudioClip staminaPotionAudio;
+        [Header("Revive Indicator")]
+        [SerializeField] private Canvas reviveCanvas;
+        [SerializeField] private Image reviveImage;
+
+        public void SetReviveImageProgress(float normalizedProgress)
+        {
+            if (!reviveImage) { return; }
+
+            reviveImage.enabled = true;
+            reviveImage.fillAmount = normalizedProgress;
+        }
+
+        public void DisableReviveImage()
+        {
+            if (!reviveImage) { return; }
+
+            reviveImage.enabled = false;
+        }
     }
 }

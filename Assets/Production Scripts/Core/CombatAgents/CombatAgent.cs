@@ -503,6 +503,7 @@ namespace Vi.Core
 
             if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
+                float maxProgress = 0;
                 foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                 {
                     if (attributes == this) { continue; }
@@ -522,6 +523,11 @@ namespace Vi.Core
                             incapacitatedReviveTimeTracker.Add(attributes, Time.fixedDeltaTime);
                         }
 
+                        if (incapacitatedReviveTimeTracker[attributes] / 3 > maxProgress)
+                        {
+                            maxProgress = incapacitatedReviveTimeTracker[attributes] / 3;
+                        }
+
                         if (incapacitatedReviveTimeTracker[attributes] >= 3)
                         {
                             ResetStats(0.25f, false, false, false);
@@ -534,6 +540,11 @@ namespace Vi.Core
                         incapacitatedReviveTimeTracker.Remove(attributes);
                     }
                 }
+                AnimationHandler.SetReviveImageProgress(maxProgress);
+            }
+            else
+            {
+                AnimationHandler.DisableReviveImage();
             }
         }
 
@@ -645,7 +656,8 @@ namespace Vi.Core
             if (GetAilment() == ActionClip.Ailment.Knockdown
                 | GetAilment() == ActionClip.Ailment.Knockup
                 | GetAilment() == ActionClip.Ailment.Stun
-                | GetAilment() == ActionClip.Ailment.Grab
+                | IsGrabbed
+                | GetAilment() == ActionClip.Ailment.Incapacitated
                 | GetAilment() == ActionClip.Ailment.Death)
             {
                 return false;
