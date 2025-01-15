@@ -943,7 +943,9 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Death:
+                            break;
                         case ActionClip.Ailment.Incapacitated:
+                            SetInviniciblity(1);
                             break;
                         default:
                             if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
