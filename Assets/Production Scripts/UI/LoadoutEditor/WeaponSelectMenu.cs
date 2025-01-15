@@ -19,8 +19,9 @@ namespace Vi.UI
         //[SerializeField] private Light previewLightPrefab;
 
         //private GameObject weaponPreviewParent;
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             //foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             //{
             //    data.OnDragEvent += OnCharPreviewDrag;

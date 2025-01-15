@@ -32,6 +32,9 @@ namespace Vi.Core
         private bool hasStaticWallBody;
         private bool forceUseStaticWallCollisions;
 
+        private float[] originalRadiuses = new float[0];
+        private float[] originalStaticRadiuses = new float[0];
+
         private void Awake()
         {
             MovementHandler = GetComponentInParent<PhysicsMovementHandler>();
@@ -50,7 +53,10 @@ namespace Vi.Core
             hasStaticWallBody = staticWallBody;
 
             CombatAgent.SetNetworkCollider(this);
-            
+
+            originalRadiuses = new float[Colliders.Length];
+
+            int i = 0;
             foreach (Collider col in Colliders)
             {
                 col.enabled = false;
@@ -61,12 +67,37 @@ namespace Vi.Core
                 {
                     Physics.IgnoreCollision(col, staticWallCollider);
                 }
+
+                if (col is CapsuleCollider capsuleCollider)
+                {
+                    originalRadiuses[i] = capsuleCollider.radius;
+                }
+                else
+                {
+                    originalRadiuses[i] = 0;
+                }
+
+                i++;
             }
 
+            originalStaticRadiuses = new float[staticWallColliders.Length];
+
+            i = 0;
             foreach (Collider staticWallCollider in staticWallColliders)
             {
                 staticWallColliderInstanceIDMap.Add(staticWallCollider.GetInstanceID(), this);
                 staticWallCollider.hasModifiableContacts = true;
+
+                if (staticWallCollider is CapsuleCollider capsuleCollider)
+                {
+                    originalStaticRadiuses[i] = capsuleCollider.radius;
+                }
+                else
+                {
+                    originalStaticRadiuses[i] = 0;
+                }
+
+                i++;
             }
         }
 
@@ -192,7 +223,11 @@ namespace Vi.Core
             //    return;
             //}
 
-            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
             {
                 pair.IgnoreContact(i);
             }
@@ -212,7 +247,7 @@ namespace Vi.Core
                 }
             }
         }
-
+        
         private static void EvaluateContactPairAsStaticWallCollider(NetworkCollider col, NetworkCollider other, ModifiableContactPair pair, int i)
         {
             //if (pair.GetNormal(i).y > 0.7f)
@@ -221,8 +256,11 @@ namespace Vi.Core
             //    return;
             //}
 
-            // Phase through other players if we are dodging out of an ailment like knockdown
-            if (col.ShouldApplyRecoveryDodgeLogic() | other.ShouldApplyRecoveryDodgeLogic())
+            if (col.CombatAgent.AnimationHandler.IsDodging() | other.CombatAgent.AnimationHandler.IsDodging())
+            {
+                pair.IgnoreContact(i);
+            }
+            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
             {
                 pair.IgnoreContact(i);
             }
@@ -272,20 +310,7 @@ namespace Vi.Core
             {
                 if (other.CombatAgent.WeaponHandler.CurrentActionClip.IsAttack())
                 {
-                    if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.GrabAttack)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return true;
-
-                        //Quaternion rel = Quaternion.LookRotation(col.MovementHandler.GetPosition() - other.MovementHandler.GetPosition());
-                        //if (Quaternion.Angle(rel, other.MovementHandler.GetRotation()) < 50)
-                        //{
-                        //    return true;
-                        //}
-                    }
+                    return true;
                 }
                 else if (other.CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.HitReaction)
                 {
@@ -298,13 +323,6 @@ namespace Vi.Core
             if (other.MovementHandler.LastMovementWasZero) { return true; }
 
             return false;
-        }
-
-        private bool ShouldApplyRecoveryDodgeLogic()
-        {
-            return CombatAgent.CanRecoveryDodge
-                & CombatAgent.WeaponHandler.CurrentActionClip.GetClipType() == ActionClip.ClipType.Dodge
-                & !CombatAgent.AnimationHandler.IsAtRest();
         }
 
         private void OnDestroy()
@@ -332,11 +350,49 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private float radiusMultiplier = 1;
+
+        private float lastRadiusMultiplier = 1;
         private void FixedUpdate()
         {
             if (!staticWallBody) { return; }
             staticWallBody.MovePosition(MovementHandler.Rigidbody.position);
             staticWallBody.MoveRotation(MovementHandler.Rigidbody.rotation);
+
+            if (CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
+            {
+                radiusMultiplier = 0.01f;
+            }
+            else
+            {
+                float t = (Time.fixedTime - CombatAgent.lastRecoveryFixedTime) / CombatAgent.recoveryTimeInvincibilityBuffer;
+                t = Mathf.Clamp01(t);
+                radiusMultiplier = Mathf.Lerp(radiusMultiplier, 1, t);
+            }
+
+            if (!Mathf.Approximately(lastRadiusMultiplier, radiusMultiplier))
+            {
+                int i = 0;
+                foreach (Collider col in Colliders)
+                {
+                    if (col is CapsuleCollider capsuleCollider)
+                    {
+                        capsuleCollider.radius = originalRadiuses[i] * radiusMultiplier;
+                    }
+                    i++;
+                }
+
+                i = 0;
+                foreach (Collider staticWallCollider in staticWallColliders)
+                {
+                    if (staticWallCollider is CapsuleCollider capsuleCollider)
+                    {
+                        capsuleCollider.radius = originalStaticRadiuses[i] * radiusMultiplier;
+                    }
+                    i++;
+                }
+            }
+            lastRadiusMultiplier = radiusMultiplier;
         }
 
         private ActionClip.Ailment lastAilmentEvaluated = ActionClip.Ailment.None;

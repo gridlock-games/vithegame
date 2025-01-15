@@ -329,9 +329,6 @@ namespace Vi.Editor
                 if (assetPath.Contains("com.unity.")) { continue; }
                 if (assetPath.Length == 0) { Debug.LogError(textures[i] + " not found"); continue; }
 
-                // TODO Remove when Genie finishes the player hub map
-                if (assetPath.Contains("Player Hub")) { continue; }
-
                 Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
                 bool textureIsInSpriteAtlas = false;
                 if (sprite)

@@ -29,10 +29,11 @@ namespace Vi.UI
         [SerializeField] private Toggle vsyncToggle;
         [SerializeField] private Toggle hdrToggle;
         [SerializeField] private Toggle postProcessingToggle;
+        [SerializeField] private GameObject shadowsWarning;
+        [SerializeField] private GameObject graphicsRestartWarning;
         [Header("Action Buttons")]
         [SerializeField] private Button applyChangesButton;
         [SerializeField] private Button discardChangesButton;
-        [SerializeField] private Text fpsWarningText;
         [Header("Display Settings Resizing By Platform")]
         //[SerializeField] private GridLayoutGroup scrollGrid;
         [SerializeField] private RectTransform displaySettingsGroup;
@@ -54,8 +55,12 @@ namespace Vi.UI
             RuntimePlatform.LinuxEditor
         };
 
-        private void Awake()
+
+        private int originalGraphicsDropdownValue;
+
+        protected override void Awake()
         {
+            base.Awake();
             if (platformsToAllowResolutionChangesOn.Contains(Application.platform))
             {
                 dpiScalingElement.SetActive(false);
@@ -87,8 +92,6 @@ namespace Vi.UI
 
             applyChangesButton.interactable = false;
             discardChangesButton.interactable = false;
-
-            adaptivePerformanceToggle.onValueChanged.AddListener((isOn) => fpsWarningText.text = isOn ? adapativePerformanceMessage : "");
 
             // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
@@ -138,12 +141,13 @@ namespace Vi.UI
             fieldOfViewSlider.value = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             fieldOfViewSlider.onValueChanged.AddListener(SetFieldOfView);
 
-            dpiScaleSlider.value = QualitySettings.resolutionScalingFixedDPIFactor;
+            dpiScaleSlider.value = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
             dpiScaleSlider.GetComponent<SliderEndEditEvent>().EndDrag += SetDPIScale;
 
             // Graphics Quality dropdown
             graphicsPresetDropdown.AddOptions(QualitySettings.names.ToList());
             graphicsPresetDropdown.value = QualitySettings.GetQualityLevel();
+            originalGraphicsDropdownValue = graphicsPresetDropdown.value;
 
             pipeline = (UniversalRenderPipelineAsset)QualitySettings.renderPipeline;
 
@@ -157,11 +161,6 @@ namespace Vi.UI
             List<string> fpsOptions = new List<string>();
             for (int i = 30; i <= 120; i+=30)
             {
-                if (i > 60)
-                {
-                    if (i > Screen.currentResolution.refreshRateRatio.value) { break; }
-                }
-
                 fpsOptions.Add(i.ToString());
                 fpsOptionsAsInt.Add(i);
             }
@@ -181,7 +180,11 @@ namespace Vi.UI
 
             // TODO Find shadows dropdown value
             int shadowsValue = 0;
-            if (pipeline.shadowCascadeCount == 4)
+            if (!pipeline.supportsMainLightShadows)
+            {
+                shadowsValue = 0;
+            }
+            else if (pipeline.shadowCascadeCount == 4)
             {
                 shadowsValue = 3;
             }
@@ -195,7 +198,9 @@ namespace Vi.UI
             }
 
             shadowsDropdown.value = shadowsValue;
+            shadowsDropdown.onValueChanged.AddListener((value) => RefreshWarningDisplays());
 
+            RefreshWarningDisplays();
             SetOriginalVariables();
         }
 
@@ -207,12 +212,6 @@ namespace Vi.UI
             "High"
         };
 
-        private const string adapativePerformanceMessage = "Some Settings Driven By Adaptive Performance";
-        private void OnEnable()
-        {
-            fpsWarningText.text = FasterPlayerPrefs.Singleton.GetBool("EnableAdaptivePerformance") ? adapativePerformanceMessage : "";
-        }
-
         private void SetFieldOfView(float value)
         {
             FasterPlayerPrefs.Singleton.SetFloat("FieldOfView", value);
@@ -220,7 +219,6 @@ namespace Vi.UI
 
         private void SetDPIScale(float sliderValue)
         {
-            QualitySettings.resolutionScalingFixedDPIFactor = sliderValue;
             FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", sliderValue);
         }
 
@@ -279,7 +277,7 @@ namespace Vi.UI
             }
 
             // Graphics settings
-            if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, true); }
+            if (QualitySettings.GetQualityLevel() != graphicsPresetDropdown.value) { QualitySettings.SetQualityLevel(graphicsPresetDropdown.value, false); }
             QualitySettings.vSyncCount = vsyncToggle.isOn ? 1 : 0;
             pipeline.supportsHDR = hdrToggle.isOn;
             FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", postProcessingToggle.isOn);
@@ -304,26 +302,21 @@ namespace Vi.UI
 
             if (FasterPlayerPrefs.IsMobilePlatform)
             {
-                switch (graphicsPresetDropdown.value)
-                {
-                    case 0:
-                        dpiScaleSlider.value = 0.5f;
-                        break;
-                    case 1:
-                        dpiScaleSlider.value = 0.7f;
-                        break;
-                    case 2:
-                        dpiScaleSlider.value = 1;
-                        break;
-                    default:
-                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
-                        break;
-                }
                 SetDPIScale(dpiScaleSlider.value);
             }
 
+            int shadowsValue = shadowsDropdown.value;
+            if (graphicsPresetDropdown.value == 0)
+            {
+                shadowsValue = 0;
+                if (shadowsDropdown.value != shadowsValue)
+                {
+                    shadowsDropdown.value = shadowsValue;
+                }
+            }
+
             // Apply shadows quality
-            switch (shadowsDropdown.value)
+            switch (shadowsValue)
             {
                 case 0: // Off
                     pipeline.mainLightShadowmapResolution = 256;
@@ -363,6 +356,7 @@ namespace Vi.UI
                     break;
             }
 
+            RefreshWarningDisplays();
             SetOriginalVariables();
         }
 
@@ -436,6 +430,33 @@ namespace Vi.UI
                     Debug.LogWarning("Unsure what post processing values to assign! " + graphicsPresetDropdown.value);
                     break;
             }
+
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                switch (graphicsPresetDropdown.value)
+                {
+                    case 0:
+                        dpiScaleSlider.value = 0.5f;
+                        break;
+                    case 1:
+                        dpiScaleSlider.value = 0.7f;
+                        break;
+                    case 2:
+                        dpiScaleSlider.value = 1;
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure what dpi scaling to assign! " + graphicsPresetDropdown.value);
+                        break;
+                }
+            }
+
+            RefreshWarningDisplays();
+        }
+
+        private void RefreshWarningDisplays()
+        {
+            graphicsRestartWarning.SetActive(graphicsPresetDropdown.value != originalGraphicsDropdownValue);
+            shadowsWarning.SetActive(graphicsPresetDropdown.value == 0 & shadowsDropdown.value > 0);
         }
 
         public void ValidateTargetFrameRate()

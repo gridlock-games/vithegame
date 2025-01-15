@@ -55,6 +55,11 @@ namespace Vi.Core
                     // Just updated, execute this code
                     if (FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.DeleteKey("IsDiscordVerified"); }
                     if (FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.DeleteKey("RenderDistance"); }
+
+                    if (FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.DeleteKey("DPIScalingFactor"); }
+                    if (FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.DeleteKey("PostProcessingEnabled"); }
+
+                    if (FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.DeleteKey("ThermalEventsEnabled"); }
                 }
             }
 
@@ -139,7 +144,7 @@ namespace Vi.Core
             if (!FasterPlayerPrefs.Singleton.HasBool("PingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PingEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("PacketLossEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PacketLossEnabled", false); }
             if (!FasterPlayerPrefs.Singleton.HasBool("JitterEnabled")) { FasterPlayerPrefs.Singleton.SetBool("JitterEnabled", false); }
-            if (!FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", true); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.SetBool("ThermalEventsEnabled", false); }
 
             if (!FasterPlayerPrefs.Singleton.HasString("Rebinds")) { FasterPlayerPrefs.Singleton.SetString("Rebinds", ""); }
 
@@ -158,11 +163,9 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
-            if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", 1); }
-            QualitySettings.resolutionScalingFixedDPIFactor = FasterPlayerPrefs.Singleton.GetFloat("DPIScalingFactor");
-
-            if (!FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.SetBool("IsDiscordVerified", false); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", false); }
+            if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", FasterPlayerPrefs.IsMobilePlatform ? 0.5f : 1); }
+            QualitySettings.resolutionScalingFixedDPIFactor = 1;
 
             foreach (KeyValuePair<string, Color> kvp in FasterPlayerPrefs.GetDefaultColorPrefs())
             {

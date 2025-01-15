@@ -60,11 +60,13 @@ namespace Vi.Player
             {
                 thisCam.enabled = true;
                 orbitalCam.enabled = false;
+                SetOrbitalCamDepth();
             }
             else
             {
                 thisCam.enabled = false;
                 orbitalCam.enabled = true;
+                SetOrbitalCamDepth();
             }
         }
 
@@ -72,14 +74,22 @@ namespace Vi.Player
         {
             thisCam.enabled = !isActive;
             orbitalCam.enabled = isActive;
+            SetOrbitalCamDepth();
         }
 
-        public bool GetOrbitalCamState() { return orbitalCam.enabled; }
+        private const int orbitalCamOffDepth = -1;
+        private const int orbitalCamOnDepth = 1;
+
+        private void SetOrbitalCamDepth()
+        {
+            orbitalCam.depth = orbitalCam.enabled ? orbitalCamOnDepth : orbitalCamOffDepth;
+        }
 
         public void SetActive(bool isActive)
         {
             thisCam.enabled = isActive;
             orbitalCam.enabled = false;
+            SetOrbitalCamDepth();
         }
 
         private Animator animator;
@@ -136,6 +146,7 @@ namespace Vi.Player
             if (CameraPositionClone) { CameraPositionClone.SetActive(false); }
             thisCam.enabled = false;
             orbitalCam.enabled = false;
+            SetOrbitalCamDepth();
         }
 
         private void OnDestroy()
@@ -149,14 +160,24 @@ namespace Vi.Player
 
         private void RefreshStatus()
         {
-            thisCam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            float renderDistance;
+            if (PlayerDataManager.Singleton.HasPlayerSpawnPoints())
+            {
+                renderDistance = Mathf.Max(PlayerDataManager.Singleton.GetPlayerSpawnPoints().MinRenderDistance, FasterPlayerPrefs.Singleton.GetInt("RenderDistance"));
+            }
+            else
+            {
+                renderDistance = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            }
+
+            thisCam.farClipPlane = renderDistance;
             thisCam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             if (thisCam.TryGetComponent(out UniversalAdditionalCameraData data))
             {
                 data.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             }
 
-            orbitalCam.farClipPlane = FasterPlayerPrefs.Singleton.GetInt("RenderDistance");
+            orbitalCam.farClipPlane = renderDistance;
             orbitalCam.fieldOfView = FasterPlayerPrefs.Singleton.GetFloat("FieldOfView");
             if (orbitalCam.TryGetComponent(out data))
             {

@@ -16,8 +16,9 @@ namespace Vi.UI
 
         [SerializeField] private UIModificationMenu UIModificationMenu;
 
-        public void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             //Clean up current set
             foreach (var item in uiList)
             {

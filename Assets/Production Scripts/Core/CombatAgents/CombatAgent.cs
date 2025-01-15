@@ -315,6 +315,11 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            incapacitatedReviveTimeTracker.Clear();
+            wasIncapacitatedThisLife = default;
+
+            lastRecoveryFixedTime = Mathf.NegativeInfinity;
+
             GlowRenderer = null;
 
             invincibilityEndTime = default;
@@ -489,10 +494,62 @@ namespace Vi.Core
             }
         }
 
+        private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
+
+        protected virtual void FixedUpdate()
+        {
+            if (!IsSpawned) { return; }
+            if (!IsServer) { return; }
+
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
+            {
+                float maxProgress = 0;
+                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                {
+                    if (attributes == this) { continue; }
+                    if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
+
+                    Vector3 a = attributes.NetworkCollider.GetClosestPoint(MovementHandler.GetPosition());
+                    Vector3 b = NetworkCollider.GetClosestPoint(attributes.MovementHandler.GetPosition());
+
+                    if (Vector3.Distance(a, b) < 1)
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
+                        {
+                            incapacitatedReviveTimeTracker[attributes] += Time.fixedDeltaTime;
+                        }
+                        else
+                        {
+                            incapacitatedReviveTimeTracker.Add(attributes, Time.fixedDeltaTime);
+                        }
+
+                        if (incapacitatedReviveTimeTracker[attributes] / 3 > maxProgress)
+                        {
+                            maxProgress = incapacitatedReviveTimeTracker[attributes] / 3;
+                        }
+
+                        if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                        {
+                            ResetStats(0.25f, false, false, false);
+                            ResetAilment();
+                            break;
+                        }
+                    }
+                    else if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
+                    {
+                        incapacitatedReviveTimeTracker.Remove(attributes);
+                    }
+                }
+                AnimationHandler.SetReviveImageProgress(maxProgress);
+            }
+            else
+            {
+                AnimationHandler.DisableReviveImage();
+            }
+        }
+
         protected virtual void Update()
         {
-            CanRecoveryDodge = Time.time - lastRecoveryStartTime <= 1.7f;
-
             if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
@@ -542,6 +599,11 @@ namespace Vi.Core
             if (GameModeManager.Singleton)
             {
                 canRegenStats = !GameModeManager.Singleton.WaitingToPlayGame();
+            }
+
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
+            {
+                canRegenStats = false;
             }
 
             if (canRegenStats)
@@ -594,7 +656,8 @@ namespace Vi.Core
             if (GetAilment() == ActionClip.Ailment.Knockdown
                 | GetAilment() == ActionClip.Ailment.Knockup
                 | GetAilment() == ActionClip.Ailment.Stun
-                | GetAilment() == ActionClip.Ailment.Grab
+                | IsGrabbed
+                | GetAilment() == ActionClip.Ailment.Incapacitated
                 | GetAilment() == ActionClip.Ailment.Death)
             {
                 return false;
@@ -880,6 +943,7 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Death:
+                        case ActionClip.Ailment.Incapacitated:
                             break;
                         default:
                             if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
@@ -903,10 +967,8 @@ namespace Vi.Core
             }
         }
 
-        // 2 second buffer after ailment is set to none to dodge and phase through enemies
-        public bool CanRecoveryDodge { get; private set; }
-        private float lastRecoveryStartTime;
-        private const float recoveryTimeInvincibilityBuffer = 1;
+        public float lastRecoveryFixedTime { get; private set; } = Mathf.NegativeInfinity;
+        public const float recoveryTimeInvincibilityBuffer = 1;
         private IEnumerator ResetAilmentAfterDuration(float duration, bool shouldMakeInvincible, bool shouldMakeInvincibleDuringRecovery)
         {
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
@@ -945,10 +1007,11 @@ namespace Vi.Core
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (current == ActionClip.Ailment.None)
+            if (prev == ActionClip.Ailment.Knockdown)
             {
-                lastRecoveryStartTime = Time.time;
+                lastRecoveryFixedTime = Time.fixedTime;
             }
+
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
 
             if (current == ActionClip.Ailment.Death)
@@ -970,6 +1033,8 @@ namespace Vi.Core
                 AnimationHandler.OnRevive();
                 if (worldSpaceLabelInstance) { worldSpaceLabelInstance.gameObject.SetActive(true); }
                 OnAlive();
+                wasIncapacitatedThisLife = false;
+                incapacitatedReviveTimeTracker.Clear();
             }
 
             if (IsServer)
@@ -1250,6 +1315,9 @@ namespace Vi.Core
             return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
+        private bool wasIncapacitatedThisLife;
+
+        [SerializeField] private bool canBeIncapacitated;
         [SerializeField] private bool disableHitReactions;
         protected HitResult ProcessHit(bool isMeleeHit, CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, Vector3 impactPosition, Vector3 hitSourcePosition, Dictionary<IHittable, RuntimeWeapon.HitCounterData> hitCounter, RuntimeWeapon runtimeWeapon = null, float damageMultiplier = 1)
         {
@@ -1367,7 +1435,7 @@ namespace Vi.Core
             if (IsRaging) { HPDamage *= rageDamageMultiplier; }
 
             bool hitReactionWasPlayed = false;
-            if (AddHPWithoutApply(HPDamage) <= 0)
+            if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
                 attackAilment = ActionClip.Ailment.Death;
                 hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
@@ -1380,6 +1448,39 @@ namespace Vi.Core
 
                 AnimationHandler.PlayAction(hitReaction);
                 hitReactionWasPlayed = true;
+            }
+            else if (AddHPWithoutApply(HPDamage) <= 0)
+            {
+                if (GameModeManager.Singleton.IncapacitatedPlayerStateEnabled & canBeIncapacitated & !wasIncapacitatedThisLife)
+                {
+                    attackAilment = ActionClip.Ailment.Incapacitated;
+                    hitReaction = WeaponHandler.GetWeapon().GetIncapacitatedReaction();
+
+                    if (IsGrabbed)
+                    {
+                        if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+                        CancelGrab();
+                    }
+
+                    AnimationHandler.PlayAction(hitReaction);
+                    hitReactionWasPlayed = true;
+
+                    wasIncapacitatedThisLife = true;
+                }
+                else
+                {
+                    attackAilment = ActionClip.Ailment.Death;
+                    hitReaction = WeaponHandler.GetWeapon().GetDeathReaction();
+
+                    if (IsGrabbed)
+                    {
+                        if (GetGrabAssailant()) { GetGrabAssailant().CancelGrab(); }
+                        CancelGrab();
+                    }
+
+                    AnimationHandler.PlayAction(hitReaction);
+                    hitReactionWasPlayed = true;
+                }
             }
             else if (!IsUninterruptable)
             {

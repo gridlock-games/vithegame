@@ -318,6 +318,8 @@ namespace Vi.UI
             }
         }
 
+        private List<CharacterCustomizationRow> customizationRowList = new List<CharacterCustomizationRow>();
+
         private void ClearMaterialsAndEquipmentOptions()
         {
             foreach (MaterialCustomizationParent materialCustomizationParent in characterMaterialParents)
@@ -343,6 +345,8 @@ namespace Vi.UI
                 Destroy(buttonInfo.button.gameObject);
             }
             customizationButtonReference.Clear();
+
+            customizationRowList.Clear();
         }
 
         private void RefreshMaterialsAndEquipmentOptions(CharacterReference.RaceAndGender raceAndGender)
@@ -354,38 +358,38 @@ namespace Vi.UI
             leftQueuedSpacing = 0;
             rightQueuedSpacing = 0;
 
-            Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
-            CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
-            otherCustomizationRowParents.Add(raceButtonParent.gameObject);
-            leftYLocalPosition += spacing + leftQueuedSpacing;
-            int raceCount = 2;
-            leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
-            raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
-            raceRowElement.rowHeaderText.text = "Race";
-            raceButtonParent = raceRowElement.GetLayoutGroup().transform;
+            //Transform raceButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
+            //CharacterCustomizationRow raceRowElement = raceButtonParent.GetComponent<CharacterCustomizationRow>();
+            //otherCustomizationRowParents.Add(raceButtonParent.gameObject);
+            //leftYLocalPosition += spacing + leftQueuedSpacing;
+            //int raceCount = 2;
+            //leftQueuedSpacing = raceCount / 11 * customizationRowSpacing;
+            //raceRowElement.transform.localPosition = new Vector3(raceButtonParent.localPosition.x, leftYLocalPosition, 0);
+            //raceRowElement.rowHeaderText.text = "Race";
+            //raceButtonParent = raceRowElement.GetLayoutGroup().transform;
 
-            foreach (string race in new List<string>() { "Human" })
-            {
-                CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
+            //foreach (string race in new List<string>() { "Human" })
+            //{
+            //    CharacterCustomizationButton buttonElement = raceRowElement.GetUninitializedButton();
 
-                switch (race)
-                {
-                    case "Human":
-                        buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
-                        break;
+            //    switch (race)
+            //    {
+            //        case "Human":
+            //            buttonElement.InitializeAsColor(new Color(210 / 255f, 180 / 255f, 140 / 255f, 1));
+            //            break;
 
-                    case "Orc":
-                        buttonElement.InitializeAsColor(Color.green);
-                        break;
+            //        case "Orc":
+            //            buttonElement.InitializeAsColor(Color.green);
+            //            break;
 
-                    default:
-                        Debug.LogError("Not sure how to handle race string " + race);
-                        break;
-                }
+            //        default:
+            //            Debug.LogError("Not sure how to handle race string " + race);
+            //            break;
+            //    }
 
-                buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
-                customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
-            }
+            //    buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel(race, true); });
+            //    customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, "Race", race));
+            //}
 
             Transform genderButtonParent = Instantiate(characterCustomizationRowPrefab.gameObject, customizationRowsParentLeft).transform;
             CharacterCustomizationRow genderRowElement = genderButtonParent.GetComponent<CharacterCustomizationRow>();
@@ -426,6 +430,7 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     buttonParent.GetComponent<CharacterCustomizationRow>().GetLayoutGroup().childAlignment = childAlignment;
+                    customizationRowList.Add(buttonParent.GetComponent<CharacterCustomizationRow>());
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
@@ -460,7 +465,7 @@ namespace Vi.UI
                 CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
-                    bool isOnLeftSide = false;
+                    bool isOnLeftSide = true;
 
                     buttonParent = Instantiate(characterCustomizationRowPrefab.gameObject, isOnLeftSide ? customizationRowsParentLeft : customizationRowsParentRight).transform;
 
@@ -472,6 +477,7 @@ namespace Vi.UI
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
                     rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    customizationRowList.Add(rowElement);
                     rowElement.OnArrowPress += (option) => ChangeCharacterEquipment(option, raceAndGender);
                     rowElement.SetAsArrowGroup(PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender).Where(item => item.equipmentType == equipmentOption.equipmentType));
                     //rowElement.GetLayoutGroup().childAlignment = childAlignment;
@@ -1067,6 +1073,14 @@ namespace Vi.UI
         {
             if (UIElementHighlightInstance) { Destroy(UIElementHighlightInstance); }
             UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
+        }
+
+        public void RandomizeCharacter()
+        {
+            foreach (CharacterCustomizationRow row in customizationRowList)
+            {
+                row.SelectRandom();
+            }
         }
 
         public void StartTutorial()

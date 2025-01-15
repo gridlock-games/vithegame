@@ -71,9 +71,11 @@ MonoBehaviour:
   numberOfRoundsWinsToWinGame: 2
   roundDuration: 30
   nextGameActionDuration: 10
+  despawnProjectilesInBetweenRounds: 1
   respawnTime: 0
   respawnType: 0
   levelingEnabled: 0
+  incapacitatedPlayerStateEnabled: 1
   environmentKillFeedIcon: {fileID: 21300000, guid: f2c8db0bfcb4a42c3b3ebc9507158784,
     type: 3}
   timerMode: 0
