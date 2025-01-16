@@ -512,6 +512,7 @@ namespace Vi.UI
                 row.SetAsArrowGroupUsingButtons(colorList);
             }
 
+            List<CharacterCustomizationRow> rowsToInvoke = new List<CharacterCustomizationRow>();
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender))
             {
                 if (!equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType)) { continue; }
@@ -552,9 +553,17 @@ namespace Vi.UI
 
                     buttonParent = rowElement.GetLayoutGroup().transform;
                     CharacterCustomizationButton removeButton = rowElement.GetUninitializedButton();
-                    removeButton.InitializeAsRemoveEquipment();
+                    removeButton.InitializeAsResetButton();
                     removeButton.Button.onClick.RemoveAllListeners();
-                    removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
+                    removeButton.Button.onClick.AddListener(delegate
+                    {
+                        rowElement.CounterIndex = -1;
+                        rowElement.IncrementOption();
+                    });
+
+                    rowsToInvoke.Add(rowElement);
+
+                    //removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
                     customizationButtonReference.Add(new ButtonInfo(removeButton.Button, equipmentOption.equipmentType.ToString(), "Remove"));
 
                     customizationButtonReference.Add(new ButtonInfo(rowElement.LeftArrowButton, "Arrow", "Arrow"));
@@ -566,6 +575,18 @@ namespace Vi.UI
                     buttonParent = rowElement.GetLayoutGroup().transform;
                 }
             }
+
+            StartCoroutine(InvokeRows(rowsToInvoke));
+        }
+
+        private IEnumerator InvokeRows(List<CharacterCustomizationRow> rowsToInvoke)
+        {
+            yield return null;
+            foreach (CharacterCustomizationRow rowToInvoke in rowsToInvoke)
+            {
+                rowToInvoke.IncrementOption();
+            }
+            shouldUseHeadCameraOrientation = false;
         }
 
         private const int customizationRowSpacing = -2000;
