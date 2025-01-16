@@ -1204,10 +1204,12 @@ namespace Vi.UI
 
         public void RandomizeCharacter()
         {
+            bool prevState = shouldUseHeadCameraOrientation;
             foreach (CharacterCustomizationRow row in customizationRowList)
             {
                 row.SelectRandom();
             }
+            shouldUseHeadCameraOrientation = prevState;
         }
 
         public void StartTutorial()
