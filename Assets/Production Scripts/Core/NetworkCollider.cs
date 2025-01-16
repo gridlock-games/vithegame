@@ -227,7 +227,8 @@ namespace Vi.Core
             {
                 pair.IgnoreContact(i);
             }
-            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
+            else if ((CombatAgent.IgnorePlayerCollisionsDuringAilment(col.CombatAgent.GetAilment()) & !col.CombatAgent.ResetColliderRadiusPredicted)
+                | (CombatAgent.IgnorePlayerCollisionsDuringAilment(other.CombatAgent.GetAilment()) & !other.CombatAgent.ResetColliderRadiusPredicted))
             {
                 pair.IgnoreContact(i);
             }
@@ -260,7 +261,8 @@ namespace Vi.Core
             {
                 pair.IgnoreContact(i);
             }
-            else if (col.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown | other.CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
+            else if ((CombatAgent.IgnorePlayerCollisionsDuringAilment(col.CombatAgent.GetAilment()) & !col.CombatAgent.ResetColliderRadiusPredicted)
+                | (CombatAgent.IgnorePlayerCollisionsDuringAilment(other.CombatAgent.GetAilment()) & !other.CombatAgent.ResetColliderRadiusPredicted))
             {
                 pair.IgnoreContact(i);
             }
@@ -359,7 +361,13 @@ namespace Vi.Core
             staticWallBody.MovePosition(MovementHandler.Rigidbody.position);
             staticWallBody.MoveRotation(MovementHandler.Rigidbody.rotation);
 
-            if (CombatAgent.GetAilment() == ActionClip.Ailment.Knockdown)
+            if (CombatAgent.ResetColliderRadiusPredicted)
+            {
+                float t = (Time.fixedTime - CombatAgent.lastRecoveryFixedTime) / CombatAgent.recoveryTimeInvincibilityBuffer;
+                t = Mathf.Clamp01(t);
+                radiusMultiplier = Mathf.Lerp(radiusMultiplier, 1, t);
+            }
+            else if (CombatAgent.IgnorePlayerCollisionsDuringAilment(CombatAgent.GetAilment()))
             {
                 radiusMultiplier = 0.01f;
             }

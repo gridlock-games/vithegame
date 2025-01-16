@@ -315,6 +315,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            ResetColliderRadiusPredicted = default;
+
             incapacitatedReviveTimeTracker.Clear();
             wasIncapacitatedThisLife = default;
 
@@ -1005,13 +1007,51 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
+        public static bool IgnorePlayerCollisionsDuringAilment(ActionClip.Ailment ailmentToCheck)
+        {
+            return ailmentToCheck == ActionClip.Ailment.Knockdown;
+        }
+
+        private Coroutine colliderRadiusResetCoroutine;
+        public bool ResetColliderRadiusPredicted { get; private set; }
+        private IEnumerator ResetColliderRadius()
+        {
+            float timeElapsed = 0;
+            while (true)
+            {
+                if (timeElapsed >= NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat
+                    & timeElapsed > recoveryTimeInvincibilityBuffer)
+                {
+                    break;
+                }
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            ResetColliderRadiusPredicted = true;
+            lastRecoveryFixedTime = Time.fixedTime;
+        }
+
         protected Coroutine ailmentResetCoroutine;
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (prev == ActionClip.Ailment.Knockdown)
+
+            if (!IsServer)
             {
-                lastRecoveryFixedTime = Time.fixedTime;
+                if (IgnorePlayerCollisionsDuringAilment(current))
+                {
+                    colliderRadiusResetCoroutine = StartCoroutine(ResetColliderRadius());
+                }
+            }
+            
+            if (IgnorePlayerCollisionsDuringAilment(prev))
+            {
+                ResetColliderRadiusPredicted = false;
+                if (IsServer)
+                {
+                    lastRecoveryFixedTime = Time.fixedTime;
+                }
             }
 
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
