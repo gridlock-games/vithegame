@@ -227,11 +227,6 @@ namespace Vi.Core
             {
                 pair.IgnoreContact(i);
             }
-            else if ((CombatAgent.IgnorePlayerCollisionsDuringAilment(col.CombatAgent.GetAilment()) & !col.CombatAgent.ResetColliderRadiusPredicted)
-                | (CombatAgent.IgnorePlayerCollisionsDuringAilment(other.CombatAgent.GetAilment()) & !other.CombatAgent.ResetColliderRadiusPredicted))
-            {
-                pair.IgnoreContact(i);
-            }
             else if (StaticWallsEnabledForThisCollision(col, other))
             {
                 pair.IgnoreContact(i);
