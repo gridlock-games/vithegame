@@ -4,6 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 using Vi.ScriptableObjects;
 using System.Linq;
+using Vi.Utility;
 
 namespace Vi.Core
 {
@@ -16,6 +17,11 @@ namespace Vi.Core
             activeStatuses = new NetworkList<int>();
             hittableAgent = GetComponent<HittableAgent>();
             combatAgent = GetComponent<CombatAgent>();
+
+            if (TryGetComponent(out PooledObject pooledObject))
+            {
+                pooledObject.OnReturnToPool += OnReturnToPool;
+            }
         }
 
         private void OnEnable()
@@ -39,6 +45,15 @@ namespace Vi.Core
 
             statusEvents.Remove(this);
             statusEventId = default;
+        }
+
+        private void OnReturnToPool()
+        {
+            foreach (KeyValuePair<ActionClip.Status, PooledObject> kvp in statusTracker)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(kvp.Value);
+            }
+            statusTracker.Clear();
         }
 
         public override void OnNetworkSpawn()
@@ -286,12 +301,43 @@ namespace Vi.Core
         public bool IsImmuneToGroundSpells() { return activeStatuses.Contains((int)ActionClip.Status.immuneToGroundSpells); }
 
         public bool ActiveStatusesWasUpdatedThisFrame { get; private set; }
+        private Dictionary<ActionClip.Status, PooledObject> statusTracker = new Dictionary<ActionClip.Status, PooledObject>();
         private void OnActiveStatusChange(NetworkListEvent<int> networkListEvent)
         {
             ActiveStatusesWasUpdatedThisFrame = true;
             if (resetActiveStatusesBoolCoroutine != null) { StopCoroutine(resetActiveStatusesBoolCoroutine); }
             resetActiveStatusesBoolCoroutine = StartCoroutine(ResetActiveStatusesWasUpdatedBool());
+
+            if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
+            {
+                if (!statusTracker.ContainsKey((ActionClip.Status)networkListEvent.Value))
+                {
+                    int index = System.Array.FindIndex(statusVFXDefinitions, item => item.status == (ActionClip.Status)networkListEvent.Value);
+                    if (index != -1)
+                    {
+                        PooledObject pooledObject = ObjectPoolingManager.SpawnObject(statusVFXDefinitions[index].statusVFX.GetComponent<PooledObject>(), transform);
+                        statusTracker.Add((ActionClip.Status)networkListEvent.Value, pooledObject);
+                    }
+                }
+            }
+            else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
+            {
+                if (statusTracker.TryGetValue((ActionClip.Status)networkListEvent.Value, out PooledObject value))
+                {
+                    StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(value));
+                    statusTracker.Remove((ActionClip.Status)networkListEvent.Value);
+                }
+            }
         }
+
+        [System.Serializable]
+        private class StatusVFXDefinition
+        {
+            public ActionClip.Status status;
+            public StatusVFX statusVFX;
+        }
+
+        [SerializeField] private StatusVFXDefinition[] statusVFXDefinitions = new StatusVFXDefinition[0];
 
         private Coroutine resetActiveStatusesBoolCoroutine;
         private IEnumerator ResetActiveStatusesWasUpdatedBool()
