@@ -105,6 +105,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _A_Normal_Strength: 1
+    - _Ambient_Str: 1
     - _B_Normal_Strength: 1
     - _Base_Color: 0
     - _Base_Normal_Strength: 1
@@ -117,8 +118,10 @@ Material:
     - _Roughness: -13.38
     - _Secondary: 0
     m_Colors:
+    - _Base_Color: {r: 0.7075472, g: 0.6314858, b: 0.53733534, a: 0}
     - _CURVATURE_Color: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 0}
     - _Secondary_Color: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0}
+    - _Shadow_Threshold: {r: -0.5, g: 0.5, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
