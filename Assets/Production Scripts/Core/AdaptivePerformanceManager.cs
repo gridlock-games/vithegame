@@ -165,7 +165,7 @@ namespace Vi.Core
             ChangeTextureMipMaps(ev.WarningLevel, ev.TemperatureLevel);
 
             // Adaptive frame rate
-            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 0.9f)
+            if (ev.WarningLevel == WarningLevel.Throttling & ev.TemperatureLevel > 1.5f)
             {
                 int newTargetFrameRate = 30;
                 if (targetFrameRate > 60) { newTargetFrameRate = 60; }
