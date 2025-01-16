@@ -502,6 +502,12 @@ namespace Vi.Core
 
         private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
 
+        private bool CanReviveTeammateFromIncapacitation()
+        {
+            if (IsGrabbed) { return false; }
+            return GetAilment() == ActionClip.Ailment.None;
+        }
+
         protected virtual void FixedUpdate()
         {
             if (!IsSpawned) { return; }
@@ -512,7 +518,24 @@ namespace Vi.Core
                 foreach (Attributes attributes in ActivePlayers)
                 {
                     if (attributes == this) { continue; }
-                    if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
+
+                    if (Time.fixedTime - attributes.lastRenderHitFixedTime < 0.1f)
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
+
+                    if (!attributes.CanReviveTeammateFromIncapacitation())
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
+
+                    if (PlayerDataManager.Singleton.CanHit(attributes, this))
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
 
                     Vector3 a = attributes.NetworkCollider.GetClosestPoint(MovementHandler.GetPosition());
                     Vector3 b = NetworkCollider.GetClosestPoint(attributes.MovementHandler.GetPosition());
@@ -1833,9 +1856,13 @@ namespace Vi.Core
         public AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
         protected AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return WeaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial); }
 
+        private float lastRenderHitFixedTime = -5;
+
         protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
+
+            lastRenderHitFixedTime = Time.fixedTime;
 
             GlowRenderer.RenderHit();
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
@@ -1855,6 +1882,8 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
+            lastRenderHitFixedTime = Time.fixedTime;
+
             // This check is for late joining clients
             if (!GlowRenderer) { return; }
             GlowRenderer.RenderHit();
