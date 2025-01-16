@@ -371,6 +371,18 @@ Camera:
     type: 3}
   m_PrefabInstance: {fileID: 3557056822110727915}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3840393409882790203 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 294674755101571024, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4949354014722338629 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8499021565615636910, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -491,6 +503,7 @@ MonoBehaviour:
   - {fileID: 6496362794858210969}
   MVPCanvas: {fileID: 6045618182926444883}
   MVPCanvasGroup: {fileID: 5071807923183610826}
+  MVPBackgroundImage: {fileID: 3840393409882790203}
   MVPAccountCard: {fileID: 2075066947893440008}
   MVPPresentationCamera: {fileID: 3430916691335124574}
   MVPKillsText: {fileID: 6116117941187681418}

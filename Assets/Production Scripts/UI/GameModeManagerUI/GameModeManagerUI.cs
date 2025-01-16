@@ -27,6 +27,7 @@ namespace Vi.UI
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
         [SerializeField] private CanvasGroup MVPCanvasGroup;
+        [SerializeField] private Image MVPBackgroundImage;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
         [SerializeField] private Text MVPKillsText;
@@ -55,6 +56,8 @@ namespace Vi.UI
             MVPPresentationCamera.enabled = false;
 
             MVPCanvas.enabled = false;
+
+            MVPBackgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
         }
 
         private void OnDestroy()
@@ -193,8 +196,21 @@ namespace Vi.UI
                     MVPCanvas.enabled = false;
                     MVPCanvasGroup.alpha = 0;
                     break;
+                case GameModeManager.PostGameStatus.Rewards:
+                    if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
+                    {
+                        GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+                        if (playerScore.isValid)
+                        {
+                            if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
+                            MVPCanvas.enabled = true;
+                            MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                            MVPAccountCard.InitializeAsMVPScore(playerScore.id);
+                        }
+                    }
+                    break;
                 case GameModeManager.PostGameStatus.MVP:
-                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview()); }
+                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
                     MVPCanvas.enabled = true;
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
@@ -210,27 +226,41 @@ namespace Vi.UI
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
                     {
-                        if (lightInstance) { Destroy(lightInstance); }
-                        if (MVPPreviewObject)
-                        {
-                            if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                            {
-                                if (pooledObject.IsSpawned)
-                                {
-                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                                }
-                                MVPPreviewObject = null;
-                            }
-                            else
-                            {
-                                Destroy(MVPPreviewObject);
-                            }
-                        }
+                        RemoveCharPreview();
                     }
                     break;
                 default:
-                    Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
+                    Debug.LogWarning("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
                     break;
+            }
+
+            if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+            {
+                RemoveCharPreview();
+            }
+
+            lastPostGameStatus = gameModeManager.GetPostGameStatus();
+        }
+
+        private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
+
+        private void RemoveCharPreview()
+        {
+            if (lightInstance) { Destroy(lightInstance); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
             }
         }
 
@@ -239,7 +269,7 @@ namespace Vi.UI
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
         private bool MVPPreviewInProgress;
-        private IEnumerator CreateMVPPreview()
+        private IEnumerator CreateMVPPreview(GameModeManager.PlayerScore playerScoreToPreview)
         {
             MVPPreviewInProgress = true;
 
@@ -247,13 +277,13 @@ namespace Vi.UI
             MVPDeathsText.text = "";
             MVPAssistsText.text = "";
 
-            yield return new WaitUntil(() => gameModeManager.GetMVPScore().isValid);
+            yield return new WaitUntil(() => playerScoreToPreview.isValid);
 
-            MVPKillsText.text = gameModeManager.GetMVPScore().cumulativeKills.ToString();
-            MVPDeathsText.text = gameModeManager.GetMVPScore().cumulativeDeaths.ToString();
-            MVPAssistsText.text = gameModeManager.GetMVPScore().cumulativeAssists.ToString();
+            MVPKillsText.text = playerScoreToPreview.cumulativeKills.ToString();
+            MVPDeathsText.text = playerScoreToPreview.cumulativeDeaths.ToString();
+            MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             if (lightInstance) { Destroy(lightInstance); }
@@ -272,7 +302,7 @@ namespace Vi.UI
             }
 
             // Instantiate the player model
-            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(gameModeManager.GetMVPScore().id);
+            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerScoreToPreview.id);
             if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledPrefab))
             {
                 MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,

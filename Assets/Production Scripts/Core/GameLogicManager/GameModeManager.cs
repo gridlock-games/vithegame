@@ -844,6 +844,7 @@ namespace Vi.Core.GameModeManagers
         public enum PostGameStatus
         {
             None,
+            Rewards,
             MVP,
             Scoreboard
         }
@@ -853,6 +854,9 @@ namespace Vi.Core.GameModeManagers
 
         private IEnumerator DisplayPostGameEvents()
         {
+            postGameStatus.Value = PostGameStatus.Rewards;
+            yield return new WaitForSeconds(7.5f);
+
             if (GetMVPScore().isValid)
             {
                 // MVP Presentation
@@ -862,7 +866,6 @@ namespace Vi.Core.GameModeManagers
 
             // Scoreboard
             postGameStatus.Value = PostGameStatus.Scoreboard;
-
             yield return new WaitForSeconds(7.5f);
 
             // Return to Lobby
