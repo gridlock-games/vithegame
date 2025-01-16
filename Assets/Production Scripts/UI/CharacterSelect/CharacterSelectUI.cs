@@ -764,6 +764,12 @@ namespace Vi.UI
 
             if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
+            if (!string.IsNullOrWhiteSpace(character._id.ToString())
+                | character.raceAndGender != selectedCharacter.raceAndGender)
+            {
+                playUltimateAnimation = true;
+            }
+
             selectedCharacter = character;
             selectedCharacter.raceAndGender = raceAndGender;
 
@@ -772,7 +778,11 @@ namespace Vi.UI
 
             RefreshButtonInteractability();
 
-            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+            if (playUltimateAnimation)
+            {
+                StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+                playUltimateAnimation = false;
+            }
         }
 
         [SerializeField] private Image weaponClassPreviewImage;
@@ -1014,6 +1024,7 @@ namespace Vi.UI
         }
 
         private bool isEditingExistingCharacter;
+        private bool playUltimateAnimation;
 
         public void OpenCharacterCustomization()
         {
@@ -1040,6 +1051,8 @@ namespace Vi.UI
             weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
             CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
+
+            playUltimateAnimation = true;
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
