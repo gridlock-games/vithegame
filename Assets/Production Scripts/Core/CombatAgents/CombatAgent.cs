@@ -293,6 +293,7 @@ namespace Vi.Core
         protected virtual void OnEnable()
         {
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
+            UpdateActivePlayersList();
         }
 
         private void OnSpiritChanged(float prev, float current)
@@ -315,6 +316,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            ResetColliderRadiusPredicted = default;
+
             incapacitatedReviveTimeTracker.Clear();
             wasIncapacitatedThisLife = default;
 
@@ -494,17 +497,19 @@ namespace Vi.Core
             }
         }
 
+        public List<Attributes> ActivePlayers { get; private set; } = new List<Attributes>();
+        private void UpdateActivePlayersList() { ActivePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(); }
+
         private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
 
         protected virtual void FixedUpdate()
         {
             if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
 
             if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
                 float maxProgress = 0;
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                foreach (Attributes attributes in ActivePlayers)
                 {
                     if (attributes == this) { continue; }
                     if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
@@ -528,11 +533,14 @@ namespace Vi.Core
                             maxProgress = incapacitatedReviveTimeTracker[attributes] / 3;
                         }
 
-                        if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                        if (IsServer)
                         {
-                            ResetStats(0.25f, false, false, false);
-                            ResetAilment();
-                            break;
+                            if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                            {
+                                ResetStats(0.25f, false, false, false);
+                                ResetAilment();
+                                break;
+                            }
                         }
                     }
                     else if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
@@ -550,6 +558,8 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
             if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
@@ -1005,13 +1015,57 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
+        public static bool IgnorePlayerCollisionsDuringAilment(ActionClip.Ailment ailmentToCheck)
+        {
+            return ailmentToCheck == ActionClip.Ailment.Knockdown;
+        }
+
+        private Coroutine colliderRadiusResetCoroutine;
+        public bool ResetColliderRadiusPredicted { get; private set; }
+        private IEnumerator ResetColliderRadius()
+        {
+            float timeElapsed = 0;
+            while (true)
+            {
+                if (timeElapsed >= (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) + knockdownDuration + ActionClip.HitStopEffectDuration)
+                {
+                    break;
+                }
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            ResetColliderRadiusPredicted = true;
+            lastRecoveryFixedTime = Time.fixedTime;
+        }
+
         protected Coroutine ailmentResetCoroutine;
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (prev == ActionClip.Ailment.Knockdown)
+
+            if (!IsServer)
             {
-                lastRecoveryFixedTime = Time.fixedTime;
+                if (IgnorePlayerCollisionsDuringAilment(current))
+                {
+                    colliderRadiusResetCoroutine = StartCoroutine(ResetColliderRadius());
+                }
+            }
+            
+            if (IgnorePlayerCollisionsDuringAilment(prev))
+            {
+                ResetColliderRadiusPredicted = false;
+
+                if (colliderRadiusResetCoroutine != null)
+                {
+                    StopCoroutine(colliderRadiusResetCoroutine);
+                    lastRecoveryFixedTime = Time.fixedTime;
+                }
+
+                if (IsServer)
+                {
+                    lastRecoveryFixedTime = Time.fixedTime;
+                }
             }
 
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
