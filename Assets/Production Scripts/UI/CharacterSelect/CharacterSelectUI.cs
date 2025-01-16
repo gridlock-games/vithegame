@@ -401,7 +401,7 @@ namespace Vi.UI
             int genderCount = 2;
             leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
             genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
-            genderRowElement.rowHeaderText.text = "Gender";
+            genderRowElement.rowHeaderText.text = "Gender".ToUpper();
             genderButtonParent = genderRowElement.GetLayoutGroup().transform;
 
             CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
