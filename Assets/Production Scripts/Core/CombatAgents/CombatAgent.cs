@@ -293,6 +293,7 @@ namespace Vi.Core
         protected virtual void OnEnable()
         {
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
+            UpdateActivePlayersList();
         }
 
         private void OnSpiritChanged(float prev, float current)
@@ -496,17 +497,19 @@ namespace Vi.Core
             }
         }
 
+        public List<Attributes> ActivePlayers { get; private set; } = new List<Attributes>();
+        private void UpdateActivePlayersList() { ActivePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(); }
+
         private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
 
         protected virtual void FixedUpdate()
         {
             if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
 
             if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
                 float maxProgress = 0;
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                foreach (Attributes attributes in ActivePlayers)
                 {
                     if (attributes == this) { continue; }
                     if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
@@ -530,11 +533,14 @@ namespace Vi.Core
                             maxProgress = incapacitatedReviveTimeTracker[attributes] / 3;
                         }
 
-                        if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                        if (IsServer)
                         {
-                            ResetStats(0.25f, false, false, false);
-                            ResetAilment();
-                            break;
+                            if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                            {
+                                ResetStats(0.25f, false, false, false);
+                                ResetAilment();
+                                break;
+                            }
                         }
                     }
                     else if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
@@ -552,6 +558,8 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
             if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
