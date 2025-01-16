@@ -1019,7 +1019,7 @@ namespace Vi.Core
             float timeElapsed = 0;
             while (true)
             {
-                if (timeElapsed >= (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) * 2 + recoveryTimeInvincibilityBuffer)
+                if (timeElapsed >= (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) + knockdownDuration + ActionClip.HitStopEffectDuration)
                 {
                     break;
                 }
@@ -1027,7 +1027,6 @@ namespace Vi.Core
                 yield return null;
             }
 
-            Debug.Log("Reset collider radius predicted " + GetName());
             ResetColliderRadiusPredicted = true;
             lastRecoveryFixedTime = Time.fixedTime;
         }
@@ -1052,7 +1051,6 @@ namespace Vi.Core
                 if (colliderRadiusResetCoroutine != null)
                 {
                     StopCoroutine(colliderRadiusResetCoroutine);
-                    Debug.Log("REACHED " + GetName());
                     lastRecoveryFixedTime = Time.fixedTime;
                 }
 
