@@ -768,6 +768,9 @@ namespace Vi.UI
                 | character.raceAndGender != selectedCharacter.raceAndGender)
             {
                 playUltimateAnimation = true;
+                weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
+                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+                weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
             }
 
             selectedCharacter = character;
