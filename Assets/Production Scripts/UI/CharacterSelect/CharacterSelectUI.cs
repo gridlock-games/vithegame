@@ -404,12 +404,12 @@ namespace Vi.UI
             CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
             boyButtonElement.InitializeAsColor(Color.blue);
             boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
+            //customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
 
             CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
             girlButtonElement.InitializeAsColor(Color.magenta);
             girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
+            //customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
 
             if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanMale)
             {
@@ -424,14 +424,18 @@ namespace Vi.UI
                 Debug.LogWarning("Unsure how to set initial counter index from " + selectedCharacter.raceAndGender);
             }
 
+            customizationButtonReference.Add(new ButtonInfo(genderRowElement.LeftArrowButton, "Arrow", "Arrow"));
+            customizationButtonReference.Add(new ButtonInfo(genderRowElement.RightArrowButton, "Arrow", "Arrow"));
             genderRowElement.SetAsArrowGroupUsingButtons(new Color[] { Color.blue, Color.magenta });
 
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
+            List<(CharacterCustomizationRow, List<Color>)> rowsToSetAsArrows = new List<(CharacterCustomizationRow, List<Color>)>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
                 if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head) { continue; }
 
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
+                CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
                     bool isOnLeftSide = true;
@@ -444,8 +448,10 @@ namespace Vi.UI
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
-                    buttonParent.GetComponent<CharacterCustomizationRow>().GetLayoutGroup().childAlignment = childAlignment;
-                    customizationRowList.Add(buttonParent.GetComponent<CharacterCustomizationRow>());
+                    rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    customizationRowList.Add(rowElement);
+                    rowsToSetAsArrows.Add((rowElement, new List<Color>()));
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
                     headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
                     if (!isOnLeftSide)
@@ -459,10 +465,39 @@ namespace Vi.UI
                     }
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
                 }
-                CharacterCustomizationRow rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
                 buttonParent = rowElement.GetLayoutGroup().transform;
 
                 Color textureAverageColor = characterMaterial.averageTextureColor;
+
+                int rowToSetIndex = rowsToSetAsArrows.FindIndex(item => item.Item1 == rowElement);
+                rowsToSetAsArrows[rowToSetIndex].Item2.Add(textureAverageColor);
+
+                var defaultChar = WebRequestManager.Singleton.GetDefaultCharacter(raceAndGender);
+                switch (characterMaterial.materialApplicationLocation)
+                {
+                    case CharacterReference.MaterialApplicationLocation.Body:
+                        if (defaultChar.bodyColor == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    case CharacterReference.MaterialApplicationLocation.Eyes:
+                        if (defaultChar.eyeColor == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    case CharacterReference.MaterialApplicationLocation.Brows:
+                        if (defaultChar.brows == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure how to handle material application location " + characterMaterial.materialApplicationLocation);
+                        break;
+                }
 
                 CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
                 buttonElement.InitializeAsColor(textureAverageColor);
@@ -470,6 +505,11 @@ namespace Vi.UI
 
                 buttonElement.Button.onClick.AddListener(delegate { ChangeCharacterMaterial(characterMaterial); });
                 customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
+            }
+
+            foreach ((CharacterCustomizationRow row, List<Color> colorList) in rowsToSetAsArrows)
+            {
+                row.SetAsArrowGroupUsingButtons(colorList);
             }
 
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender))

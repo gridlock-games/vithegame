@@ -16,8 +16,11 @@ namespace Vi.UI
 
         public bool Initialized { get; private set; }
 
-        public void InitializeAsColor(Color color)
+        public bool IsPreview { get; private set; }
+
+        public void InitializeAsColor(Color color, bool isPreview = false)
         {
+            IsPreview = isPreview;
             Initialized = true;
             iconImage.sprite = materialSprite;
             iconImage.color = color;

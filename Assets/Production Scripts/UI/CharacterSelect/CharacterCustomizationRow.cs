@@ -37,6 +37,12 @@ namespace Vi.UI
             arrowLayoutGroup.gameObject.SetActive(true);
             this.colorList = colorList.ToArray();
 
+            if (CounterIndex == -1)
+            {
+                Debug.LogWarning("Counter index is -1 on initialization");
+                CounterIndex = 0;
+            }
+
             previewButton = GetUninitializedButton();
             previewButton.InitializeAsColor(this.colorList[CounterIndex]);
             previewButton.Button.transition = Selectable.Transition.None;
@@ -65,12 +71,12 @@ namespace Vi.UI
             if (isButtonArrowGroup)
             {
                 List<CharacterCustomizationButton> options = new List<CharacterCustomizationButton>();
-                options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & item.Button.interactable));
+                options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & !item.IsPreview));
 
-                if (CounterIndex >= options.Count) { CounterIndex = 0; }
+                if (CounterIndex >= colorList.Length) { CounterIndex = 0; }
 
                 options[CounterIndex].Button.onClick.Invoke();
-                previewButton.InitializeAsColor(colorList[CounterIndex]);
+                previewButton.InitializeAsColor(colorList[CounterIndex], true);
             }
             else
             {
@@ -86,12 +92,12 @@ namespace Vi.UI
             if (isButtonArrowGroup)
             {
                 List<CharacterCustomizationButton> options = new List<CharacterCustomizationButton>();
-                options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & item.Button.interactable));
+                options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & !item.IsPreview));
 
-                if (CounterIndex < 0) { CounterIndex = options.Count - 1; }
+                if (CounterIndex < 0) { CounterIndex = colorList.Length - 1; }
 
                 options[CounterIndex].Button.onClick.Invoke();
-                previewButton.InitializeAsColor(colorList[CounterIndex]);
+                previewButton.InitializeAsColor(colorList[CounterIndex], true);
             }
             else
             {
@@ -114,7 +120,12 @@ namespace Vi.UI
 
         public void SelectRandom()
         {
-            if (buttonLayoutGroup.gameObject.activeInHierarchy)
+            if (isButtonArrowGroup)
+            {
+                CounterIndex = Random.Range(0, colorList.Length);
+                IncrementOption();
+            }
+            else if (buttonLayoutGroup.gameObject.activeInHierarchy)
             {
                 List<CharacterCustomizationButton> options = new List<CharacterCustomizationButton>();
                 options.AddRange(System.Array.FindAll(buttons, item => item.Initialized & item.gameObject.activeInHierarchy));
