@@ -27,7 +27,6 @@ namespace Vi.UI
 
             worldSpacePosition = cam.ScreenToWorldPoint(screenPoint);
 
-            Debug.Log(worldSpacePosition);
             particleEmitSettings.position = worldSpacePosition;
             ps.Emit(particleEmitSettings, 1);
         }
