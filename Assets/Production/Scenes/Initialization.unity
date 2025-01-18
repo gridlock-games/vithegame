@@ -998,7 +998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78da3fcd2563f9f429d1666053688ef1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clickParticle: {fileID: 1035310795}
+  clickParticle: {fileID: 1035310798}
 --- !u!20 &494376425 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 533234322584259637, guid: 030cc18a9d9cba14184b6346d3165263,
@@ -2014,6 +2014,7 @@ GameObject:
   - component: {fileID: 1035310797}
   - component: {fileID: 1035310795}
   - component: {fileID: 1035310796}
+  - component: {fileID: 1035310798}
   m_Layer: 12
   m_Name: Click Particle Effect
   m_TagString: Untagged
@@ -6836,6 +6837,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 486171615}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+--- !u!114 &1035310798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1035310794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1045652829
 GameObject:
   m_ObjectHideFlags: 0

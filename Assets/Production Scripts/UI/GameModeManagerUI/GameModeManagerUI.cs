@@ -30,8 +30,14 @@ namespace Vi.UI
         [SerializeField] private Image MVPBackgroundImage;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
+        [SerializeField] private Image MVPHeaderImage;
+        [SerializeField] private Text MVPHeaderText;
+        [SerializeField] private UIParticleSystem scorePopEffect;
+        [SerializeField] private RectTransform killsParent;
         [SerializeField] private Text MVPKillsText;
+        [SerializeField] private RectTransform deathsParent;
         [SerializeField] private Text MVPDeathsText;
+        [SerializeField] private RectTransform assistsParent;
         [SerializeField] private Text MVPAssistsText;
         [SerializeField] private Light previewLightPrefab;
 
@@ -58,6 +64,13 @@ namespace Vi.UI
             MVPCanvas.enabled = false;
 
             MVPBackgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
+
+            MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
+            MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
+
+            killsParent.localScale = Vector3.zero;
+            assistsParent.localScale = Vector3.zero;
+            deathsParent.localScale = Vector3.zero;
         }
 
         private void OnDestroy()
@@ -150,6 +163,7 @@ namespace Vi.UI
             }
         }
 
+        private float MVPScoreLerpProgress;
         protected virtual void Update()
         {
             FindLocalActionMapHandler();
@@ -197,6 +211,8 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
+                    MVPCanvas.enabled = true;
+                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
                     {
                         GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
@@ -208,12 +224,69 @@ namespace Vi.UI
                             MVPAccountCard.InitializeAsMVPScore(playerScore.id);
                         }
                     }
+
+                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 1))
+                    {
+                        Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+
+                        if (killsParent.localScale != Vector3.one)
+                        {
+                            killsParent.localScale = newScale;
+                            if (newScale == Vector3.one)
+                            {
+                                scorePopEffect.PlayWorldPoint(killsParent.position + Vector3.forward * 0.01f);
+                                MVPScoreLerpProgress = 0;
+                            }
+                        }
+                        else if (deathsParent.localScale != Vector3.one)
+                        {
+                            deathsParent.localScale = newScale;
+                            if (newScale == Vector3.one)
+                            {
+                                scorePopEffect.PlayWorldPoint(deathsParent.position + Vector3.forward * 0.01f);
+                                MVPScoreLerpProgress = 0;
+                            }
+                        }
+                        else if (assistsParent.localScale != Vector3.one)
+                        {
+                            assistsParent.localScale = newScale;
+                            if (newScale == Vector3.one)
+                            {
+                                scorePopEffect.PlayWorldPoint(assistsParent.position + Vector3.forward * 0.01f);
+                                MVPScoreLerpProgress = 0;
+                            }
+                        }
+                        
+                        MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
+                    }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
+                    // Remove char preview from last status
+                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+                    {
+                        RemoveCharPreview();
+                        MVPScoreLerpProgress = 0;
+                        killsParent.localScale = Vector3.zero;
+                        assistsParent.localScale = Vector3.zero;
+                        deathsParent.localScale = Vector3.zero;
+                    }
+
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
                     MVPCanvas.enabled = true;
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
+
+                    MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, Mathf.MoveTowards(MVPHeaderImage.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+                    MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, Mathf.MoveTowards(MVPHeaderText.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+
+                    if (Mathf.Approximately(MVPHeaderImage.color.a, 1))
+                    {
+                        Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+                        killsParent.localScale = newScale;
+                        assistsParent.localScale = newScale;
+                        deathsParent.localScale = newScale;
+                        MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
+                    }
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
@@ -232,11 +305,6 @@ namespace Vi.UI
                 default:
                     Debug.LogWarning("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
                     break;
-            }
-
-            if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
-            {
-                RemoveCharPreview();
             }
 
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
@@ -264,7 +332,8 @@ namespace Vi.UI
             }
         }
 
-        private const float opacityTransitionSpeed = 2;
+        private const float opacityTransitionSpeed = 0.5f;
+        private const float scaleTransitionSpeed = 2;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;

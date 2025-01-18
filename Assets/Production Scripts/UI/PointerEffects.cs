@@ -10,18 +10,11 @@ namespace Vi.UI
 {
     public class PointerEffects : MonoBehaviour
     {
-        [SerializeField] ParticleSystem clickParticle;
-
-        ParticleSystem.EmitParams clickParticleEmitSettings;
+        [SerializeField] UIParticleSystem clickParticle;
 
         private void OnEnable()
         {
             RefreshStatus();
-        }
-
-        private void Start()
-        {
-            clickParticleEmitSettings = new ParticleSystem.EmitParams();
         }
 
         private PlayerInput playerInput;
@@ -78,8 +71,8 @@ namespace Vi.UI
                     {
                         clickParticle.gameObject.SetActive(false);
 
-                        particleCam = UICamera.GetActiveUIParticleCamera();
-                        if (particleCam) { particleCam.enabled = false; }
+                        //particleCam = UICamera.GetActiveUIParticleCamera();
+                        //if (particleCam) { particleCam.enabled = false; }
 
                         return;
                     }
@@ -107,10 +100,7 @@ namespace Vi.UI
             {
                 if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
                 {
-                    Vector3 startPos = touch.screenPosition;
-                    startPos.z = cam.nearClipPlane;
-                    clickParticleEmitSettings.position = cam.ScreenToWorldPoint(startPos);
-                    clickParticle.Emit(clickParticleEmitSettings, 1);
+                    clickParticle.PlayScreenPoint(touch.screenPosition);
                 }
             }
 #else
@@ -120,10 +110,7 @@ namespace Vi.UI
 
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    Vector3 startPos = Mouse.current.position.value;
-                    startPos.z = cam.nearClipPlane;
-                    clickParticleEmitSettings.position = cam.ScreenToWorldPoint(startPos);
-                    clickParticle.Emit(clickParticleEmitSettings, 1);
+                    clickParticle.PlayScreenPoint(Mouse.current.position.value);
                 }
             }
 #endif
