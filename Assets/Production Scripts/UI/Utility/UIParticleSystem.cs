@@ -14,6 +14,11 @@ namespace Vi.UI
         {
             ps = GetComponent<ParticleSystem>();
             particleEmitSettings = new ParticleSystem.EmitParams();
+
+            if (gameObject.layer != LayerMask.NameToLayer("UIParticle"))
+            {
+                Debug.LogWarning(this + " isn't in the UI Particle layer!");
+            }
         }
 
         public void PlayWorldPoint(Vector3 worldSpacePosition)

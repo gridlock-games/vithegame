@@ -414,11 +414,11 @@ namespace Vi.UI
             girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
             //customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
 
-            if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanMale)
+            if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
             {
                 genderRowElement.CounterIndex = 1;
             }
-            else if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
+            else if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanMale)
             {
                 genderRowElement.CounterIndex = 0;
             }
@@ -677,12 +677,34 @@ namespace Vi.UI
             }
         }
 
-        private WebRequestManager.Character selectedCharacter;
-        private GameObject previewObject;
-        private LoadoutManager loadoutManager;
+        [SerializeField] private RawImage characterPreviewImage;
+        private Queue<WebRequestManager.Character> characterQueue = new Queue<WebRequestManager.Character>();
 
-        public void UpdateSelectedCharacter(WebRequestManager.Character character)
+        private void ProcessCharacterQueue()
         {
+            if (characterQueue.Count > 0)
+            {
+                //if (updateCharCoroutine != null)
+                //{
+                //    return;
+                //}
+
+                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
+            }
+            else if (!updateDisplayCharacterRunning)
+            {
+                characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 1, Time.deltaTime * characterPreviewFadeSpeed));
+            }
+        }
+
+        private const float characterPreviewFadeSpeed = 3;
+
+        private Coroutine updateCharCoroutine;
+        private bool updateDisplayCharacterRunning;
+        private IEnumerator UpdateDisplayCharacter(WebRequestManager.Character character)
+        {
+            updateDisplayCharacterRunning = true;
+
             shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
@@ -704,10 +726,37 @@ namespace Vi.UI
                 }
                 selectedCharacter = default;
                 RefreshButtonInteractability();
-                return;
+                updateDisplayCharacterRunning = false;
+                yield break;
+            }
+
+            bool idsAreEqual = selectedCharacter._id == character._id;
+            bool raceAndGendersAreEqual = selectedCharacter.raceAndGender == character.raceAndGender;
+            bool shouldCreateNewModel = !raceAndGendersAreEqual | selectedCharacter.model != character.model;
+
+            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            selectedRace = raceAndGenderStrings[0];
+            selectedGender = raceAndGenderStrings[1];
+            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+
+            selectedCharacter = character;
+            selectedCharacter.raceAndGender = raceAndGender;
+
+            RefreshButtonInteractability();
+
+            if (!string.IsNullOrWhiteSpace(character._id.ToString()))
+            {
+                if (shouldCreateNewModel | !idsAreEqual)
+                {
+                    while (true)
+                    {
+                        characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 0, Time.deltaTime * characterPreviewFadeSpeed));
+                        if (Mathf.Approximately(characterPreviewImage.color.a, 0)) { break; }
+                        yield return null;
+                    }
+                }
             }
             
-            bool shouldCreateNewModel = selectedCharacter.raceAndGender != character.raceAndGender | selectedCharacter.model != character.model;
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -729,11 +778,6 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-
-            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
-            selectedRace = raceAndGenderStrings[0];
-            selectedGender = raceAndGenderStrings[1];
-            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
 
             if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
             {
@@ -765,16 +809,13 @@ namespace Vi.UI
             if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
             if (!string.IsNullOrWhiteSpace(character._id.ToString())
-                | character.raceAndGender != selectedCharacter.raceAndGender)
+                | !raceAndGendersAreEqual)
             {
                 playUltimateAnimation = true;
                 weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
                 CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
                 weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
             }
-
-            selectedCharacter = character;
-            selectedCharacter.raceAndGender = raceAndGender;
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
@@ -783,9 +824,20 @@ namespace Vi.UI
 
             if (playUltimateAnimation)
             {
-                StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+                yield return PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>());
                 playUltimateAnimation = false;
             }
+
+            updateDisplayCharacterRunning = false;
+        }
+
+        private WebRequestManager.Character selectedCharacter;
+        private GameObject previewObject;
+        private LoadoutManager loadoutManager;
+
+        private void UpdateSelectedCharacter(WebRequestManager.Character character)
+        {
+            characterQueue.Enqueue(character);
         }
 
         [SerializeField] private Image weaponClassPreviewImage;
@@ -905,6 +957,8 @@ namespace Vi.UI
         private const float cameraLerpSpeed = 2;
         private void Update()
         {
+            ProcessCharacterQueue();
+
             characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
             characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
 
