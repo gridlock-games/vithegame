@@ -367,6 +367,8 @@ namespace Vi.UI
                 yield return null;
             }
 
+            yield return new WaitForSeconds(transitionWaitTime);
+
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -385,6 +387,8 @@ namespace Vi.UI
                 yield return null;
             }
 
+            yield return new WaitForSeconds(transitionWaitTime);
+
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -396,6 +400,8 @@ namespace Vi.UI
 
             yield return DisplayKDA();
         }
+
+        private const float transitionWaitTime = 2;
 
         private bool displayKDARunning;
         private IEnumerator DisplayKDA()
