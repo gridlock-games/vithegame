@@ -185,7 +185,6 @@ namespace Vi.UI
             }
         }
 
-        private float MVPScoreLerpProgress;
         protected virtual void Update()
         {
             FindLocalActionMapHandler();
@@ -263,114 +262,14 @@ namespace Vi.UI
                         viEssenceEarnedText.text += "x";
                     }
 
-                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 1)
-                        & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1))
+                    if (!displayRewardsHasBeenRun)
                     {
-                        // TODO change this to be calculated based on exp to next level and current exp earned
-                        float maxExpFillAmount = 0.7f;
-
-                        if (expGainedParent.localScale != Vector3.one & !skipFirstIf)
-                        {
-                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
-
-                            expGainedParent.localScale = newScale;
-                            if (newScale == Vector3.one)
-                            {
-                                skipFirstIf = true;
-                                MVPScoreLerpProgress = 0;
-                            }
-
-                            MVPScoreLerpProgress += Time.deltaTime * rewardsTransitionSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
-                        else if (!Mathf.Approximately(expGainedBar.fillAmount, maxExpFillAmount))
-                        {
-                            float newFillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, MVPScoreLerpProgress);
-                            expGainedBar.fillAmount = newFillAmount;
-                            if (Mathf.Approximately(newFillAmount, maxExpFillAmount))
-                            {
-                                MVPScoreLerpProgress = 0;
-                            }
-
-                            MVPScoreLerpProgress += Time.deltaTime * expTransitionSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
-                        else if (expGainedParent.localScale != Vector3.zero)
-                        {
-                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, MVPScoreLerpProgress);
-
-                            expGainedParent.localScale = newScale;
-                            if (newScale == Vector3.zero)
-                            {
-                                MVPScoreLerpProgress = 0;
-                            }
-
-                            MVPScoreLerpProgress += Time.deltaTime * rewardsTransitionSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
-                        else if (viEssenceEarnedParent.localScale != Vector3.one)
-                        {
-                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
-
-                            viEssenceEarnedParent.localScale = newScale;
-                            if (newScale == Vector3.one)
-                            {
-                                MVPScoreLerpProgress = 0;
-                            }
-
-                            MVPScoreLerpProgress += Time.deltaTime * expTransitionSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
-                        else if (characterPreviewImage.rectTransform.anchoredPosition != previewImageLeftAnchoredPosition)
-                        {
-                            Vector2 newPos = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, MVPScoreLerpProgress);
-
-                            characterPreviewImage.rectTransform.anchoredPosition = newPos;
-                            if (newPos == previewImageLeftAnchoredPosition)
-                            {
-                                MVPScoreLerpProgress = 0;
-                            }
-
-                            MVPScoreLerpProgress += Time.deltaTime * characterPreviewImageMoveSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
-                        else // KDA section
-                        {
-                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
-
-                            if (killsParent.localScale != Vector3.one)
-                            {
-                                killsParent.localScale = newScale;
-                                if (newScale == Vector3.one)
-                                {
-                                    scorePopEffect.PlayWorldPoint(killsParent.position);
-                                    MVPScoreLerpProgress = 0;
-                                }
-                            }
-                            else if (deathsParent.localScale != Vector3.one)
-                            {
-                                deathsParent.localScale = newScale;
-                                if (newScale == Vector3.one)
-                                {
-                                    scorePopEffect.PlayWorldPoint(deathsParent.position);
-                                    MVPScoreLerpProgress = 0;
-                                }
-                            }
-                            else if (assistsParent.localScale != Vector3.one)
-                            {
-                                assistsParent.localScale = newScale;
-                                if (newScale == Vector3.one)
-                                {
-                                    scorePopEffect.PlayWorldPoint(assistsParent.position);
-                                    MVPScoreLerpProgress = 0;
-                                }
-                            }
-                            MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
-                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
-                        }
+                        displayRewardsCoroutine = StartCoroutine(DisplayRewards());
                     }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
+                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
+
                     // Remove char preview from last status
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
                     {
@@ -389,14 +288,15 @@ namespace Vi.UI
 
                     if (Mathf.Approximately(MVPHeaderImage.color.a, 1))
                     {
-                        Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+                        Vector3 newScale = Vector3.one;
                         killsParent.localScale = newScale;
                         assistsParent.localScale = newScale;
                         deathsParent.localScale = newScale;
-                        MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
                     }
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
+                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
+
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
                     MVPCanvas.enabled = MVPCanvasGroup.alpha == 0;
 
@@ -418,7 +318,6 @@ namespace Vi.UI
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
         }
 
-        private bool skipFirstIf;
         private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
 
         private void RemoveCharPreview()
@@ -439,6 +338,101 @@ namespace Vi.UI
                     Destroy(MVPPreviewObject);
                 }
             }
+        }
+
+        private bool displayRewardsHasBeenRun;
+        private Coroutine displayRewardsCoroutine;
+        private IEnumerator DisplayRewards()
+        {
+            displayRewardsHasBeenRun = true;
+            yield return new WaitUntil(() => Mathf.Approximately(MVPCanvasGroup.alpha, 1) & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1));
+            
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+
+            // TODO change this to be calculated based on exp to next level and current exp earned
+            float maxExpFillAmount = 0.7f;
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * expTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
+                yield return null;
+            }
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
+                yield return null;
+            }
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                viEssenceEarnedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * characterPreviewImageMoveSpeed;
+                t = Mathf.Clamp01(t);
+                characterPreviewImage.rectTransform.anchoredPosition = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, t);
+                yield return null;
+            }
+
+            yield return DisplayKDA();
+        }
+
+        private bool displayKDARunning;
+        private IEnumerator DisplayKDA()
+        {
+            displayKDARunning = true;
+
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(killsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(deathsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(assistsParent.position);
+
+            displayKDARunning = false;
         }
 
         private const float rewardsTransitionSpeed = 3;
