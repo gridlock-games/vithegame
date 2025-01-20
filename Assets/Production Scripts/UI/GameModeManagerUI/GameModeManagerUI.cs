@@ -376,6 +376,7 @@ namespace Vi.UI
                     {
                         RemoveCharPreview();
                         ResetMVPUIElements();
+                        characterPreviewImage.rectTransform.anchoredPosition = previewImageLeftAnchoredPosition;
                     }
 
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
