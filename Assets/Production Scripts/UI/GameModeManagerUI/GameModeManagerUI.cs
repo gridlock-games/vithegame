@@ -50,10 +50,13 @@ namespace Vi.UI
         [SerializeField] private Image[] MVPHeaderImages;
         [SerializeField] private Text MVPHeaderText;
         [SerializeField] private RectTransform killsParent;
+        [SerializeField] private RectTransform killsParticleLocation;
         [SerializeField] private Text MVPKillsText;
         [SerializeField] private RectTransform deathsParent;
+        [SerializeField] private RectTransform deathsParticleLocation;
         [SerializeField] private Text MVPDeathsText;
         [SerializeField] private RectTransform assistsParent;
+        [SerializeField] private RectTransform assistsParticleLocation;
         [SerializeField] private Text MVPAssistsText;
         [SerializeField] private Light previewLightPrefab;
         [SerializeField] private AnimationCurve scaleLerpTimeCurve;
@@ -450,7 +453,7 @@ namespace Vi.UI
 
             foreach (UIParticleSystem ps in rewardsParticleSystems)
             {
-                ps.PlayWorldPoint(MVPKillsText.rectTransform.position);
+                ps.PlayWorldPoint(killsParticleLocation.position);
             }
 
             t = 0;
@@ -464,7 +467,7 @@ namespace Vi.UI
 
             foreach (UIParticleSystem ps in rewardsParticleSystems)
             {
-                ps.PlayWorldPoint(MVPDeathsText.rectTransform.position);
+                ps.PlayWorldPoint(deathsParticleLocation.position);
             }
 
             t = 0;
@@ -478,7 +481,7 @@ namespace Vi.UI
 
             foreach (UIParticleSystem ps in rewardsParticleSystems)
             {
-                ps.PlayWorldPoint(MVPAssistsText.rectTransform.position);
+                ps.PlayWorldPoint(assistsParticleLocation.position);
             }
 
             if (showAccountCard)

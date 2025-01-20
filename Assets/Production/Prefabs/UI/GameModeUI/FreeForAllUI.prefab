@@ -364,6 +364,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1247531113743216189 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2309549073530831062, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2075066947893440008 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3283451991084073187, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -388,6 +394,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &2637751591394660081 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1568969341725499418, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2659175620211108452 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1565702867242042511, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -490,6 +502,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &4761448135813007397 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8307236474242115278, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &4949354014722338629 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8499021565615636910, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -815,10 +833,13 @@ MonoBehaviour:
   - {fileID: 668117890989911160}
   MVPHeaderText: {fileID: 8593579891658446405}
   killsParent: {fileID: 4565861629334144900}
+  killsParticleLocation: {fileID: 1247531113743216189}
   MVPKillsText: {fileID: 6116117941187681418}
   deathsParent: {fileID: 8690540710027222329}
+  deathsParticleLocation: {fileID: 2637751591394660081}
   MVPDeathsText: {fileID: 3091920020764572196}
   assistsParent: {fileID: 4570715222461448708}
+  assistsParticleLocation: {fileID: 4761448135813007397}
   MVPAssistsText: {fileID: 5836330603770680221}
   previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
     type: 3}
