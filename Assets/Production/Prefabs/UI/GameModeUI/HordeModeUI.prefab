@@ -1345,6 +1345,48 @@ MonoBehaviour:
   roundWinThresholdText: {fileID: 242903032943073472}
   canvasGroupsToAffectOpacity:
   - {fileID: 5128843092965117886}
+  experienceAppearanceCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.12815168
+      value: 0.7821446
+      inSlope: 6.1633887
+      outSlope: 6.1633887
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.041293345
+    - serializedVersion: 3
+      time: 0.7
+      value: 1
+      inSlope: 0.091385305
+      outSlope: -0.0357432
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.102951504
+      outWeight: 0.121360645
+    - serializedVersion: 3
+      time: 1.0015259
+      value: 1
+      inSlope: -0.0071708076
+      outSlope: -0.0071708076
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2950206
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   expGainedParent: {fileID: 2139464311422246781}
   expGainedBar: {fileID: 7222602179012488472}
   expMessageParent: {fileID: 3689990380434191674}

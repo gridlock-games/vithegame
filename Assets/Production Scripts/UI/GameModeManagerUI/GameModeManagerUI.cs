@@ -25,6 +25,7 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
         [Header("Experience")]
+        [SerializeField] private AnimationCurve experienceAppearanceCurve;
         [SerializeField] private RectTransform expGainedParent;
         [SerializeField] private Image expGainedBar;
         [SerializeField] private RectTransform expMessageParent;
@@ -367,9 +368,9 @@ namespace Vi.UI
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
-                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, experienceAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
             }
 
