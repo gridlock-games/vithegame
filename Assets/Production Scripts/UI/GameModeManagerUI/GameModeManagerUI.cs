@@ -409,12 +409,11 @@ namespace Vi.UI
                     if (t >= 0.7f)
                     {
                         psPlayed = true;
-                        //foreach (UIParticleSystem ps in rewardsParticleSystems)
-                        //{
-                        //    ps.PlayWorldPoint(viEssenceRewardsImage.rectTransform.position);
-                        //}
-                        sparkleEffect.ps.Play();
-                        sparkleEffect.transform.position = viEssenceRewardsImage.rectTransform.position;
+                        if (gameModeManager.TokensEarnedFromMatch > 0)
+                        {
+                            sparkleEffect.ps.Play();
+                            sparkleEffect.transform.position = viEssenceRewardsImage.rectTransform.position;
+                        }
                     }
                 }
                 
