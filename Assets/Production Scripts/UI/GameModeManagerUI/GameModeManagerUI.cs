@@ -570,7 +570,13 @@ namespace Vi.UI
             
             MVPPresentationCamera.enabled = true;
 
-            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            string stateName = "MVP";
+            if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
+            {
+                yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
+                stateName = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "Victory" : "Defeat";
+            }
+            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
 
             MVPPreviewInProgress = false;
         }
