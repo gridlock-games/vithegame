@@ -25,6 +25,8 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
         [Header("Rewards")]
+        [SerializeField] private RawImage characterPreviewImage;
+        [SerializeField] private RectTransform expGainedParent;
         [SerializeField] private Image expGainedBar;
         [SerializeField] private RectTransform viEssenceEarnedParent;
         [SerializeField] private Text viEssenceEarnedText;
@@ -74,10 +76,17 @@ namespace Vi.UI
             MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
 
+            ResetMVPUIElements();
+        }
+
+        private void ResetMVPUIElements()
+        {
             killsParent.localScale = Vector3.zero;
             assistsParent.localScale = Vector3.zero;
             deathsParent.localScale = Vector3.zero;
 
+            expGainedParent.localScale = Vector3.zero;
+            expGainedBar.fillAmount = 0;
             viEssenceEarnedParent.localScale = Vector3.zero;
         }
 
@@ -252,28 +261,62 @@ namespace Vi.UI
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 1)
                         & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1))
                     {
-                        float maxFillAmount = 0.7f;
-                        if (!Mathf.Approximately(expGainedBar.fillAmount, maxFillAmount))
+                        // TODO change this to be calculated based on exp to next level and current exp earned
+                        float maxExpFillAmount = 0.7f;
+
+                        if (expGainedParent.localScale != Vector3.one & !skipFirstIf)
                         {
-                            float newFillAmount = Mathf.Lerp(0, maxFillAmount, MVPScoreLerpProgress);
+                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+
+                            expGainedParent.localScale = newScale;
+                            if (newScale == Vector3.one)
+                            {
+                                skipFirstIf = true;
+                                MVPScoreLerpProgress = 0;
+                            }
+
+                            MVPScoreLerpProgress += Time.deltaTime * rewardsTransitionSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
+                        }
+                        else if (!Mathf.Approximately(expGainedBar.fillAmount, maxExpFillAmount))
+                        {
+                            float newFillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, MVPScoreLerpProgress);
                             expGainedBar.fillAmount = newFillAmount;
-                            if (Mathf.Approximately(newFillAmount, maxFillAmount))
+                            if (Mathf.Approximately(newFillAmount, maxExpFillAmount))
                             {
                                 MVPScoreLerpProgress = 0;
                             }
 
                             MVPScoreLerpProgress += Time.deltaTime * expTransitionSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
+                        }
+                        else if (expGainedParent.localScale != Vector3.zero)
+                        {
+                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, MVPScoreLerpProgress);
+
+                            expGainedParent.localScale = newScale;
+                            if (newScale == Vector3.zero)
+                            {
+                                MVPScoreLerpProgress = 0;
+                            }
+
+                            MVPScoreLerpProgress += Time.deltaTime * rewardsTransitionSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
                         }
                         else
                         {
-                            Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
 
                             if (viEssenceEarnedParent.localScale != Vector3.one)
                             {
+                                if (Mathf.Approximately(MVPScoreLerpProgress, 0))
+                                {
+                                    scorePopEffect.PlayWorldPoint(viEssenceEarnedParent.position);
+                                }
+
                                 viEssenceEarnedParent.localScale = newScale;
                                 if (newScale == Vector3.one)
                                 {
-                                    scorePopEffect.PlayWorldPoint(viEssenceEarnedParent.position + Vector3.forward * 0.01f);
                                     MVPScoreLerpProgress = 0;
                                 }
                             }
@@ -305,6 +348,7 @@ namespace Vi.UI
                                 }
                             }
                             MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
                         }
                     }
                     break;
@@ -313,10 +357,7 @@ namespace Vi.UI
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
                     {
                         RemoveCharPreview();
-                        MVPScoreLerpProgress = 0;
-                        killsParent.localScale = Vector3.zero;
-                        assistsParent.localScale = Vector3.zero;
-                        deathsParent.localScale = Vector3.zero;
+                        ResetMVPUIElements();
                     }
 
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
@@ -358,6 +399,7 @@ namespace Vi.UI
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
         }
 
+        private bool skipFirstIf;
         private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
 
         private void RemoveCharPreview()
@@ -380,6 +422,7 @@ namespace Vi.UI
             }
         }
 
+        private const float rewardsTransitionSpeed = 5;
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
         private const float expTransitionSpeed = 1;
