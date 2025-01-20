@@ -29,6 +29,7 @@ namespace Vi.UI
         [SerializeField] private Image expGainedBar;
         [SerializeField] private RectTransform expMessageParent;
         [SerializeField] private Text expGainedMessage;
+        [SerializeField] private Weapon.Vector3AnimationCurve expMessageCurve;
         [SerializeField] private Text gameResultText;
 
         [Header("Rewards")]
@@ -52,6 +53,7 @@ namespace Vi.UI
         [SerializeField] private RectTransform assistsParent;
         [SerializeField] private Text MVPAssistsText;
         [SerializeField] private Light previewLightPrefab;
+        [SerializeField] private AnimationCurve scaleLerpTimeCurve;
 
         protected GameModeManager gameModeManager;
         protected virtual void Start()
@@ -373,7 +375,7 @@ namespace Vi.UI
                 t += Time.deltaTime * expTransitionSpeed;
                 t = Mathf.Clamp01(t);
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
-                expMessageParent.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
                 yield return null;
             }
 
@@ -423,7 +425,7 @@ namespace Vi.UI
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
             scorePopEffect.PlayWorldPoint(killsParent.position);
@@ -433,7 +435,7 @@ namespace Vi.UI
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
             scorePopEffect.PlayWorldPoint(deathsParent.position);
@@ -443,7 +445,7 @@ namespace Vi.UI
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
             scorePopEffect.PlayWorldPoint(assistsParent.position);
@@ -455,7 +457,7 @@ namespace Vi.UI
                 {
                     t += Time.deltaTime * scaleTransitionSpeed;
                     t = Mathf.Clamp01(t);
-                    MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                    MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                     yield return null;
                 }
             }
