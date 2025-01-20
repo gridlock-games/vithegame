@@ -895,7 +895,7 @@ namespace Vi.Core.GameModeManagers
         private IEnumerator DisplayPostGameEvents()
         {
             postGameStatus.Value = PostGameStatus.Rewards;
-            yield return new WaitForSeconds(7.5f);
+            yield return new WaitForSeconds(15);
 
             if (GetMVPScore().isValid)
             {

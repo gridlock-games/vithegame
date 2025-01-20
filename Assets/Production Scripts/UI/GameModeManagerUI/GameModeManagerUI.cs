@@ -88,7 +88,12 @@ namespace Vi.UI
             expGainedParent.localScale = Vector3.zero;
             expGainedBar.fillAmount = 0;
             viEssenceEarnedParent.localScale = Vector3.zero;
+
+            characterPreviewImage.rectTransform.anchoredPosition = previewImageCenteredAnchoredPosition;
         }
+
+        private readonly static Vector2 previewImageCenteredAnchoredPosition = new Vector2(700, 0);
+        private readonly static Vector2 previewImageLeftAnchoredPosition = new Vector2(250, 0);
 
         private void OnDestroy()
         {
@@ -303,24 +308,37 @@ namespace Vi.UI
                             MVPScoreLerpProgress += Time.deltaTime * rewardsTransitionSpeed;
                             MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
                         }
-                        else
+                        else if (viEssenceEarnedParent.localScale != Vector3.one)
                         {
                             Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
 
-                            if (viEssenceEarnedParent.localScale != Vector3.one)
+                            viEssenceEarnedParent.localScale = newScale;
+                            if (newScale == Vector3.one)
                             {
-                                if (Mathf.Approximately(MVPScoreLerpProgress, 0))
-                                {
-                                    scorePopEffect.PlayWorldPoint(viEssenceEarnedParent.position);
-                                }
-
-                                viEssenceEarnedParent.localScale = newScale;
-                                if (newScale == Vector3.one)
-                                {
-                                    MVPScoreLerpProgress = 0;
-                                }
+                                MVPScoreLerpProgress = 0;
                             }
-                            else if (killsParent.localScale != Vector3.one)
+
+                            MVPScoreLerpProgress += Time.deltaTime * expTransitionSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
+                        }
+                        else if (characterPreviewImage.rectTransform.anchoredPosition != previewImageLeftAnchoredPosition)
+                        {
+                            Vector2 newPos = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, MVPScoreLerpProgress);
+
+                            characterPreviewImage.rectTransform.anchoredPosition = newPos;
+                            if (newPos == previewImageLeftAnchoredPosition)
+                            {
+                                MVPScoreLerpProgress = 0;
+                            }
+
+                            MVPScoreLerpProgress += Time.deltaTime * characterPreviewImageMoveSpeed;
+                            MVPScoreLerpProgress = Mathf.Clamp01(MVPScoreLerpProgress);
+                        }
+                        else // KDA section
+                        {
+                            Vector3 newScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+
+                            if (killsParent.localScale != Vector3.one)
                             {
                                 killsParent.localScale = newScale;
                                 if (newScale == Vector3.one)
@@ -422,10 +440,11 @@ namespace Vi.UI
             }
         }
 
-        private const float rewardsTransitionSpeed = 5;
+        private const float rewardsTransitionSpeed = 3;
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
         private const float expTransitionSpeed = 1;
+        private const float characterPreviewImageMoveSpeed = 2;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
