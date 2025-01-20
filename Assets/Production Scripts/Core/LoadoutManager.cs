@@ -228,7 +228,7 @@ namespace Vi.Core
             
             if (WebRequestManager.TryGetInventoryItem(characterId, loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
             {
-                if (weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out CharacterReference.WeaponOption weaponOption))
+                if (weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out CharacterReference.WeaponOption weaponOption))
                 {
                     PrimaryWeaponOption = weaponOption;
                 }
@@ -251,7 +251,7 @@ namespace Vi.Core
 
             if (WebRequestManager.TryGetInventoryItem(characterId, loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
             {
-                if (weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out CharacterReference.WeaponOption weaponOption))
+                if (weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out CharacterReference.WeaponOption weaponOption))
                 {
                     SecondaryWeaponOption = weaponOption;
                 }
@@ -297,7 +297,7 @@ namespace Vi.Core
                 CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
                 if (WebRequestManager.TryGetInventoryItem(characterId, kvp.Value.ToString(), out WebRequestManager.InventoryItem equipmentInventoryItem))
                 {
-                    wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == equipmentInventoryItem.itemId);
+                    wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == equipmentInventoryItem.itemId._id);
                 }
                 else
                 {

@@ -25,7 +25,6 @@ namespace Vi.UI
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
         [Header("Rewards")]
-        [SerializeField] private RawImage characterPreviewImage;
         [SerializeField] private RectTransform expGainedParent;
         [SerializeField] private Image expGainedBar;
         [SerializeField] private RectTransform viEssenceEarnedParent;
@@ -90,12 +89,7 @@ namespace Vi.UI
             expGainedParent.localScale = Vector3.zero;
             expGainedBar.fillAmount = 0;
             viEssenceEarnedParent.localScale = Vector3.zero;
-
-            characterPreviewImage.rectTransform.anchoredPosition = previewImageCenteredAnchoredPosition;
         }
-
-        private readonly static Vector2 previewImageCenteredAnchoredPosition = new Vector2(700, 0);
-        private readonly static Vector2 previewImageLeftAnchoredPosition = new Vector2(250, 0);
 
         private void OnDestroy()
         {
@@ -277,7 +271,6 @@ namespace Vi.UI
                     {
                         RemoveCharPreview();
                         ResetMVPUIElements();
-                        characterPreviewImage.rectTransform.anchoredPosition = previewImageLeftAnchoredPosition;
                     }
 
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
@@ -396,7 +389,6 @@ namespace Vi.UI
             {
                 t += Time.deltaTime * characterPreviewImageMoveSpeed;
                 t = Mathf.Clamp01(t);
-                characterPreviewImage.rectTransform.anchoredPosition = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, t);
                 yield return null;
             }
 

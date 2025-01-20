@@ -899,7 +899,7 @@ namespace Vi.Core
             if (HasCharacterInventory(characterId))
             {
                 List<InventoryItem> inventoryItems = GetInventory(characterId);
-                return inventoryItems.Exists(item => item.itemId == itemWebId);
+                return inventoryItems.Exists(item => item.itemId._id == itemWebId);
             }
 
             return false;
@@ -908,7 +908,7 @@ namespace Vi.Core
         public static CharacterReference.WeaponOption GetWeaponOption(InventoryItem inventoryItem)
         {
             CharacterReference.WeaponOption[] options = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            int index = System.Array.FindIndex(options, item => item.itemWebId == inventoryItem.itemId);
+            int index = System.Array.FindIndex(options, item => item.itemWebId == inventoryItem.itemId._id);
 
             if (index == -1) { return null; }
 
@@ -918,7 +918,7 @@ namespace Vi.Core
         public static CharacterReference.WearableEquipmentOption GetEquipmentOption(InventoryItem inventoryItem, CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> options = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
-            int index = options.FindIndex(item => item.itemWebId == inventoryItem.itemId);
+            int index = options.FindIndex(item => item.itemWebId == inventoryItem.itemId._id);
 
             if (index == -1) { return null; }
 
@@ -1015,6 +1015,8 @@ namespace Vi.Core
                 }
                 string json = getRequest.downloadHandler.text;
 
+                Debug.Log(json);
+
                 if (!inventoryItems.ContainsKey(characterId))
                     inventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
                 else
@@ -1045,11 +1047,56 @@ namespace Vi.Core
             getRequest.Dispose();
         }
 
+        public struct ItemAttributes
+        {
+            public int strength;
+            public int vitality;
+            public int agility;
+            public int dexterity;
+            public int intelligence;
+            public int? attack;
+            public int? defense;
+        }
+
+        public struct ItemId
+        {
+            public string _id;
+            public string @class;
+            public string name;
+            public string equipmentType;
+            public int weight;
+            public ItemAttributes attributes;
+            public bool isCraftOnly;
+            public bool isCashExclusive;
+            public bool isPassExclusive;
+            public bool isBasicGear;
+            public ModelNames modelNames;
+            public int __v;
+            public string id;
+
+            public ItemId(string itemId)
+            {
+                _id = itemId;
+                @class = "";
+                name = "";
+                equipmentType = "";
+                weight = 0;
+                attributes = new ItemAttributes();
+                isCraftOnly = false;
+                isCashExclusive = false;
+                isPassExclusive = false;
+                isBasicGear = false;
+                modelNames = new ModelNames();
+                __v = 0;
+                id = itemId;
+            }
+        }
+
         public struct InventoryItem
         {
             public string charId;
             public List<int> loadoutSlot;
-            public string itemId;
+            public ItemId itemId;
             public bool enabled;
             public string id;
 
@@ -1057,7 +1104,7 @@ namespace Vi.Core
             {
                 this.charId = charId;
                 this.loadoutSlot = loadoutSlot;
-                this.itemId = itemId;
+                this.itemId = new ItemId(itemId);
                 this.enabled = enabled;
                 this.id = id;
             }
@@ -1126,17 +1173,17 @@ namespace Vi.Core
 
             yield return GetCharacterInventory(characterId.ToString());
 
-            newLoadout.helmGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "";
-            newLoadout.capeGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "";
-            newLoadout.pantsGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "";
-            newLoadout.shouldersGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "";
-            newLoadout.chestArmorGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "";
-            newLoadout.glovesGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "";
-            newLoadout.beltGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "";
-            newLoadout.robeGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "";
-            newLoadout.bootsGearItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
-            newLoadout.weapon1ItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
-            newLoadout.weapon2ItemId = inventoryItems[characterId].Find(item => item.itemId == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
+            newLoadout.helmGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.helmGearItemId | item.id == newLoadout.helmGearItemId).id ?? "";
+            newLoadout.capeGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.capeGearItemId | item.id == newLoadout.capeGearItemId).id ?? "";
+            newLoadout.pantsGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.pantsGearItemId | item.id == newLoadout.pantsGearItemId).id ?? "";
+            newLoadout.shouldersGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.shouldersGearItemId | item.id == newLoadout.shouldersGearItemId).id ?? "";
+            newLoadout.chestArmorGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.chestArmorGearItemId | item.id == newLoadout.chestArmorGearItemId).id ?? "";
+            newLoadout.glovesGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.glovesGearItemId | item.id == newLoadout.glovesGearItemId).id ?? "";
+            newLoadout.beltGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.beltGearItemId | item.id == newLoadout.beltGearItemId).id ?? "";
+            newLoadout.robeGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.robeGearItemId | item.id == newLoadout.robeGearItemId).id ?? "";
+            newLoadout.bootsGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
+            newLoadout.weapon1ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
+            newLoadout.weapon2ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
@@ -3188,39 +3235,38 @@ namespace Vi.Core
                 this.modelNames = new ModelNames(humanMaleModelName, humanFemaleModelName, orcMaleModelName, orcFemaleModelName);
                 this.isBasicGear = isBasicGear;
             }
+        }
 
-            public struct ModelNames
+        public struct ModelNames
+        {
+            public Human human;
+            public Orc orc;
+
+            public ModelNames(string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
             {
-                public Human human;
-                public Orc orc;
-
-                public ModelNames(string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
+                human = new Human()
                 {
-                    human = new Human()
-                    {
-                        m = humanMaleModelName,
-                        f = humanFemaleModelName
-                    };
-                    orc = new Orc()
-                    {
-                        m = orcMaleModelName,
-                        f = orcFemaleModelName
-                    };
-                }
+                    m = humanMaleModelName,
+                    f = humanFemaleModelName
+                };
+                orc = new Orc()
+                {
+                    m = orcMaleModelName,
+                    f = orcFemaleModelName
+                };
             }
+        }
 
-            public struct Human
-            {
-                public string m;
-                public string f;
-            }
+        public struct Human
+        {
+            public string m;
+            public string f;
+        }
 
-            public struct Orc
-            {
-                public string m;
-                public string f;
-            }
-
+        public struct Orc
+        {
+            public string m;
+            public string f;
         }
 
         private enum ItemClass
