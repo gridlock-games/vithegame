@@ -81,6 +81,8 @@ namespace Vi.UI
 
         private void ResetMVPUIElements()
         {
+            MVPAccountCard.transform.localScale = Vector3.zero;
+
             killsParent.localScale = Vector3.zero;
             assistsParent.localScale = Vector3.zero;
             deathsParent.localScale = Vector3.zero;
@@ -437,6 +439,15 @@ namespace Vi.UI
                 yield return null;
             }
             scorePopEffect.PlayWorldPoint(assistsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
 
             displayKDARunning = false;
         }
