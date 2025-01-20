@@ -352,7 +352,7 @@ namespace Vi.UI
             yield return new WaitUntil(() => !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1));
             yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
 
-            gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "YOU WIN!" : "YOU LOSE!";
+            gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
             expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString() + " XP";
 
