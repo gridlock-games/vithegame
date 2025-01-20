@@ -353,6 +353,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1747334229357544584 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2982213549183920739, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2075066947893440008 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3283451991084073187, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -544,6 +550,7 @@ MonoBehaviour:
   canvasGroupsToAffectOpacity:
   - {fileID: 6496362794858210969}
   expGainedBar: {fileID: 8732812272582313023}
+  viEssenceEarnedParent: {fileID: 1747334229357544584}
   viEssenceEarnedText: {fileID: 6586341971720630437}
   gameResultText: {fileID: 7928653501413405301}
   MVPCanvas: {fileID: 6045618182926444883}

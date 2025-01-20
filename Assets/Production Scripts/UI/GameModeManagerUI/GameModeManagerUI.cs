@@ -26,6 +26,7 @@ namespace Vi.UI
 
         [Header("Rewards")]
         [SerializeField] private Image expGainedBar;
+        [SerializeField] private RectTransform viEssenceEarnedParent;
         [SerializeField] private Text viEssenceEarnedText;
         [SerializeField] private Text gameResultText;
 
@@ -76,6 +77,8 @@ namespace Vi.UI
             killsParent.localScale = Vector3.zero;
             assistsParent.localScale = Vector3.zero;
             deathsParent.localScale = Vector3.zero;
+
+            viEssenceEarnedParent.localScale = Vector3.zero;
         }
 
         private void OnDestroy()
@@ -265,12 +268,21 @@ namespace Vi.UI
                         {
                             Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
 
-                            if (killsParent.localScale != Vector3.one)
+                            if (viEssenceEarnedParent.localScale != Vector3.one)
+                            {
+                                viEssenceEarnedParent.localScale = newScale;
+                                if (newScale == Vector3.one)
+                                {
+                                    scorePopEffect.PlayWorldPoint(viEssenceEarnedParent.position + Vector3.forward * 0.01f);
+                                    MVPScoreLerpProgress = 0;
+                                }
+                            }
+                            else if (killsParent.localScale != Vector3.one)
                             {
                                 killsParent.localScale = newScale;
                                 if (newScale == Vector3.one)
                                 {
-                                    scorePopEffect.PlayWorldPoint(killsParent.position + Vector3.forward * 0.01f);
+                                    scorePopEffect.PlayWorldPoint(killsParent.position);
                                     MVPScoreLerpProgress = 0;
                                 }
                             }
@@ -279,7 +291,7 @@ namespace Vi.UI
                                 deathsParent.localScale = newScale;
                                 if (newScale == Vector3.one)
                                 {
-                                    scorePopEffect.PlayWorldPoint(deathsParent.position + Vector3.forward * 0.01f);
+                                    scorePopEffect.PlayWorldPoint(deathsParent.position);
                                     MVPScoreLerpProgress = 0;
                                 }
                             }
@@ -288,7 +300,7 @@ namespace Vi.UI
                                 assistsParent.localScale = newScale;
                                 if (newScale == Vector3.one)
                                 {
-                                    scorePopEffect.PlayWorldPoint(assistsParent.position + Vector3.forward * 0.01f);
+                                    scorePopEffect.PlayWorldPoint(assistsParent.position);
                                     MVPScoreLerpProgress = 0;
                                 }
                             }
