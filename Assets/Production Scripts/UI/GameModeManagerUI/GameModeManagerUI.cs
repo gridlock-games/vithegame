@@ -387,18 +387,19 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * characterPreviewImageMoveSpeed;
+                t += Time.deltaTime * rewardsTransitionSpeed;
                 t = Mathf.Clamp01(t);
+                viEssenceEarnedParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
             }
 
-            yield return DisplayKDA();
+            yield return DisplayKDA(false);
         }
 
         private const float transitionWaitTime = 2;
 
         private bool displayKDARunning;
-        private IEnumerator DisplayKDA()
+        private IEnumerator DisplayKDA(bool showAccountCard)
         {
             displayKDARunning = true;
 
@@ -432,15 +433,18 @@ namespace Vi.UI
             }
             scorePopEffect.PlayWorldPoint(assistsParent.position);
 
-            t = 0;
-            while (!Mathf.Approximately(t, 1))
+            if (showAccountCard)
             {
-                t += Time.deltaTime * scaleTransitionSpeed;
-                t = Mathf.Clamp01(t);
-                MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
-                yield return null;
+                t = 0;
+                while (!Mathf.Approximately(t, 1))
+                {
+                    t += Time.deltaTime * scaleTransitionSpeed;
+                    t = Mathf.Clamp01(t);
+                    MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                    yield return null;
+                }
             }
-
+            
             displayKDARunning = false;
         }
 
@@ -448,7 +452,6 @@ namespace Vi.UI
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
         private const float expTransitionSpeed = 1;
-        private const float characterPreviewImageMoveSpeed = 2;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;

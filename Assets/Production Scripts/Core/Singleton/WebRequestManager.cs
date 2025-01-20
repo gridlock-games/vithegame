@@ -1015,8 +1015,6 @@ namespace Vi.Core
                 }
                 string json = getRequest.downloadHandler.text;
 
-                Debug.Log(json);
-
                 if (!inventoryItems.ContainsKey(characterId))
                     inventoryItems.Add(characterId, JsonConvert.DeserializeObject<List<InventoryItem>>(json));
                 else
