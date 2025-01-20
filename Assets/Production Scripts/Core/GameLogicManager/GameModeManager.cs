@@ -469,7 +469,7 @@ namespace Vi.Core.GameModeManagers
         }
 
         private NetworkList<int> winningPlayerDataIds;
-
+        public int ExpEarnedFromMatch { get; private set; } = -1;
         public int TokensEarnedFromMatch { get; private set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
@@ -484,6 +484,8 @@ namespace Vi.Core.GameModeManagers
                         PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.GetGameMode(),
                         localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
+
+                    ExpEarnedFromMatch = 100;
 
                     // TODO Change this to use web requests on the server
                     if (GameModeManager.Singleton.LevelingEnabled)

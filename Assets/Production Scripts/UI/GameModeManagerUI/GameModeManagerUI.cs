@@ -246,39 +246,54 @@ namespace Vi.UI
                         viEssenceEarnedText.text += "x";
                     }
 
-                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 1))
+                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 1)
+                        & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1))
                     {
-                        Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+                        float maxFillAmount = 0.7f;
+                        if (!Mathf.Approximately(expGainedBar.fillAmount, maxFillAmount))
+                        {
+                            float newFillAmount = Mathf.Lerp(0, maxFillAmount, MVPScoreLerpProgress);
+                            expGainedBar.fillAmount = newFillAmount;
+                            if (Mathf.Approximately(newFillAmount, maxFillAmount))
+                            {
+                                MVPScoreLerpProgress = 0;
+                            }
 
-                        if (killsParent.localScale != Vector3.one)
-                        {
-                            killsParent.localScale = newScale;
-                            if (newScale == Vector3.one)
-                            {
-                                scorePopEffect.PlayWorldPoint(killsParent.position + Vector3.forward * 0.01f);
-                                MVPScoreLerpProgress = 0;
-                            }
+                            MVPScoreLerpProgress += Time.deltaTime * expTransitionSpeed;
                         }
-                        else if (deathsParent.localScale != Vector3.one)
+                        else
                         {
-                            deathsParent.localScale = newScale;
-                            if (newScale == Vector3.one)
+                            Vector3 newScale = Vector3.Lerp(Vector3.zero, Vector3.one, MVPScoreLerpProgress);
+
+                            if (killsParent.localScale != Vector3.one)
                             {
-                                scorePopEffect.PlayWorldPoint(deathsParent.position + Vector3.forward * 0.01f);
-                                MVPScoreLerpProgress = 0;
+                                killsParent.localScale = newScale;
+                                if (newScale == Vector3.one)
+                                {
+                                    scorePopEffect.PlayWorldPoint(killsParent.position + Vector3.forward * 0.01f);
+                                    MVPScoreLerpProgress = 0;
+                                }
                             }
-                        }
-                        else if (assistsParent.localScale != Vector3.one)
-                        {
-                            assistsParent.localScale = newScale;
-                            if (newScale == Vector3.one)
+                            else if (deathsParent.localScale != Vector3.one)
                             {
-                                scorePopEffect.PlayWorldPoint(assistsParent.position + Vector3.forward * 0.01f);
-                                MVPScoreLerpProgress = 0;
+                                deathsParent.localScale = newScale;
+                                if (newScale == Vector3.one)
+                                {
+                                    scorePopEffect.PlayWorldPoint(deathsParent.position + Vector3.forward * 0.01f);
+                                    MVPScoreLerpProgress = 0;
+                                }
                             }
+                            else if (assistsParent.localScale != Vector3.one)
+                            {
+                                assistsParent.localScale = newScale;
+                                if (newScale == Vector3.one)
+                                {
+                                    scorePopEffect.PlayWorldPoint(assistsParent.position + Vector3.forward * 0.01f);
+                                    MVPScoreLerpProgress = 0;
+                                }
+                            }
+                            MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
                         }
-                        
-                        MVPScoreLerpProgress += Time.deltaTime * scaleTransitionSpeed;
                     }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
@@ -355,6 +370,7 @@ namespace Vi.UI
 
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
+        private const float expTransitionSpeed = 1;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
