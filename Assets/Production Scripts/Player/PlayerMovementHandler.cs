@@ -191,7 +191,7 @@ namespace Vi.Player
                     float rootMotionPositionError = Vector3.Distance(latestServerState.Value.position, rootMotionReconciliationState.position);
                     if (rootMotionPositionError > serverReconciliationThreshold)
                     {
-                        Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
+                        //Debug.Log(latestServerState.Value.tick + " " + rootMotionReconciliationState.tick + " Root Motion Position Error: " + rootMotionPositionError);
 
                         StatePayload modifiedStatePayload = latestServerState.Value;
                         modifiedStatePayload.tick = combatAgent.AnimationHandler.WasLastActionClipMotionPredicted ? latestServerState.Value.tick : rootMotionReconciliationState.tick;
@@ -217,7 +217,7 @@ namespace Vi.Player
             float positionError = Vector3.Distance(latestServerState.Value.position, stateBuffer[serverStateBufferIndex].position);
             if (positionError > serverReconciliationThreshold)
             {
-                Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
+                //Debug.Log(latestServerState.Value.tick + " Position Error: " + positionError);
 
                 // Update buffer at index of latest server state
                 stateBuffer[serverStateBufferIndex] = latestServerState.Value;

@@ -24,13 +24,28 @@ namespace Vi.UI
         [SerializeField] protected Text roundWinThresholdText;
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
+        [Header("Rewards")]
+        [SerializeField] private RawImage characterPreviewImage;
+        [SerializeField] private RectTransform expGainedParent;
+        [SerializeField] private Image expGainedBar;
+        [SerializeField] private RectTransform viEssenceEarnedParent;
+        [SerializeField] private Text viEssenceEarnedText;
+        [SerializeField] private Text gameResultText;
+
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
         [SerializeField] private CanvasGroup MVPCanvasGroup;
+        [SerializeField] private Image MVPBackgroundImage;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
+        [SerializeField] private Image MVPHeaderImage;
+        [SerializeField] private Text MVPHeaderText;
+        [SerializeField] private UIParticleSystem scorePopEffect;
+        [SerializeField] private RectTransform killsParent;
         [SerializeField] private Text MVPKillsText;
+        [SerializeField] private RectTransform deathsParent;
         [SerializeField] private Text MVPDeathsText;
+        [SerializeField] private RectTransform assistsParent;
         [SerializeField] private Text MVPAssistsText;
         [SerializeField] private Light previewLightPrefab;
 
@@ -55,7 +70,32 @@ namespace Vi.UI
             MVPPresentationCamera.enabled = false;
 
             MVPCanvas.enabled = false;
+
+            MVPBackgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
+
+            MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
+            MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
+
+            ResetMVPUIElements();
         }
+
+        private void ResetMVPUIElements()
+        {
+            MVPAccountCard.transform.localScale = Vector3.zero;
+
+            killsParent.localScale = Vector3.zero;
+            assistsParent.localScale = Vector3.zero;
+            deathsParent.localScale = Vector3.zero;
+
+            expGainedParent.localScale = Vector3.zero;
+            expGainedBar.fillAmount = 0;
+            viEssenceEarnedParent.localScale = Vector3.zero;
+
+            characterPreviewImage.rectTransform.anchoredPosition = previewImageCenteredAnchoredPosition;
+        }
+
+        private readonly static Vector2 previewImageCenteredAnchoredPosition = new Vector2(700, 0);
+        private readonly static Vector2 previewImageLeftAnchoredPosition = new Vector2(250, 0);
 
         private void OnDestroy()
         {
@@ -193,13 +233,72 @@ namespace Vi.UI
                     MVPCanvas.enabled = false;
                     MVPCanvasGroup.alpha = 0;
                     break;
+                case GameModeManager.PostGameStatus.Rewards:
+                    MVPCanvas.enabled = true;
+                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                    if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
+                    {
+                        GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+                        if (playerScore.isValid)
+                        {
+                            if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
+                            MVPCanvas.enabled = true;
+                            MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                            MVPAccountCard.InitializeAsMVPScore(playerScore.id);
+                        }
+                    }
+
+                    List<int> winningIds = gameModeManager.GetGameWinnerIds();
+                    if (winningIds.Count == 0)
+                    {
+                        gameResultText.text = "";
+                    }
+                    else
+                    {
+                        gameResultText.text = winningIds.Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "YOU WIN!" : "YOU LOSE!";
+                    }
+
+                    viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
+                    if (gameModeManager.TokensEarnedFromMatch > 0)
+                    {
+                        viEssenceEarnedText.text += "x";
+                    }
+
+                    if (!displayRewardsHasBeenRun)
+                    {
+                        displayRewardsCoroutine = StartCoroutine(DisplayRewards());
+                    }
+                    break;
                 case GameModeManager.PostGameStatus.MVP:
-                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview()); }
+                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
+
+                    // Remove char preview from last status
+                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+                    {
+                        RemoveCharPreview();
+                        ResetMVPUIElements();
+                        characterPreviewImage.rectTransform.anchoredPosition = previewImageLeftAnchoredPosition;
+                    }
+
+                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
                     MVPCanvas.enabled = true;
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
+
+                    MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, Mathf.MoveTowards(MVPHeaderImage.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+                    MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, Mathf.MoveTowards(MVPHeaderText.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+
+                    if (Mathf.Approximately(MVPHeaderImage.color.a, 1))
+                    {
+                        Vector3 newScale = Vector3.one;
+                        killsParent.localScale = newScale;
+                        assistsParent.localScale = newScale;
+                        deathsParent.localScale = newScale;
+                    }
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
+                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
+
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
                     MVPCanvas.enabled = MVPCanvasGroup.alpha == 0;
 
@@ -210,36 +309,159 @@ namespace Vi.UI
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
                     {
-                        if (lightInstance) { Destroy(lightInstance); }
-                        if (MVPPreviewObject)
-                        {
-                            if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                            {
-                                if (pooledObject.IsSpawned)
-                                {
-                                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                                }
-                                MVPPreviewObject = null;
-                            }
-                            else
-                            {
-                                Destroy(MVPPreviewObject);
-                            }
-                        }
+                        RemoveCharPreview();
                     }
                     break;
                 default:
-                    Debug.LogError("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
+                    Debug.LogWarning("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
                     break;
+            }
+
+            lastPostGameStatus = gameModeManager.GetPostGameStatus();
+        }
+
+        private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
+
+        private void RemoveCharPreview()
+        {
+            if (lightInstance) { Destroy(lightInstance); }
+            if (MVPPreviewObject)
+            {
+                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
+                {
+                    if (pooledObject.IsSpawned)
+                    {
+                        ObjectPoolingManager.ReturnObjectToPool(pooledObject);
+                    }
+                    MVPPreviewObject = null;
+                }
+                else
+                {
+                    Destroy(MVPPreviewObject);
+                }
             }
         }
 
-        private const float opacityTransitionSpeed = 2;
+        private bool displayRewardsHasBeenRun;
+        private Coroutine displayRewardsCoroutine;
+        private IEnumerator DisplayRewards()
+        {
+            displayRewardsHasBeenRun = true;
+            yield return new WaitUntil(() => Mathf.Approximately(MVPCanvasGroup.alpha, 1) & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1));
+            
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+
+            // TODO change this to be calculated based on exp to next level and current exp earned
+            float maxExpFillAmount = 0.7f;
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * expTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(transitionWaitTime);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
+                yield return null;
+            }
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * rewardsTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                viEssenceEarnedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(transitionWaitTime);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * characterPreviewImageMoveSpeed;
+                t = Mathf.Clamp01(t);
+                characterPreviewImage.rectTransform.anchoredPosition = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, t);
+                yield return null;
+            }
+
+            yield return DisplayKDA();
+        }
+
+        private const float transitionWaitTime = 2;
+
+        private bool displayKDARunning;
+        private IEnumerator DisplayKDA()
+        {
+            displayKDARunning = true;
+
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(killsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(deathsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+            scorePopEffect.PlayWorldPoint(assistsParent.position);
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * scaleTransitionSpeed;
+                t = Mathf.Clamp01(t);
+                MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                yield return null;
+            }
+
+            displayKDARunning = false;
+        }
+
+        private const float rewardsTransitionSpeed = 3;
+        private const float opacityTransitionSpeed = 0.5f;
+        private const float scaleTransitionSpeed = 2;
+        private const float expTransitionSpeed = 1;
+        private const float characterPreviewImageMoveSpeed = 2;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
         private bool MVPPreviewInProgress;
-        private IEnumerator CreateMVPPreview()
+        private IEnumerator CreateMVPPreview(GameModeManager.PlayerScore playerScoreToPreview)
         {
             MVPPreviewInProgress = true;
 
@@ -247,13 +469,13 @@ namespace Vi.UI
             MVPDeathsText.text = "";
             MVPAssistsText.text = "";
 
-            yield return new WaitUntil(() => gameModeManager.GetMVPScore().isValid);
+            yield return new WaitUntil(() => playerScoreToPreview.isValid);
 
-            MVPKillsText.text = gameModeManager.GetMVPScore().cumulativeKills.ToString();
-            MVPDeathsText.text = gameModeManager.GetMVPScore().cumulativeDeaths.ToString();
-            MVPAssistsText.text = gameModeManager.GetMVPScore().cumulativeAssists.ToString();
+            MVPKillsText.text = playerScoreToPreview.cumulativeKills.ToString();
+            MVPDeathsText.text = playerScoreToPreview.cumulativeDeaths.ToString();
+            MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(gameModeManager.GetMVPScore().id).character;
+            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             if (lightInstance) { Destroy(lightInstance); }
@@ -272,7 +494,7 @@ namespace Vi.UI
             }
 
             // Instantiate the player model
-            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(gameModeManager.GetMVPScore().id);
+            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerScoreToPreview.id);
             if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledPrefab))
             {
                 MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,

@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
+using static Vi.ScriptableObjects.Weapon;
 
 namespace Vi.UI
 {
@@ -168,6 +169,8 @@ namespace Vi.UI
 
         private void Awake()
         {
+            weaponClasses = (Weapon.WeaponClass[])System.Enum.GetValues(typeof(Weapon.WeaponClass));
+
             if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted")) { tutorialAlertBox.DestroyAlert(); }
             else { tutorialAlertBox.gameObject.SetActive(true); }
 
@@ -398,25 +401,44 @@ namespace Vi.UI
             int genderCount = 2;
             leftQueuedSpacing = genderCount / 11 * customizationRowSpacing;
             genderRowElement.transform.localPosition = new Vector3(genderButtonParent.localPosition.x, leftYLocalPosition, 0);
-            genderRowElement.rowHeaderText.text = "Gender";
+            genderRowElement.rowHeaderText.text = "Gender".ToUpper();
             genderButtonParent = genderRowElement.GetLayoutGroup().transform;
 
             CharacterCustomizationButton boyButtonElement = genderRowElement.GetUninitializedButton();
             boyButtonElement.InitializeAsColor(Color.blue);
             boyButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Male", false); });
-            customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
+            //customizationButtonReference.Add(new ButtonInfo(boyButtonElement.Button, "Gender", "Male"));
 
             CharacterCustomizationButton girlButtonElement = genderRowElement.GetUninitializedButton();
             girlButtonElement.InitializeAsColor(Color.magenta);
             girlButtonElement.Button.onClick.AddListener(delegate { ChangeCharacterModel("Female", false); });
-            customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
+            //customizationButtonReference.Add(new ButtonInfo(girlButtonElement.Button, "Gender", "Female"));
+
+            if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanFemale)
+            {
+                genderRowElement.CounterIndex = 1;
+            }
+            else if (selectedCharacter.raceAndGender == CharacterReference.RaceAndGender.HumanMale)
+            {
+                genderRowElement.CounterIndex = 0;
+            }
+            else
+            {
+                Debug.LogWarning("Unsure how to set initial counter index from " + selectedCharacter.raceAndGender);
+            }
+
+            customizationButtonReference.Add(new ButtonInfo(genderRowElement.LeftArrowButton, "Arrow", "Arrow"));
+            customizationButtonReference.Add(new ButtonInfo(genderRowElement.RightArrowButton, "Arrow", "Arrow"));
+            genderRowElement.SetAsArrowGroupUsingButtons(new Color[] { Color.blue, Color.magenta });
 
             List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>> materialColorList = new List<KeyValuePair<CharacterReference.MaterialApplicationLocation, Color>>();
+            List<(CharacterCustomizationRow, List<Color>)> rowsToSetAsArrows = new List<(CharacterCustomizationRow, List<Color>)>();
             foreach (CharacterReference.CharacterMaterial characterMaterial in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender))
             {
                 if (characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Head) { continue; }
 
                 Transform buttonParent = characterMaterialParents.Find(item => item.applicationLocation == characterMaterial.materialApplicationLocation).parent;
+                CharacterCustomizationRow rowElement = null;
                 if (!buttonParent)
                 {
                     bool isOnLeftSide = true;
@@ -429,10 +451,12 @@ namespace Vi.UI
                     buttonParent.localPosition = new Vector3(buttonParent.localPosition.x * (isOnLeftSide ? 1 : -1), isOnLeftSide ? leftYLocalPosition : rightYLocalPosition, 0);
 
                     TextAnchor childAlignment = isOnLeftSide ? TextAnchor.UpperRight : TextAnchor.UpperLeft;
-                    buttonParent.GetComponent<CharacterCustomizationRow>().GetLayoutGroup().childAlignment = childAlignment;
-                    customizationRowList.Add(buttonParent.GetComponent<CharacterCustomizationRow>());
+                    rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                    rowElement.GetLayoutGroup().childAlignment = childAlignment;
+                    customizationRowList.Add(rowElement);
+                    rowsToSetAsArrows.Add((rowElement, new List<Color>()));
                     Text headerText = buttonParent.GetComponentInChildren<Text>();
-                    headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "Skin Color" : characterMaterial.materialApplicationLocation.ToString();
+                    headerText.text = characterMaterial.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body ? "SKIN COLOR" : characterMaterial.materialApplicationLocation.ToString().ToUpper();
                     if (!isOnLeftSide)
                     {
                         RectTransform rt = (RectTransform)headerText.transform;
@@ -444,10 +468,39 @@ namespace Vi.UI
                     }
                     characterMaterialParents.Add(new MaterialCustomizationParent() { applicationLocation = characterMaterial.materialApplicationLocation, parent = buttonParent });
                 }
-                CharacterCustomizationRow rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
+                rowElement = buttonParent.GetComponent<CharacterCustomizationRow>();
                 buttonParent = rowElement.GetLayoutGroup().transform;
 
                 Color textureAverageColor = characterMaterial.averageTextureColor;
+
+                int rowToSetIndex = rowsToSetAsArrows.FindIndex(item => item.Item1 == rowElement);
+                rowsToSetAsArrows[rowToSetIndex].Item2.Add(textureAverageColor);
+
+                var defaultChar = WebRequestManager.Singleton.GetDefaultCharacter(raceAndGender);
+                switch (characterMaterial.materialApplicationLocation)
+                {
+                    case CharacterReference.MaterialApplicationLocation.Body:
+                        if (defaultChar.bodyColor == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    case CharacterReference.MaterialApplicationLocation.Eyes:
+                        if (defaultChar.eyeColor == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    case CharacterReference.MaterialApplicationLocation.Brows:
+                        if (defaultChar.brows == characterMaterial.material.name)
+                        {
+                            rowElement.CounterIndex = rowsToSetAsArrows[rowToSetIndex].Item2.IndexOf(textureAverageColor);
+                        }
+                        break;
+                    default:
+                        Debug.LogWarning("Unsure how to handle material application location " + characterMaterial.materialApplicationLocation);
+                        break;
+                }
 
                 CharacterCustomizationButton buttonElement = rowElement.GetUninitializedButton();
                 buttonElement.InitializeAsColor(textureAverageColor);
@@ -457,6 +510,12 @@ namespace Vi.UI
                 customizationButtonReference.Add(new ButtonInfo(buttonElement.Button, characterMaterial.materialApplicationLocation.ToString(), characterMaterial.material.name));
             }
 
+            foreach ((CharacterCustomizationRow row, List<Color> colorList) in rowsToSetAsArrows)
+            {
+                row.SetAsArrowGroupUsingButtons(colorList);
+            }
+
+            List<CharacterCustomizationRow> rowsToInvoke = new List<CharacterCustomizationRow>();
             foreach (CharacterReference.WearableEquipmentOption equipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender))
             {
                 if (!equipmentTypesIncludedInCharacterAppearance.Contains(equipmentOption.equipmentType)) { continue; }
@@ -497,9 +556,17 @@ namespace Vi.UI
 
                     buttonParent = rowElement.GetLayoutGroup().transform;
                     CharacterCustomizationButton removeButton = rowElement.GetUninitializedButton();
-                    removeButton.InitializeAsRemoveEquipment();
+                    removeButton.InitializeAsResetButton();
                     removeButton.Button.onClick.RemoveAllListeners();
-                    removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
+                    removeButton.Button.onClick.AddListener(delegate
+                    {
+                        rowElement.CounterIndex = -1;
+                        rowElement.IncrementOption();
+                    });
+
+                    rowsToInvoke.Add(rowElement);
+
+                    //removeButton.Button.onClick.AddListener(delegate { ChangeCharacterEquipment(new CharacterReference.WearableEquipmentOption(equipmentOption.equipmentType), raceAndGender); });
                     customizationButtonReference.Add(new ButtonInfo(removeButton.Button, equipmentOption.equipmentType.ToString(), "Remove"));
 
                     customizationButtonReference.Add(new ButtonInfo(rowElement.LeftArrowButton, "Arrow", "Arrow"));
@@ -511,6 +578,18 @@ namespace Vi.UI
                     buttonParent = rowElement.GetLayoutGroup().transform;
                 }
             }
+
+            StartCoroutine(InvokeRows(rowsToInvoke));
+        }
+
+        private IEnumerator InvokeRows(List<CharacterCustomizationRow> rowsToInvoke)
+        {
+            yield return null;
+            foreach (CharacterCustomizationRow rowToInvoke in rowsToInvoke)
+            {
+                rowToInvoke.IncrementOption();
+            }
+            shouldUseHeadCameraOrientation = false;
         }
 
         private const int customizationRowSpacing = -2000;
@@ -598,12 +677,34 @@ namespace Vi.UI
             }
         }
 
-        private WebRequestManager.Character selectedCharacter;
-        private GameObject previewObject;
-        private LoadoutManager loadoutManager;
+        [SerializeField] private RawImage characterPreviewImage;
+        private Queue<WebRequestManager.Character> characterQueue = new Queue<WebRequestManager.Character>();
 
-        public void UpdateSelectedCharacter(WebRequestManager.Character character)
+        private void ProcessCharacterQueue()
         {
+            if (characterQueue.Count > 0)
+            {
+                //if (updateCharCoroutine != null)
+                //{
+                //    return;
+                //}
+
+                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
+            }
+            else if (!updateDisplayCharacterRunning)
+            {
+                characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 1, Time.deltaTime * characterPreviewFadeSpeed));
+            }
+        }
+
+        private const float characterPreviewFadeSpeed = 3;
+
+        private Coroutine updateCharCoroutine;
+        private bool updateDisplayCharacterRunning;
+        private IEnumerator UpdateDisplayCharacter(WebRequestManager.Character character)
+        {
+            updateDisplayCharacterRunning = true;
+
             shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
@@ -625,10 +726,37 @@ namespace Vi.UI
                 }
                 selectedCharacter = default;
                 RefreshButtonInteractability();
-                return;
+                updateDisplayCharacterRunning = false;
+                yield break;
+            }
+
+            bool idsAreEqual = selectedCharacter._id == character._id;
+            bool raceAndGendersAreEqual = selectedCharacter.raceAndGender == character.raceAndGender;
+            bool shouldCreateNewModel = !raceAndGendersAreEqual | selectedCharacter.model != character.model;
+
+            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
+            selectedRace = raceAndGenderStrings[0];
+            selectedGender = raceAndGenderStrings[1];
+            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
+
+            selectedCharacter = character;
+            selectedCharacter.raceAndGender = raceAndGender;
+
+            RefreshButtonInteractability();
+
+            if (!string.IsNullOrWhiteSpace(character._id.ToString()))
+            {
+                if (shouldCreateNewModel | !idsAreEqual)
+                {
+                    while (true)
+                    {
+                        characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 0, Time.deltaTime * characterPreviewFadeSpeed));
+                        if (Mathf.Approximately(characterPreviewImage.color.a, 0)) { break; }
+                        yield return null;
+                    }
+                }
             }
             
-            bool shouldCreateNewModel = selectedCharacter.raceAndGender != character.raceAndGender | selectedCharacter.model != character.model;
             if (shouldCreateNewModel)
             {
                 ClearMaterialsAndEquipmentOptions();
@@ -650,11 +778,6 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-
-            string[] raceAndGenderStrings = Regex.Matches(playerModelOption.raceAndGender.ToString(), @"([A-Z][a-z]+)").Cast<Match>().Select(m => m.Value).ToArray();
-            selectedRace = raceAndGenderStrings[0];
-            selectedGender = raceAndGenderStrings[1];
-            CharacterReference.RaceAndGender raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
 
             if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
             {
@@ -685,13 +808,78 @@ namespace Vi.UI
 
             if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
 
-            selectedCharacter = character;
-            selectedCharacter.raceAndGender = raceAndGender;
+            if (!string.IsNullOrWhiteSpace(character._id.ToString())
+                | !raceAndGendersAreEqual)
+            {
+                playUltimateAnimation = true;
+                weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
+                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+                weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
+            }
 
             finishCharacterCustomizationButton.onClick.RemoveAllListeners();
             finishCharacterCustomizationButton.onClick.AddListener(delegate { StartCoroutine(ApplyCharacterChanges(selectedCharacter)); });
 
             RefreshButtonInteractability();
+
+            if (playUltimateAnimation)
+            {
+                yield return PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>());
+                playUltimateAnimation = false;
+            }
+
+            updateDisplayCharacterRunning = false;
+        }
+
+        private WebRequestManager.Character selectedCharacter;
+        private GameObject previewObject;
+        private LoadoutManager loadoutManager;
+
+        private void UpdateSelectedCharacter(WebRequestManager.Character character)
+        {
+            characterQueue.Enqueue(character);
+        }
+
+        [SerializeField] private Image weaponClassPreviewImage;
+        private Weapon.WeaponClass[] weaponClasses;
+        private int weaponClassIndex;
+        public void IncrementWeaponClass()
+        {
+            weaponClassIndex++;
+
+            if (weaponClassIndex >= weaponClasses.Length) { weaponClassIndex = 0; }
+
+            ChangeDisplayCharacterWeaponClass(selectedCharacter.raceAndGender, weaponClasses[weaponClassIndex]);
+        }
+
+        public void DecrementWeaponClass()
+        {
+            weaponClassIndex--;
+
+            if (weaponClassIndex < 0) { weaponClassIndex = weaponClasses.Length - 1; }
+
+            ChangeDisplayCharacterWeaponClass(selectedCharacter.raceAndGender, weaponClasses[weaponClassIndex]);
+        }
+
+        private void ChangeDisplayCharacterWeaponClass(CharacterReference.RaceAndGender raceAndGender, Weapon.WeaponClass weaponClass)
+        {
+            if (!previewObject) { return; }
+
+            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == weaponClass);
+
+            weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
+
+            WebRequestManager.Loadout loadout = WebRequestManager.GetDefaultDisplayLoadout(raceAndGender);
+            loadout.weapon1ItemId = weaponOption.itemWebId;
+            previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, loadout, selectedCharacter._id.ToString());
+
+            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+        }
+
+        private IEnumerator PlayUltimateAnimation(AnimationHandler animationHandler)
+        {
+            yield return new WaitUntil(() => animationHandler.Animator);
+            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private string selectedRace = "Human";
@@ -769,6 +957,8 @@ namespace Vi.UI
         private const float cameraLerpSpeed = 2;
         private void Update()
         {
+            ProcessCharacterQueue();
+
             characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
             characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
 
@@ -891,6 +1081,7 @@ namespace Vi.UI
         }
 
         private bool isEditingExistingCharacter;
+        private bool playUltimateAnimation;
 
         public void OpenCharacterCustomization()
         {
@@ -913,6 +1104,12 @@ namespace Vi.UI
             {
                 CreateUIElementHighlight((RectTransform)characterNameInputField.transform);
             }
+
+            weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
+            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+            weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
+
+            playUltimateAnimation = true;
         }
 
         private void OpenCharacterCustomization(WebRequestManager.Character character)
@@ -1081,6 +1278,7 @@ namespace Vi.UI
             {
                 row.SelectRandom();
             }
+            shouldUseHeadCameraOrientation = true;
         }
 
         public void StartTutorial()

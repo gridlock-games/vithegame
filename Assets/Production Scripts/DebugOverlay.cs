@@ -247,6 +247,31 @@ public class DebugOverlay : MonoBehaviour
 
     private void Update()
     {
+        // Uncomment for profiling during a match
+        //if (PlayerDataManager.DoesExist())
+        //{
+        //    if (PlayerDataManager.Singleton.GetGameMode() != PlayerDataManager.GameMode.None
+        //    & Vi.Core.GameModeManagers.GameModeManager.Singleton)
+        //    {
+        //        if (Debug.isDebugBuild)
+        //        {
+        //            if (!Application.isEditor)
+        //            {
+        //                if (!UnityEngine.Profiling.Profiler.enabled)
+        //                {
+        //                    Debug.Log("Enabling Profiler " + System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"));
+        //                    UnityEngine.Profiling.Profiler.logFile = System.IO.Path.Join(Application.persistentDataPath, "myLog.raw"); //Also supports passing "myLog.raw"
+        //                    UnityEngine.Profiling.Profiler.enableBinaryLog = true;
+        //                    UnityEngine.Profiling.Profiler.enabled = true;
+
+        //                    // Optional, if more memory is needed for the buffer
+        //                    //Profiler.maxUsedMemory = 256 * 1024 * 1024;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }

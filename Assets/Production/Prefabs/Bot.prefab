@@ -59,7 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3799388084
+  GlobalObjectIdHash: 4024358980
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -133,6 +133,9 @@ MonoBehaviour:
   - ailment: 2
     actionVFX: {fileID: -7875032226876358665, guid: 8362a2c4a1d1d431ea2bd66cacb72c41,
       type: 3}
+  - ailment: 8
+    actionVFX: {fileID: 3143014717447008685, guid: 9875a274e13e66b46a2e1b471bb348a6,
+      type: 3}
   deathBehavior: 0
   deathExplosionDelay: 0
   deathVFX: {fileID: 0}
@@ -195,6 +198,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blacklistedStatuses: 
+  statusVFXDefinitions:
+  - status: 13
+    statusVFX: {fileID: 6413193280615179171, guid: 4e053a50ca78cd245b881ef4e22fea31,
+      type: 3}
 --- !u!114 &2946962623116814342
 MonoBehaviour:
   m_ObjectHideFlags: 0

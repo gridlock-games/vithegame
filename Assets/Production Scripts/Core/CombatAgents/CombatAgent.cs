@@ -293,6 +293,7 @@ namespace Vi.Core
         protected virtual void OnEnable()
         {
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
+            UpdateActivePlayersList();
         }
 
         private void OnSpiritChanged(float prev, float current)
@@ -315,6 +316,8 @@ namespace Vi.Core
         private PooledObject ragingVFXInstance;
         protected virtual void OnDisable()
         {
+            ResetColliderRadiusPredicted = default;
+
             incapacitatedReviveTimeTracker.Clear();
             wasIncapacitatedThisLife = default;
 
@@ -494,20 +497,45 @@ namespace Vi.Core
             }
         }
 
+        public List<Attributes> ActivePlayers { get; private set; } = new List<Attributes>();
+        private void UpdateActivePlayersList() { ActivePlayers = PlayerDataManager.Singleton.GetActivePlayerObjects(); }
+
         private Dictionary<Attributes, float> incapacitatedReviveTimeTracker = new Dictionary<Attributes, float>();
+
+        private bool CanReviveTeammateFromIncapacitation()
+        {
+            if (IsGrabbed) { return false; }
+            return GetAilment() == ActionClip.Ailment.None;
+        }
 
         protected virtual void FixedUpdate()
         {
             if (!IsSpawned) { return; }
-            if (!IsServer) { return; }
 
             if (GetAilment() == ActionClip.Ailment.Incapacitated)
             {
                 float maxProgress = 0;
-                foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
+                foreach (Attributes attributes in ActivePlayers)
                 {
                     if (attributes == this) { continue; }
-                    if (PlayerDataManager.Singleton.CanHit(attributes, this)) { continue; }
+
+                    if (Time.fixedTime - attributes.lastRenderHitFixedTime < 0.1f)
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
+
+                    if (!attributes.CanReviveTeammateFromIncapacitation())
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
+
+                    if (PlayerDataManager.Singleton.CanHit(attributes, this))
+                    {
+                        if (incapacitatedReviveTimeTracker.ContainsKey(attributes)) { incapacitatedReviveTimeTracker.Remove(attributes); }
+                        continue;
+                    }
 
                     Vector3 a = attributes.NetworkCollider.GetClosestPoint(MovementHandler.GetPosition());
                     Vector3 b = NetworkCollider.GetClosestPoint(attributes.MovementHandler.GetPosition());
@@ -528,11 +556,14 @@ namespace Vi.Core
                             maxProgress = incapacitatedReviveTimeTracker[attributes] / 3;
                         }
 
-                        if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                        if (IsServer)
                         {
-                            ResetStats(0.25f, false, false, false);
-                            ResetAilment();
-                            break;
+                            if (incapacitatedReviveTimeTracker[attributes] >= 3)
+                            {
+                                ResetStats(0.25f, false, false, false);
+                                ResetAilment();
+                                break;
+                            }
                         }
                     }
                     else if (incapacitatedReviveTimeTracker.ContainsKey(attributes))
@@ -550,6 +581,8 @@ namespace Vi.Core
 
         protected virtual void Update()
         {
+            if (PlayerDataManager.Singleton.LocalPlayersWasUpdatedThisFrame) { UpdateActivePlayersList(); }
+
             if (IsServer & IsSpawned)
             {
                 bool evaluateInvinicibility = true;
@@ -943,7 +976,9 @@ namespace Vi.Core
                             ailmentResetCoroutine = StartCoroutine(ResetAilmentAfterAnimationPlays(hitReaction));
                             break;
                         case ActionClip.Ailment.Death:
+                            break;
                         case ActionClip.Ailment.Incapacitated:
+                            SetInviniciblity(1);
                             break;
                         default:
                             if (attackAilment != ActionClip.Ailment.Pull & attackAilment != ActionClip.Ailment.Grab) { Debug.LogWarning(attackAilment + " has not been implemented yet!"); }
@@ -1003,13 +1038,57 @@ namespace Vi.Core
             ailment.Value = ActionClip.Ailment.None;
         }
 
+        public static bool IgnorePlayerCollisionsDuringAilment(ActionClip.Ailment ailmentToCheck)
+        {
+            return ailmentToCheck == ActionClip.Ailment.Knockdown;
+        }
+
+        private Coroutine colliderRadiusResetCoroutine;
+        public bool ResetColliderRadiusPredicted { get; private set; }
+        private IEnumerator ResetColliderRadius()
+        {
+            float timeElapsed = 0;
+            while (true)
+            {
+                if (timeElapsed >= (NetworkManager.LocalTime.TimeAsFloat - NetworkManager.ServerTime.TimeAsFloat) + knockdownDuration + ActionClip.HitStopEffectDuration)
+                {
+                    break;
+                }
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            ResetColliderRadiusPredicted = true;
+            lastRecoveryFixedTime = Time.fixedTime;
+        }
+
         protected Coroutine ailmentResetCoroutine;
         protected virtual void OnAilmentChanged(ActionClip.Ailment prev, ActionClip.Ailment current)
         {
             AnimationHandler.Animator.SetBool("CanResetAilment", current == ActionClip.Ailment.None);
-            if (prev == ActionClip.Ailment.Knockdown)
+
+            if (!IsServer)
             {
-                lastRecoveryFixedTime = Time.fixedTime;
+                if (IgnorePlayerCollisionsDuringAilment(current))
+                {
+                    colliderRadiusResetCoroutine = StartCoroutine(ResetColliderRadius());
+                }
+            }
+            
+            if (IgnorePlayerCollisionsDuringAilment(prev))
+            {
+                ResetColliderRadiusPredicted = false;
+
+                if (colliderRadiusResetCoroutine != null)
+                {
+                    StopCoroutine(colliderRadiusResetCoroutine);
+                    lastRecoveryFixedTime = Time.fixedTime;
+                }
+
+                if (IsServer)
+                {
+                    lastRecoveryFixedTime = Time.fixedTime;
+                }
             }
 
             if (ailmentResetCoroutine != null) { StopCoroutine(ailmentResetCoroutine); }
@@ -1777,9 +1856,13 @@ namespace Vi.Core
         public AudioClip GetHitSoundEffect(Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment) { return WeaponHandler.GetWeapon().GetInflictHitSoundEffect(armorType, weaponBone, ailment); }
         protected AudioClip GetBlockingHitSoundEffect(Weapon.WeaponMaterial attackingWeaponMaterial) { return WeaponHandler.GetWeapon().GetBlockingHitSoundEffect(attackingWeaponMaterial); }
 
+        private float lastRenderHitFixedTime = -5;
+
         protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
+
+            lastRenderHitFixedTime = Time.fixedTime;
 
             GlowRenderer.RenderHit();
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
@@ -1799,6 +1882,8 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
         private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
         {
+            lastRenderHitFixedTime = Time.fixedTime;
+
             // This check is for late joining clients
             if (!GlowRenderer) { return; }
             GlowRenderer.RenderHit();

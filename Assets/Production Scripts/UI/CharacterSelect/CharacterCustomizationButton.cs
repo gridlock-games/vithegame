@@ -10,14 +10,18 @@ namespace Vi.UI
     {
         [SerializeField] private Sprite materialSprite;
         [SerializeField] private Sprite removeEquipmentSprite;
+        [SerializeField] private Sprite resetSprite;
         [SerializeField] private Image iconImage;
         [SerializeField] private Image selectedOverlayImage;
         public Button Button;
 
         public bool Initialized { get; private set; }
 
-        public void InitializeAsColor(Color color)
+        public bool IsPreview { get; private set; }
+
+        public void InitializeAsColor(Color color, bool isPreview = false)
         {
+            IsPreview = isPreview;
             Initialized = true;
             iconImage.sprite = materialSprite;
             iconImage.color = color;
@@ -43,6 +47,15 @@ namespace Vi.UI
             selectedOverlayImage.enabled = false;
             iconImage.sprite = removeEquipmentSprite;
             iconImage.color = Color.white;
+        }
+
+        public void InitializeAsResetButton()
+        {
+            Initialized = true;
+            selectedOverlayImage.enabled = false;
+            iconImage.sprite = resetSprite;
+            iconImage.color = Color.white;
+            iconImage.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
         }
 
         private Canvas canvas;
