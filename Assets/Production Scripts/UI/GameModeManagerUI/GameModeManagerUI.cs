@@ -24,13 +24,23 @@ namespace Vi.UI
         [SerializeField] protected Text roundWinThresholdText;
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
-        [Header("Rewards")]
-        [SerializeField] private RawImage characterPreviewImage;
+        [Header("Experience")]
+        [SerializeField] private AnimationCurve experienceAppearanceCurve;
         [SerializeField] private RectTransform expGainedParent;
         [SerializeField] private Image expGainedBar;
-        [SerializeField] private RectTransform viEssenceEarnedParent;
-        [SerializeField] private Text viEssenceEarnedText;
+        [SerializeField] private RectTransform expMessageParent;
+        [SerializeField] private Text expGainedMessage;
+        [SerializeField] private Weapon.Vector3AnimationCurve expMessageCurve;
         [SerializeField] private Text gameResultText;
+
+        [Header("Rewards")]
+        [SerializeField] private RectTransform rewardsSectionParent;
+        [SerializeField] private Text rewardsHeaderText;
+        [SerializeField] private Text viEssenceEarnedText;
+        [SerializeField] private AnimationCurve rewardsAppearanceCurve;
+        [SerializeField] private UIParticleSystem sparkleEffect;
+        [SerializeField] private UIParticleSystem[] rewardsParticleSystems;
+        [SerializeField] private Image viEssenceRewardsImage;
 
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
@@ -38,16 +48,19 @@ namespace Vi.UI
         [SerializeField] private Image MVPBackgroundImage;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
-        [SerializeField] private Image MVPHeaderImage;
+        [SerializeField] private Image[] MVPHeaderImages;
         [SerializeField] private Text MVPHeaderText;
-        [SerializeField] private UIParticleSystem scorePopEffect;
         [SerializeField] private RectTransform killsParent;
+        [SerializeField] private RectTransform killsParticleLocation;
         [SerializeField] private Text MVPKillsText;
         [SerializeField] private RectTransform deathsParent;
+        [SerializeField] private RectTransform deathsParticleLocation;
         [SerializeField] private Text MVPDeathsText;
         [SerializeField] private RectTransform assistsParent;
+        [SerializeField] private RectTransform assistsParticleLocation;
         [SerializeField] private Text MVPAssistsText;
         [SerializeField] private Light previewLightPrefab;
+        [SerializeField] private AnimationCurve scaleLerpTimeCurve;
 
         protected GameModeManager gameModeManager;
         protected virtual void Start()
@@ -73,7 +86,10 @@ namespace Vi.UI
 
             MVPBackgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
 
-            MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
+            foreach (Image MVPHeaderImage in MVPHeaderImages)
+            {
+                MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
+            }
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
 
             ResetMVPUIElements();
@@ -89,13 +105,10 @@ namespace Vi.UI
 
             expGainedParent.localScale = Vector3.zero;
             expGainedBar.fillAmount = 0;
-            viEssenceEarnedParent.localScale = Vector3.zero;
+            expMessageParent.localScale = Vector3.zero;
 
-            characterPreviewImage.rectTransform.anchoredPosition = previewImageCenteredAnchoredPosition;
+            rewardsSectionParent.localScale = Vector3.zero;
         }
-
-        private readonly static Vector2 previewImageCenteredAnchoredPosition = new Vector2(700, 0);
-        private readonly static Vector2 previewImageLeftAnchoredPosition = new Vector2(250, 0);
 
         private void OnDestroy()
         {
@@ -248,15 +261,8 @@ namespace Vi.UI
                         }
                     }
 
-                    List<int> winningIds = gameModeManager.GetGameWinnerIds();
-                    if (winningIds.Count == 0)
-                    {
-                        gameResultText.text = "";
-                    }
-                    else
-                    {
-                        gameResultText.text = winningIds.Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "YOU WIN!" : "YOU LOSE!";
-                    }
+                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
+                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
 
                     viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
                     if (gameModeManager.TokensEarnedFromMatch > 0)
@@ -277,7 +283,6 @@ namespace Vi.UI
                     {
                         RemoveCharPreview();
                         ResetMVPUIElements();
-                        characterPreviewImage.rectTransform.anchoredPosition = previewImageLeftAnchoredPosition;
                     }
 
                     if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
@@ -285,10 +290,13 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
 
-                    MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, Mathf.MoveTowards(MVPHeaderImage.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+                    foreach (Image MVPHeaderImage in MVPHeaderImages)
+                    {
+                        MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
+                    }
                     MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, Mathf.MoveTowards(MVPHeaderText.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
 
-                    if (Mathf.Approximately(MVPHeaderImage.color.a, 1))
+                    if (Mathf.Approximately(MVPHeaderText.color.a, 1))
                     {
                         Vector3 newScale = Vector3.one;
                         killsParent.localScale = newScale;
@@ -347,14 +355,22 @@ namespace Vi.UI
         private IEnumerator DisplayRewards()
         {
             displayRewardsHasBeenRun = true;
-            yield return new WaitUntil(() => Mathf.Approximately(MVPCanvasGroup.alpha, 1) & !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1));
-            
+            gameResultText.text = "";
+
+            yield return new WaitUntil(() => Mathf.Approximately(MVPCanvasGroup.alpha, 1));
+            yield return new WaitUntil(() => !Mathf.Approximately(gameModeManager.ExpEarnedFromMatch, -1));
+            yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
+
+            gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
+
+            expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString() + " XP";
+
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
-                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, experienceAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
             }
 
@@ -363,9 +379,10 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * expTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
+                expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
                 yield return null;
             }
 
@@ -381,11 +398,26 @@ namespace Vi.UI
             }
 
             t = 0;
+            bool psPlayed = false;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
-                viEssenceEarnedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+
+                if (!psPlayed)
+                {
+                    if (t >= 0.7f)
+                    {
+                        psPlayed = true;
+                        if (gameModeManager.TokensEarnedFromMatch > 0)
+                        {
+                            sparkleEffect.ps.Play();
+                            sparkleEffect.transform.position = viEssenceRewardsImage.rectTransform.position;
+                        }
+                    }
+                }
+                
+                rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, rewardsAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
             }
 
@@ -394,19 +426,19 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * characterPreviewImageMoveSpeed;
+                t += Time.deltaTime * rewardsTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                characterPreviewImage.rectTransform.anchoredPosition = Vector2.LerpUnclamped(previewImageCenteredAnchoredPosition, previewImageLeftAnchoredPosition, t);
+                rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
             }
 
-            yield return DisplayKDA();
+            yield return DisplayKDA(false);
         }
 
         private const float transitionWaitTime = 2;
 
         private bool displayKDARunning;
-        private IEnumerator DisplayKDA()
+        private IEnumerator DisplayKDA(bool showAccountCard)
         {
             displayKDARunning = true;
 
@@ -415,48 +447,61 @@ namespace Vi.UI
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(killsParent.position);
+
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
+            {
+                ps.PlayWorldPoint(killsParticleLocation.position);
+            }
 
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(deathsParent.position);
+
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
+            {
+                ps.PlayWorldPoint(deathsParticleLocation.position);
+            }
 
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * scaleTransitionSpeed;
                 t = Mathf.Clamp01(t);
-                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+                assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(assistsParent.position);
 
-            t = 0;
-            while (!Mathf.Approximately(t, 1))
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
             {
-                t += Time.deltaTime * scaleTransitionSpeed;
-                t = Mathf.Clamp01(t);
-                MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
-                yield return null;
+                ps.PlayWorldPoint(assistsParticleLocation.position);
             }
 
+            if (showAccountCard)
+            {
+                t = 0;
+                while (!Mathf.Approximately(t, 1))
+                {
+                    t += Time.deltaTime * scaleTransitionSpeed;
+                    t = Mathf.Clamp01(t);
+                    MVPAccountCard.transform.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
+                    yield return null;
+                }
+            }
+            
             displayKDARunning = false;
         }
 
         private const float rewardsTransitionSpeed = 3;
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
-        private const float expTransitionSpeed = 1;
-        private const float characterPreviewImageMoveSpeed = 2;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
@@ -524,7 +569,13 @@ namespace Vi.UI
             
             MVPPresentationCamera.enabled = true;
 
-            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            string stateName = "MVP";
+            if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
+            {
+                yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
+                stateName = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "Victory" : "Defeat";
+            }
+            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
 
             MVPPreviewInProgress = false;
         }

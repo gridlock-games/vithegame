@@ -237,7 +237,7 @@ namespace Vi.UI
             CharacterReference.WeaponOption primaryWeaponOption = null;
             if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
             {
-                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId, out primaryWeaponOption))
+                if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out primaryWeaponOption))
                 {
                     Debug.LogWarning("Can't find primary weapon inventory item in character reference");
                 }
@@ -250,7 +250,7 @@ namespace Vi.UI
             CharacterReference.WeaponOption secondaryWeaponOption = null;
             if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
             {
-                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId, out secondaryWeaponOption))
+                if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out secondaryWeaponOption))
                 {
                     Debug.LogWarning("Can't find secondary weapon inventory item in character reference");
                 }
