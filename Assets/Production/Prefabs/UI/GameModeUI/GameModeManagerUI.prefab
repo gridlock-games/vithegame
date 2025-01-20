@@ -8836,28 +8836,6 @@ MonoBehaviour:
   expGainedBar: {fileID: 5218574841052588756}
   expMessageParent: {fileID: 2261571114915984118}
   expGainedMessage: {fileID: 9181550187682563182}
-  gameResultText: {fileID: 6869405668972764318}
-  rewardsSectionParent: {fileID: 139446649261764078}
-  rewardsHeaderText: {fileID: 623770820171755886}
-  viEssenceEarnedText: {fileID: 7654526680960949838}
-  MVPCanvas: {fileID: 7114400852570474424}
-  MVPCanvasGroup: {fileID: 8592756189447898401}
-  MVPBackgroundImage: {fileID: 294674755101571024}
-  MVPAccountCard: {fileID: 3283451991084073187}
-  MVPPresentationCamera: {fileID: 2215811530945411253}
-  MVPHeaderImages:
-  - {fileID: 1046977736422761889}
-  - {fileID: 4042145575116948115}
-  MVPHeaderText: {fileID: 5052954343137343662}
-  scorePopEffect: {fileID: 2408187778324813695}
-  killsParent: {fileID: 1008813603375442287}
-  MVPKillsText: {fileID: 7331267047892496993}
-  deathsParent: {fileID: 5315994608322507730}
-  MVPDeathsText: {fileID: 1996643528584533199}
-  assistsParent: {fileID: 1023237485356068079}
-  MVPAssistsText: {fileID: 7035743666336710006}
-  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
-    type: 3}
   expMessageCurve:
     curveX:
       serializedVersion: 2
@@ -8976,6 +8954,61 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  gameResultText: {fileID: 6869405668972764318}
+  rewardsSectionParent: {fileID: 139446649261764078}
+  rewardsHeaderText: {fileID: 623770820171755886}
+  viEssenceEarnedText: {fileID: 7654526680960949838}
+  MVPCanvas: {fileID: 7114400852570474424}
+  MVPCanvasGroup: {fileID: 8592756189447898401}
+  MVPBackgroundImage: {fileID: 294674755101571024}
+  MVPAccountCard: {fileID: 3283451991084073187}
+  MVPPresentationCamera: {fileID: 2215811530945411253}
+  MVPHeaderImages:
+  - {fileID: 1046977736422761889}
+  - {fileID: 4042145575116948115}
+  MVPHeaderText: {fileID: 5052954343137343662}
+  scorePopEffect: {fileID: 2408187778324813695}
+  killsParent: {fileID: 1008813603375442287}
+  MVPKillsText: {fileID: 7331267047892496993}
+  deathsParent: {fileID: 5315994608322507730}
+  MVPDeathsText: {fileID: 1996643528584533199}
+  assistsParent: {fileID: 1023237485356068079}
+  MVPAssistsText: {fileID: 7035743666336710006}
+  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
+    type: 3}
+  scaleLerpTimeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 1.2
+      inSlope: -0.68514824
+      outSlope: -0.68514824
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.31393385
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!225 &7744647505305684082
 CanvasGroup:
   m_ObjectHideFlags: 0
