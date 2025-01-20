@@ -36,6 +36,9 @@ namespace Vi.UI
         [SerializeField] private RectTransform rewardsSectionParent;
         [SerializeField] private Text rewardsHeaderText;
         [SerializeField] private Text viEssenceEarnedText;
+        [SerializeField] private AnimationCurve rewardsAppearanceCurve;
+        [SerializeField] private UIParticleSystem[] rewardsParticleSystems;
+        [SerializeField] private Image viEssenceRewardsImage;
 
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
@@ -372,7 +375,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * expTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
@@ -391,11 +394,25 @@ namespace Vi.UI
             }
 
             t = 0;
+            bool psPlayed = false;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime;
                 t = Mathf.Clamp01(t);
-                rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, t);
+
+                if (!psPlayed)
+                {
+                    if (t >= 0.7f)
+                    {
+                        psPlayed = true;
+                        foreach (UIParticleSystem ps in rewardsParticleSystems)
+                        {
+                            ps.PlayWorldPoint(viEssenceRewardsImage.rectTransform.position);
+                        }
+                    }
+                }
+                
+                rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, rewardsAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
             }
 
@@ -468,7 +485,6 @@ namespace Vi.UI
         private const float rewardsTransitionSpeed = 3;
         private const float opacityTransitionSpeed = 0.5f;
         private const float scaleTransitionSpeed = 2;
-        private const float expTransitionSpeed = 1;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;

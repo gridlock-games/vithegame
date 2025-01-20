@@ -340,6 +340,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 3557056822110727915}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &494123973454584871 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4000972694421631692, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &668117890989911160 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4042145575116948115, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -386,6 +398,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2659175620211108452 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1565702867242042511, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &2869488234363253675 stripped
@@ -574,6 +598,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &6365407605959629833 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7569227347971355362, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!225 &6496362794858210969 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 7744647505305684082, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -734,6 +770,52 @@ MonoBehaviour:
   rewardsSectionParent: {fileID: 3508970037918008069}
   rewardsHeaderText: {fileID: 4176279503659425669}
   viEssenceEarnedText: {fileID: 6586341971720630437}
+  rewardsAppearanceCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.12815168
+      value: 0.7821446
+      inSlope: 6.1633887
+      outSlope: 6.1633887
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.041293345
+    - serializedVersion: 3
+      time: 0.7
+      value: 1
+      inSlope: -0.0357432
+      outSlope: -0.0357432
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.121360645
+    - serializedVersion: 3
+      time: 1.0015259
+      value: 1
+      inSlope: -0.0071708076
+      outSlope: -0.0071708076
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2950206
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rewardsParticleSystems:
+  - {fileID: 6365407605959629833}
+  - {fileID: 494123973454584871}
+  viEssenceRewardsImage: {fileID: 2659175620211108452}
   MVPCanvas: {fileID: 6045618182926444883}
   MVPCanvasGroup: {fileID: 5071807923183610826}
   MVPBackgroundImage: {fileID: 3840393409882790203}
