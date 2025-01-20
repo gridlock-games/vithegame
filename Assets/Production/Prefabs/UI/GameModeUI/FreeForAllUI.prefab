@@ -612,28 +612,6 @@ MonoBehaviour:
   expGainedBar: {fileID: 8732812272582313023}
   expMessageParent: {fileID: 3332525904073317405}
   expGainedMessage: {fileID: 5635796895121517189}
-  gameResultText: {fileID: 7928653501413405301}
-  rewardsSectionParent: {fileID: 3508970037918008069}
-  rewardsHeaderText: {fileID: 4176279503659425669}
-  viEssenceEarnedText: {fileID: 6586341971720630437}
-  MVPCanvas: {fileID: 6045618182926444883}
-  MVPCanvasGroup: {fileID: 5071807923183610826}
-  MVPBackgroundImage: {fileID: 3840393409882790203}
-  MVPAccountCard: {fileID: 2075066947893440008}
-  MVPPresentationCamera: {fileID: 3430916691335124574}
-  MVPHeaderImages:
-  - {fileID: 4601175654253366090}
-  - {fileID: 668117890989911160}
-  MVPHeaderText: {fileID: 8593579891658446405}
-  scorePopEffect: {fileID: 1168312825135167892}
-  killsParent: {fileID: 4565861629334144900}
-  MVPKillsText: {fileID: 6116117941187681418}
-  deathsParent: {fileID: 8690540710027222329}
-  MVPDeathsText: {fileID: 3091920020764572196}
-  assistsParent: {fileID: 4570715222461448708}
-  MVPAssistsText: {fileID: 5836330603770680221}
-  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
-    type: 3}
   expMessageCurve:
     curveX:
       serializedVersion: 2
@@ -752,6 +730,61 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
+  gameResultText: {fileID: 7928653501413405301}
+  rewardsSectionParent: {fileID: 3508970037918008069}
+  rewardsHeaderText: {fileID: 4176279503659425669}
+  viEssenceEarnedText: {fileID: 6586341971720630437}
+  MVPCanvas: {fileID: 6045618182926444883}
+  MVPCanvasGroup: {fileID: 5071807923183610826}
+  MVPBackgroundImage: {fileID: 3840393409882790203}
+  MVPAccountCard: {fileID: 2075066947893440008}
+  MVPPresentationCamera: {fileID: 3430916691335124574}
+  MVPHeaderImages:
+  - {fileID: 4601175654253366090}
+  - {fileID: 668117890989911160}
+  MVPHeaderText: {fileID: 8593579891658446405}
+  scorePopEffect: {fileID: 1168312825135167892}
+  killsParent: {fileID: 4565861629334144900}
+  MVPKillsText: {fileID: 6116117941187681418}
+  deathsParent: {fileID: 8690540710027222329}
+  MVPDeathsText: {fileID: 3091920020764572196}
+  assistsParent: {fileID: 4570715222461448708}
+  MVPAssistsText: {fileID: 5836330603770680221}
+  previewLightPrefab: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
+    type: 3}
+  scaleLerpTimeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 1.2
+      inSlope: -0.68514824
+      outSlope: -0.68514824
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.31393385
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   killsToWinRoundThresholdText: {fileID: 6271930216214367342}
 --- !u!114 &6586341971720630437 stripped
 MonoBehaviour:
