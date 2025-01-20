@@ -364,18 +364,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1168312825135167892 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2408187778324813695, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
-    type: 3}
-  m_PrefabInstance: {fileID: 3557056822110727915}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2075066947893440008 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3283451991084073187, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -812,6 +800,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  sparkleEffect: {fileID: 7675674038617388319}
   rewardsParticleSystems:
   - {fileID: 6365407605959629833}
   - {fileID: 494123973454584871}
@@ -825,7 +814,6 @@ MonoBehaviour:
   - {fileID: 4601175654253366090}
   - {fileID: 668117890989911160}
   MVPHeaderText: {fileID: 8593579891658446405}
-  scorePopEffect: {fileID: 1168312825135167892}
   killsParent: {fileID: 4565861629334144900}
   MVPKillsText: {fileID: 6116117941187681418}
   deathsParent: {fileID: 8690540710027222329}
@@ -890,6 +878,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7675674038617388319 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6618123814531242996, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 3557056822110727915}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84989a61fa577a64495d06ef8fa206d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7928653501413405301 stripped

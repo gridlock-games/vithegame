@@ -37,6 +37,7 @@ namespace Vi.UI
         [SerializeField] private Text rewardsHeaderText;
         [SerializeField] private Text viEssenceEarnedText;
         [SerializeField] private AnimationCurve rewardsAppearanceCurve;
+        [SerializeField] private UIParticleSystem sparkleEffect;
         [SerializeField] private UIParticleSystem[] rewardsParticleSystems;
         [SerializeField] private Image viEssenceRewardsImage;
 
@@ -48,7 +49,6 @@ namespace Vi.UI
         [SerializeField] private Camera MVPPresentationCamera;
         [SerializeField] private Image[] MVPHeaderImages;
         [SerializeField] private Text MVPHeaderText;
-        [SerializeField] private UIParticleSystem scorePopEffect;
         [SerializeField] private RectTransform killsParent;
         [SerializeField] private Text MVPKillsText;
         [SerializeField] private RectTransform deathsParent;
@@ -405,10 +405,12 @@ namespace Vi.UI
                     if (t >= 0.7f)
                     {
                         psPlayed = true;
-                        foreach (UIParticleSystem ps in rewardsParticleSystems)
-                        {
-                            ps.PlayWorldPoint(viEssenceRewardsImage.rectTransform.position);
-                        }
+                        //foreach (UIParticleSystem ps in rewardsParticleSystems)
+                        //{
+                        //    ps.PlayWorldPoint(viEssenceRewardsImage.rectTransform.position);
+                        //}
+                        sparkleEffect.ps.Play();
+                        sparkleEffect.transform.position = viEssenceRewardsImage.rectTransform.position;
                     }
                 }
                 
@@ -445,7 +447,11 @@ namespace Vi.UI
                 killsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(killsParent.position);
+
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
+            {
+                ps.PlayWorldPoint(MVPKillsText.rectTransform.position);
+            }
 
             t = 0;
             while (!Mathf.Approximately(t, 1))
@@ -455,7 +461,11 @@ namespace Vi.UI
                 deathsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(deathsParent.position);
+
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
+            {
+                ps.PlayWorldPoint(MVPDeathsText.rectTransform.position);
+            }
 
             t = 0;
             while (!Mathf.Approximately(t, 1))
@@ -465,7 +475,11 @@ namespace Vi.UI
                 assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
             }
-            scorePopEffect.PlayWorldPoint(assistsParent.position);
+
+            foreach (UIParticleSystem ps in rewardsParticleSystems)
+            {
+                ps.PlayWorldPoint(MVPAssistsText.rectTransform.position);
+            }
 
             if (showAccountCard)
             {
