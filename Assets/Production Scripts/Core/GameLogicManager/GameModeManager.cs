@@ -432,6 +432,11 @@ namespace Vi.Core.GameModeManagers
             gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
 
+            foreach (int playerDataId in winningPlayersDataIds)
+            {
+                this.winningPlayerDataIds.Add(playerDataId);
+            }
+
             if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
             {
                 List<PlayerScore> highestKillPlayers = GetHighestKillPlayersCumulative(winningPlayersDataIds);
@@ -451,6 +456,21 @@ namespace Vi.Core.GameModeManagers
             }
         }
 
+        public List<int> GetGameWinnerIds()
+        {
+            if (!IsGameOver()) { Debug.LogWarning("Calling GetGameWinnerIds when the game isn't over yet!"); return new List<int>(); }
+
+            List<int> returnedList = new List<int>();
+            foreach (int id in winningPlayerDataIds)
+            {
+                returnedList.Add(id);
+            }
+            return returnedList;
+        }
+
+        private NetworkList<int> winningPlayerDataIds;
+
+        public int TokensEarnedFromMatch { get; private set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
             if (current & IsClient)
@@ -464,6 +484,24 @@ namespace Vi.Core.GameModeManagers
                         PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.GetGameMode(),
                         localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
+
+                    // TODO Change this to use web requests on the server
+                    if (GameModeManager.Singleton.LevelingEnabled)
+                    {
+                        KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
+                        if (kvp.Value)
+                        {
+                            TokensEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
+                            FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + kvp.Value.SessionProgressionHandler.Essences);
+                        }
+                    }
+                    else
+                    {
+                        TokensEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
+                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens")
+                            + localPlayerScore.cumulativeKills
+                            + localPlayerScore.cumulativeAssists);
+                    }
                 }
             }
         }
@@ -953,6 +991,7 @@ namespace Vi.Core.GameModeManagers
             scoreList = new NetworkList<PlayerScore>();
             disconnectedScoreList = new NetworkList<DisconnectedPlayerScore>();
             killHistory = new NetworkList<KillHistoryElement>();
+            winningPlayerDataIds = new NetworkList<int>();
 
             foreach (string propertyString in PlayerDataManager.Singleton.GetGameModeSettings().Split("|"))
             {

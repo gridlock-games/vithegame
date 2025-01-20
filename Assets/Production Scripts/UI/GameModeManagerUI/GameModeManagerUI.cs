@@ -24,6 +24,11 @@ namespace Vi.UI
         [SerializeField] protected Text roundWinThresholdText;
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
 
+        [Header("Rewards")]
+        [SerializeField] private Image expGainedBar;
+        [SerializeField] private Text viEssenceEarnedText;
+        [SerializeField] private Text gameResultText;
+
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
         [SerializeField] private CanvasGroup MVPCanvasGroup;
@@ -223,6 +228,22 @@ namespace Vi.UI
                             MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                             MVPAccountCard.InitializeAsMVPScore(playerScore.id);
                         }
+                    }
+
+                    List<int> winningIds = gameModeManager.GetGameWinnerIds();
+                    if (winningIds.Count == 0)
+                    {
+                        gameResultText.text = "";
+                    }
+                    else
+                    {
+                        gameResultText.text = winningIds.Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "YOU WIN!" : "YOU LOSE!";
+                    }
+
+                    viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
+                    if (gameModeManager.TokensEarnedFromMatch > 0)
+                    {
+                        viEssenceEarnedText.text += "x";
                     }
 
                     if (Mathf.Approximately(MVPCanvasGroup.alpha, 1))
