@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Vi.Player;
 using Vi.Utility;
 using System.Linq;
+using Vi.Core.GameModeManagers;
 
 namespace Vi.UI
 {
@@ -14,6 +15,7 @@ namespace Vi.UI
     {
         [SerializeField] private Text scoreboardHeaderText;
         [SerializeField] private Text spectatorCountText;
+        [SerializeField] private GameObject closeButton;
 
         [Header("1 Team")]
         [SerializeField] private ScoreboardTeamDividerElement teamDividerScoreboardLine;
@@ -78,11 +80,30 @@ namespace Vi.UI
             }
 
             UpdateSpectatorText();
+
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None)
+                {
+                    closeButton.gameObject.SetActive(true);
+                }
+            }
         }
 
         private void Update()
         {
             if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame) { UpdateSpectatorText(); }
+        }
+
+        private void LateUpdate()
+        {
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None)
+                {
+                    closeButton.gameObject.SetActive(true);
+                }
+            }
         }
 
         private void UpdateSpectatorText()

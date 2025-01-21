@@ -8,6 +8,7 @@ using Vi.Core;
 using Vi.Player;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.UI
 {
@@ -88,6 +89,10 @@ namespace Vi.UI
                 MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
             }
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
+
+            transitionGroup.alpha = 0;
+            topImage.enabled = false;
+            bottomImage.enabled = false;
 
             ResetMVPUIElements();
         }
@@ -197,6 +202,63 @@ namespace Vi.UI
             }
         }
 
+        private const float transitionSpeed = 3;
+        private const float transitionPeakLimit = 540;
+        private const float transitionValleyLimit = 1280;
+
+        [Header("Transition")]
+        [SerializeField] private CanvasGroup transitionGroup;
+        [SerializeField] private AnimationCurve transitionInAlphaCurve;
+        [SerializeField] private AnimationCurve transitionOutAlphaCurve;
+        [SerializeField] private Image topImage;
+        [SerializeField] private Image bottomImage;
+        private bool transitionRunning;
+        private bool transitionPeakReached;
+        private IEnumerator PlayTransition()
+        {
+            transitionRunning = true;
+
+            topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, transitionValleyLimit);
+            bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -transitionValleyLimit);
+
+            topImage.enabled = true;
+            bottomImage.enabled = true;
+
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * transitionSpeed;
+                t = Mathf.Clamp01(t);
+
+                transitionGroup.alpha = transitionInAlphaCurve.EvaluateNormalizedTime(t);
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
+                yield return null;
+            }
+
+            transitionPeakReached = true;
+            yield return new WaitForSeconds(0.05f);
+            yield return null;
+            transitionPeakReached = false;
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * transitionSpeed;
+                t = Mathf.Clamp01(t);
+
+                transitionGroup.alpha = transitionOutAlphaCurve.EvaluateNormalizedTime(t);
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
+                yield return null;
+            }
+
+            topImage.enabled = false;
+            bottomImage.enabled = false;
+
+            transitionRunning = false;
+        }
+
         protected virtual void Update()
         {
             FindLocalActionMapHandler();
@@ -244,8 +306,18 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
-                    MVPCanvas.enabled = true;
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                    Cursor.lockState = CursorLockMode.None;
+                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionRunning)
+                    {
+                        StartCoroutine(PlayTransition());
+                    }
+
+                    if (transitionPeakReached)
+                    {
+                        MVPCanvas.enabled = true;
+                        MVPCanvasGroup.alpha = 1;
+                    }
+
                     if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
                     {
                         GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
@@ -253,7 +325,6 @@ namespace Vi.UI
                         {
                             if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
                             MVPCanvas.enabled = true;
-                            MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                             MVPAccountCard.InitializeAsMVPScore(playerScore.id);
                         }
                     }
@@ -267,54 +338,45 @@ namespace Vi.UI
                         viEssenceEarnedText.text += "x";
                     }
 
-                    if (!displayRewardsHasBeenRun)
+                    if (!displayRewardsHasBeenRun & !transitionRunning)
                     {
                         displayRewardsCoroutine = StartCoroutine(DisplayRewards());
                     }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
+                    Cursor.lockState = CursorLockMode.None;
                     if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
 
-                    // Remove char preview from last status
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+                    {
+                        if (!transitionRunning) { StartCoroutine(PlayTransition()); }
+                    }
+
+                    if (transitionPeakReached)
                     {
                         RemoveCharPreview();
                         ResetMVPUIElements();
-                    }
 
-                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
-                    MVPCanvas.enabled = true;
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
-                    MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
+                        MVPCanvas.enabled = true;
+                        MVPCanvasGroup.alpha = 1;
 
-                    foreach (Image MVPHeaderImage in MVPHeaderImages)
-                    {
-                        MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
-                    }
-                    MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, Mathf.MoveTowards(MVPHeaderText.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+                        foreach (Image MVPHeaderImage in MVPHeaderImages)
+                        {
+                            MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 1);
+                        }
+                        MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 1);
 
-                    if (Mathf.Approximately(MVPHeaderText.color.a, 1))
-                    {
-                        Vector3 newScale = Vector3.one;
-                        killsParent.localScale = newScale;
-                        assistsParent.localScale = newScale;
-                        deathsParent.localScale = newScale;
-                    }
-                    break;
-                case GameModeManager.PostGameStatus.Scoreboard:
-                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
+                        if (!MVPPreviewObject & !MVPPreviewInProgress)
+                        {
+                            GameModeManager.PlayerScore MVPScore = gameModeManager.GetMVPScore();
+                            if (MVPScore.isValid)
+                            {
+                                StartCoroutine(CreateMVPPreview(MVPScore));
+                                MVPAccountCard.InitializeAsMVPScore(MVPScore.id);
 
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
-                    MVPCanvas.enabled = MVPCanvasGroup.alpha == 0;
-
-                    if (actionMapHandler)
-                    {
-                        actionMapHandler.OpenScoreboard();
-                    }
-
-                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
-                    {
-                        RemoveCharPreview();
+                                if (!displayKDARunning) { StartCoroutine(DisplayKDA(true)); }
+                            }
+                        }
                     }
                     break;
                 default:
@@ -322,13 +384,30 @@ namespace Vi.UI
                     break;
             }
 
+            if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+            {
+                charPreviewRemovedThisStatus = false;
+            }
+
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
+        }
+
+        public void OpenScoreboard()
+        {
+            if (actionMapHandler)
+            {
+                actionMapHandler.OpenScoreboard();
+            }
         }
 
         private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
 
+        private bool charPreviewRemovedThisStatus;
         private void RemoveCharPreview()
         {
+            if (charPreviewRemovedThisStatus) { return; }
+            charPreviewRemovedThisStatus = true;
+
             if (lightInstance) { Destroy(lightInstance); }
             if (MVPPreviewObject)
             {
@@ -439,6 +518,8 @@ namespace Vi.UI
         {
             displayKDARunning = true;
 
+            yield return new WaitUntil(() => !MVPPreviewInProgress);
+
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -511,8 +592,6 @@ namespace Vi.UI
             MVPDeathsText.text = "";
             MVPAssistsText.text = "";
 
-            yield return new WaitUntil(() => playerScoreToPreview.isValid);
-
             MVPKillsText.text = playerScoreToPreview.cumulativeKills.ToString();
             MVPDeathsText.text = playerScoreToPreview.cumulativeDeaths.ToString();
             MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
@@ -520,20 +599,7 @@ namespace Vi.UI
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
-            if (lightInstance) { Destroy(lightInstance); }
-
-            if (MVPPreviewObject)
-            {
-                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    MVPPreviewObject = null;
-                }
-                else
-                {
-                    Destroy(MVPPreviewObject);
-                }
-            }
+            RemoveCharPreview();
 
             // Instantiate the player model
             Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerScoreToPreview.id);
@@ -564,7 +630,13 @@ namespace Vi.UI
             lightInstance.transform.localPosition = new Vector3(0, 3, 4);
             lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
             
+            if (MVPPresentationCamera.TryGetComponent(out UniversalAdditionalCameraData data))
+            {
+                data.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+            }
             MVPPresentationCamera.enabled = true;
+
+            yield return new WaitUntil(() => !transitionPeakReached);
 
             string stateName = "MVP";
             if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
