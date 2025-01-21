@@ -8,9 +8,9 @@ namespace Vi.UI
     public class UIParticleSystem : MonoBehaviour
     {
         ParticleSystem.EmitParams particleEmitSettings;
-        ParticleSystem ps;
+        public ParticleSystem ps { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
             ps = GetComponent<ParticleSystem>();
             particleEmitSettings = new ParticleSystem.EmitParams();
