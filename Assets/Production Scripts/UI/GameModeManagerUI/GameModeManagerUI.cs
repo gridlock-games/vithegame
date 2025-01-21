@@ -345,42 +345,39 @@ namespace Vi.UI
                 case GameModeManager.PostGameStatus.MVP:
                     if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
 
-                    // Remove char preview from last status
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
                     {
                         if (!transitionRunning) { StartCoroutine(PlayTransition()); }
-                        RemoveCharPreview();
-                        ResetMVPUIElements();
-                    }
-
-                    if (!MVPPreviewObject & !MVPPreviewInProgress)
-                    {
-                        GameModeManager.PlayerScore MVPScore = gameModeManager.GetMVPScore();
-                        if (MVPScore.isValid)
-                        {
-                            StartCoroutine(CreateMVPPreview(MVPScore));
-                            MVPAccountCard.InitializeAsMVPScore(MVPScore.id);
-                        }
                     }
 
                     if (transitionPeakReached)
                     {
+                        RemoveCharPreview();
+                        ResetMVPUIElements();
+
                         MVPCanvas.enabled = true;
                         MVPCanvasGroup.alpha = 1;
-                    }
 
-                    foreach (Image MVPHeaderImage in MVPHeaderImages)
-                    {
-                        MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 0);
-                    }
-                    MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, Mathf.MoveTowards(MVPHeaderText.color.a, 1, Time.deltaTime * opacityTransitionSpeed));
+                        foreach (Image MVPHeaderImage in MVPHeaderImages)
+                        {
+                            MVPHeaderImage.color = StringUtility.SetColorAlpha(MVPHeaderImage.color, 1);
+                        }
+                        MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 1);
 
-                    if (Mathf.Approximately(MVPHeaderText.color.a, 1))
-                    {
-                        Vector3 newScale = Vector3.one;
-                        killsParent.localScale = newScale;
-                        assistsParent.localScale = newScale;
-                        deathsParent.localScale = newScale;
+                        killsParent.localScale = Vector3.one;
+                        assistsParent.localScale = Vector3.one;
+                        deathsParent.localScale = Vector3.one;
+
+                        if (!MVPPreviewObject & !MVPPreviewInProgress)
+                        {
+                            GameModeManager.PlayerScore MVPScore = gameModeManager.GetMVPScore();
+                            if (MVPScore.isValid)
+                            {
+                                StartCoroutine(CreateMVPPreview(MVPScore));
+                                MVPAccountCard.InitializeAsMVPScore(MVPScore.id);
+                                MVPAccountCard.transform.localScale = Vector3.one;
+                            }
+                        }
                     }
                     break;
                 case GameModeManager.PostGameStatus.Scoreboard:
@@ -404,13 +401,22 @@ namespace Vi.UI
                     break;
             }
 
+            if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
+            {
+                charPreviewRemovedThisStatus = false;
+            }
+
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
         }
 
         private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;
 
+        private bool charPreviewRemovedThisStatus;
         private void RemoveCharPreview()
         {
+            if (charPreviewRemovedThisStatus) { return; }
+            charPreviewRemovedThisStatus = true;
+
             if (lightInstance) { Destroy(lightInstance); }
             if (MVPPreviewObject)
             {
@@ -600,20 +606,7 @@ namespace Vi.UI
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
             var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
-            if (lightInstance) { Destroy(lightInstance); }
-
-            if (MVPPreviewObject)
-            {
-                if (MVPPreviewObject.TryGetComponent(out PooledObject pooledObject))
-                {
-                    ObjectPoolingManager.ReturnObjectToPool(pooledObject);
-                    MVPPreviewObject = null;
-                }
-                else
-                {
-                    Destroy(MVPPreviewObject);
-                }
-            }
+            RemoveCharPreview();
 
             // Instantiate the player model
             Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerScoreToPreview.id);
@@ -649,6 +642,8 @@ namespace Vi.UI
                 data.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
             }
             MVPPresentationCamera.enabled = true;
+
+            //yield return new WaitUntil(() => !transitionPeakReached);
 
             string stateName = "MVP";
             if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
