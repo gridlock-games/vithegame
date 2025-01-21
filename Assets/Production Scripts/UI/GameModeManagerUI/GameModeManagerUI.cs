@@ -8,6 +8,7 @@ using Vi.Core;
 using Vi.Player;
 using Vi.ScriptableObjects;
 using Unity.Netcode;
+using UnityEngine.Rendering.Universal;
 
 namespace Vi.UI
 {
@@ -282,7 +283,15 @@ namespace Vi.UI
                         ResetMVPUIElements();
                     }
 
-                    if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(gameModeManager.GetMVPScore())); }
+                    if (!MVPPreviewObject & !MVPPreviewInProgress)
+                    {
+                        GameModeManager.PlayerScore MVPScore = gameModeManager.GetMVPScore();
+                        if (MVPScore.isValid)
+                        {
+                            StartCoroutine(CreateMVPPreview(MVPScore));
+                        }
+                    }
+
                     MVPCanvas.enabled = true;
                     MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                     MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
@@ -511,8 +520,6 @@ namespace Vi.UI
             MVPDeathsText.text = "";
             MVPAssistsText.text = "";
 
-            yield return new WaitUntil(() => playerScoreToPreview.isValid);
-
             MVPKillsText.text = playerScoreToPreview.cumulativeKills.ToString();
             MVPDeathsText.text = playerScoreToPreview.cumulativeDeaths.ToString();
             MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
@@ -564,6 +571,10 @@ namespace Vi.UI
             lightInstance.transform.localPosition = new Vector3(0, 3, 4);
             lightInstance.transform.localEulerAngles = new Vector3(30, 180, 0);
             
+            if (MVPPresentationCamera.TryGetComponent(out UniversalAdditionalCameraData data))
+            {
+                data.renderPostProcessing = FasterPlayerPrefs.Singleton.GetBool("PostProcessingEnabled");
+            }
             MVPPresentationCamera.enabled = true;
 
             string stateName = "MVP";
