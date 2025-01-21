@@ -627,12 +627,12 @@ namespace Vi.UI
             MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
 
             WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
-            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             RemoveCharPreview();
 
             // Instantiate the player model
-            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition(playerScoreToPreview.id);
+            Vector3 basePos = PlayerDataManager.Singleton.GetPlayerSpawnPoints().GetCharacterPreviewPosition();
             if (PlayerDataManager.Singleton.GetCharacterReference().PlayerPrefab.TryGetComponent(out PooledObject pooledPrefab))
             {
                 MVPPreviewObject = ObjectPoolingManager.SpawnObject(pooledPrefab,

@@ -8,11 +8,26 @@ namespace Vi.Core
 {
     public class SpawnPoints : MonoBehaviour
     {
+        [SerializeField] private Vector3[] playerPreviewModelSpawnPoints = new Vector3[0];
+
         public float MinRenderDistance { get { return minimumRenderDistance; } }
         [SerializeField] private float minimumRenderDistance = 100;
         [SerializeField] private TransformData[] environmentViewPoints = new TransformData[0];
         [SerializeField] private TransformData[] gameItemSpawnPoints = new TransformData[0];
         [SerializeField] private SpawnPointDefinition[] spawnPoints = new SpawnPointDefinition[0];
+
+        public Vector3 GetCharacterPreviewPosition()
+        {
+            if (playerPreviewModelSpawnPoints.Length > 0)
+            {
+                return playerPreviewModelSpawnPoints[Random.Range(0, playerPreviewModelSpawnPoints.Length)];
+            }
+            else
+            {
+                Debug.LogWarning("Player Preview Model Spawn Points Length is 0!");
+                return new Vector3(0, 5, 0);
+            }
+        }
 
         public Vector3 GetCharacterPreviewPosition(int playerDataIdToPreview)
         {
@@ -308,6 +323,7 @@ namespace Vi.Core
         [Header("Gizmos")]
         [SerializeField] private bool displayDefaultGizmos = true;
         [SerializeField] private bool displayDamageCircleGizmos;
+        [SerializeField] private bool displayPreviewCharacterGizmos;
 
         private void OnDrawGizmos()
         {
@@ -349,6 +365,15 @@ namespace Vi.Core
                 Gizmos.DrawWireSphere(damageCircleSpawnPosition, damageCircleMaxScale.x / 2);
                 Gizmos.color = Color.blue;
                 Gizmos.DrawWireSphere(damageCircleSpawnPosition, damageCircleMinScale.x / 2);
+            }
+
+            if (displayPreviewCharacterGizmos)
+            {
+                Gizmos.color = Color.black;
+                foreach (Vector3 position in playerPreviewModelSpawnPoints)
+                {
+                    Gizmos.DrawWireSphere(position, 0.4f);
+                }
             }
         }
     }
