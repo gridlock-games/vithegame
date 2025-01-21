@@ -90,6 +90,9 @@ namespace Vi.UI
             }
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
 
+            topImage.enabled = false;
+            bottomImage.enabled = false;
+
             ResetMVPUIElements();
         }
 
@@ -198,6 +201,56 @@ namespace Vi.UI
             }
         }
 
+        private const float transitionSpeed = 3;
+
+        [Header("Transition")]
+        [SerializeField] private Image topImage;
+        [SerializeField] private Image bottomImage;
+        private bool transitionRunning;
+        private bool transitionPeakReached;
+        private IEnumerator PlayTransition()
+        {
+            transitionRunning = true;
+
+            topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, 1080);
+            bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -1080);
+
+            topImage.enabled = true;
+            bottomImage.enabled = true;
+
+            float t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * transitionSpeed;
+                t = Mathf.Clamp01(t);
+
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(1080, 540, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(1080, 540, t));
+                yield return null;
+            }
+
+            transitionPeakReached = true;
+            yield return new WaitForSeconds(0.05f);
+            yield return null;
+            transitionPeakReached = false;
+
+            t = 0;
+            while (!Mathf.Approximately(t, 1))
+            {
+                t += Time.deltaTime * transitionSpeed;
+                t = Mathf.Clamp01(t);
+
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(540, 1080, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(540, 1080, t));
+                yield return null;
+            }
+
+            topImage.enabled = false;
+            bottomImage.enabled = false;
+
+            transitionRunning = false;
+        }
+
         protected virtual void Update()
         {
             FindLocalActionMapHandler();
@@ -245,8 +298,17 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
-                    MVPCanvas.enabled = true;
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
+                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionRunning)
+                    {
+                        StartCoroutine(PlayTransition());
+                    }
+
+                    if (transitionPeakReached)
+                    {
+                        MVPCanvas.enabled = true;
+                        MVPCanvasGroup.alpha = 1;
+                    }
+
                     if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
                     {
                         GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
@@ -254,7 +316,6 @@ namespace Vi.UI
                         {
                             if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
                             MVPCanvas.enabled = true;
-                            MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
                             MVPAccountCard.InitializeAsMVPScore(playerScore.id);
                         }
                     }
@@ -268,7 +329,7 @@ namespace Vi.UI
                         viEssenceEarnedText.text += "x";
                     }
 
-                    if (!displayRewardsHasBeenRun)
+                    if (!displayRewardsHasBeenRun & !transitionRunning)
                     {
                         displayRewardsCoroutine = StartCoroutine(DisplayRewards());
                     }
@@ -279,6 +340,7 @@ namespace Vi.UI
                     // Remove char preview from last status
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
                     {
+                        if (!transitionRunning) { StartCoroutine(PlayTransition()); }
                         RemoveCharPreview();
                         ResetMVPUIElements();
                     }
@@ -289,12 +351,15 @@ namespace Vi.UI
                         if (MVPScore.isValid)
                         {
                             StartCoroutine(CreateMVPPreview(MVPScore));
+                            MVPAccountCard.InitializeAsMVPScore(MVPScore.id);
                         }
                     }
 
-                    MVPCanvas.enabled = true;
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 1, Time.deltaTime * opacityTransitionSpeed);
-                    MVPAccountCard.InitializeAsMVPScore(gameModeManager.GetMVPScore().id);
+                    if (transitionPeakReached)
+                    {
+                        MVPCanvas.enabled = true;
+                        MVPCanvasGroup.alpha = 1;
+                    }
 
                     foreach (Image MVPHeaderImage in MVPHeaderImages)
                     {
