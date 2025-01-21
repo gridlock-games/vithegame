@@ -356,13 +356,27 @@ namespace Vi.Core
 
         private NetworkVariable<bool> isInvincible = new NetworkVariable<bool>();
         private float invincibilityEndTime;
-        public void SetInviniciblity(float duration) { invincibilityEndTime = Time.time + duration; }
+        public void SetInviniciblity(float duration)
+        {
+            invincibilityEndTime = Time.time + duration;
+            if (IsSpawned & IsServer)
+            {
+                isInvincible.Value = Time.time <= invincibilityEndTime;
+            }
+        }
 
         public bool IsUninterruptable { get { return isUninterruptable.Value; } }
 
         private NetworkVariable<bool> isUninterruptable = new NetworkVariable<bool>();
         private float uninterruptableEndTime;
-        public void SetUninterruptable(float duration) { uninterruptableEndTime = Time.time + duration; }
+        public void SetUninterruptable(float duration)
+        {
+            uninterruptableEndTime = Time.time + duration;
+            if (IsSpawned & IsServer)
+            {
+                isUninterruptable.Value = Time.time <= uninterruptableEndTime;
+            }
+        }
 
         protected NetworkVariable<ulong> grabAssailantDataId = new NetworkVariable<ulong>();
         protected NetworkVariable<ulong> grabVictimDataId = new NetworkVariable<ulong>();

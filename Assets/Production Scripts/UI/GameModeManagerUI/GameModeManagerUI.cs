@@ -643,7 +643,7 @@ namespace Vi.UI
             }
             MVPPresentationCamera.enabled = true;
 
-            //yield return new WaitUntil(() => !transitionPeakReached);
+            yield return new WaitUntil(() => !transitionPeakReached);
 
             string stateName = "MVP";
             if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
