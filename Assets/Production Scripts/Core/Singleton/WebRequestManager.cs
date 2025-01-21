@@ -1045,6 +1045,38 @@ namespace Vi.Core
             getRequest.Dispose();
         }
 
+        public struct ModelNames
+        {
+            public Human human;
+            public Orc orc;
+
+            public ModelNames(string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
+            {
+                human = new Human()
+                {
+                    m = humanMaleModelName,
+                    f = humanFemaleModelName
+                };
+                orc = new Orc()
+                {
+                    m = orcMaleModelName,
+                    f = orcFemaleModelName
+                };
+            }
+        }
+
+        public struct Human
+        {
+            public string m;
+            public string f;
+        }
+
+        public struct Orc
+        {
+            public string m;
+            public string f;
+        }
+
         public struct ItemAttributes
         {
             public int strength;
@@ -3233,38 +3265,6 @@ namespace Vi.Core
                 this.modelNames = new ModelNames(humanMaleModelName, humanFemaleModelName, orcMaleModelName, orcFemaleModelName);
                 this.isBasicGear = isBasicGear;
             }
-        }
-
-        public struct ModelNames
-        {
-            public Human human;
-            public Orc orc;
-
-            public ModelNames(string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
-            {
-                human = new Human()
-                {
-                    m = humanMaleModelName,
-                    f = humanFemaleModelName
-                };
-                orc = new Orc()
-                {
-                    m = orcMaleModelName,
-                    f = orcFemaleModelName
-                };
-            }
-        }
-
-        public struct Human
-        {
-            public string m;
-            public string f;
-        }
-
-        public struct Orc
-        {
-            public string m;
-            public string f;
         }
 
         private enum ItemClass
