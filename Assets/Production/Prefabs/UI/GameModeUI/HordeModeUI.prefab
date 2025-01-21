@@ -934,6 +934,16 @@ PrefabInstance:
       propertyPath: m_Text
       value: 'Waves Remaining: 3'
       objectReference: {fileID: 0}
+    - target: {fileID: 3825416113138257458, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 6355759310535317560}
+    - target: {fileID: 3825416113138257458, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OpenScoreboard
+      objectReference: {fileID: 0}
     - target: {fileID: 4838034580604955711, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
         type: 3}
       propertyPath: m_AnchoredPosition.y

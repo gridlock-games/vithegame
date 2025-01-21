@@ -306,6 +306,7 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
+                    Cursor.lockState = CursorLockMode.None;
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionRunning)
                     {
                         StartCoroutine(PlayTransition());
@@ -343,6 +344,7 @@ namespace Vi.UI
                     }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
+                    Cursor.lockState = CursorLockMode.None;
                     if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
 
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
@@ -377,22 +379,6 @@ namespace Vi.UI
                         }
                     }
                     break;
-                case GameModeManager.PostGameStatus.Scoreboard:
-                    if (displayRewardsCoroutine != null) { StopCoroutine(displayRewardsCoroutine); }
-
-                    MVPCanvasGroup.alpha = Mathf.MoveTowards(MVPCanvasGroup.alpha, 0, Time.deltaTime * opacityTransitionSpeed);
-                    MVPCanvas.enabled = MVPCanvasGroup.alpha == 0;
-
-                    if (actionMapHandler)
-                    {
-                        actionMapHandler.OpenScoreboard();
-                    }
-
-                    if (Mathf.Approximately(MVPCanvasGroup.alpha, 0))
-                    {
-                        RemoveCharPreview();
-                    }
-                    break;
                 default:
                     Debug.LogWarning("Unsure how to handle post game status " + gameModeManager.GetPostGameStatus());
                     break;
@@ -404,6 +390,14 @@ namespace Vi.UI
             }
 
             lastPostGameStatus = gameModeManager.GetPostGameStatus();
+        }
+
+        public void OpenScoreboard()
+        {
+            if (actionMapHandler)
+            {
+                actionMapHandler.OpenScoreboard();
+            }
         }
 
         private GameModeManager.PostGameStatus lastPostGameStatus = GameModeManager.PostGameStatus.None;

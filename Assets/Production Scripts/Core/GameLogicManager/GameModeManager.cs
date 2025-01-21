@@ -885,8 +885,7 @@ namespace Vi.Core.GameModeManagers
         {
             None,
             Rewards,
-            MVP,
-            Scoreboard
+            MVP
         }
 
         public PostGameStatus GetPostGameStatus() { return postGameStatus.Value; }
@@ -903,10 +902,6 @@ namespace Vi.Core.GameModeManagers
                 postGameStatus.Value = PostGameStatus.MVP;
                 yield return new WaitForSeconds(7.5f);
             }
-
-            // Scoreboard
-            postGameStatus.Value = PostGameStatus.Scoreboard;
-            yield return new WaitForSeconds(7.5f);
 
             // Return to Lobby
             NetSceneManager.Singleton.LoadScene("Lobby");
