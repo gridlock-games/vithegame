@@ -45,7 +45,6 @@ namespace Vi.UI
         [Header("MVP Presentation")]
         [SerializeField] private Canvas MVPCanvas;
         [SerializeField] private CanvasGroup MVPCanvasGroup;
-        [SerializeField] private Image MVPBackgroundImage;
         [SerializeField] private AccountCard MVPAccountCard;
         [SerializeField] private Camera MVPPresentationCamera;
         [SerializeField] private Image[] MVPHeaderImages;
@@ -83,8 +82,6 @@ namespace Vi.UI
             MVPPresentationCamera.enabled = false;
 
             MVPCanvas.enabled = false;
-
-            MVPBackgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
 
             foreach (Image MVPHeaderImage in MVPHeaderImages)
             {
