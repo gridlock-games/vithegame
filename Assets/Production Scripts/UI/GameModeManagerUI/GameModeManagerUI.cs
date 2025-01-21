@@ -90,6 +90,7 @@ namespace Vi.UI
             }
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
 
+            transitionGroup.alpha = 0;
             topImage.enabled = false;
             bottomImage.enabled = false;
 
@@ -202,8 +203,13 @@ namespace Vi.UI
         }
 
         private const float transitionSpeed = 3;
+        private const float transitionPeakLimit = 540;
+        private const float transitionValleyLimit = 1280;
 
         [Header("Transition")]
+        [SerializeField] private CanvasGroup transitionGroup;
+        [SerializeField] private AnimationCurve transitionInAlphaCurve;
+        [SerializeField] private AnimationCurve transitionOutAlphaCurve;
         [SerializeField] private Image topImage;
         [SerializeField] private Image bottomImage;
         private bool transitionRunning;
@@ -212,8 +218,8 @@ namespace Vi.UI
         {
             transitionRunning = true;
 
-            topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, 1080);
-            bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -1080);
+            topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, transitionValleyLimit);
+            bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -transitionValleyLimit);
 
             topImage.enabled = true;
             bottomImage.enabled = true;
@@ -224,8 +230,9 @@ namespace Vi.UI
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(1080, 540, t));
-                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(1080, 540, t));
+                transitionGroup.alpha = transitionInAlphaCurve.EvaluateNormalizedTime(t);
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
                 yield return null;
             }
 
@@ -240,8 +247,9 @@ namespace Vi.UI
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(540, 1080, t));
-                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(540, 1080, t));
+                transitionGroup.alpha = transitionOutAlphaCurve.EvaluateNormalizedTime(t);
+                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
+                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
                 yield return null;
             }
 
