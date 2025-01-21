@@ -43234,6 +43234,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPreviewModelSpawnPoints:
+  - {x: 0, y: -4.3, z: 0}
+  - {x: -9.96, y: -4.3, z: 13.07}
+  - {x: 11.97, y: -4.3, z: 0.9}
+  minimumRenderDistance: 100
   environmentViewPoints:
   - position: {x: 0, y: 11.25, z: -7.6}
     rotation: {x: 0.444557, y: 0, z: 0, w: 0.8957506}
@@ -43316,7 +43321,8 @@ MonoBehaviour:
   shrinkSize: 20
   mobSpawnPoints: []
   displayDefaultGizmos: 0
-  displayDamageCircleGizmos: 1
+  displayDamageCircleGizmos: 0
+  displayPreviewCharacterGizmos: 1
 --- !u!4 &1283122655
 Transform:
   m_ObjectHideFlags: 0

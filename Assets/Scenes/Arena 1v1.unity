@@ -8027,7 +8027,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  size: {x: 115.99408, y: 62.42183, z: 132.8353}
+  size: {x: 61.1923, y: 41.511925, z: 132.8353}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -8067,7 +8067,7 @@ Transform:
   m_GameObject: {fileID: 1197548990}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.827705, y: 1.5968666, z: 2.1495495}
+  m_LocalPosition: {x: -8.846233, y: -3.2120972, z: 2.1495495}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11413,6 +11413,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1b0280e67e47914bb041c428a01f5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPreviewModelSpawnPoints:
+  - {x: 0, y: 0.12, z: 0}
+  minimumRenderDistance: 100
   environmentViewPoints:
   - position: {x: 8, y: 8, z: -6}
     rotation: {x: -0.15607397, y: 0.43171126, z: -0.07612236, w: -0.88513935}
@@ -11462,7 +11465,8 @@ MonoBehaviour:
   shrinkSize: 20
   mobSpawnPoints: []
   displayDefaultGizmos: 0
-  displayDamageCircleGizmos: 1
+  displayDamageCircleGizmos: 0
+  displayPreviewCharacterGizmos: 1
 --- !u!4 &1904603669
 Transform:
   m_ObjectHideFlags: 0
