@@ -364,10 +364,6 @@ namespace Vi.UI
                         }
                         MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 1);
 
-                        killsParent.localScale = Vector3.one;
-                        assistsParent.localScale = Vector3.one;
-                        deathsParent.localScale = Vector3.one;
-
                         if (!MVPPreviewObject & !MVPPreviewInProgress)
                         {
                             GameModeManager.PlayerScore MVPScore = gameModeManager.GetMVPScore();
@@ -375,7 +371,8 @@ namespace Vi.UI
                             {
                                 StartCoroutine(CreateMVPPreview(MVPScore));
                                 MVPAccountCard.InitializeAsMVPScore(MVPScore.id);
-                                MVPAccountCard.transform.localScale = Vector3.one;
+
+                                if (!displayKDARunning) { StartCoroutine(DisplayKDA(true)); }
                             }
                         }
                     }
@@ -526,6 +523,8 @@ namespace Vi.UI
         private IEnumerator DisplayKDA(bool showAccountCard)
         {
             displayKDARunning = true;
+
+            yield return new WaitUntil(() => !MVPPreviewInProgress);
 
             float t = 0;
             while (!Mathf.Approximately(t, 1))
