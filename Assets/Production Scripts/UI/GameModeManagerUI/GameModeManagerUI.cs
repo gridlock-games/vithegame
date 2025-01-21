@@ -24,6 +24,7 @@ namespace Vi.UI
         [SerializeField] protected Text roundResultText;
         [SerializeField] protected Text roundWinThresholdText;
         [SerializeField] private CanvasGroup[] canvasGroupsToAffectOpacity;
+        [SerializeField] private Button returnToHubButton;
 
         [Header("Experience")]
         [SerializeField] private AnimationCurve experienceAppearanceCurve;
@@ -95,6 +96,8 @@ namespace Vi.UI
             bottomImage.enabled = false;
 
             ResetMVPUIElements();
+
+            returnToHubButton.onClick.AddListener(() => ReturnToHub());
         }
 
         private void ResetMVPUIElements()
@@ -397,6 +400,33 @@ namespace Vi.UI
             if (actionMapHandler)
             {
                 actionMapHandler.OpenScoreboard();
+            }
+        }
+
+        private void ReturnToHub()
+        {
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
+            PersistentLocalObjects.Singleton.StartCoroutine(ReturnToHubCoroutine());
+        }
+
+        private IEnumerator ReturnToHubCoroutine()
+        {
+            returnToHubButton.interactable = false;
+
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.WasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.StartClient();
             }
         }
 

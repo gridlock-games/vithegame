@@ -555,6 +555,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3572720532118724586 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7868199695294908219, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
+    type: 3}
+  m_PrefabInstance: {fileID: 6675935031586560209}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3868279410608876083 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7569227347971355362, guid: 7314c07a3d8a63949ae8ae9b21ff2076,
@@ -607,6 +619,7 @@ MonoBehaviour:
   roundWinThresholdText: {fileID: 8335200626675337181}
   canvasGroupsToAffectOpacity:
   - {fileID: 4025985339453722787}
+  returnToHubButton: {fileID: 3572720532118724586}
   experienceAppearanceCurve:
     serializedVersion: 2
     m_Curve:
