@@ -497,7 +497,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime * rewardsTransitionOutSpeed;
                 t = Mathf.Clamp01(t);
                 expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
@@ -532,7 +532,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime * rewardsTransitionOutSpeed;
                 t = Mathf.Clamp01(t);
                 rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
@@ -607,9 +607,9 @@ namespace Vi.UI
             displayKDARunning = false;
         }
 
-        private const float UIAnimationTimeMultiplier = 2;
-        private const float rewardsTransitionSpeed = 4;
-        private const float scaleTransitionSpeed = 3;
+        private const float UIAnimationTimeMultiplier = 1.85f;
+        private const float rewardsTransitionOutSpeed = 3.6f;
+        private const float scaleTransitionSpeed = 2.85f;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
