@@ -233,6 +233,10 @@ namespace Vi.UI
         {
             if (previewObject)
             {
+                if (previewObject.TryGetComponent(out AnimationHandler animationHandler))
+                {
+                    if (animationHandler.IsPlayingPreviewClip) { return; }
+                }
                 previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
             }
         }
@@ -754,6 +758,14 @@ namespace Vi.UI
                         characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 0, Time.deltaTime * characterPreviewFadeSpeed));
                         if (Mathf.Approximately(characterPreviewImage.color.a, 0)) { break; }
                         yield return null;
+                    }
+                }
+
+                if (!idsAreEqual)
+                {
+                    if (previewObject)
+                    {
+                        previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
                     }
                 }
             }
