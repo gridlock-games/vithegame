@@ -404,7 +404,9 @@ namespace Vi.Editor
                         shouldReimport = true;
                     }
 
-                    if (!importer.GetPlatformTextureSettings("Android").overridden)
+                    int targetMobileImportSize = assetPath.Contains("Environment Assets") ? 1024 : 256;
+                    if (!importer.GetPlatformTextureSettings("Android").overridden
+                        | importer.GetPlatformTextureSettings("Android").maxTextureSize < targetMobileImportSize)
                     {
                         TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
                         androidSettings.name = "Android";
