@@ -262,6 +262,8 @@ namespace Vi.UI
             transitionRunning = false;
         }
 
+        private const float textPingPongSpeed = 1.5f;
+
         protected virtual void Update()
         {
             FindLocalActionMapHandler();
@@ -332,8 +334,8 @@ namespace Vi.UI
                         }
                     }
 
-                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
-                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
+                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
+                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
 
                     viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
                     if (gameModeManager.TokensEarnedFromMatch > 0)
