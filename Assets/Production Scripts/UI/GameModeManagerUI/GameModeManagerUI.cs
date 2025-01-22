@@ -211,8 +211,6 @@ namespace Vi.UI
 
         [Header("Transition")]
         [SerializeField] private CanvasGroup transitionGroup;
-        [SerializeField] private AnimationCurve transitionInAlphaCurve;
-        [SerializeField] private AnimationCurve transitionOutAlphaCurve;
         [SerializeField] private Image topImage;
         [SerializeField] private Image bottomImage;
         private bool transitionRunning;
@@ -227,13 +225,14 @@ namespace Vi.UI
             topImage.enabled = true;
             bottomImage.enabled = true;
 
+            transitionGroup.alpha = 1;
+
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                transitionGroup.alpha = transitionInAlphaCurve.EvaluateNormalizedTime(t);
                 topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
                 bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
                 yield return null;
@@ -250,17 +249,20 @@ namespace Vi.UI
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                transitionGroup.alpha = transitionOutAlphaCurve.EvaluateNormalizedTime(t);
                 topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
                 bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
                 yield return null;
             }
+
+            transitionGroup.alpha = 0;
 
             topImage.enabled = false;
             bottomImage.enabled = false;
 
             transitionRunning = false;
         }
+
+        private const float textPingPongSpeed = 1.5f;
 
         protected virtual void Update()
         {
@@ -332,8 +334,8 @@ namespace Vi.UI
                         }
                     }
 
-                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
-                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time, 1));
+                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
+                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
 
                     viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
                     if (gameModeManager.TokensEarnedFromMatch > 0)
