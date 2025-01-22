@@ -16,6 +16,62 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
+        public void PlayActionInPreviewState(ActionClip actionClip)
+        {
+            if (IsSpawned) { Debug.LogError("AnimationHandler.PlayActionInPreviewState should only be called when not spawned!"); return; }
+            if (actionClip.GetClipType() != ActionClip.ClipType.Ability) { Debug.LogError("Only ability clips can be played in preview state currently"); return; }
+
+            if (previewClipRoutine != null) { StopCoroutine(previewClipRoutine); }
+
+            Animator.Play("Actions.Empty", actionsLayerIndex);
+
+            foreach (PooledObject instance in previewVFXInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(instance);
+            }
+            previewVFXInstances.Clear();
+
+            previewClipRoutine = StartCoroutine(PlayActionInPreviewStateRoutine(actionClip));
+        }
+
+        private List<PooledObject> previewVFXInstances = new List<PooledObject>();
+        private Coroutine previewClipRoutine;
+        private IEnumerator PlayActionInPreviewStateRoutine(ActionClip actionClip)
+        {
+            yield return new WaitUntil(() => IsAtRestIgnoringTransition());
+
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+            float transitionTime = actionClip.transitionTime;
+            Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+
+            List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
+
+            yield return new WaitUntil(() => IsActionClipPlaying(actionClip));
+
+            while (true)
+            {
+                float normalizedTime = GetActionClipNormalizedTime(actionClip);
+                foreach (ActionVFX actionVFX in actionClip.actionVFXList)
+                {
+                    if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                    if (actionVFXTracker.Contains(actionVFX)) { continue; }
+                    if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                    {
+                        actionVFXTracker.Add(actionVFX);
+
+                        (SpawnPoints.TransformData data, Transform parent) = combatAgent.WeaponHandler.GetActionVFXOrientation(actionClip, actionVFX, false, transform);
+
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(actionVFX.GetComponent<PooledObject>(), data.position, data.rotation, parent);
+                        previewVFXInstances.Add(instance);
+                    }
+                }
+
+                if (!IsActionClipPlaying(actionClip)) { break; }
+
+                yield return null;
+            }
+        }
+
         public bool WaitingForActionClipToPlay { get; private set; }
 
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
@@ -1678,6 +1734,12 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            foreach (PooledObject instance in previewVFXInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(instance);
+            }
+            previewVFXInstances.Clear();
+
             WasLastActionClipMotionPredicted = default;
             RootMotionId = default;
             actionClipQueueWaitTime = 0;

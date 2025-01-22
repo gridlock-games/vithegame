@@ -824,7 +824,7 @@ namespace Vi.UI
 
             if (playUltimateAnimation)
             {
-                yield return PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>());
+                yield return PlayUltimateAnimation(previewObject.GetComponent<CombatAgent>());
                 playUltimateAnimation = false;
             }
 
@@ -873,13 +873,16 @@ namespace Vi.UI
             loadout.weapon1ItemId = weaponOption.itemWebId;
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, loadout, selectedCharacter._id.ToString());
 
-            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<CombatAgent>()));
         }
 
-        private IEnumerator PlayUltimateAnimation(AnimationHandler animationHandler)
+        private IEnumerator PlayUltimateAnimation(CombatAgent combatAgent)
         {
-            yield return new WaitUntil(() => animationHandler.Animator);
-            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, animationHandler.Animator.GetLayerIndex("Actions"));
+            yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
+
+            combatAgent.AnimationHandler.PlayActionInPreviewState(combatAgent.WeaponHandler.GetWeapon().GetAbility4());
+
+            //combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private string selectedRace = "Human";
