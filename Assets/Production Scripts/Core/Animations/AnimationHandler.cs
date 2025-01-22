@@ -34,10 +34,12 @@ namespace Vi.Core
             previewClipRoutine = StartCoroutine(PlayActionInPreviewStateRoutine(actionClip));
         }
 
+        public bool IsPlayingPreviewClip { get; private set; }
         private List<PooledObject> previewVFXInstances = new List<PooledObject>();
         private Coroutine previewClipRoutine;
         private IEnumerator PlayActionInPreviewStateRoutine(ActionClip actionClip)
         {
+            IsPlayingPreviewClip = true;
             yield return new WaitUntil(() => IsAtRestIgnoringTransition());
 
             string animationStateName = GetActionClipAnimationStateName(actionClip);
@@ -70,6 +72,14 @@ namespace Vi.Core
 
                 yield return null;
             }
+
+            while (previewVFXInstances.Count > 0)
+            {
+                yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(previewVFXInstances[0]);
+                previewVFXInstances.RemoveAt(0);
+            }
+
+            IsPlayingPreviewClip = false;
         }
 
         public bool WaitingForActionClipToPlay { get; private set; }
@@ -1739,6 +1749,7 @@ namespace Vi.Core
                 ObjectPoolingManager.ReturnObjectToPool(instance);
             }
             previewVFXInstances.Clear();
+            IsPlayingPreviewClip = false;
 
             WasLastActionClipMotionPredicted = default;
             RootMotionId = default;

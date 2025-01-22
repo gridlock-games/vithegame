@@ -26,6 +26,7 @@ namespace Vi.UI
         [SerializeField] private Camera characterPreviewCamera;
         [SerializeField] private SpawnPoints.TransformData defaultCameraOrientation;
         [SerializeField] private SpawnPoints.TransformData headCameraOrientation;
+        [SerializeField] private SpawnPoints.TransformData previewUltimateCameraOrientation;
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -882,6 +883,9 @@ namespace Vi.UI
 
             combatAgent.AnimationHandler.PlayActionInPreviewState(combatAgent.WeaponHandler.GetWeapon().GetAbility4());
 
+            characterPreviewCamera.transform.position = previewUltimateCameraOrientation.position;
+            characterPreviewCamera.transform.rotation = previewUltimateCameraOrientation.rotation;
+
             //combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
         }
 
@@ -962,8 +966,20 @@ namespace Vi.UI
         {
             ProcessCharacterQueue();
 
-            characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
-            characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+            bool evaluateCameraTransform = true;
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out AnimationHandler animationHandler))
+                {
+                    evaluateCameraTransform = !animationHandler.IsPlayingPreviewClip;
+                }
+            }
+
+            if (evaluateCameraTransform)
+            {
+                characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
+                characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+            }
 
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
             statsParent.SetActive(statsSelected);
