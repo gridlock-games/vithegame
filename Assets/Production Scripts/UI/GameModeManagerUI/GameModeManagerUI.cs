@@ -211,8 +211,6 @@ namespace Vi.UI
 
         [Header("Transition")]
         [SerializeField] private CanvasGroup transitionGroup;
-        [SerializeField] private AnimationCurve transitionInAlphaCurve;
-        [SerializeField] private AnimationCurve transitionOutAlphaCurve;
         [SerializeField] private Image topImage;
         [SerializeField] private Image bottomImage;
         private bool transitionRunning;
@@ -227,13 +225,14 @@ namespace Vi.UI
             topImage.enabled = true;
             bottomImage.enabled = true;
 
+            transitionGroup.alpha = 1;
+
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                transitionGroup.alpha = transitionInAlphaCurve.EvaluateNormalizedTime(t);
                 topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
                 bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
                 yield return null;
@@ -250,11 +249,12 @@ namespace Vi.UI
                 t += Time.deltaTime * transitionSpeed;
                 t = Mathf.Clamp01(t);
 
-                transitionGroup.alpha = transitionOutAlphaCurve.EvaluateNormalizedTime(t);
                 topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
                 bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
                 yield return null;
             }
+
+            transitionGroup.alpha = 0;
 
             topImage.enabled = false;
             bottomImage.enabled = false;
