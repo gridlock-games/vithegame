@@ -879,7 +879,7 @@ namespace Vi.UI
         private IEnumerator PlayUltimateAnimation(AnimationHandler animationHandler)
         {
             yield return new WaitUntil(() => animationHandler.Animator);
-            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, animationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private string selectedRace = "Human";

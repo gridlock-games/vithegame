@@ -674,7 +674,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
                 stateName = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "Victory" : "Defeat";
             }
-            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.25f, animationHandler.Animator.GetLayerIndex("Actions"));
 
             MVPPreviewInProgress = false;
         }
