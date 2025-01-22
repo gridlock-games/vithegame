@@ -474,7 +474,7 @@ namespace Vi.UI
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
                 expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, experienceAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
@@ -485,7 +485,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
@@ -507,7 +507,7 @@ namespace Vi.UI
             bool psPlayed = false;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
 
                 if (!psPlayed)
@@ -607,9 +607,9 @@ namespace Vi.UI
             displayKDARunning = false;
         }
 
-        private const float rewardsTransitionSpeed = 3;
-        private const float opacityTransitionSpeed = 0.5f;
-        private const float scaleTransitionSpeed = 2;
+        private const float UIAnimationTimeMultiplier = 2;
+        private const float rewardsTransitionSpeed = 4;
+        private const float scaleTransitionSpeed = 3;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
