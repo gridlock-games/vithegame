@@ -474,7 +474,7 @@ namespace Vi.UI
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
                 expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, experienceAppearanceCurve.EvaluateNormalizedTime(t));
                 yield return null;
@@ -485,7 +485,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
@@ -497,7 +497,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime * rewardsTransitionOutSpeed;
                 t = Mathf.Clamp01(t);
                 expGainedParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
@@ -507,7 +507,7 @@ namespace Vi.UI
             bool psPlayed = false;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime;
+                t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
 
                 if (!psPlayed)
@@ -532,7 +532,7 @@ namespace Vi.UI
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
-                t += Time.deltaTime * rewardsTransitionSpeed;
+                t += Time.deltaTime * rewardsTransitionOutSpeed;
                 t = Mathf.Clamp01(t);
                 rewardsSectionParent.localScale = Vector3.LerpUnclamped(Vector3.one, Vector3.zero, t);
                 yield return null;
@@ -607,9 +607,9 @@ namespace Vi.UI
             displayKDARunning = false;
         }
 
-        private const float rewardsTransitionSpeed = 3;
-        private const float opacityTransitionSpeed = 0.5f;
-        private const float scaleTransitionSpeed = 2;
+        private const float UIAnimationTimeMultiplier = 1.85f;
+        private const float rewardsTransitionOutSpeed = 3.6f;
+        private const float scaleTransitionSpeed = 2.85f;
 
         private GameObject MVPPreviewObject;
         private GameObject lightInstance;
@@ -674,7 +674,7 @@ namespace Vi.UI
                 yield return new WaitUntil(() => gameModeManager.GetGameWinnerIds().Count > 0);
                 stateName = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "Victory" : "Defeat";
             }
-            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.15f, animationHandler.Animator.GetLayerIndex("Actions"));
+            animationHandler.Animator.CrossFadeInFixedTime(stateName, 0.25f, animationHandler.Animator.GetLayerIndex("Actions"));
 
             MVPPreviewInProgress = false;
         }
