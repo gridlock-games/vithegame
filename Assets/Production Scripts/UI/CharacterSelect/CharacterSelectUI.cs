@@ -909,6 +909,8 @@ namespace Vi.UI
 
             if (characterCustomizationParent.activeSelf)
             {
+                characterCreationOpacityGroup.interactable = false;
+
                 int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
                 if (index != -1)
                 {
@@ -1051,6 +1053,8 @@ namespace Vi.UI
                 if (!ultimateAnimationRunning)
                 {
                     characterCreationOpacityGroup.alpha = Mathf.Lerp(characterCreationOpacityGroup.alpha, 1, Time.deltaTime * cameraLerpSpeed);
+                    characterCreationOpacityGroup.interactable = true;
+
                     characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
                 }
