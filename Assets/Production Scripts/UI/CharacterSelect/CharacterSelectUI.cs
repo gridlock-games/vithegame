@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
-using static Vi.ScriptableObjects.Weapon;
 
 namespace Vi.UI
 {
@@ -32,8 +31,8 @@ namespace Vi.UI
         private struct ComboCameraOrientation
         {
             public Weapon.WeaponClass weaponClass;
-            public Vector3AnimationCurve position;
-            public Vector3AnimationCurve rotation;
+            public Weapon.Vector3AnimationCurve position;
+            public Weapon.Vector3AnimationCurve rotation;
         }
 
         [Header("Character Select")]
@@ -833,8 +832,8 @@ namespace Vi.UI
                 | !raceAndGendersAreEqual)
             {
                 playUltimateAnimation = true;
-                weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
-                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+                weaponClassIndex = System.Array.IndexOf(weaponClasses, Weapon.WeaponClass.Greatsword);
+                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
                 weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
             }
 
@@ -905,6 +904,12 @@ namespace Vi.UI
         {
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
 
+            if (characterSelectParent.activeSelf)
+            {
+                combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
+                yield break;
+            }
+
             int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
             if (index != -1)
             {
@@ -923,7 +928,7 @@ namespace Vi.UI
 
             comboCameraOrientationMaxTime = 0;
             int i = 0;
-            foreach (PreviewActionClip previewClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
+            foreach (Weapon.PreviewActionClip previewClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
             {
                 i++;
                 float length = combatAgent.AnimationHandler.GetTotalActionClipLengthInSeconds(previewClip.actionClip);
@@ -932,8 +937,6 @@ namespace Vi.UI
             }
 
             combatAgent.AnimationHandler.PlayPreviewCombo();
-
-            //combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
         }
 
         private string selectedRace = "Human";
@@ -1177,8 +1180,8 @@ namespace Vi.UI
                 CreateUIElementHighlight((RectTransform)characterNameInputField.transform);
             }
 
-            weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
-            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+            weaponClassIndex = System.Array.IndexOf(weaponClasses, Weapon.WeaponClass.Greatsword);
+            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
 
             playUltimateAnimation = true;
