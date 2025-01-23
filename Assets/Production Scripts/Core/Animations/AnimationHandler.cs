@@ -1779,6 +1779,18 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
+            foreach (Coroutine routine in returnRoutines)
+            {
+                if (routine != null) { StopCoroutine(routine); }
+            }
+            returnRoutines.Clear();
+
+            foreach (PooledObject instance in previewVFXInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(instance);
+            }
+            previewVFXInstances.Clear();
+
             if (animatorReference)
             {
                 foreach (Renderer r in animatorReference.Renderers)
@@ -1857,18 +1869,6 @@ namespace Vi.Core
 
         private void OnDisable()
         {
-            foreach (PooledObject instance in previewVFXInstances)
-            {
-                ObjectPoolingManager.ReturnObjectToPool(instance);
-            }
-            previewVFXInstances.Clear();
-
-            foreach (Coroutine routine in returnRoutines)
-            {
-                if (routine != null) { StopCoroutine(routine); }
-            }
-            returnRoutines.Clear();
-
             IsPlayingPreviewClip = false;
 
             WasLastActionClipMotionPredicted = default;
