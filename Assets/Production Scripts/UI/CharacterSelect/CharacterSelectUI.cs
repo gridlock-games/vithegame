@@ -175,8 +175,14 @@ namespace Vi.UI
 
         private Color originalSelectionBarGlowColor;
 
+        private Vector2 originalLeftPos;
+        private Vector2 originalRightPos;
+
         private void Awake()
         {
+            originalLeftPos = ((RectTransform)customizationRowsParentLeft).anchoredPosition;
+            originalRightPos = ((RectTransform)customizationRowsParentRight).anchoredPosition;
+
             weaponClasses = (Weapon.WeaponClass[])System.Enum.GetValues(typeof(Weapon.WeaponClass));
 
             if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted")) { tutorialAlertBox.DestroyAlert(); }
@@ -934,6 +940,9 @@ namespace Vi.UI
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(0)), t);
                     yield return null;
                 }
+
+                ((RectTransform)customizationRowsParentLeft).anchoredPosition -= new Vector2(700, 0);
+                ((RectTransform)customizationRowsParentRight).anchoredPosition += new Vector2(700, 0);
             }
             
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
@@ -1057,6 +1066,9 @@ namespace Vi.UI
 
                     characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+
+                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentLeft).anchoredPosition, originalLeftPos, Time.deltaTime * cameraLerpSpeed);
+                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentRight).anchoredPosition, originalRightPos, Time.deltaTime * cameraLerpSpeed);
                 }
             }
             else
