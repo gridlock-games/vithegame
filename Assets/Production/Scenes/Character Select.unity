@@ -1969,21 +1969,21 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -11.52
+          value: -13
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0.33333334
+          outWeight: 0
         - serializedVersion: 3
           time: 1
           value: -11.52
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 34
+          inSlope: 2
+          outSlope: 2
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -2263,21 +2263,30 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -11.52
+          value: -13
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0.33333334
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.55332214
+          value: -13
+          inSlope: 0.00239998
+          outSlope: 0.00239998
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
+          outWeight: 0.20460953
         - serializedVersion: 3
           time: 1
           value: -11.52
-          inSlope: 0
-          outSlope: 0
-          tangentMode: 34
+          inSlope: -0.29994386
+          outSlope: -0.29994386
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0.260559
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -2410,21 +2419,21 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -11.52
+          value: -13
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0.33333334
+          outWeight: 0
         - serializedVersion: 3
           time: 1
           value: -11.52
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -2557,21 +2566,21 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -11.52
+          value: -13
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
-          outWeight: 0.33333334
+          outWeight: 0
         - serializedVersion: 3
           time: 1
           value: -11.52
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -2704,21 +2713,30 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -11.52
+          value: -12
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
           inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 0.2
+          value: -25
+          inSlope: 0.50110435
+          outSlope: 0.50110435
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.33333334
           outWeight: 0.33333334
         - serializedVersion: 3
           time: 1
           value: -11.52
           inSlope: 0
           outSlope: 0
-          tangentMode: 34
+          tangentMode: 0
           weightedMode: 0
-          inWeight: 0.33333334
+          inWeight: 0
           outWeight: 0
         m_PreInfinity: 2
         m_PostInfinity: 2
@@ -12999,7 +13017,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 425.7322, y: 63.242676}
+  m_SizeDelta: {x: 435.9807, y: 64.67845}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1816820239
 MonoBehaviour:
@@ -16226,6 +16244,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_BounceIntensity
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2192268691185060654, guid: b7237a7cdf80e6b4c8d645a50dae788a,
+        type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 1280
       objectReference: {fileID: 0}
     - target: {fileID: 4686628037996511150, guid: b7237a7cdf80e6b4c8d645a50dae788a,
         type: 3}
