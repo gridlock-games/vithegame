@@ -902,32 +902,48 @@ namespace Vi.UI
         private float comboCameraOrientationTime;
         private float comboCameraOrientationMaxTime;
         ComboCameraOrientation comboCameraOrientation;
+        private bool ultimateAnimationRunning;
         private IEnumerator PlayUltimateAnimation(CombatAgent combatAgent)
         {
+            ultimateAnimationRunning = true;
+
+            if (characterCustomizationParent.activeSelf)
+            {
+                int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+                if (index != -1)
+                {
+                    comboCameraOrientation = previewUltimateCameraOrientation[index];
+                }
+                else
+                {
+                    Debug.LogWarning("No combo camera orientation for weapon class " + combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+                    comboCameraOrientation = previewUltimateCameraOrientation[0];
+                }
+
+                float t = 0;
+                while (!Mathf.Approximately(t, 1))
+                {
+                    t += Time.deltaTime * cameraLerpSpeed;
+                    t = Mathf.Clamp01(t);
+
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(1, 0, t);
+
+                    characterPreviewCamera.transform.position = Vector3.Slerp(shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, comboCameraOrientation.position.EvaluateNormalized(0), t);
+                    characterPreviewCamera.transform.rotation = Quaternion.Slerp(shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(0)), t);
+                    yield return null;
+                }
+            }
+            
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
 
             if (characterSelectParent.activeSelf)
             {
                 combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
+                ultimateAnimationRunning = false;
                 yield break;
             }
 
-            int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
-            if (index != -1)
-            {
-                comboCameraOrientation = previewUltimateCameraOrientation[index];
-            }
-            else
-            {
-                Debug.LogWarning("No combo camera orientation for weapon class " + combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
-                comboCameraOrientation = previewUltimateCameraOrientation[0];
-            }
-
             comboCameraOrientationTime = 0;
-
-            characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime);
-            characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime));
-
             comboCameraOrientationMaxTime = 0;
             int i = 0;
             foreach (Weapon.PreviewActionClip previewClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
@@ -939,6 +955,7 @@ namespace Vi.UI
             }
 
             combatAgent.AnimationHandler.PlayPreviewCombo();
+            ultimateAnimationRunning = false;
         }
 
         private string selectedRace = "Human";
@@ -1008,7 +1025,9 @@ namespace Vi.UI
 
             HandlePlatformAPI(false);
         }
-        
+
+        [SerializeField] private CanvasGroup characterCreationOpacityGroup;
+
         private List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private float lastTextChangeTime;
         private bool lastClientState;
@@ -1029,8 +1048,12 @@ namespace Vi.UI
 
             if (evaluateCameraTransform)
             {
-                characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
-                characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+                if (!ultimateAnimationRunning)
+                {
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(characterCreationOpacityGroup.alpha, 1, Time.deltaTime * cameraLerpSpeed);
+                    characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
+                    characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+                }
             }
             else
             {
