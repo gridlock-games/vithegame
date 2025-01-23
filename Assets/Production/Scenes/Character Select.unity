@@ -2713,7 +2713,7 @@ MonoBehaviour:
         m_Curve:
         - serializedVersion: 3
           time: 0
-          value: -12
+          value: -13
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -2721,14 +2721,23 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.2
-          value: -25
-          inSlope: 0.50110435
-          outSlope: 0.50110435
+          time: 0.3
+          value: -15
+          inSlope: 0.13926251
+          outSlope: 0.13926251
           tangentMode: 0
           weightedMode: 0
           inWeight: 0.33333334
-          outWeight: 0.33333334
+          outWeight: 0.1074163
+        - serializedVersion: 3
+          time: 0.7
+          value: -15
+          inSlope: 0.24507648
+          outSlope: 0.24507648
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0.25421143
+          outWeight: 0.23940781
         - serializedVersion: 3
           time: 1
           value: -11.52
@@ -4265,8 +4274,8 @@ Transform:
   m_GameObject: {fileID: 642833309}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.00215, y: 0.65, z: -1.5200005}
-  m_LocalScale: {x: 11.547005, y: 11.547005, z: 1}
+  m_LocalPosition: {x: -0.00215, y: 0.65, z: 188.48}
+  m_LocalScale: {x: 230.94011, y: 230.94011, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -4284,7 +4293,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetCamera: {fileID: 1085791623}
-  distanceFromCamera: 10
+  distanceFromCamera: 200
   backgroundMaterial: {fileID: 2100000, guid: 07686fc9133db6344bc3afb5ed99b764, type: 2}
   backgroundTexture: {fileID: 2800000, guid: 6d266d6804d8da64c99fa3b07b3d9f88, type: 3}
   fineTuningTextureOffset: {x: 0, y: -0.16}
