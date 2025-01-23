@@ -21,6 +21,7 @@ namespace Vi.Core
             if (IsSpawned) { Debug.LogError("AnimationHandler.PlayPreviewCombo should only be called when not spawned!"); return; }
 
             lastIsAttacking = default;
+            currentPreviewClip = null;
 
             if (previewComboRoutine != null) { StopCoroutine(previewComboRoutine); }
 
@@ -127,7 +128,17 @@ namespace Vi.Core
         private void PreviewActionClipUpdate()
         {
             if (IsSpawned) { return; }
-            if (currentPreviewClip == null) { return; }
+            if (currentPreviewClip == null)
+            {
+                foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in combatAgent.WeaponHandler.WeaponInstances)
+                {
+                    if (kvp.Value is ColliderWeapon colliderWeapon)
+                    {
+                        colliderWeapon.StopWeaponTrail();
+                    }
+                }
+                return;
+            }
 
             float normalizedTime = GetActionClipNormalizedTime(currentPreviewClip);
             if (currentPreviewClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
@@ -1846,6 +1857,7 @@ namespace Vi.Core
             lastHealthPotionTime = Mathf.NegativeInfinity;
             lastStaminaPotionTime = Mathf.NegativeInfinity;
 
+            currentPreviewClip = null;
             lastIsAttacking = default;
 
             ResetRootMotionTime();
