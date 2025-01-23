@@ -26,7 +26,15 @@ namespace Vi.UI
         [SerializeField] private Camera characterPreviewCamera;
         [SerializeField] private SpawnPoints.TransformData defaultCameraOrientation;
         [SerializeField] private SpawnPoints.TransformData headCameraOrientation;
-        [SerializeField] private SpawnPoints.TransformData previewUltimateCameraOrientation;
+        [SerializeField] private List<ComboCameraOrientation> previewUltimateCameraOrientation;
+
+        [System.Serializable]
+        private struct ComboCameraOrientation
+        {
+            public Weapon.WeaponClass weaponClass;
+            public Vector3AnimationCurve position;
+            public Vector3AnimationCurve rotation;
+        }
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -889,14 +897,41 @@ namespace Vi.UI
             StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<CombatAgent>()));
         }
 
+        private const float comboCameraOrientationSpeed = 1;
+        private float comboCameraOrientationTime;
+        private float comboCameraOrientationMaxTime;
+        ComboCameraOrientation comboCameraOrientation;
         private IEnumerator PlayUltimateAnimation(CombatAgent combatAgent)
         {
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
 
-            combatAgent.AnimationHandler.PlayActionInPreviewState(combatAgent.WeaponHandler.GetWeapon().GetAbility4());
+            int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+            if (index != -1)
+            {
+                comboCameraOrientation = previewUltimateCameraOrientation[index];
+            }
+            else
+            {
+                Debug.LogWarning("No combo camera orientation for weapon class " + combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+                comboCameraOrientation = previewUltimateCameraOrientation[0];
+            }
 
-            characterPreviewCamera.transform.position = previewUltimateCameraOrientation.position;
-            characterPreviewCamera.transform.rotation = previewUltimateCameraOrientation.rotation;
+            comboCameraOrientationTime = 0;
+
+            characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime);
+            characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime));
+
+            comboCameraOrientationMaxTime = 0;
+            int i = 0;
+            foreach (PreviewActionClip previewClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
+            {
+                i++;
+                float length = combatAgent.AnimationHandler.GetTotalActionClipLengthInSeconds(previewClip.actionClip);
+                if (i < combatAgent.WeaponHandler.GetWeapon().PreviewCombo.Count) { length *= previewClip.normalizedTimeToPlayNext; }
+                comboCameraOrientationMaxTime += length;
+            }
+
+            combatAgent.AnimationHandler.PlayPreviewCombo();
 
             //combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
         }
@@ -968,7 +1003,7 @@ namespace Vi.UI
 
             HandlePlatformAPI(false);
         }
-
+        
         private List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private float lastTextChangeTime;
         private bool lastClientState;
@@ -991,6 +1026,12 @@ namespace Vi.UI
             {
                 characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                 characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+            }
+            else
+            {
+                comboCameraOrientationTime += Time.deltaTime * comboCameraOrientationSpeed;
+                characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime);
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime));
             }
 
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
