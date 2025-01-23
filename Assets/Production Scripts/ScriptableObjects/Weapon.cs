@@ -1173,6 +1173,9 @@ namespace Vi.ScriptableObjects
         public List<PreviewActionClip> PreviewCombo { get { return previewCombo; } }
         [SerializeField] private List<PreviewActionClip> previewCombo = new List<PreviewActionClip>();
 
+        public float GetMVPAnimationSpeed() { return MVPAnimationSpeed; }
+        [SerializeField] private float MVPAnimationSpeed = 1;
+
         [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
         [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
         [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
