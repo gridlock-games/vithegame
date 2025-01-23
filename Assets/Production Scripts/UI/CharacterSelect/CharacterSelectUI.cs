@@ -1044,6 +1044,7 @@ namespace Vi.UI
         private bool lastClientState;
 
         private const float cameraLerpSpeed = 2;
+        private float customizationAnimationTime;
         private void Update()
         {
             ProcessCharacterQueue();
@@ -1061,14 +1062,21 @@ namespace Vi.UI
             {
                 if (!ultimateAnimationRunning)
                 {
-                    characterCreationOpacityGroup.alpha = Mathf.Lerp(characterCreationOpacityGroup.alpha, 1, Time.deltaTime * cameraLerpSpeed);
+                    customizationAnimationTime += Time.deltaTime * cameraLerpSpeed;
+                    customizationAnimationTime = Mathf.Clamp01(customizationAnimationTime);
+
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(0, 1, customizationAnimationTime);
                     characterCreationOpacityGroup.interactable = true;
 
                     characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
 
-                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentLeft).anchoredPosition, originalLeftPos, Time.deltaTime * cameraLerpSpeed);
-                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentRight).anchoredPosition, originalRightPos, Time.deltaTime * cameraLerpSpeed);
+                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(originalLeftPos - new Vector2(700, 0), originalLeftPos, customizationAnimationTime);
+                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(originalRightPos + new Vector2(700, 0), originalRightPos, customizationAnimationTime);
+                }
+                else
+                {
+                    customizationAnimationTime = 0;
                 }
             }
             else
@@ -1076,6 +1084,7 @@ namespace Vi.UI
                 comboCameraOrientationTime += Time.deltaTime * comboCameraOrientationSpeed;
                 characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime);
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime));
+                customizationAnimationTime = 0;
             }
 
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
