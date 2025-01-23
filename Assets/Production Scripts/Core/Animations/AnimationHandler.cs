@@ -16,6 +16,185 @@ namespace Vi.Core
     [DisallowMultipleComponent]
     public class AnimationHandler : NetworkBehaviour
     {
+        public void PlayPreviewCombo()
+        {
+            if (IsSpawned) { Debug.LogError("AnimationHandler.PlayPreviewCombo should only be called when not spawned!"); return; }
+
+            lastIsAttacking = default;
+            currentPreviewClip = null;
+
+            if (previewComboRoutine != null) { StopCoroutine(previewComboRoutine); }
+
+            previewComboRoutine = StartCoroutine(PlayPreviewComboRoutine());
+        }
+
+        public bool IsPlayingPreviewClip { get; private set; }
+        private Coroutine previewComboRoutine;
+        private ActionClip currentPreviewClip;
+        private IEnumerator PlayPreviewComboRoutine()
+        {
+            IsPlayingPreviewClip = true;
+
+            foreach (Coroutine routine in previewClipRoutines)
+            {
+                if (routine != null) { StopCoroutine(routine); }
+            }
+            previewClipRoutines.Clear();
+
+            Animator.Play("Actions.Empty", actionsLayerIndex);
+
+            foreach (Coroutine routine in returnRoutines)
+            {
+                if (routine != null) { StopCoroutine(routine); }
+            }
+            returnRoutines.Clear();
+
+            foreach (PooledObject instance in previewVFXInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(instance);
+            }
+            previewVFXInstances.Clear();
+
+            foreach (Weapon.PreviewActionClip previewActionClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
+            {
+                currentPreviewClip = previewActionClip.actionClip;
+                previewClipRoutines.Add(StartCoroutine(PlayActionInPreviewStateRoutine(previewActionClip.actionClip)));
+
+                while (true)
+                {
+                    float normalizedTime = GetActionClipNormalizedTime(previewActionClip.actionClip);
+                    if (normalizedTime >= previewActionClip.normalizedTimeToPlayNext) { break; }
+                    yield return null;
+                }
+            }
+
+            foreach (Coroutine routine in previewClipRoutines)
+            {
+                if (routine != null)
+                {
+                    yield return routine;
+                }
+
+                if (previewClipRoutines.Count(item => item != null) == 0)
+                {
+                    break;
+                }
+            }
+            previewClipRoutines.Clear();
+
+            currentPreviewClip = null;
+            IsPlayingPreviewClip = false;
+        }
+
+        private List<PooledObject> previewVFXInstances = new List<PooledObject>();
+        private List<Coroutine> previewClipRoutines = new List<Coroutine>();
+        private List<Coroutine> returnRoutines = new List<Coroutine>();
+        private IEnumerator PlayActionInPreviewStateRoutine(ActionClip actionClip)
+        {
+            string animationStateName = GetActionClipAnimationStateName(actionClip);
+            float transitionTime = actionClip.transitionTime;
+            Animator.CrossFadeInFixedTime(animationStateName, transitionTime, actionsLayerIndex);
+
+            List<ActionVFX> actionVFXTracker = new List<ActionVFX>();
+
+            yield return new WaitUntil(() => IsActionClipPlaying(actionClip));
+
+            while (true)
+            {
+                float normalizedTime = GetActionClipNormalizedTime(actionClip);
+                foreach (ActionVFX actionVFX in actionClip.actionVFXList)
+                {
+                    if (actionVFX.vfxSpawnType != ActionVFX.VFXSpawnType.OnActivate) { continue; }
+                    if (actionVFXTracker.Contains(actionVFX)) { continue; }
+                    if (normalizedTime >= actionVFX.onActivateVFXSpawnNormalizedTime)
+                    {
+                        actionVFXTracker.Add(actionVFX);
+
+                        (SpawnPoints.TransformData data, Transform parent) = combatAgent.WeaponHandler.GetActionVFXOrientation(actionClip, actionVFX, false, transform);
+
+                        PooledObject instance = ObjectPoolingManager.SpawnObject(actionVFX.GetComponent<PooledObject>(), data.position, data.rotation, parent);
+                        previewVFXInstances.Add(instance);
+                        returnRoutines.Add(StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance)));
+                    }
+                }
+
+                if (!IsActionClipPlaying(actionClip)) { break; }
+
+                yield return null;
+            }
+
+            while (previewVFXInstances.Count > 0)
+            {
+                previewVFXInstances.RemoveAll(item => !item.IsSpawned);
+                yield return null;
+            }
+        }
+
+        private bool lastIsAttacking;
+        private void PreviewActionClipUpdate()
+        {
+            if (IsSpawned) { return; }
+            if (currentPreviewClip == null)
+            {
+                foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in combatAgent.WeaponHandler.WeaponInstances)
+                {
+                    if (kvp.Value is ColliderWeapon colliderWeapon)
+                    {
+                        colliderWeapon.StopWeaponTrail();
+                    }
+                }
+                Animator.speed = 1;
+                return;
+            }
+
+            if (IsActionClipPlaying(currentPreviewClip))
+            {
+                float normalizedTime = GetActionClipNormalizedTime(currentPreviewClip);
+                if (currentPreviewClip.GetClipType() == ActionClip.ClipType.HeavyAttack)
+                {
+                    float floor = Mathf.FloorToInt(normalizedTime);
+                    if (!Mathf.Approximately(floor, normalizedTime)) { normalizedTime -= floor; }
+                }
+
+                bool isInRecovery = normalizedTime >= currentPreviewClip.recoveryNormalizedTime;
+                bool isAttacking = normalizedTime >= currentPreviewClip.attackingNormalizedTime & !isInRecovery;
+                bool isInAnticipation = !isAttacking & !isInRecovery;
+
+                Animator.speed = isInRecovery ? currentPreviewClip.recoveryAnimationSpeed : currentPreviewClip.animationSpeed;
+
+                foreach (KeyValuePair<Weapon.WeaponBone, RuntimeWeapon> kvp in combatAgent.WeaponHandler.WeaponInstances)
+                {
+                    if (kvp.Value is ColliderWeapon colliderWeapon)
+                    {
+                        if (currentPreviewClip.effectedWeaponBones.Contains(kvp.Key))
+                        {
+                            colliderWeapon.PlayWeaponTrail();
+
+                            if (isAttacking & !lastIsAttacking)
+                            {
+                                AudioClip attackSoundEffect = combatAgent.WeaponHandler.GetWeapon().GetAttackSoundEffect(kvp.Key);
+                                if (attackSoundEffect)
+                                {
+                                    AudioSource audioSource = AudioManager.Singleton.PlayClipOnTransform(kvp.Value.transform, attackSoundEffect, false, Weapon.attackSoundEffectVolume);
+                                    if (audioSource) { audioSource.maxDistance = Weapon.attackSoundEffectMaxDistance; }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            colliderWeapon.StopWeaponTrail();
+                        }
+                    }
+                }
+                lastIsAttacking = isAttacking;
+            }
+            else
+            {
+                Animator.speed = 1;
+                lastIsAttacking = false;
+            }
+        }
+
         public bool WaitingForActionClipToPlay { get; private set; }
 
         public void PlayAction(ActionClip actionClip, bool isFollowUpClip = false)
@@ -1600,6 +1779,18 @@ namespace Vi.Core
 
         private void OnReturnToPool()
         {
+            foreach (Coroutine routine in returnRoutines)
+            {
+                if (routine != null) { StopCoroutine(routine); }
+            }
+            returnRoutines.Clear();
+
+            foreach (PooledObject instance in previewVFXInstances)
+            {
+                ObjectPoolingManager.ReturnObjectToPool(instance);
+            }
+            previewVFXInstances.Clear();
+
             if (animatorReference)
             {
                 foreach (Renderer r in animatorReference.Renderers)
@@ -1678,6 +1869,8 @@ namespace Vi.Core
 
         private void OnDisable()
         {
+            IsPlayingPreviewClip = false;
+
             WasLastActionClipMotionPredicted = default;
             RootMotionId = default;
             actionClipQueueWaitTime = 0;
@@ -1686,6 +1879,9 @@ namespace Vi.Core
 
             lastHealthPotionTime = Mathf.NegativeInfinity;
             lastStaminaPotionTime = Mathf.NegativeInfinity;
+
+            currentPreviewClip = null;
+            lastIsAttacking = default;
 
             ResetRootMotionTime();
         }
@@ -1701,6 +1897,8 @@ namespace Vi.Core
 
         private void Update()
         {
+            PreviewActionClipUpdate();
+
             if (IsAtRest())
             {
                 UpdateAnimationLayerWeights(ActionClip.AvatarLayer.FullBody);

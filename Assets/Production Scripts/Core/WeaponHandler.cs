@@ -73,6 +73,7 @@ namespace Vi.Core
             else
             {
                 combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
+                combatAgent.AnimationHandler.Animator.SetFloat("MVPSpeed", weaponInstance.GetMVPAnimationSpeed());
             }
             
             EquipWeapon();

@@ -41,6 +41,24 @@ namespace Vi.Core.Weapons
             }
         }
 
+        public void PlayWeaponTrail()
+        {
+            if (!weaponTrailVFX) { return; }
+
+            weaponTrailVFX.gameObject.SetActive(true);
+            lastWeaponTrailActiveTime = Time.time;
+        }
+
+        public void StopWeaponTrail()
+        {
+            if (!weaponTrailVFX) { return; }
+
+            if (Time.time - lastWeaponTrailActiveTime > weaponTrailDeactivateDuration)
+            {
+                weaponTrailVFX.gameObject.SetActive(false);
+            }
+        }
+
         protected override void Update()
         {
             base.Update();

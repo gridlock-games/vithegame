@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
-using static Vi.ScriptableObjects.Weapon;
 
 namespace Vi.UI
 {
@@ -26,6 +25,15 @@ namespace Vi.UI
         [SerializeField] private Camera characterPreviewCamera;
         [SerializeField] private SpawnPoints.TransformData defaultCameraOrientation;
         [SerializeField] private SpawnPoints.TransformData headCameraOrientation;
+        [SerializeField] private List<ComboCameraOrientation> previewUltimateCameraOrientation;
+
+        [System.Serializable]
+        private struct ComboCameraOrientation
+        {
+            public Weapon.WeaponClass weaponClass;
+            public Weapon.Vector3AnimationCurve position;
+            public Weapon.Vector3AnimationCurve rotation;
+        }
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
@@ -167,8 +175,14 @@ namespace Vi.UI
 
         private Color originalSelectionBarGlowColor;
 
+        private Vector2 originalLeftPos;
+        private Vector2 originalRightPos;
+
         private void Awake()
         {
+            originalLeftPos = ((RectTransform)customizationRowsParentLeft).anchoredPosition;
+            originalRightPos = ((RectTransform)customizationRowsParentRight).anchoredPosition;
+
             weaponClasses = (Weapon.WeaponClass[])System.Enum.GetValues(typeof(Weapon.WeaponClass));
 
             if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted")) { tutorialAlertBox.DestroyAlert(); }
@@ -230,8 +244,14 @@ namespace Vi.UI
 
         private void OnCharPreviewDrag(Vector2 delta)
         {
+            if (!characterSelectParent.activeSelf) { return; }
+
             if (previewObject)
             {
+                if (previewObject.TryGetComponent(out AnimationHandler animationHandler))
+                {
+                    if (animationHandler.IsPlayingPreviewClip) { return; }
+                }
                 previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
             }
         }
@@ -684,10 +704,10 @@ namespace Vi.UI
         {
             if (characterQueue.Count > 0)
             {
-                //if (updateCharCoroutine != null)
-                //{
-                //    return;
-                //}
+                if (updateCharCoroutine != null)
+                {
+                    StopCoroutine(updateCharCoroutine);
+                }
 
                 updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
             }
@@ -755,6 +775,14 @@ namespace Vi.UI
                         yield return null;
                     }
                 }
+
+                if (!idsAreEqual)
+                {
+                    if (previewObject)
+                    {
+                        previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
+                    }
+                }
             }
             
             if (shouldCreateNewModel)
@@ -812,8 +840,8 @@ namespace Vi.UI
                 | !raceAndGendersAreEqual)
             {
                 playUltimateAnimation = true;
-                weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
-                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+                weaponClassIndex = System.Array.IndexOf(weaponClasses, Weapon.WeaponClass.Greatsword);
+                CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
                 weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
             }
 
@@ -824,7 +852,7 @@ namespace Vi.UI
 
             if (playUltimateAnimation)
             {
-                yield return PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>());
+                yield return PlayUltimateAnimation(previewObject.GetComponent<CombatAgent>());
                 playUltimateAnimation = false;
             }
 
@@ -873,13 +901,72 @@ namespace Vi.UI
             loadout.weapon1ItemId = weaponOption.itemWebId;
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, loadout, selectedCharacter._id.ToString());
 
-            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<AnimationHandler>()));
+            StartCoroutine(PlayUltimateAnimation(previewObject.GetComponent<CombatAgent>()));
         }
 
-        private IEnumerator PlayUltimateAnimation(AnimationHandler animationHandler)
+        private const float comboCameraOrientationSpeed = 1;
+        private float comboCameraOrientationTime;
+        private float comboCameraOrientationMaxTime;
+        ComboCameraOrientation comboCameraOrientation;
+        private bool ultimateAnimationRunning;
+        private IEnumerator PlayUltimateAnimation(CombatAgent combatAgent)
         {
-            yield return new WaitUntil(() => animationHandler.Animator);
-            animationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, animationHandler.Animator.GetLayerIndex("Actions"));
+            ultimateAnimationRunning = true;
+
+            if (characterCustomizationParent.activeSelf)
+            {
+                characterCreationOpacityGroup.interactable = false;
+
+                int index = previewUltimateCameraOrientation.FindIndex(item => item.weaponClass == combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+                if (index != -1)
+                {
+                    comboCameraOrientation = previewUltimateCameraOrientation[index];
+                }
+                else
+                {
+                    Debug.LogWarning("No combo camera orientation for weapon class " + combatAgent.LoadoutManager.PrimaryWeaponOption.weapon.GetWeaponClass());
+                    comboCameraOrientation = previewUltimateCameraOrientation[0];
+                }
+
+                float t = 0;
+                while (!Mathf.Approximately(t, 1))
+                {
+                    t += Time.deltaTime * cameraLerpSpeed;
+                    t = Mathf.Clamp01(t);
+
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(1, 0, t);
+
+                    characterPreviewCamera.transform.position = Vector3.Slerp(shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, comboCameraOrientation.position.EvaluateNormalized(0), t);
+                    characterPreviewCamera.transform.rotation = Quaternion.Slerp(shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(0)), t);
+                    yield return null;
+                }
+
+                ((RectTransform)customizationRowsParentLeft).anchoredPosition -= new Vector2(700, 0);
+                ((RectTransform)customizationRowsParentRight).anchoredPosition += new Vector2(700, 0);
+            }
+            
+            yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
+
+            if (characterSelectParent.activeSelf)
+            {
+                combatAgent.AnimationHandler.Animator.CrossFadeInFixedTime("MVP", 0.25f, combatAgent.AnimationHandler.Animator.GetLayerIndex("Actions"));
+                ultimateAnimationRunning = false;
+                yield break;
+            }
+
+            comboCameraOrientationTime = 0;
+            comboCameraOrientationMaxTime = 0;
+            int i = 0;
+            foreach (Weapon.PreviewActionClip previewClip in combatAgent.WeaponHandler.GetWeapon().PreviewCombo)
+            {
+                i++;
+                float length = combatAgent.AnimationHandler.GetTotalActionClipLengthInSeconds(previewClip.actionClip);
+                if (i < combatAgent.WeaponHandler.GetWeapon().PreviewCombo.Count) { length *= previewClip.normalizedTimeToPlayNext; }
+                comboCameraOrientationMaxTime += length;
+            }
+
+            combatAgent.AnimationHandler.PlayPreviewCombo();
+            ultimateAnimationRunning = false;
         }
 
         private string selectedRace = "Human";
@@ -950,6 +1037,8 @@ namespace Vi.UI
             HandlePlatformAPI(false);
         }
 
+        [SerializeField] private CanvasGroup characterCreationOpacityGroup;
+
         private List<ServerListElement> serverListElementList = new List<ServerListElement>();
         private float lastTextChangeTime;
         private bool lastClientState;
@@ -959,8 +1048,35 @@ namespace Vi.UI
         {
             ProcessCharacterQueue();
 
-            characterPreviewCamera.transform.position = Vector3.Lerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
-            characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+            bool evaluateCameraTransform = true;
+            if (previewObject)
+            {
+                if (previewObject.TryGetComponent(out AnimationHandler animationHandler))
+                {
+                    evaluateCameraTransform = !animationHandler.IsPlayingPreviewClip;
+                }
+            }
+
+            if (evaluateCameraTransform)
+            {
+                if (!ultimateAnimationRunning)
+                {
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(characterCreationOpacityGroup.alpha, 1, Time.deltaTime * cameraLerpSpeed);
+                    characterCreationOpacityGroup.interactable = true;
+
+                    characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
+                    characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
+
+                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentLeft).anchoredPosition, originalLeftPos, Time.deltaTime * cameraLerpSpeed);
+                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentRight).anchoredPosition, originalRightPos, Time.deltaTime * cameraLerpSpeed);
+                }
+            }
+            else
+            {
+                comboCameraOrientationTime += Time.deltaTime * comboCameraOrientationSpeed;
+                characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime);
+                characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime));
+            }
 
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
             statsParent.SetActive(statsSelected);
@@ -1105,8 +1221,8 @@ namespace Vi.UI
                 CreateUIElementHighlight((RectTransform)characterNameInputField.transform);
             }
 
-            weaponClassIndex = System.Array.IndexOf(weaponClasses, WeaponClass.Greatsword);
-            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == WeaponClass.Greatsword);
+            weaponClassIndex = System.Array.IndexOf(weaponClasses, Weapon.WeaponClass.Greatsword);
+            CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
 
             playUltimateAnimation = true;
