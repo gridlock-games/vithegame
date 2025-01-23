@@ -238,6 +238,8 @@ namespace Vi.UI
 
         private void OnCharPreviewDrag(Vector2 delta)
         {
+            if (!characterSelectParent.activeSelf) { return; }
+
             if (previewObject)
             {
                 if (previewObject.TryGetComponent(out AnimationHandler animationHandler))
