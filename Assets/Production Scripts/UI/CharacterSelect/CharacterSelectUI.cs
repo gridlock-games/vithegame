@@ -698,10 +698,10 @@ namespace Vi.UI
         {
             if (characterQueue.Count > 0)
             {
-                //if (updateCharCoroutine != null)
-                //{
-                //    return;
-                //}
+                if (updateCharCoroutine != null)
+                {
+                    StopCoroutine(updateCharCoroutine);
+                }
 
                 updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
             }
