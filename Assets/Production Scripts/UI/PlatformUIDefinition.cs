@@ -130,13 +130,6 @@ namespace Vi.UI
                     {
                         gameObjectsAlreadySetActive.Add(g);
                     }
-                    else
-                    {
-                        foreach (Graphic graphic in g.GetComponentsInChildren<Graphic>(true))
-                        {
-                            graphic.raycastTarget = false;
-                        }
-                    }
                 }
 
                 foreach (MoveUIDefinition moveUIDefinition in controlSchemeDefinition.objectsToMove)
@@ -195,25 +188,11 @@ namespace Vi.UI
                 foreach (GameObject g in platformUIDefinition.gameObjectsToEnable)
                 {
                     g.SetActive(platformUIDefinition.platforms.Contains(Application.platform));
-                    if (!g.activeSelf)
-                    {
-                        foreach (Graphic graphic in g.GetComponentsInChildren<Graphic>(true))
-                        {
-                            graphic.raycastTarget = false;
-                        }
-                    }
                 }
 
                 foreach (GameObject g in platformUIDefinition.gameObjectsToDisable)
                 {
                     g.SetActive(!platformUIDefinition.platforms.Contains(Application.platform));
-                    if (!g.activeSelf)
-                    {
-                        foreach (Graphic graphic in g.GetComponentsInChildren<Graphic>(true))
-                        {
-                            graphic.raycastTarget = false;
-                        }
-                    }
                 }
 
                 foreach (MoveUIDefinition moveUIDefinition in platformUIDefinition.objectsToMove)

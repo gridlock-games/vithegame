@@ -1163,6 +1163,19 @@ namespace Vi.ScriptableObjects
             return GetActionClipLookup().Values;
         }
 
+        [System.Serializable]
+        public class PreviewActionClip
+        {
+            public float normalizedTimeToPlayNext;
+            public ActionClip actionClip;
+        }
+
+        public List<PreviewActionClip> PreviewCombo { get { return previewCombo; } }
+        [SerializeField] private List<PreviewActionClip> previewCombo = new List<PreviewActionClip>();
+
+        public float GetMVPAnimationSpeed() { return MVPAnimationSpeed; }
+        [SerializeField] private float MVPAnimationSpeed = 1;
+
         [Header("DO NOT MODIFY, USE THE CONTEXT MENU")]
         [SerializeField] private List<string> animationClipLookupKeys = new List<string>();
         [SerializeField] private List<AnimationClip> animationClipLookupValues = new List<AnimationClip>();
@@ -1180,6 +1193,19 @@ namespace Vi.ScriptableObjects
                 this.curveX = curveX;
                 this.curveY = curveY;
                 this.curveZ = curveZ;
+            }
+
+            public int Length
+            {
+                get
+                {
+                    return Mathf.Max(curveX.length, curveY.length, curveZ.length);
+                }
+            }
+
+            public Vector3 Evaluate(float t)
+            {
+                return new Vector3(curveX.Evaluate(t), curveY.Evaluate(t), curveZ.Evaluate(t));
             }
 
             public Vector3 EvaluateNormalized(float t)

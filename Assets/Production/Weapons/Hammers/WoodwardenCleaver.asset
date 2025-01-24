@@ -205,6 +205,14 @@ MonoBehaviour:
   invinicbleLunge: {fileID: 11400000, guid: ebec049c0120a604d87b8530937d6b15, type: 2}
   uninterruptableLunge: {fileID: 11400000, guid: a43a0a5372b79934abccbec59ae3cf93,
     type: 2}
+  previewCombo:
+  - normalizedTimeToPlayNext: 0.35
+    actionClip: {fileID: 11400000, guid: e73673792fce43340a8a38f4c76b6ec3, type: 2}
+  - normalizedTimeToPlayNext: 0.6
+    actionClip: {fileID: 11400000, guid: 680a19656b558a04498346cf7b29ed76, type: 2}
+  - normalizedTimeToPlayNext: 0.8
+    actionClip: {fileID: 11400000, guid: 78ab62a15b50637409c49e43d82a2422, type: 2}
+  MVPAnimationSpeed: 1
   animationClipLookupKeys:
   - DodgeF
   - DodgeB

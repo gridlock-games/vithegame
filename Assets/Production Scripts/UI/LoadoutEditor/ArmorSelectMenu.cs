@@ -200,9 +200,9 @@ namespace Vi.UI
                     {
                         pantsId = "";
                     }
-                    else if (inventory.Exists(item => item.itemId == pants.itemWebId))
+                    else if (inventory.Exists(item => item.itemId._id == pants.itemWebId))
                     {
-                        pantsId = inventory.Find(item => item.itemId == pants.itemWebId).id;
+                        pantsId = inventory.Find(item => item.itemId._id == pants.itemWebId).id;
                         newLoadout.pantsGearItemId = pantsId;
                     }
 
@@ -212,9 +212,9 @@ namespace Vi.UI
                     {
                         bootsId = "";
                     }
-                    else if (inventory.Exists(item => item.itemId == boots.itemWebId))
+                    else if (inventory.Exists(item => item.itemId._id == boots.itemWebId))
                     {
-                        bootsId = inventory.Find(item => item.itemId == boots.itemWebId).id;
+                        bootsId = inventory.Find(item => item.itemId._id == boots.itemWebId).id;
                         newLoadout.bootsGearItemId = bootsId;
                     }
 
@@ -224,9 +224,9 @@ namespace Vi.UI
                     {
                         beltId = "";
                     }
-                    else if (inventory.Exists(item => item.itemId == belt.itemWebId))
+                    else if (inventory.Exists(item => item.itemId._id == belt.itemWebId))
                     {
-                        beltId = inventory.Find(item => item.itemId == belt.itemWebId).id;
+                        beltId = inventory.Find(item => item.itemId._id == belt.itemWebId).id;
                         newLoadout.beltGearItemId = beltId;
                     }
 
