@@ -698,6 +698,7 @@ namespace Vi.UI
         }
 
         [SerializeField] private RawImage characterPreviewImage;
+        [SerializeField] private RawImage characterCustomizationPreviewImage;
         private Queue<WebRequestManager.Character> characterQueue = new Queue<WebRequestManager.Character>();
 
         private void ProcessCharacterQueue()
@@ -928,7 +929,7 @@ namespace Vi.UI
                     comboCameraOrientation = previewUltimateCameraOrientation[0];
                 }
 
-                float t = 0;
+                float t = Mathf.InverseLerp(1, 0, characterCreationOpacityGroup.alpha);
                 while (!Mathf.Approximately(t, 1))
                 {
                     t += Time.deltaTime * cameraLerpSpeed;
@@ -941,8 +942,23 @@ namespace Vi.UI
                     yield return null;
                 }
 
-                ((RectTransform)customizationRowsParentLeft).anchoredPosition -= new Vector2(700, 0);
-                ((RectTransform)customizationRowsParentRight).anchoredPosition += new Vector2(700, 0);
+                if (characterCustomizationPreviewImage.color.a < 1)
+                {
+                    characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(0);
+                    characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(0));
+
+                    t = 0;
+                    while (!Mathf.Approximately(t, 1))
+                    {
+                        t += Time.deltaTime * cameraLerpSpeed;
+                        t = Mathf.Clamp01(t);
+                        characterCustomizationPreviewImage.color = StringUtility.SetColorAlpha(characterCustomizationPreviewImage.color, Mathf.Lerp(0, 1, t));
+                        yield return null;
+                    }
+                }
+                
+                ((RectTransform)customizationRowsParentLeft).anchoredPosition = originalLeftPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
+                ((RectTransform)customizationRowsParentRight).anchoredPosition = originalRightPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
             }
             
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
@@ -1043,6 +1059,7 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private bool lastClientState;
 
+        private const float customizationRowsSlidingAnimationOffset = 500;
         private const float cameraLerpSpeed = 2;
         private float customizationAnimationTime;
         private void Update()
@@ -1071,8 +1088,8 @@ namespace Vi.UI
                     characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
 
-                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(originalLeftPos - new Vector2(700, 0), originalLeftPos, customizationAnimationTime);
-                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(originalRightPos + new Vector2(700, 0), originalRightPos, customizationAnimationTime);
+                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(originalLeftPos - new Vector2(customizationRowsSlidingAnimationOffset, 0), originalLeftPos, customizationAnimationTime);
+                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(originalRightPos + new Vector2(customizationRowsSlidingAnimationOffset, 0), originalRightPos, customizationAnimationTime);
                 }
                 else
                 {
@@ -1233,6 +1250,9 @@ namespace Vi.UI
             weaponClassIndex = System.Array.IndexOf(weaponClasses, Weapon.WeaponClass.Greatsword);
             CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
+
+            characterCreationOpacityGroup.alpha = 0;
+            characterCustomizationPreviewImage.color = StringUtility.SetColorAlpha(characterCustomizationPreviewImage.color, 0);
 
             playUltimateAnimation = true;
         }
