@@ -1059,7 +1059,7 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private bool lastClientState;
 
-        private const float customizationRowsSlidingAnimationOffset = 500;
+        private const float customizationRowsSlidingAnimationOffset = 300;
         private const float cameraLerpSpeed = 2;
         private float customizationAnimationTime;
         private void Update()
