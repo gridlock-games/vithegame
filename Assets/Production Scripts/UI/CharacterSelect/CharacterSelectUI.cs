@@ -202,8 +202,8 @@ namespace Vi.UI
             gearOpenAnchorMax = selectionBarUnselectedImage.anchorMax;
             gearOpenPivot = selectionBarUnselectedImage.pivot;
 
-            OpenCharacterSelect();
-
+            StartCoroutine(OpenCharacterSelect(false));
+            
             if (characterNameInputField.text.Length < 6)
             {
                 finishCharacterCustomizationButton.interactable = false;
@@ -297,7 +297,7 @@ namespace Vi.UI
                     addButtonCreated = true;
                     characterCardInstances[i].InitializeAsAddButton();
                     characterCardInstances[i].Button.onClick.RemoveAllListeners();
-                    characterCardInstances[i].Button.onClick.AddListener(delegate { OpenCharacterCustomization(); });
+                    characterCardInstances[i].Button.onClick.AddListener(delegate { StartCoroutine(OpenCharacterCustomization()); });
                 }
             }
 
@@ -1112,7 +1112,7 @@ namespace Vi.UI
 
             gameVersionText.text = WebRequestManager.Singleton.GameVersionErrorMessage;
 
-            if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
+            if (lastClientState & !NetworkManager.Singleton.IsClient) { StartCoroutine(OpenCharacterSelect(false)); }
             lastClientState = NetworkManager.Singleton.IsClient;
 
             connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
@@ -1225,8 +1225,14 @@ namespace Vi.UI
         private bool isEditingExistingCharacter;
         private bool playUltimateAnimation;
 
-        public void OpenCharacterCustomization()
+        [SerializeField] private TransitionController transitionController;
+
+        private IEnumerator OpenCharacterCustomization()
         {
+            if (transitionController.TransitionRunning) { yield break; }
+            StartCoroutine(transitionController.PlayTransition());
+            yield return new WaitUntil(() => transitionController.TransitionPeakReached);
+
             selectedRace = "Human";
             selectedGender = "Female";
 
@@ -1235,7 +1241,7 @@ namespace Vi.UI
             characterCustomizationParent.SetActive(true);
 
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(OpenCharacterSelect);
+            returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
@@ -1264,7 +1270,7 @@ namespace Vi.UI
             characterCustomizationParent.SetActive(true);
 
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(OpenCharacterSelect);
+            returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(character);
@@ -1272,8 +1278,15 @@ namespace Vi.UI
             isEditingExistingCharacter = true;
         }
 
-        public void OpenCharacterSelect()
+        private IEnumerator OpenCharacterSelect(bool playTransition = true)
         {
+            if (playTransition)
+            {
+                if (transitionController.TransitionRunning) { yield break; }
+                StartCoroutine(transitionController.PlayTransition());
+                yield return new WaitUntil(() => transitionController.TransitionPeakReached);
+            }
+            
             shouldUseHeadCameraOrientation = false;
             characterPreviewCamera.transform.position = defaultCameraOrientation.position;
             characterPreviewCamera.transform.rotation = defaultCameraOrientation.rotation;
@@ -1319,7 +1332,7 @@ namespace Vi.UI
 
             if (string.IsNullOrWhiteSpace(WebRequestManager.Singleton.CharacterCreationError))
             {
-                OpenCharacterSelect();
+                StartCoroutine(OpenCharacterSelect(false));
             }
             else
             {
@@ -1360,7 +1373,7 @@ namespace Vi.UI
                 card.Button.interactable = true;
             }
 
-            OpenCharacterSelect();
+            StartCoroutine(OpenCharacterSelect(false));
         }
 
         private List<string> trainingRoomMapOptions = new List<string>()

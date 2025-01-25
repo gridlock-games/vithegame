@@ -91,10 +91,6 @@ namespace Vi.UI
             }
             MVPHeaderText.color = StringUtility.SetColorAlpha(MVPHeaderText.color, 0);
 
-            transitionGroup.alpha = 0;
-            topImage.enabled = false;
-            bottomImage.enabled = false;
-
             ResetMVPUIElements();
 
             returnToHubButton.onClick.AddListener(() => ReturnToHub());
@@ -205,62 +201,7 @@ namespace Vi.UI
             }
         }
 
-        private const float transitionSpeed = 3;
-        private const float transitionPeakLimit = 540;
-        private const float transitionValleyLimit = 1280;
-
-        [Header("Transition")]
-        [SerializeField] private CanvasGroup transitionGroup;
-        [SerializeField] private Image topImage;
-        [SerializeField] private Image bottomImage;
-        private bool transitionRunning;
-        private bool transitionPeakReached;
-        private IEnumerator PlayTransition()
-        {
-            transitionRunning = true;
-
-            topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, transitionValleyLimit);
-            bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -transitionValleyLimit);
-
-            topImage.enabled = true;
-            bottomImage.enabled = true;
-
-            transitionGroup.alpha = 1;
-
-            float t = 0;
-            while (!Mathf.Approximately(t, 1))
-            {
-                t += Time.deltaTime * transitionSpeed;
-                t = Mathf.Clamp01(t);
-
-                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
-                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionValleyLimit, transitionPeakLimit, t));
-                yield return null;
-            }
-
-            transitionPeakReached = true;
-            yield return new WaitForSeconds(0.05f);
-            yield return null;
-            transitionPeakReached = false;
-
-            t = 0;
-            while (!Mathf.Approximately(t, 1))
-            {
-                t += Time.deltaTime * transitionSpeed;
-                t = Mathf.Clamp01(t);
-
-                topImage.rectTransform.offsetMin = new Vector2(topImage.rectTransform.offsetMin.x, Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
-                bottomImage.rectTransform.offsetMax = new Vector2(bottomImage.rectTransform.offsetMax.x, -Mathf.Lerp(transitionPeakLimit, transitionValleyLimit, t));
-                yield return null;
-            }
-
-            transitionGroup.alpha = 0;
-
-            topImage.enabled = false;
-            bottomImage.enabled = false;
-
-            transitionRunning = false;
-        }
+        [SerializeField] private TransitionController transitionController;
 
         private const float textPingPongSpeed = 1.5f;
 
@@ -312,12 +253,12 @@ namespace Vi.UI
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
                     Cursor.lockState = CursorLockMode.None;
-                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionRunning)
+                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionController.TransitionRunning)
                     {
-                        StartCoroutine(PlayTransition());
+                        StartCoroutine(transitionController.PlayTransition());
                     }
 
-                    if (transitionPeakReached)
+                    if (transitionController)
                     {
                         MVPCanvas.enabled = true;
                         MVPCanvasGroup.alpha = 1;
@@ -343,7 +284,7 @@ namespace Vi.UI
                         viEssenceEarnedText.text += "x";
                     }
 
-                    if (!displayRewardsHasBeenRun & !transitionRunning)
+                    if (!displayRewardsHasBeenRun & !transitionController.TransitionRunning)
                     {
                         displayRewardsCoroutine = StartCoroutine(DisplayRewards());
                     }
@@ -354,10 +295,10 @@ namespace Vi.UI
 
                     if (gameModeManager.GetPostGameStatus() != lastPostGameStatus)
                     {
-                        if (!transitionRunning) { StartCoroutine(PlayTransition()); }
+                        if (!transitionController.TransitionRunning) { StartCoroutine(transitionController.PlayTransition()); }
                     }
 
-                    if (transitionPeakReached)
+                    if (transitionController.TransitionPeakReached)
                     {
                         RemoveCharPreview();
                         ResetMVPUIElements();
@@ -668,7 +609,7 @@ namespace Vi.UI
             }
             MVPPresentationCamera.enabled = true;
 
-            yield return new WaitUntil(() => !transitionPeakReached);
+            yield return new WaitUntil(() => !transitionController.TransitionPeakReached);
 
             string stateName = "MVP";
             if (gameModeManager.GetPostGameStatus() != GameModeManager.PostGameStatus.MVP)
