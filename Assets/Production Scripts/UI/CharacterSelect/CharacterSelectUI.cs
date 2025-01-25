@@ -1216,6 +1216,7 @@ namespace Vi.UI
 
         public void ReturnToMainMenu()
         {
+            if (transitionController.TransitionRunning) { return; }
             if (NetworkManager.Singleton.IsListening) { return; }
             returnButton.interactable = false;
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
