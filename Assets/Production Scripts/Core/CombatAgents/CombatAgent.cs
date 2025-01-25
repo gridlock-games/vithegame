@@ -231,7 +231,6 @@ namespace Vi.Core
         {
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
-            spirit.OnValueChanged += OnSpiritChanged;
             rage.OnValueChanged += OnRageChanged;
 
             LastAliveStartTime = Time.time;
@@ -271,7 +270,6 @@ namespace Vi.Core
         {
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
-            spirit.OnValueChanged -= OnSpiritChanged;
             rage.OnValueChanged -= OnRageChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
@@ -294,20 +292,6 @@ namespace Vi.Core
         {
             GlowRenderer = GetComponentInChildren<GlowRenderer>();
             UpdateActivePlayersList();
-        }
-
-        private void OnSpiritChanged(float prev, float current)
-        {
-            if (Mathf.Approximately(current, 0))
-            {
-                spiritRegenActivateTime = Time.time;
-            }
-        }
-
-        public void StartSpiritRegen()
-        {
-            if (!IsServer) { Debug.LogError("Attributes.StartSpiritRegen() should only be called on the server!"); return; }
-            spiritRegenActivateTime = Time.time;
         }
 
         [SerializeField] private PooledObject ragingVFXPrefab;
@@ -339,7 +323,6 @@ namespace Vi.Core
             hitFreezeStartTime = Mathf.NegativeInfinity;
 
             staminaDelayCooldown = default;
-            spiritRegenActivateTime = Mathf.NegativeInfinity;
             rageDelayCooldown = default;
 
             Master = null;
@@ -657,9 +640,6 @@ namespace Vi.Core
             {
                 UpdateStamina();
                 UpdateRage();
-
-                // Regen for 50 seconds
-                if (Time.time - spiritRegenActivateTime <= 50 & !WeaponHandler.IsBlocking) { UpdateSpirit(); }
             }
         }
 
@@ -669,13 +649,6 @@ namespace Vi.Core
             staminaDelayCooldown = Mathf.Max(0, staminaDelayCooldown - Time.deltaTime);
             if (staminaDelayCooldown > 0) { return; }
             AddStamina(WeaponHandler.GetWeapon().GetStaminaRecoveryRate() * Time.deltaTime, false);
-        }
-
-        private float spiritRegenActivateTime = Mathf.NegativeInfinity;
-        private const float spiritRegenRate = 3;
-        private void UpdateSpirit()
-        {
-            AddSpirit(spiritRegenRate * Time.deltaTime);
         }
 
         private float rageDepletionRate { get { return GetMaxRage() / 60; } }
@@ -1109,7 +1082,6 @@ namespace Vi.Core
 
             if (current == ActionClip.Ailment.Death)
             {
-                spiritRegenActivateTime = Mathf.NegativeInfinity;
                 StartCoroutine(ClearDamageMappingAfter1Frame());
                 WeaponHandler.OnDeath();
                 AnimationHandler.OnDeath();
