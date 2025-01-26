@@ -537,5 +537,22 @@ namespace Vi.Core
             public Sprite[] scenePreviewIconOptions;
             public SceneReference[] sceneReferences;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Validate Scene Reference Names")]
+        private void ValidateSceneReferenceNames()
+        {
+            foreach (ScenePayload scenePayload in scenePayloads)
+            {
+                foreach (SceneReference sceneReference in scenePayload.sceneReferences)
+                {
+                    if (sceneReference.editorAsset.name != sceneReference.SceneName)
+                    {
+                        Debug.LogError(sceneReference.SceneName + " " + sceneReference.editorAsset);
+                    }
+                }
+            }
+        }
+#endif
     }
 }
