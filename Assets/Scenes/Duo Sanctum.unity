@@ -398,6 +398,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1006,6 +1011,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
       propertyPath: m_StaticEditorFlags
       value: 123
       objectReference: {fileID: 0}
@@ -1507,6 +1517,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1581,6 +1596,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_BrokenArc (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 1040104077037336515, guid: 53f98bf59dca69e4ab12a057aca1a761,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1604,6 +1624,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Arc
+      objectReference: {fileID: 0}
+    - target: {fileID: 6037480642085442783, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6377835993218453093, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
         type: 3}
@@ -1759,6 +1784,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1898,7 +1928,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 81951439}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Stage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2960,6 +2990,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3531,6 +3566,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3889,6 +3929,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4220,9 +4265,9 @@ MonoBehaviour:
   damageCircleMinScale: {x: 12, y: 200, z: 12}
   shrinkSize: 20
   mobSpawnPoints: []
-  displayDefaultGizmos: 0
+  displayDefaultGizmos: 1
   displayDamageCircleGizmos: 0
-  displayPreviewCharacterGizmos: 1
+  displayPreviewCharacterGizmos: 0
 --- !u!4 &218177581
 Transform:
   m_ObjectHideFlags: 0
@@ -6093,10 +6138,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1299133751}
     m_Modifications:
+    - target: {fileID: 1043140550791640855, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 1696359640315463129, guid: b2f77deaf0de35b499550e732753a991,
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_ArcBroken Full (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1696359640315463129, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5174717083454657045, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 8275542652174878919, guid: b2f77deaf0de35b499550e732753a991,
         type: 3}
@@ -6375,7 +6435,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 319982276}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ====== Midground Assets =====
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8012,6 +8072,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8186,6 +8251,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9939,7 +10009,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 492477029}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: '  ===== New Blocks  ====='
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10722,7 +10792,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 533957196}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: '>> New Assets <<'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10792,6 +10862,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Arc
+      objectReference: {fileID: 0}
+    - target: {fileID: 6037480642085442783, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6377835993218453093, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
         type: 3}
@@ -11164,6 +11239,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11664,6 +11744,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_A (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5341983637848349697, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -11933,7 +12018,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 596283036}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Blocks
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12232,7 +12317,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 652190231}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Blocks (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13282,6 +13367,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1299133751}
     m_Modifications:
+    - target: {fileID: 1833711012413052911, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691882914353537611, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5878239051468174140, guid: 4236a5e2651d58348875714df2ca4e9d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13336,6 +13431,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Arc Full
+      objectReference: {fileID: 0}
+    - target: {fileID: 8323113279408556074, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16386,6 +16486,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_B
       objectReference: {fileID: 0}
+    - target: {fileID: 7025114563179815389, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 7653279147177933671, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -17354,6 +17459,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18330,6 +18440,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18403,6 +18518,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20446,6 +20566,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -20643,6 +20768,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -20666,6 +20796,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_A (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 5341983637848349697, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
@@ -21086,6 +21221,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21641,6 +21781,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_A (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5341983637848349697, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -22012,7 +22157,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1299133751}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ====== New Midground Assets =====
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22369,7 +22514,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1341885792}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Stage (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23013,6 +23158,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -23387,6 +23537,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -23818,6 +23973,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_A
       objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5341983637848349697, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -23907,6 +24067,16 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1299133751}
     m_Modifications:
+    - target: {fileID: 1833711012413052911, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691882914353537611, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 5878239051468174140, guid: 4236a5e2651d58348875714df2ca4e9d,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -23962,6 +24132,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Arc Full (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8323113279408556074, guid: 4236a5e2651d58348875714df2ca4e9d,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -23985,6 +24160,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_B (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7025114563179815389, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7653279147177933671, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
         type: 3}
@@ -24145,6 +24325,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -24168,6 +24353,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_B
+      objectReference: {fileID: 0}
+    - target: {fileID: 7025114563179815389, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7653279147177933671, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
         type: 3}
@@ -24416,6 +24606,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -25903,6 +26098,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -26821,6 +27021,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -27423,10 +27628,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1299133751}
     m_Modifications:
+    - target: {fileID: 1043140550791640855, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 1696359640315463129, guid: b2f77deaf0de35b499550e732753a991,
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_ArcBroken Full
+      objectReference: {fileID: 0}
+    - target: {fileID: 1696359640315463129, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 5174717083454657045, guid: b2f77deaf0de35b499550e732753a991,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 8275542652174878919, guid: b2f77deaf0de35b499550e732753a991,
         type: 3}
@@ -27911,6 +28131,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -28209,6 +28434,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_BrokenArc
       objectReference: {fileID: 0}
+    - target: {fileID: 1040104077037336515, guid: 53f98bf59dca69e4ab12a057aca1a761,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -28424,6 +28654,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -29065,6 +29300,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -29088,6 +29328,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_A
+      objectReference: {fileID: 0}
+    - target: {fileID: 4713396875528898235, guid: 196c811b2fa52254bac7c599af130fcf,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 5341983637848349697, guid: 196c811b2fa52254bac7c599af130fcf,
         type: 3}
@@ -29883,6 +30128,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock_Wall_FlatFormation_B (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7025114563179815389, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 7653279147177933671, guid: d6e8d534c8d3f9b408a64bfba7ce46e8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -30141,6 +30391,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -30242,6 +30497,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Arc (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 6037480642085442783, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 6377835993218453093, guid: 9386b1f1fefa86a47985d47d1ccbf2f1,
         type: 3}
@@ -31361,6 +31621,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -40433,6 +40698,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -40625,6 +40895,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Mod_ArcPillars_Cube (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7665316453233292667, guid: 44afc2bac73d80e45ae91141e6f57891,
+        type: 3}
+      propertyPath: m_Layer
+      value: 11
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
