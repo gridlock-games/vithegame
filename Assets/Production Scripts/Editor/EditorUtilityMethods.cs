@@ -318,7 +318,7 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Set Texture Import Overrides")]
         static void SetTextureImportOverrides()
         {
-            string[] textures = AssetDatabase.FindAssets("t:Texture");
+            string[] textures = AssetDatabase.FindAssets("t:Texture");//, new string[] { @"Assets\Production\Images\Map Icons\Mobile version Screenshots" });
             for (int i = 0; i < textures.Length; i++)
             {
                 if (EditorUtility.DisplayCancelableProgressBar("Overriding Textures For Android",
