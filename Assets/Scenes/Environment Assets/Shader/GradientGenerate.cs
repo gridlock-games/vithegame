@@ -1,4 +1,5 @@
 using UnityEngine;
+
 [ExecuteInEditMode]
 public class GradientGenerate : MonoBehaviour
 {
@@ -7,7 +8,7 @@ public class GradientGenerate : MonoBehaviour
     public Gradient lutGradient;
     public Vector2Int lutTextureSize;
     public Texture2D lutTexture;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     private void Update()
     {
         if (realtimeGeneration)
@@ -27,8 +28,7 @@ public class GradientGenerate : MonoBehaviour
                 lutTexture.SetPixel(x, y, color);
             }
         }
-             lutTexture.Apply();
+        lutTexture.Apply();
         rocksMaterial.SetTexture("GradientRamp", lutTexture);
-        
     }
 }
