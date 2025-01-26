@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: T_Vegetation_A
-  m_Shader: {fileID: -6465566751694194690, guid: f635ba84c3e2fe34696ecfa88b66cbb2,
+  m_Shader: {fileID: -6465566751694194690, guid: 52d775bc50639ae4ebc7c07b4d7bdfa4,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -94,6 +94,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Roughness_Map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -115,6 +119,7 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 1
     - _AlphaToMask: 1
+    - _Alpha_cut: 1
     - _Ambiant_Strength: 0
     - _Ambient_Strength: 1
     - _Blend: 0
