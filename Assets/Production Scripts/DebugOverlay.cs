@@ -271,7 +271,7 @@ public class DebugOverlay : MonoBehaviour
         //        }
         //    }
         //}
-        
+
         if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { return; }
 
         if (FasterPlayerPrefs.Singleton.PlayerPrefsWasUpdatedThisFrame) { RefreshStatus(); }
