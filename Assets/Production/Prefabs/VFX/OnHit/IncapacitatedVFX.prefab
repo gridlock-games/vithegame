@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4598101806716229602}
   - component: {fileID: 4347947140999968074}
   - component: {fileID: 3143014717447008685}
-  m_Layer: 3
+  m_Layer: 10
   m_Name: IncapacitatedVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63,7 +63,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2503644536
+  GlobalObjectIdHash: 2703123402
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -146,10 +146,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: FX_hit_spark
       objectReference: {fileID: 0}
+    - target: {fileID: 3171823363539322164, guid: 4f94b83d58cc42a41b22e60e00bdb379,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3793837727460404471, guid: 4f94b83d58cc42a41b22e60e00bdb379,
         type: 3}
       propertyPath: m_Materials.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4097406517039364985, guid: 4f94b83d58cc42a41b22e60e00bdb379,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6794991283547454831, guid: 4f94b83d58cc42a41b22e60e00bdb379,
         type: 3}
