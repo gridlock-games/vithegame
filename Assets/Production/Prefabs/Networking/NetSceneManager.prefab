@@ -69,7 +69,7 @@ MonoBehaviour:
   scenePayloads:
   - name: Main Menu
     sceneType: 0
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 85109efbee0684840965d4e59c6bc3f4
       m_SubObjectName: 
@@ -79,7 +79,7 @@ MonoBehaviour:
       sceneName: Main Menu
   - name: Character Select
     sceneType: 0
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: f4ef5f6705c500f44a3be50dd19d8ee6
       m_SubObjectName: 
@@ -89,7 +89,7 @@ MonoBehaviour:
       sceneName: Character Select
   - name: Training Room
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 825e8977e019c1348b14ce9013c03a8a
       m_SubObjectName: 
@@ -99,7 +99,7 @@ MonoBehaviour:
       sceneName: Training Room
   - name: Tutorial Room
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: cbf5d4a04f52a4a4da9816d655fa6ce4
       m_SubObjectName: 
@@ -109,7 +109,7 @@ MonoBehaviour:
       sceneName: Tutorial Room
   - name: Player Hub
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 1b70c5a196b72f24689157d24caacbf0
       m_SubObjectName: 
@@ -119,7 +119,14 @@ MonoBehaviour:
       sceneName: Player Hub
   - name: Player Hub Environment
     sceneType: 3
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: d64f89e1225f9da4ba7705b3729dcae6, type: 3}
+    - {fileID: 21300000, guid: 43c797be8f218d349804c7ab11b1ceee, type: 3}
+    - {fileID: 21300000, guid: 2759374300967434ea6cfcc25a3bd410, type: 3}
+    - {fileID: 21300000, guid: 00edb450daf01094f9a914ee58e242b1, type: 3}
+    - {fileID: 21300000, guid: 0a5b94c0f266a4344b87c238e7ba3a3f, type: 3}
+    - {fileID: 21300000, guid: 9fa44f2fa1dd4124394f604b12560d7c, type: 3}
+    - {fileID: 21300000, guid: 5655e34e15b832f4ea43877a04ef775b, type: 3}
     sceneReferences:
     - m_AssetGUID: 6ac9036b344e9f54c818fbea7cdd87da
       m_SubObjectName: 
@@ -129,7 +136,7 @@ MonoBehaviour:
       sceneName: Player Hub Map
   - name: Lobby
     sceneType: 1
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 5fb7fe9049ad69e48a54d872a6e1ee72
       m_SubObjectName: 
@@ -139,7 +146,7 @@ MonoBehaviour:
       sceneName: Lobby
   - name: Free For All
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 3a544987c4a966b45ad76240e0fdc184
       m_SubObjectName: 
@@ -149,7 +156,7 @@ MonoBehaviour:
       sceneName: FreeForAll
   - name: Team Elimination
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 013a9e0dc897cd54298a50fd0633462a
       m_SubObjectName: 
@@ -159,7 +166,7 @@ MonoBehaviour:
       sceneName: TeamElimination
   - name: Horde Mode
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 415594f39eb6f9a43af6ab47aa751300
       m_SubObjectName: 
@@ -169,7 +176,8 @@ MonoBehaviour:
       sceneName: HordeMode
   - name: Tutorial Map
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: 634685884b1eccf47bdcc9fcc8c58fea, type: 3}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: 634685884b1eccf47bdcc9fcc8c58fea, type: 3}
     sceneReferences:
     - m_AssetGUID: baf8e2ead133fa945a3c90a5fcbf3fe4
       m_SubObjectName: 
@@ -179,47 +187,62 @@ MonoBehaviour:
       sceneName: Consolidated Eclipse Grove
   - name: Eclipse Grove
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: 7c588004d9fee5841bcd111e1720c5a7, type: 3}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: 03714b5563acdc440a3315e7c3d71f94, type: 3}
+    - {fileID: 21300000, guid: f888290450386cd4d81bc1de4bdfc8ba, type: 3}
+    - {fileID: 21300000, guid: 122c38c19b9f79846b0f3fe70301bb18, type: 3}
+    - {fileID: 21300000, guid: c78e25fd7415ece478735248f44e873b, type: 3}
+    - {fileID: 21300000, guid: 652e5a4ca6512f74f99fe809f9011840, type: 3}
     sceneReferences:
     - m_AssetGUID: 3b7216b42cafd664184580fede3f3d75
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-      sceneName: Arena Map A
+      sceneName: Eclipse Grove
   - name: Twilight Chasm
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: d249c54ce8b8ebd41b165be95a911527, type: 3}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: a68a198cf8a085e478325965da73478a, type: 3}
+    - {fileID: 21300000, guid: 4ee861739366c5448afd48cb997e4f46, type: 3}
+    - {fileID: 21300000, guid: a29812beaa7fbb84a9ef24a265f1a7ca, type: 3}
+    - {fileID: 21300000, guid: 2cb135e37ac654e448569ebaa89a5d29, type: 3}
     sceneReferences:
     - m_AssetGUID: 4de140d4c16d73646a0e37b145a6dd6a
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-      sceneName: Corrupted abyss
+      sceneName: Twilight Chasm
   - name: Octagon Skirmish
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: d6c44d244fe47cd448b7589efbefce88, type: 3}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: cf3f6fa64da1fa04f82bcb2ea6801cd3, type: 3}
+    - {fileID: 21300000, guid: 2d28c05a167d9ab4fbadf2583676da80, type: 3}
+    - {fileID: 21300000, guid: c2d4795e7b0084d42bad350a1521fc89, type: 3}
     sceneReferences:
     - m_AssetGUID: 13cf6b8bb80559c40889e75c61e31b09
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-      sceneName: Arena 1v1
+      sceneName: Octagon Skirmish
   - name: Duo's Sanctum
     sceneType: 3
-    scenePreviewIcon: {fileID: 21300000, guid: 009ad9d104921ea4ba2300a75297109a, type: 3}
+    scenePreviewIconOptions:
+    - {fileID: 21300000, guid: 5155b32b916b3394d812ef8ec5eaf17f, type: 3}
+    - {fileID: 21300000, guid: 3a3592f3c453ead429ffc0d4a9a408cc, type: 3}
+    - {fileID: 21300000, guid: e3885feb4a28bae4885057d0d109ec73, type: 3}
     sceneReferences:
     - m_AssetGUID: ec42c2e38b4f8f241bb62674ec2eed55
       m_SubObjectName: 
       m_SubObjectGUID: 
       m_SubObjectType: 
       m_EditorAssetChanged: 0
-      sceneName: Arena 2v2
+      sceneName: Duo Sanctum
   - name: Essence War
     sceneType: 2
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: 9e35f561e234d7940826c6c4f419f5da
       m_SubObjectName: 
@@ -229,7 +252,7 @@ MonoBehaviour:
       sceneName: EssenceWar
   - name: Essence War Test Map
     sceneType: 3
-    scenePreviewIcon: {fileID: 0}
+    scenePreviewIconOptions: []
     sceneReferences:
     - m_AssetGUID: d03c4ae7503bb00468b9350863b90926
       m_SubObjectName: 

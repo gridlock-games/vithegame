@@ -244,7 +244,7 @@ namespace Vi.UI
 
         private void OnCharPreviewDrag(Vector2 delta)
         {
-            if (!characterSelectParent.activeSelf) { return; }
+            if (ultimateAnimationRunning) { return; }
 
             if (previewObject)
             {
@@ -913,6 +913,8 @@ namespace Vi.UI
         private IEnumerator PlayUltimateAnimation(CombatAgent combatAgent)
         {
             ultimateAnimationRunning = true;
+
+            previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
 
             if (characterCustomizationParent.activeSelf)
             {

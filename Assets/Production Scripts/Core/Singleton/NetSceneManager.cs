@@ -61,11 +61,27 @@ namespace Vi.Core
             }
         }
 
-        public Sprite GetSceneGroupIcon(string sceneGroupName)
+        public Sprite GetSceneGroupIcon(string sceneGroupName, int preferredIndex = -1)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return null; }
-            return scenePayloads[sceneGroupIndex].scenePreviewIcon;
+
+            if (scenePayloads[sceneGroupIndex].scenePreviewIconOptions == null)
+            {
+                return null;
+            }
+            else if (scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length == 0)
+            {
+                return null;
+            }
+            else if (preferredIndex > -1 & preferredIndex < scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length)
+            {
+                return scenePayloads[sceneGroupIndex].scenePreviewIconOptions[preferredIndex];
+            }
+            else
+            {
+                return scenePayloads[sceneGroupIndex].scenePreviewIconOptions[Random.Range(0, scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length)];
+            }
         }
 
         public struct AsyncOperationUI : System.IEquatable<AsyncOperationUI>
@@ -518,8 +534,25 @@ namespace Vi.Core
         {
             public string name;
             public SceneType sceneType;
-            public Sprite scenePreviewIcon;
+            public Sprite[] scenePreviewIconOptions;
             public SceneReference[] sceneReferences;
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Validate Scene Reference Names")]
+        private void ValidateSceneReferenceNames()
+        {
+            foreach (ScenePayload scenePayload in scenePayloads)
+            {
+                foreach (SceneReference sceneReference in scenePayload.sceneReferences)
+                {
+                    if (sceneReference.editorAsset.name != sceneReference.SceneName)
+                    {
+                        Debug.LogError(sceneReference.SceneName + " " + sceneReference.editorAsset);
+                    }
+                }
+            }
+        }
+#endif
     }
 }
