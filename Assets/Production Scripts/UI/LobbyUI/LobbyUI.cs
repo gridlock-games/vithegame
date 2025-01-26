@@ -256,7 +256,7 @@ namespace Vi.UI
             foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
-                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName)));
+                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName, 0)));
             }
         }
 
@@ -811,7 +811,7 @@ namespace Vi.UI
 
             lastGameMode = PlayerDataManager.Singleton.GetGameMode();
 
-            backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName());
+            backgroundImage.sprite = NetSceneManager.Singleton.GetSceneGroupIcon(PlayerDataManager.Singleton.GetMapName(), 0);
             mapPreview.sprite = backgroundImage.sprite;
 
             RefreshPlayerCards();

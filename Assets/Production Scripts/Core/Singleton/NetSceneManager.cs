@@ -61,7 +61,7 @@ namespace Vi.Core
             }
         }
 
-        public Sprite GetSceneGroupIcon(string sceneGroupName)
+        public Sprite GetSceneGroupIcon(string sceneGroupName, int preferredIndex = -1)
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return null; }
@@ -73,6 +73,10 @@ namespace Vi.Core
             else if (scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length == 0)
             {
                 return null;
+            }
+            else if (preferredIndex > -1 & preferredIndex < scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length)
+            {
+                return scenePayloads[sceneGroupIndex].scenePreviewIconOptions[preferredIndex];
             }
             else
             {
