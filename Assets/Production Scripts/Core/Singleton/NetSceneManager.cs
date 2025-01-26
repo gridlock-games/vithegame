@@ -65,7 +65,19 @@ namespace Vi.Core
         {
             int sceneGroupIndex = System.Array.FindIndex(scenePayloads, item => item.name == sceneGroupName);
             if (sceneGroupIndex == -1) { Debug.LogError("Could not find scene group for: " + sceneGroupName); return null; }
-            return scenePayloads[sceneGroupIndex].scenePreviewIcon;
+
+            if (scenePayloads[sceneGroupIndex].scenePreviewIconOptions == null)
+            {
+                return null;
+            }
+            else if (scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return scenePayloads[sceneGroupIndex].scenePreviewIconOptions[Random.Range(0, scenePayloads[sceneGroupIndex].scenePreviewIconOptions.Length)];
+            }
         }
 
         public struct AsyncOperationUI : System.IEquatable<AsyncOperationUI>
@@ -518,7 +530,7 @@ namespace Vi.Core
         {
             public string name;
             public SceneType sceneType;
-            public Sprite scenePreviewIcon;
+            public Sprite[] scenePreviewIconOptions;
             public SceneReference[] sceneReferences;
         }
     }
