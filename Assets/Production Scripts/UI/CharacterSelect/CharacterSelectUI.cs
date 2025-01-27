@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
+using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -726,7 +727,6 @@ namespace Vi.UI
         {
             updateDisplayCharacterRunning = true;
 
-            shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
 
@@ -893,6 +893,8 @@ namespace Vi.UI
         private void ChangeDisplayCharacterWeaponClass(CharacterReference.RaceAndGender raceAndGender, Weapon.WeaponClass weaponClass)
         {
             if (!previewObject) { return; }
+
+            shouldUseHeadCameraOrientation = false;
 
             CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == weaponClass);
 
