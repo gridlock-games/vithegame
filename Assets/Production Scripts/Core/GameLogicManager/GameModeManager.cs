@@ -43,7 +43,7 @@ namespace Vi.Core.GameModeManagers
             DontRespawn,
             ResetStats,
             ResetHP,
-            ResetHPAndRegenSpirit
+            ResetHPAndSpirit
         }
 
         public bool LevelingEnabled { get { return levelingEnabled; } }
@@ -805,7 +805,7 @@ namespace Vi.Core.GameModeManagers
                                 }
                             }
                             break;
-                        case RespawnType.ResetHPAndRegenSpirit:
+                        case RespawnType.ResetHPAndSpirit:
                             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                             {
                                 if (attributes.GetAilment() == ActionClip.Ailment.Death)
@@ -814,9 +814,8 @@ namespace Vi.Core.GameModeManagers
                                 }
                                 else
                                 {
-                                    attributes.ResetStats(1, false, false, false);
+                                    attributes.ResetStats(1, false, true, false);
                                     attributes.LoadoutManager.SwapLoadoutOnRespawn();
-                                    attributes.StartSpiritRegen();
                                 }
                             }
                             break;

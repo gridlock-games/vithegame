@@ -1359,6 +1359,11 @@ namespace Vi.Core
 
         private void AimCharacter(bool isAiming)
         {
+            if (GameModeManager.Singleton)
+            {
+                if (GameModeManager.Singleton.IsGameOver()) { isAiming = false; }
+            }
+
             combatAgent.AnimationHandler.Animator.SetBool("Aiming", isAiming);
             foreach (ShooterWeapon shooterWeapon in shooterWeapons)
             {

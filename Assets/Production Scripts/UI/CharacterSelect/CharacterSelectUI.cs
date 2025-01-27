@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
+using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -202,8 +203,8 @@ namespace Vi.UI
             gearOpenAnchorMax = selectionBarUnselectedImage.anchorMax;
             gearOpenPivot = selectionBarUnselectedImage.pivot;
 
-            OpenCharacterSelect();
-
+            StartCoroutine(OpenCharacterSelect(false));
+            
             if (characterNameInputField.text.Length < 6)
             {
                 finishCharacterCustomizationButton.interactable = false;
@@ -244,7 +245,7 @@ namespace Vi.UI
 
         private void OnCharPreviewDrag(Vector2 delta)
         {
-            if (!characterSelectParent.activeSelf) { return; }
+            if (ultimateAnimationRunning) { return; }
 
             if (previewObject)
             {
@@ -297,7 +298,7 @@ namespace Vi.UI
                     addButtonCreated = true;
                     characterCardInstances[i].InitializeAsAddButton();
                     characterCardInstances[i].Button.onClick.RemoveAllListeners();
-                    characterCardInstances[i].Button.onClick.AddListener(delegate { OpenCharacterCustomization(); });
+                    characterCardInstances[i].Button.onClick.AddListener(delegate { StartCoroutine(OpenCharacterCustomization()); });
                 }
             }
 
@@ -698,20 +699,36 @@ namespace Vi.UI
         }
 
         [SerializeField] private RawImage characterPreviewImage;
+        [SerializeField] private RawImage characterCustomizationPreviewImage;
         private Queue<WebRequestManager.Character> characterQueue = new Queue<WebRequestManager.Character>();
 
         private void ProcessCharacterQueue()
         {
-            if (characterQueue.Count > 0)
+            while (characterQueue.Count > 0)
             {
-                if (updateCharCoroutine != null)
+                WebRequestManager.Character character = characterQueue.Dequeue();
+
+                bool idsAreEqual = selectedCharacter._id == character._id;
+                bool raceAndGendersAreEqual = selectedCharacter.raceAndGender == character.raceAndGender;
+                bool shouldCreateNewModel = !raceAndGendersAreEqual | selectedCharacter.model != character.model;
+
+                if (shouldCreateNewModel | !idsAreEqual)
                 {
-                    StopCoroutine(updateCharCoroutine);
+                    if (updateCharCoroutine != null)
+                    {
+                        StopCoroutine(updateCharCoroutine);
+                    }
                 }
 
-                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
+                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(character));
+
+                if (shouldCreateNewModel | !idsAreEqual)
+                {
+                    break;
+                }
             }
-            else if (!updateDisplayCharacterRunning)
+            
+            if (!updateDisplayCharacterRunning & characterQueue.Count == 0)
             {
                 characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 1, Time.deltaTime * characterPreviewFadeSpeed));
             }
@@ -725,7 +742,6 @@ namespace Vi.UI
         {
             updateDisplayCharacterRunning = true;
 
-            shouldUseHeadCameraOrientation = false;
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
 
@@ -893,6 +909,8 @@ namespace Vi.UI
         {
             if (!previewObject) { return; }
 
+            shouldUseHeadCameraOrientation = false;
+
             CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == weaponClass);
 
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
@@ -913,6 +931,8 @@ namespace Vi.UI
         {
             ultimateAnimationRunning = true;
 
+            previewObject.transform.rotation = Quaternion.Euler(previewCharacterRotation);
+
             if (characterCustomizationParent.activeSelf)
             {
                 characterCreationOpacityGroup.interactable = false;
@@ -928,7 +948,7 @@ namespace Vi.UI
                     comboCameraOrientation = previewUltimateCameraOrientation[0];
                 }
 
-                float t = 0;
+                float t = Mathf.InverseLerp(1, 0, characterCreationOpacityGroup.alpha);
                 while (!Mathf.Approximately(t, 1))
                 {
                     t += Time.deltaTime * cameraLerpSpeed;
@@ -941,8 +961,23 @@ namespace Vi.UI
                     yield return null;
                 }
 
-                ((RectTransform)customizationRowsParentLeft).anchoredPosition -= new Vector2(700, 0);
-                ((RectTransform)customizationRowsParentRight).anchoredPosition += new Vector2(700, 0);
+                if (characterCustomizationPreviewImage.color.a < 1)
+                {
+                    characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(0);
+                    characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(0));
+
+                    t = 0;
+                    while (!Mathf.Approximately(t, 1))
+                    {
+                        t += Time.deltaTime * cameraLerpSpeed;
+                        t = Mathf.Clamp01(t);
+                        characterCustomizationPreviewImage.color = StringUtility.SetColorAlpha(characterCustomizationPreviewImage.color, Mathf.Lerp(0, 1, t));
+                        yield return null;
+                    }
+                }
+                
+                ((RectTransform)customizationRowsParentLeft).anchoredPosition = originalLeftPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
+                ((RectTransform)customizationRowsParentRight).anchoredPosition = originalRightPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
             }
             
             yield return new WaitUntil(() => combatAgent.AnimationHandler.Animator);
@@ -1043,7 +1078,9 @@ namespace Vi.UI
         private float lastTextChangeTime;
         private bool lastClientState;
 
+        private const float customizationRowsSlidingAnimationOffset = 300;
         private const float cameraLerpSpeed = 2;
+        private float customizationAnimationTime;
         private void Update()
         {
             ProcessCharacterQueue();
@@ -1061,14 +1098,21 @@ namespace Vi.UI
             {
                 if (!ultimateAnimationRunning)
                 {
-                    characterCreationOpacityGroup.alpha = Mathf.Lerp(characterCreationOpacityGroup.alpha, 1, Time.deltaTime * cameraLerpSpeed);
+                    customizationAnimationTime += Time.deltaTime * cameraLerpSpeed;
+                    customizationAnimationTime = Mathf.Clamp01(customizationAnimationTime);
+
+                    characterCreationOpacityGroup.alpha = Mathf.Lerp(0, 1, customizationAnimationTime);
                     characterCreationOpacityGroup.interactable = true;
 
                     characterPreviewCamera.transform.position = Vector3.Slerp(characterPreviewCamera.transform.position, shouldUseHeadCameraOrientation ? headCameraOrientation.position : defaultCameraOrientation.position, Time.deltaTime * cameraLerpSpeed);
                     characterPreviewCamera.transform.rotation = Quaternion.Slerp(characterPreviewCamera.transform.rotation, shouldUseHeadCameraOrientation ? headCameraOrientation.rotation : defaultCameraOrientation.rotation, Time.deltaTime * cameraLerpSpeed);
 
-                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentLeft).anchoredPosition, originalLeftPos, Time.deltaTime * cameraLerpSpeed);
-                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(((RectTransform)customizationRowsParentRight).anchoredPosition, originalRightPos, Time.deltaTime * cameraLerpSpeed);
+                    ((RectTransform)customizationRowsParentLeft).anchoredPosition = Vector2.Lerp(originalLeftPos - new Vector2(customizationRowsSlidingAnimationOffset, 0), originalLeftPos, customizationAnimationTime);
+                    ((RectTransform)customizationRowsParentRight).anchoredPosition = Vector2.Lerp(originalRightPos + new Vector2(customizationRowsSlidingAnimationOffset, 0), originalRightPos, customizationAnimationTime);
+                }
+                else
+                {
+                    customizationAnimationTime = 0;
                 }
             }
             else
@@ -1076,6 +1120,7 @@ namespace Vi.UI
                 comboCameraOrientationTime += Time.deltaTime * comboCameraOrientationSpeed;
                 characterPreviewCamera.transform.position = comboCameraOrientation.position.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime);
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(comboCameraOrientation.rotation.EvaluateNormalized(comboCameraOrientationTime / comboCameraOrientationMaxTime));
+                customizationAnimationTime = 0;
             }
 
             statsAndGearParent.SetActive(!string.IsNullOrEmpty(selectedCharacter._id.ToString()));
@@ -1086,7 +1131,7 @@ namespace Vi.UI
 
             gameVersionText.text = WebRequestManager.Singleton.GameVersionErrorMessage;
 
-            if (lastClientState & !NetworkManager.Singleton.IsClient) { OpenCharacterSelect(); }
+            if (lastClientState & !NetworkManager.Singleton.IsClient) { StartCoroutine(OpenCharacterSelect(false)); }
             lastClientState = NetworkManager.Singleton.IsClient;
 
             connectButton.interactable = serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port) & !NetworkManager.Singleton.IsListening;
@@ -1190,6 +1235,7 @@ namespace Vi.UI
 
         public void ReturnToMainMenu()
         {
+            if (transitionController.TransitionRunning) { return; }
             if (NetworkManager.Singleton.IsListening) { return; }
             returnButton.interactable = false;
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", false);
@@ -1199,8 +1245,14 @@ namespace Vi.UI
         private bool isEditingExistingCharacter;
         private bool playUltimateAnimation;
 
-        public void OpenCharacterCustomization()
+        [SerializeField] private TransitionController transitionController;
+
+        private IEnumerator OpenCharacterCustomization()
         {
+            if (transitionController.TransitionRunning) { yield break; }
+            StartCoroutine(transitionController.PlayTransition());
+            yield return new WaitUntil(() => transitionController.TransitionPeakReached);
+
             selectedRace = "Human";
             selectedGender = "Female";
 
@@ -1209,7 +1261,7 @@ namespace Vi.UI
             characterCustomizationParent.SetActive(true);
 
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(OpenCharacterSelect);
+            returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
@@ -1225,6 +1277,9 @@ namespace Vi.UI
             CharacterReference.WeaponOption weaponOption = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions().First(item => item.weapon.GetWeaponClass() == Weapon.WeaponClass.Greatsword);
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
 
+            characterCreationOpacityGroup.alpha = 0;
+            characterCustomizationPreviewImage.color = StringUtility.SetColorAlpha(characterCustomizationPreviewImage.color, 0);
+
             playUltimateAnimation = true;
         }
 
@@ -1235,7 +1290,7 @@ namespace Vi.UI
             characterCustomizationParent.SetActive(true);
 
             returnButton.onClick.RemoveAllListeners();
-            returnButton.onClick.AddListener(OpenCharacterSelect);
+            returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
             selectedCharacter = new WebRequestManager.Character();
             UpdateSelectedCharacter(character);
@@ -1243,8 +1298,15 @@ namespace Vi.UI
             isEditingExistingCharacter = true;
         }
 
-        public void OpenCharacterSelect()
+        private IEnumerator OpenCharacterSelect(bool playTransition = true)
         {
+            if (playTransition)
+            {
+                if (transitionController.TransitionRunning) { yield break; }
+                StartCoroutine(transitionController.PlayTransition());
+                yield return new WaitUntil(() => transitionController.TransitionPeakReached);
+            }
+            
             shouldUseHeadCameraOrientation = false;
             characterPreviewCamera.transform.position = defaultCameraOrientation.position;
             characterPreviewCamera.transform.rotation = defaultCameraOrientation.rotation;
@@ -1290,7 +1352,7 @@ namespace Vi.UI
 
             if (string.IsNullOrWhiteSpace(WebRequestManager.Singleton.CharacterCreationError))
             {
-                OpenCharacterSelect();
+                StartCoroutine(OpenCharacterSelect(false));
             }
             else
             {
@@ -1331,7 +1393,7 @@ namespace Vi.UI
                 card.Button.interactable = true;
             }
 
-            OpenCharacterSelect();
+            StartCoroutine(OpenCharacterSelect(false));
         }
 
         private List<string> trainingRoomMapOptions = new List<string>()

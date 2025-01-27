@@ -140,9 +140,12 @@ namespace Vi.Core
         public static ThermalMetrics lastEV { get; private set; }
         void OnThermalEvent(ThermalMetrics ev)
         {
-            Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
-            Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
-
+            if (FasterPlayerPrefs.IsMobilePlatform)
+            {
+                Debug.Log("Thermal Warning Level: " + ev.WarningLevel);
+                Debug.Log("Temperature Level: " + ev.TemperatureLevel + " Temperature Trend: " + ev.TemperatureTrend);
+            }
+            
             lastEV = ev;
             thermalWarningLevel = ev.WarningLevel;
 
