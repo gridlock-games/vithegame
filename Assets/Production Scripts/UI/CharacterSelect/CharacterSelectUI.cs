@@ -975,7 +975,10 @@ namespace Vi.UI
                         yield return null;
                     }
                 }
-                
+
+                customizationRowsParentLeft.gameObject.SetActive(false);
+                customizationRowsParentRight.gameObject.SetActive(false);
+
                 ((RectTransform)customizationRowsParentLeft).anchoredPosition = originalLeftPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
                 ((RectTransform)customizationRowsParentRight).anchoredPosition = originalRightPos + new Vector2(customizationRowsSlidingAnimationOffset, 0);
             }
@@ -1002,6 +1005,9 @@ namespace Vi.UI
 
             combatAgent.AnimationHandler.PlayPreviewCombo();
             ultimateAnimationRunning = false;
+
+            customizationRowsParentLeft.gameObject.SetActive(true);
+            customizationRowsParentRight.gameObject.SetActive(true);
         }
 
         private string selectedRace = "Human";
