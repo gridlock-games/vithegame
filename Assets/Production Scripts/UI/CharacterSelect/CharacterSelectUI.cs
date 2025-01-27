@@ -704,16 +704,31 @@ namespace Vi.UI
 
         private void ProcessCharacterQueue()
         {
-            if (characterQueue.Count > 0)
+            while (characterQueue.Count > 0)
             {
-                if (updateCharCoroutine != null)
+                WebRequestManager.Character character = characterQueue.Dequeue();
+
+                bool idsAreEqual = selectedCharacter._id == character._id;
+                bool raceAndGendersAreEqual = selectedCharacter.raceAndGender == character.raceAndGender;
+                bool shouldCreateNewModel = !raceAndGendersAreEqual | selectedCharacter.model != character.model;
+
+                if (shouldCreateNewModel | !idsAreEqual)
                 {
-                    StopCoroutine(updateCharCoroutine);
+                    if (updateCharCoroutine != null)
+                    {
+                        StopCoroutine(updateCharCoroutine);
+                    }
                 }
 
-                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(characterQueue.Dequeue()));
+                updateCharCoroutine = StartCoroutine(UpdateDisplayCharacter(character));
+
+                if (shouldCreateNewModel | !idsAreEqual)
+                {
+                    break;
+                }
             }
-            else if (!updateDisplayCharacterRunning)
+            
+            if (!updateDisplayCharacterRunning & characterQueue.Count == 0)
             {
                 characterPreviewImage.color = StringUtility.SetColorAlpha(characterPreviewImage.color, Mathf.MoveTowards(characterPreviewImage.color.a, 1, Time.deltaTime * characterPreviewFadeSpeed));
             }
