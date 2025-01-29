@@ -173,7 +173,7 @@ namespace Vi.Core.MovementHandlers
 
         protected float GetRunSpeed()
         {
-            float baseMovementSpeed = weaponHandler.GetWeapon().GetMovementSpeed(weaponHandler.IsBlocking, weaponHandler.IsAiming());
+            float baseMovementSpeed = weaponHandler.GetWeapon().GetMovementSpeed(false, weaponHandler.IsAiming());
             float moveSpeedAdjusted = baseMovementSpeed - combatAgent.StatusAgent.GetMovementSpeedDecreaseAmount(baseMovementSpeed) + combatAgent.StatusAgent.GetMovementSpeedIncreaseAmount(baseMovementSpeed);
             return Mathf.Max(0, moveSpeedAdjusted);
         }
@@ -284,7 +284,8 @@ namespace Vi.Core.MovementHandlers
                 Vector2 animDir = new Vector2(animationMoveInput.x, animationMoveInput.y) * (combatAgent.StatusAgent.IsFeared() ? -1 : 1);
                 animDir = Vector2.ClampMagnitude(animDir, 1);
 
-                if (combatAgent.WeaponHandler.IsBlocking)
+                bool isBlocking = false;
+                if (isBlocking)
                 {
                     switch (combatAgent.WeaponHandler.GetWeapon().GetBlockingLocomotion())
                     {

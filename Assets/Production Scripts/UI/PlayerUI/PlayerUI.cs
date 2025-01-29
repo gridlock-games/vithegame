@@ -246,8 +246,6 @@ namespace Vi.UI
             playerMovementHandler.OnDodge();
         }
 
-        public void Block(bool isPressed) { attributes.WeaponHandler.Block(isPressed); }
-
         public void Rage() { attributes.OnActivateRage(); }
 
         public void IncrementFollowPlayer() { playerMovementHandler.OnIncrementFollowPlayer(); }

@@ -368,57 +368,7 @@ namespace Vi.UI
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
-            else if (currentActionIndex == 6) // Block
-            {
-                playerUI.GetBlockingButton().gameObject.SetActive(true);
-
-                List<Sprite> controlSchemeSpriteList = PlayerDataManager.Singleton.GetControlsImageMapping().GetControlSchemeActionImages(controlScheme, playerInput.actions["Block"]);
-                if (controlSchemeSpriteList.Count > 0)
-                {
-                    currentOverlaySprites = controlSchemeSpriteList;
-                }
-                else if (controlScheme.name != "Touchscreen")
-                {
-                    var result = PlayerDataManager.Singleton.GetControlsImageMapping().GetActionSprite(controlScheme, new InputAction[] { playerInput.actions["Block"] });
-                    currentOverlaySprites = result.releasedSprites;
-                }
-
-                currentOverlayMessage = "Block An Attack.";
-                FasterPlayerPrefs.Singleton.SetBool("DisableBots", false);
-                foreach (InputAction action in playerInput.actions)
-                {
-                    if (action.name.Contains("Block") | action.name.Contains("Look") | action.name.Contains("Aim")) { playerInput.actions.FindAction(action.name).Enable(); }
-                    else { playerInput.actions.FindAction(action.name).Disable(); }
-                }
-
-                if (weaponHandler.CanADS) { weaponHandler.AimDownSights(false); }
-
-                foreach (AbilityCard abilityCard in playerUI.GetAbilityCards())
-                {
-                    abilityCard.transform.localScale = Vector3.one;
-                }
-
-                UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetBlockingButton().transform, true));
-
-                yield return new WaitUntil(() => ShouldCheckmarkBeDisplayed());
-
-                FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
-                foreach (InputAction action in playerInput.actions)
-                {
-                    if (action.name.Contains("Aim")) { continue; }
-                    playerInput.actions.FindAction(action.name).Disable();
-                }
-
-                yield return new WaitUntil(() => !IsTaskComplete() & !ShouldCheckmarkBeDisplayed() & IsInBufferTime());
-                bufferDurationBetweenActions = 6;
-                playerUI.SetFadeToBlack(true);
-                yield return new WaitUntil(() => Vector4.Distance(playerUI.GetFadeToBlackColor(), Color.black) < colorDistance);
-                PlayerDataManager.Singleton.RespawnAllPlayers();
-                yield return new WaitForSeconds(0.5f);
-                playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
-                playerUI.SetFadeToBlack(false);
-            }
-            else if (currentActionIndex == 7) // Dodge
+            else if (currentActionIndex == 6) // Dodge
             {
                 playerUI.GetDodgeButton().gameObject.SetActive(true);
 
@@ -460,7 +410,7 @@ namespace Vi.UI
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + botAttributes.transform.forward * forwardSpawnPosMultiplier, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
-            else if (currentActionIndex == 8) // Player Card
+            else if (currentActionIndex == 7) // Player Card
             {
                 botAttributes.ResetComboCounter();
 
@@ -486,7 +436,7 @@ namespace Vi.UI
                 playerMovementHandler.SetOrientation(botAttributes.transform.position + Vector3.right * 6, playerMovementHandler.transform.rotation);
                 playerUI.SetFadeToBlack(false);
             }
-            else if (currentActionIndex == 9) // Swap Weapons
+            else if (currentActionIndex == 8) // Swap Weapons
             {
                 onTaskCompleteBufferDuration = 2;
                 checkmarkDuration = 1;
@@ -521,7 +471,7 @@ namespace Vi.UI
 
                 UIElementHighlightInstances.Add(Instantiate(UIElementHighlightPrefab.gameObject, playerUI.GetSwitchWeaponButton().transform, true));
             }
-            else if (currentActionIndex == 10) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
                 onTaskCompleteBufferDuration = 5;
                 checkmarkDuration = 0;
@@ -553,7 +503,7 @@ namespace Vi.UI
                 playerUI.GetHealthPotionCard().gameObject.SetActive(true);
                 playerUI.GetStaminaPotionCard().gameObject.SetActive(true);
             }
-            else if (currentActionIndex == 11) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
                 onTaskCompleteBufferDuration = 1;
                 checkmarkDuration = 1;
@@ -575,7 +525,7 @@ namespace Vi.UI
 
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
             }
-            else if (currentActionIndex == 12) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
                 FasterPlayerPrefs.Singleton.SetBool("DisableBots", true);
                 currentOverlayMessage = "ENEMY KNOCKED OUT.";
@@ -869,16 +819,7 @@ namespace Vi.UI
                 canProceedCondition1 = weaponHandler.CurrentActionClip.name == "Ability4" | canProceedCondition1;
                 canProceed = (canProceedCondition1 & !animationHandler.IsActionClipPlaying(weaponHandler.CurrentActionClip)) | canProceed;
             }
-            else if (currentActionIndex == 6) // Block
-            {
-                if (botAttributes)
-                {
-                    WeaponHandler weaponHandler = botAttributes.WeaponHandler;
-                    Time.timeScale = weaponHandler.IsInAnticipation | weaponHandler.IsAttacking ? 0.1f : 1;
-                }
-                canProceed = attributes.BlockedRecently() | canProceed;
-            }
-            else if (currentActionIndex == 7) // Dodge
+            else if (currentActionIndex == 6) // Dodge
             {
                 if (botAttributes)
                 {
@@ -887,22 +828,22 @@ namespace Vi.UI
                 }
                 canProceed = animationHandler.IsDodging() | canProceed;
             }
-            else if (currentActionIndex == 8) // Player Card
+            else if (currentActionIndex == 7) // Player Card
             {
                 if (botAttributes)
                 {
                     canProceed = botAttributes.GetComboCounter() > 0 | canProceed;
                 }
             }
-            else if (currentActionIndex == 9) // Swap Weapons
+            else if (currentActionIndex == 8) // Swap Weapons
             {
                 canProceed = loadoutManager.GetEquippedSlotType() == LoadoutManager.WeaponSlotType.Secondary | canProceed;
             }
-            else if (currentActionIndex == 10) // Prepare to fight with NPC
+            else if (currentActionIndex == 9) // Prepare to fight with NPC
             {
                 canProceed = true;
             }
-            else if (currentActionIndex == 11) // Fight with NPC
+            else if (currentActionIndex == 10) // Fight with NPC
             {
                 bool botIsDead = false;
                 if (botAttributes)
@@ -911,7 +852,7 @@ namespace Vi.UI
                 }
                 canProceed = botIsDead | canProceed;
             }
-            else if (currentActionIndex == 12) // Display victory or defeat message
+            else if (currentActionIndex == 11) // Display victory or defeat message
             {
 
             }

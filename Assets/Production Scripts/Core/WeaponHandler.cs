@@ -262,8 +262,6 @@ namespace Vi.Core
 
             reloadFinished = false;
 
-            IsBlocking = false;
-
             lastLightAttackPressNetworkLatencyWait = Mathf.NegativeInfinity;
         }
 
@@ -714,15 +712,6 @@ namespace Vi.Core
             if (!IsSpawned) { return; }
             if (!combatAgent.AnimationHandler.Animator) { return; }
 
-            if (combatAgent.AnimationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
-            {
-                IsBlocking = combatAgent.GetArmor() > 0 | combatAgent.GetStamina() / combatAgent.GetMaxStamina() > CombatAgent.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
-            }
-            else
-            {
-                IsBlocking = false;
-            }
-
             if (combatAgent.AnimationHandler.IsActionClipPlaying(CurrentActionClip))
             {
                 float normalizedTime = combatAgent.AnimationHandler.GetActionClipNormalizedTime(CurrentActionClip);
@@ -1041,12 +1030,9 @@ namespace Vi.Core
             combatAgent.AnimationHandler.SetHeavyAttackPressedState(isPressed);
             if (isPressed)
             {
-                if (!IsBlocking)
-                {
-                    ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
-                    if (actionClip != null)
-                        combatAgent.AnimationHandler.PlayAction(actionClip);
-                }
+                ActionClip actionClip = GetAttack(Weapon.InputAttackType.HeavyAttack);
+                if (actionClip != null)
+                    combatAgent.AnimationHandler.PlayAction(actionClip);
             }
         }
 
@@ -1398,8 +1384,6 @@ namespace Vi.Core
 
             if (!combatAgent.AnimationHandler.Animator) { return; }
 
-            combatAgent.AnimationHandler.Animator.SetBool("Blocking", IsBlocking);
-
             if (IsServer & IsSpawned)
             {
                 if (ShouldUseAmmo())
@@ -1427,26 +1411,6 @@ namespace Vi.Core
 
             ActionClip reloadClip = GetWeapon().GetReloadClip();
             if (reloadClip) { combatAgent.AnimationHandler.PlayAction(reloadClip); }
-        }
-
-        public bool IsBlocking { get; private set; }
-        private NetworkVariable<bool> isBlocking = new NetworkVariable<bool>(default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private void OnBlock(InputValue value) { Block(value.isPressed); }
-
-        public void Block(bool isPressed)
-        {
-            if (blockingMode == "TOGGLE")
-            {
-                if (isPressed) { isBlocking.Value = !isBlocking.Value; }
-            }
-            else if (blockingMode == "HOLD")
-            {
-                isBlocking.Value = isPressed;
-            }
-            else
-            {
-                Debug.LogError("Not sure how to handle player prefs BlockingMode - " + blockingMode);
-            }
         }
 
 #if UNITY_EDITOR
