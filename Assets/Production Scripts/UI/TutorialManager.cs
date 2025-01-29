@@ -72,7 +72,6 @@ namespace Vi.UI
                 }
 
                 playerUI.GetSwitchWeaponButton().gameObject.SetActive(false);
-                playerUI.GetBlockingButton().gameObject.SetActive(false);
                 playerUI.GetDodgeButton().gameObject.SetActive(false);
                 playerUI.GetMainPlayerCard().gameObject.SetActive(false);
                 playerUI.GetOrbitalCameraButton().gameObject.SetActive(false);

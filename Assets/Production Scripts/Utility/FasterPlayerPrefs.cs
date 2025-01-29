@@ -43,10 +43,11 @@ namespace Vi.Utility
         {
             get
             {
-                //return Application.internetReachability;
-                return NetworkReachability.NotReachable;
+                return IsPlayingOffline ? NetworkReachability.NotReachable : Application.internetReachability;
             }
         }
+
+        public static bool IsPlayingOffline { get; set; }
 
         private void Awake()
         {

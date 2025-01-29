@@ -1454,6 +1454,7 @@ namespace Vi.UI
         {
             if (UIElementHighlightInstance) { Destroy(UIElementHighlightInstance); }
             UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
+            Debug.Log("Create");
         }
 
         public void RandomizeCharacter()
@@ -1469,7 +1470,12 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", true);
 
-            if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
+            if (FasterPlayerPrefs.IsPlayingOffline)
+            {
+                CreateUIElementHighlight((RectTransform)selectCharacterButton.transform);
+                selectCharacterButton.interactable = true;
+            }
+            else if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
             {
                 CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
             }
