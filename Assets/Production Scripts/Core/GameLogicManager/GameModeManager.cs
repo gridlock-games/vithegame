@@ -43,7 +43,7 @@ namespace Vi.Core.GameModeManagers
             DontRespawn,
             ResetStats,
             ResetHP,
-            ResetHPAndSpirit
+            ResetHPAndArmor
         }
 
         public bool LevelingEnabled { get { return levelingEnabled; } }
@@ -805,7 +805,7 @@ namespace Vi.Core.GameModeManagers
                                 }
                             }
                             break;
-                        case RespawnType.ResetHPAndSpirit:
+                        case RespawnType.ResetHPAndArmor:
                             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                             {
                                 if (attributes.GetAilment() == ActionClip.Ailment.Death)

@@ -30,7 +30,7 @@ namespace Vi.Core.CombatAgents
                 if (!actionClip) { continue; }
                 if (actionClip.summonableCount > 0)
                 {
-                    useSpirit = true;
+                    useArmor = true;
                     break;
                 }
             }
@@ -93,8 +93,8 @@ namespace Vi.Core.CombatAgents
         [SerializeField] private CharacterReference.RaceAndGender raceAndGender;
         public override CharacterReference.RaceAndGender GetRaceAndGender() { return raceAndGender; }
 
-        private bool useSpirit;
-        protected override bool ShouldUseSpirit() { return useSpirit; }
+        private bool useArmor;
+        protected override bool ShouldUseArmor() { return useArmor; }
 
         [SerializeField] private bool useRage;
         protected override bool ShouldUseRage() { return useRage; }

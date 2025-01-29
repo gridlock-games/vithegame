@@ -716,7 +716,7 @@ namespace Vi.Core
 
             if (combatAgent.AnimationHandler.IsAtRest() | CurrentActionClip.GetHitReactionType() == ActionClip.HitReactionType.Blocking)
             {
-                IsBlocking = combatAgent.GetSpirit() > 0 | combatAgent.GetStamina() / combatAgent.GetMaxStamina() > CombatAgent.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
+                IsBlocking = combatAgent.GetArmor() > 0 | combatAgent.GetStamina() / combatAgent.GetMaxStamina() > CombatAgent.minStaminaPercentageToBeAbleToBlock && isBlocking.Value;
             }
             else
             {

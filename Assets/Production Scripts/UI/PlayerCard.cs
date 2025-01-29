@@ -32,12 +32,12 @@ namespace Vi.UI
         [SerializeField] private Image bottomStaminaBorder;
         [SerializeField] private Image staminaBackground;
 
-        [Header("Spirit UI")]
-        [SerializeField] private Text spiritText;
-        [SerializeField] private Image spiritFillImage;
-        [SerializeField] private Image interimSpiritFillImage;
-        [SerializeField] private Image bottomSpiritBorder;
-        [SerializeField] private Image spiritBackground;
+        [Header("Armor UI")]
+        [SerializeField] private Text armorText;
+        [SerializeField] private Image armorFillImage;
+        [SerializeField] private Image interimArmorFillImage;
+        [SerializeField] private Image bottomArmorBorder;
+        [SerializeField] private Image armorBackground;
 
         [Header("Rage UI")]
         [SerializeField] private RenderTexture ragingRT;
@@ -104,8 +104,8 @@ namespace Vi.UI
         }
 
         [SerializeField] private bool isRightSideCard;
-        private bool staminaAndSpiritAreDisabled;
-        private void DisableStaminaAndSpiritDisplay()
+        private bool staminaAndArmorAreDisabled;
+        private void DisableStaminaAndArmorDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
             interimStaminaFillImage.gameObject.SetActive(false);
@@ -113,11 +113,11 @@ namespace Vi.UI
             bottomStaminaBorder.gameObject.SetActive(false);
             staminaBackground.gameObject.SetActive(false);
 
-            spiritFillImage.gameObject.SetActive(false);
-            interimSpiritFillImage.gameObject.SetActive(false);
-            spiritText.gameObject.SetActive(false);
-            bottomSpiritBorder.gameObject.SetActive(false);
-            spiritBackground.gameObject.SetActive(false);
+            armorFillImage.gameObject.SetActive(false);
+            interimArmorFillImage.gameObject.SetActive(false);
+            armorText.gameObject.SetActive(false);
+            bottomArmorBorder.gameObject.SetActive(false);
+            armorBackground.gameObject.SetActive(false);
 
             if (isRightSideCard)
             {
@@ -136,7 +136,7 @@ namespace Vi.UI
                 ((RectTransform)interimHealthFillImage.transform).anchoredPosition = ((RectTransform)interimStaminaFillImage.transform).anchoredPosition;
             }
 
-            staminaAndSpiritAreDisabled = true;
+            staminaAndArmorAreDisabled = true;
         }
 
         private static GameObject ragingPreviewInstance;
@@ -157,7 +157,7 @@ namespace Vi.UI
         {
             if (!IsMainCard())
             {
-                DisableStaminaAndSpiritDisplay();
+                DisableStaminaAndArmorDisplay();
             }
 
             RefreshLevelingSystem();
@@ -197,12 +197,12 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = 0;
             staminaFillImage.fillAmount = 0;
-            spiritFillImage.fillAmount = 0;
+            armorFillImage.fillAmount = 0;
             rageFillImage.fillAmount = 0;
 
             interimHealthFillImage.fillAmount = 0;
             interimStaminaFillImage.fillAmount = 0;
-            interimSpiritFillImage.fillAmount = 0;
+            interimArmorFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
 
             foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
@@ -222,12 +222,12 @@ namespace Vi.UI
 
         private float lastHP = -1;
         private float lastStamina = -1;
-        private float lastSpirit = -1;
+        private float lastArmor = -1;
         private float lastRage = -1;
 
         private float lastMaxHP = -1;
         private float lastMaxStamina = -1;
-        private float lastMaxSpirit = -1;
+        private float lastMaxArmor = -1;
         private float lastMaxRage = -1;
 
         private void Update()
@@ -265,13 +265,13 @@ namespace Vi.UI
                 experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
             }
             
-            if (!staminaAndSpiritAreDisabled)
+            if (!staminaAndArmorAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                float spirit = combatAgent.GetSpirit();
+                float armor = combatAgent.GetArmor();
 
                 float maxStamina = combatAgent.GetMaxStamina();
-                float maxSpirit = combatAgent.GetMaxSpirit();
+                float maxArmor = combatAgent.GetMaxArmor();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
@@ -279,21 +279,21 @@ namespace Vi.UI
                     staminaFillImage.fillAmount = stamina / maxStamina;
                 }
 
-                if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
+                if (!Mathf.Approximately(lastArmor, armor) | !Mathf.Approximately(lastMaxArmor, maxArmor))
                 {
-                    spiritText.text = "SP " + StringUtility.FormatDynamicFloatForUI(spirit) + " / " + maxSpirit.ToString("F0");
-                    spiritFillImage.fillAmount = spirit / maxSpirit;
+                    armorText.text = "AR " + StringUtility.FormatDynamicFloatForUI(armor) + " / " + maxArmor.ToString("F0");
+                    armorFillImage.fillAmount = armor / maxArmor;
                 }
 
                 // Interim images - these update every frame
                 interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
-                interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
+                interimArmorFillImage.fillAmount = Mathf.Lerp(interimArmorFillImage.fillAmount, armor / maxArmor, Time.deltaTime * fillSpeed);
 
                 lastStamina = stamina;
-                lastSpirit = spirit;
+                lastArmor = armor;
 
                 lastMaxStamina = maxStamina;
-                lastMaxSpirit = maxSpirit;
+                lastMaxArmor = maxArmor;
             }
 
             // Interim images - these update every frame
