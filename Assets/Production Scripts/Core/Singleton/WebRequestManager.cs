@@ -690,7 +690,7 @@ namespace Vi.Core
             if (IsRefreshingCharacters) { yield break; }
             IsRefreshingCharacters = true;
 
-            if (Application.internetReachability == NetworkReachability.NotReachable)
+            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
             {
                 Characters.Clear();
                 yield return new WaitUntil(() => PlayerDataManager.DoesExist());
@@ -777,7 +777,7 @@ namespace Vi.Core
 
         private IEnumerator CharacterByIdGetRequest(string characterId)
         {
-            if (Application.internetReachability == NetworkReachability.NotReachable)
+            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
             {
                 CharacterById = Characters.Find(item => item._id == characterId);
                 LastCharacterByIdWasSuccessful = true;
@@ -981,7 +981,7 @@ namespace Vi.Core
         public IEnumerator GetCharacterInventory(Character character)
         {
             string characterId = character._id.ToString();
-            if (Application.internetReachability == NetworkReachability.NotReachable)
+            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
             {
                 List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(character.raceAndGender);
                 CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
@@ -3122,7 +3122,7 @@ namespace Vi.Core
         {
             if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
 
-            if (Application.internetReachability == NetworkReachability.NotReachable) { Debug.LogWarning("No internet connection, can't create items"); yield break; }
+            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable) { Debug.LogWarning("No internet connection, can't create items"); yield break; }
 
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "items/getItems");
             yield return getRequest.SendWebRequest();
@@ -3321,7 +3321,7 @@ namespace Vi.Core
         private Coroutine gameVersionCheckCoroutine;
         private IEnumerator CheckGameVersionRequest()
         {
-            if (Application.internetReachability == NetworkReachability.NotReachable)
+            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
             {
                 yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
                 Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
@@ -3345,7 +3345,7 @@ namespace Vi.Core
             {
                 Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "game/version");
                 getRequest.Dispose();
-                if (Application.internetReachability != NetworkReachability.NotReachable)
+                if (FasterPlayerPrefs.InternetReachability != NetworkReachability.NotReachable)
                 {
                     yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
                     Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version. Servers may be offline.";
