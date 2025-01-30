@@ -153,6 +153,38 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private PooledObject armorDestroyedVFX;
+        [SerializeField] private AudioClip armorDestroyedAudio;
+        private List<PooledObject> armorDestroyedVFXInstances = new List<PooledObject>();
+        private void OnArmorChanged(float prev, float current)
+        {
+            if (Mathf.Approximately(prev, 0)) { return; }
+            if (!Mathf.Approximately(current, 0)) { return; }
+            if (current > prev) { return; }
+
+            if (ShouldUseArmor())
+            {
+                StartCoroutine(PlayArmorVFX());
+            }
+        }
+
+        private IEnumerator PlayArmorVFX()
+        {
+            if (armorDestroyedVFX)
+            {
+                PooledObject instance = ObjectPoolingManager.SpawnObject(armorDestroyedVFX, transform);
+                armorDestroyedVFXInstances.Add(instance);
+
+                if (armorDestroyedAudio)
+                {
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, armorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                }
+
+                yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
+                armorDestroyedVFXInstances.Remove(instance);
+            }
+        }
+
         public AnimationHandler AnimationHandler { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
@@ -178,6 +210,15 @@ namespace Vi.Core
         {
             if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
             if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+
+            foreach (PooledObject instance in armorDestroyedVFXInstances)
+            {
+                if (instance.IsSpawned)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(instance);
+                }
+            }
+            armorDestroyedVFXInstances.Clear();
         }
 
         [SerializeField] private AudioClip rageStartAudio;
@@ -231,6 +272,7 @@ namespace Vi.Core
         {
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
+            armor.OnValueChanged += OnArmorChanged;
             rage.OnValueChanged += OnRageChanged;
 
             LastAliveStartTime = Time.time;
@@ -270,6 +312,7 @@ namespace Vi.Core
         {
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
+            armor.OnValueChanged -= OnArmorChanged;
             rage.OnValueChanged -= OnRageChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
@@ -1597,18 +1640,11 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (GetArmor() > 0)
-                {
-                    RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
-                }
-                else if (!Mathf.Approximately(HPDamage, 0))
-                {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
-                    float prevHP = GetHP();
-                    AddHP(HPDamage);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attacker, prevHP - GetHP());
-                }
+                RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment, GetArmor() > 0, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+                float prevHP = GetHP();
+                AddHP(HPDamage);
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                AddDamageToMapping(attacker, prevHP - GetHP());
 
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
@@ -1791,16 +1827,8 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            if (GetArmor() > 0)
-            {
-                RenderBlock(transform.position, Weapon.WeaponMaterial.Metal);
-                AddArmor(damage);
-            }
-            else
-            {
-                RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
-                AddHP(damage);
-            }
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None, GetArmor() > 0, Weapon.WeaponMaterial.Metal);
+            AddHP(damage);
             return true;
         }
 
@@ -1867,7 +1895,7 @@ namespace Vi.Core
 
         private float lastRenderHitFixedTime = -5;
 
-        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment, bool isArmorHit, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
@@ -1878,18 +1906,27 @@ namespace Vi.Core
             {
                 if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
-                        impactPosition, Weapon.hitSoundEffectVolume);
-
-                    RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
+                    if (isArmorHit)
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
+                        AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                            ailment == ActionClip.Ailment.None ? attackingCombatAgent.GetBlockingHitSoundEffect(attackingWeaponMaterial) : attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                            impactPosition, Weapon.hitSoundEffectVolume);
+                    }
+                    else
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                        AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                            attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                            impactPosition, Weapon.hitSoundEffectVolume);
+                    }
+                    RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment, isArmorHit, attackingWeaponMaterial);
                 }
             }
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
-        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment, bool isArmorHit, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             lastRenderHitFixedTime = Time.fixedTime;
 
