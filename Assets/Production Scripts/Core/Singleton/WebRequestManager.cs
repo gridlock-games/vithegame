@@ -3324,7 +3324,13 @@ namespace Vi.Core
             if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
             {
                 yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
-                Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
+
+                if (!FasterPlayerPrefs.IsPlayingOffline)
+                {
+                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
+                    GameIsUpToDate = true;
+                    GameVersionErrorMessage = "";
+                }
 
                 IsLoggedIn = true;
                 currentlyLoggedInUserId = "";
