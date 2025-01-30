@@ -1901,7 +1901,15 @@ namespace Vi.Core
 
             lastRenderHitFixedTime = Time.fixedTime;
 
-            GlowRenderer.RenderHit();
+            if (isArmorHit)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                GlowRenderer.RenderHit();
+            }
+
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
             {
                 if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
@@ -1932,7 +1940,15 @@ namespace Vi.Core
 
             // This check is for late joining clients
             if (!GlowRenderer) { return; }
-            GlowRenderer.RenderHit();
+
+            if (isArmorHit)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                GlowRenderer.RenderHit();
+            }
 
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
             {
