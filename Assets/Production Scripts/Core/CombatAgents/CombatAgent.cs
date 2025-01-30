@@ -1751,8 +1751,16 @@ namespace Vi.Core
                 }
             }
 
-            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(); }
-            AddHP(damage);
+            if (GetArmor() > 0)
+            {
+                AddArmor(damage);
+            }
+            else
+            {
+                AddHP(damage);
+            }
+
+            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(GetArmor() > 0); }
             return true;
         }
 
@@ -1783,8 +1791,16 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
-            AddHP(damage);
+            if (GetArmor() > 0)
+            {
+                RenderBlock(transform.position, Weapon.WeaponMaterial.Metal);
+                AddArmor(damage);
+            }
+            else
+            {
+                RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
+                AddHP(damage);
+            }
             return true;
         }
 
@@ -1893,28 +1909,42 @@ namespace Vi.Core
             }
         }
 
-        protected void RenderHitGlowOnly()
+        protected void RenderHitGlowOnly(bool isBlockedByArmor)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
 
             if (GlowRenderer)
             {
-                GlowRenderer.RenderHit();
+                if (isBlockedByArmor)
+                {
+                    GlowRenderer.RenderBlock();
+                }
+                else
+                {
+                    GlowRenderer.RenderHit();
+                }
             }
             else
             {
                 Debug.LogError("No Glow Renderer! " + this);
                 return;
             }
-            RenderHitGlowOnlyClientRpc();
+            RenderHitGlowOnlyClientRpc(isBlockedByArmor);
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
-        private void RenderHitGlowOnlyClientRpc()
+        private void RenderHitGlowOnlyClientRpc(bool isBlockedByArmor)
         {
             if (GlowRenderer)
             {
-                GlowRenderer.RenderHit();
+                if (isBlockedByArmor)
+                {
+                    GlowRenderer.RenderBlock();
+                }
+                else
+                {
+                    GlowRenderer.RenderHit();
+                }
             }
             else
             {
