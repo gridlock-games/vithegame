@@ -169,7 +169,6 @@ namespace Vi.Core.CombatAgents
             CachedPlayerData = default;
 
             lastComboCounterChangeTime = default;
-            lastBlockTime = Mathf.NegativeInfinity;
 
             IsRespawning = false;
             isWaitingForSpawnPoint = false;
@@ -180,7 +179,7 @@ namespace Vi.Core.CombatAgents
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessMeleeHit() should only be called on the server!"); return false; }
             HitResult hitResult = ProcessHit(true, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, runtimeWeapon.GetHitCounter(), runtimeWeapon);
-            if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
+            
             return CastHitResultToBoolean(hitResult);
         }
 
@@ -188,7 +187,7 @@ namespace Vi.Core.CombatAgents
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessProjectileHit() should only be called on the server!"); return false; }
             HitResult hitResult = ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier);
-            if (hitResult == HitResult.Block) { lastBlockTime = Time.time; }
+            
             return CastHitResultToBoolean(hitResult);
         }
 
@@ -210,13 +209,6 @@ namespace Vi.Core.CombatAgents
         {
             if (!IsServer) { Debug.LogError("Reset combo counter should only be called on the server!"); return; }
             comboCounter.Value = 0;
-        }
-
-        private float lastBlockTime = Mathf.NegativeInfinity;
-        public bool BlockedRecently()
-        {
-            if (!IsServer) { Debug.LogError("Attributes.BlockedRecently will not be evaluated properly if we aren't the server!"); return false; }
-            return Time.time - lastBlockTime <= 0.25f;
         }
 
         protected override void Update()

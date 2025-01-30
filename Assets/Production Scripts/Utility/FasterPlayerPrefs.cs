@@ -39,6 +39,16 @@ namespace Vi.Utility
             get { return Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
         }
 
+        public static NetworkReachability InternetReachability
+        {
+            get
+            {
+                return IsPlayingOffline ? NetworkReachability.NotReachable : Application.internetReachability;
+            }
+        }
+
+        public static bool IsPlayingOffline { get; set; }
+
         private void Awake()
         {
             _singleton = this;

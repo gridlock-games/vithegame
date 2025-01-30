@@ -34,16 +34,16 @@ namespace Vi.Core
         private List<CombatAgent> slaves = new List<CombatAgent>();
 
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
-        protected NetworkVariable<float> spirit = new NetworkVariable<float>();
+        protected NetworkVariable<float> armor = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetStamina() { return stamina.Value; }
-        public float GetSpirit() { return spirit.Value; }
+        public float GetArmor() { return armor.Value; }
         public float GetRage() { return rage.Value; }
 
         public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
         public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
-        public float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit() + SessionProgressionHandler.MaxSpiritBonus; }
+        public float GetMaxArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
         public float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -71,33 +71,33 @@ namespace Vi.Core
             }
         }
 
-        protected virtual bool ShouldUseSpirit() { return true; }
+        protected virtual bool ShouldUseArmor() { return true; }
 
         protected virtual bool ShouldUseRage() { return true; }
 
-        public void AddSpirit(float amount)
+        public void AddArmor(float amount)
         {
-            if (!ShouldUseSpirit()) { return; }
+            if (!ShouldUseArmor()) { return; }
 
-            if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
+            if (amount < 0) { amount *= StatusAgent.ArmorReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.ArmorIncreaseMultiplier; }
 
             if (amount > 0)
             {
-                if (spirit.Value < GetMaxSpirit())
+                if (armor.Value < GetMaxArmor())
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
+                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (spirit.Value > GetMaxSpirit())
+                if (armor.Value > GetMaxArmor())
                 {
-                    spirit.Value += amount;
+                    armor.Value += amount;
                 }
                 else
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
+                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
                 }
             }
         }
@@ -263,7 +263,7 @@ namespace Vi.Core
             yield return new WaitUntil(() => IsSpawned);
             yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = GetMaxHP();
-            spirit.Value = GetMaxSpirit();
+            armor.Value = GetMaxArmor();
         }
 
         public override void OnNetworkDespawn()
@@ -716,14 +716,14 @@ namespace Vi.Core
 
         [Rpc(SendTo.Server)] private void ActivateRageServerRpc() { ActivateRage(); }
 
-        public void ResetStats(float hpPercentage, bool resetStamina, bool resetSpirit, bool resetRage)
+        public void ResetStats(float hpPercentage, bool resetStamina, bool resetArmor, bool resetRage)
         {
             damageMappingThisLife.Clear();
             HP.Value = GetMaxHP() * hpPercentage;
             if (resetStamina)
                 stamina.Value = 0;
-            if (resetSpirit)
-                spirit.Value = GetMaxSpirit();
+            if (resetArmor)
+                armor.Value = GetMaxArmor();
             if (resetRage)
                 rage.Value = 0;
         }
@@ -817,8 +817,8 @@ namespace Vi.Core
 
         public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
 
-        protected const float notBlockingSpiritHitReactionPercentage = 0.4f;
-        protected const float blockingSpiritHitReactionPercentage = 0.5f;
+        protected const float notBlockingArmorHitReactionPercentage = 0.4f;
+        protected const float blockingArmorHitReactionPercentage = 0.5f;
 
         protected const float rageDamageMultiplier = 1.15f;
 
@@ -1423,53 +1423,56 @@ namespace Vi.Core
             if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
-            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
+            bool isBlocking = false;
+            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
             float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
             bool shouldPlayHitReaction;
-            if (ShouldUseSpirit())
+            if (ShouldUseArmor())
             {
                 shouldPlayHitReaction = false;
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
+                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddSpirit(HPDamage * 0.7f);
-                            HPDamage *= 0.7f;
+                            AddArmor(HPDamage * 0.7f);
+                            //HPDamage *= 0.7f;
+                            HPDamage = 0;
                         }
-                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
+                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0)
                         {
-                            AddSpirit(HPDamage * 0.7f);
+                            AddArmor(HPDamage * 0.7f);
                             shouldPlayHitReaction = true;
-                            HPDamage *= 0.7f;
+                            //HPDamage *= 0.7f;
+                            HPDamage = 0;
                         }
-                        else // Spirit is at 0
+                        else // Armor is at 0
                         {
-                            AddSpirit(HPDamage);
+                            AddArmor(HPDamage);
                             shouldPlayHitReaction = true;
                         }
                         break;
                     case ActionClip.HitReactionType.Blocking:
-                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
+                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= blockingArmorHitReactionPercentage) // If armor is greater than or equal to 50%
                         {
-                            AddSpirit(HPDamage * 0.5f);
+                            AddArmor(HPDamage * 0.5f);
                             HPDamage = 0;
                         }
-                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
+                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0) // If armor is greater than 0% and less than 50%
                         {
-                            AddSpirit(-GetMaxSpirit());
+                            AddArmor(-GetMaxArmor());
                             AddStamina(-GetMaxStamina() * 0.3f);
                             shouldPlayHitReaction = true;
                             HPDamage *= 0.7f;
                         }
-                        else // Spirit is at 0
+                        else // Armor is at 0
                         {
                             AddStamina(-GetMaxStamina() * 0.3f);
-                            AddSpirit(HPDamage);
+                            AddArmor(HPDamage);
                             if (GetStamina() <= 0)
                             {
                                 if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
@@ -1566,7 +1569,7 @@ namespace Vi.Core
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
                             | AnimationHandler.IsCharging()
-                            | shouldPlayHitReaction) // For spirit logic
+                            | shouldPlayHitReaction) // For armor logic
                         {
                             AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;

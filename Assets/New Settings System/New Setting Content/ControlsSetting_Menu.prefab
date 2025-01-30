@@ -90,12 +90,6 @@ MonoBehaviour:
     - {fileID: -947087152926947649, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
     excludedControlSchemes:
     - Touchscreen
-  - overrideActionName: Block
-    actionGroup: 1
-    inputActionReferences:
-    - {fileID: -2658562141224241184, guid: 89394a0546c86d141bf6aafeb721c454, type: 3}
-    excludedControlSchemes:
-    - Touchscreen
   - overrideActionName: Dodge
     actionGroup: 1
     inputActionReferences:
@@ -643,7 +637,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 28771014061788789}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999999
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1008,7 +1002,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 7583614748884552518}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.4034802
+  m_Size: 0.43103623
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
