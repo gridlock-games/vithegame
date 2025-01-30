@@ -1597,7 +1597,11 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (!Mathf.Approximately(HPDamage, 0))
+                if (GetArmor() > 0)
+                {
+                    RenderBlock(impactPosition, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+                }
+                else if (!Mathf.Approximately(HPDamage, 0))
                 {
                     RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
                     float prevHP = GetHP();
