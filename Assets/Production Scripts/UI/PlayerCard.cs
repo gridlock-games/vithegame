@@ -235,11 +235,14 @@ namespace Vi.UI
             if (!combatAgent) { canvas.enabled = false; return; }
 
             float HP = combatAgent.GetHP();
+            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetArmor(); }
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
             float rage = combatAgent.GetRage();
 
             float maxHP = combatAgent.GetMaxHP();
+            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxArmor(); }
+
             float maxRage = combatAgent.GetMaxRage();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
