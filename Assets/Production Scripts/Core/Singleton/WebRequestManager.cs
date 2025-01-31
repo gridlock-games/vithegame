@@ -3070,20 +3070,20 @@ namespace Vi.Core
         public struct CharacterAttributesResponse
         {
             public int level;
-            public double attack;
-            public double mattack;
-            public double defense;
-            public int mdefense;
-            public int hp;
-            public int stamina;
-            public int critChance;
-            public double crit;
-            public int baseHP;
-            public int baseST;
-            public int baseAtk;
-            public int baseMatk;
-            public int weaponABaseAtk;
-            public int weaponBBaseAtk;
+            public float attack;
+            public float mattack;
+            public float defense;
+            public float mdefense;
+            public float hp;
+            public float stamina;
+            public float critChance;
+            public float crit;
+            public float baseHP;
+            public float baseST;
+            public float baseAtk;
+            public float baseMatk;
+            public float weaponABaseAtk;
+            public float weaponBBaseAtk;
         }
 
         public CharacterAttributesResponse FindCharacterAttributesInLookup(string characterId)
@@ -3112,7 +3112,6 @@ namespace Vi.Core
                 yield break;
             }
             string json = getRequest.downloadHandler.text;
-            
             if (characterAttributesLookup.ContainsKey(characterId))
             {
                 characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterAttributesResponse>(json);
