@@ -37,6 +37,7 @@ namespace Vi.UI
 
         [Header("Rewards")]
         [SerializeField] private RectTransform rewardsSectionParent;
+        [SerializeField] private Text levelText;
         [SerializeField] private Text rewardsHeaderText;
         [SerializeField] private Text viEssenceEarnedText;
         [SerializeField] private AnimationCurve rewardsAppearanceCurve;
@@ -412,6 +413,7 @@ namespace Vi.UI
 
             gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
+            levelText.text = "Lv " + WebRequestManager.Singleton.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()).level.ToString();
             expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString() + " XP";
 
             float t = 0;

@@ -473,7 +473,11 @@ namespace Vi.Core.GameModeManagers
         public int TokensEarnedFromMatch { get; private set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
-            if (current & IsClient)
+            if (!current) { return; }
+
+            StartCoroutine(AwardExpBasedOnWin());
+
+            if (IsClient)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
@@ -485,7 +489,7 @@ namespace Vi.Core.GameModeManagers
                         PlayerDataManager.Singleton.GetGameMode(),
                         localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
 
-                    ExpEarnedFromMatch = 100;
+                    ExpEarnedFromMatch += localPlayerScore.GetExpReward();
 
                     // TODO Change this to use web requests on the server
                     if (GameModeManager.Singleton.LevelingEnabled)
@@ -504,6 +508,34 @@ namespace Vi.Core.GameModeManagers
                             + localPlayerScore.cumulativeKills
                             + localPlayerScore.cumulativeAssists);
                     }
+                }
+            }
+        }
+
+        private IEnumerator AwardExpBasedOnWin()
+        {
+            yield return new WaitUntil(() => GetGameWinnerIds().Count > 0);
+
+            if (IsServer)
+            {
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                {
+                    if (playerData.id > 0)
+                    {
+                        PlayerScore playerScore = GetPlayerScore(playerData.id);
+                        int expAward = playerScore.GetExpReward();
+                        expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+                    }
+                }
+            }
+
+            if (IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    int expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                    ExpEarnedFromMatch += expToAward;
                 }
             }
         }
@@ -1197,6 +1229,11 @@ namespace Vi.Core.GameModeManagers
                 damageRecievedThisRound = 0;
                 roundWins = 0;
                 isValid = true;
+            }
+
+            public int GetExpReward()
+            {
+                return cumulativeKills * 5 + cumulativeAssists * 3;
             }
 
             public void ResetRoundVariables()
