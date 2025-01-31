@@ -31,7 +31,6 @@ namespace Vi.UI
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
         [SerializeField] private Text healthText;
-        [SerializeField] private Image armorIndicator;
 
         [Header("Status UI")]
         [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
@@ -267,9 +266,9 @@ namespace Vi.UI
             healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
             healthText.enabled = team != PlayerDataManager.Team.Peaceful;
 
-            float HP = combatAgent.GetHP();
+            float HP = combatAgent.GetHP() + combatAgent.GetArmor();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-            float maxHP = combatAgent.GetMaxHP();
+            float maxHP = combatAgent.GetMaxHP() + combatAgent.GetMaxArmor();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
@@ -284,18 +283,7 @@ namespace Vi.UI
             if (armor < 0.1f & armor > 0) { armor = 0.1f; }
             float maxArmor = combatAgent.GetMaxArmor();
 
-            if (!Mathf.Approximately(lastArmor, armor) | !Mathf.Approximately(lastMaxArmor, maxArmor))
-            {
-                armorIndicator.fillAmount = armor / maxArmor;
-            }
-
-            lastArmor = armor;
-            lastMaxArmor = maxArmor;
-
-            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, combatAgent.GetHP() / combatAgent.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
         }
-
-        private float lastArmor;
-        private float lastMaxArmor;
     }
 }
