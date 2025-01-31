@@ -258,7 +258,7 @@ namespace Vi.UI
                         StartCoroutine(transitionController.PlayTransition());
                     }
 
-                    if (transitionController)
+                    if (transitionController.TransitionPeakReached)
                     {
                         MVPCanvas.enabled = true;
                         MVPCanvasGroup.alpha = 1;
