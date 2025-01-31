@@ -1480,18 +1480,16 @@ namespace Vi.Core
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
+                        if ((GetArmor() + HPDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddArmor(HPDamage * 0.7f);
-                            //HPDamage *= 0.7f;
-                            HPDamage = 0;
+                            AddArmor(HPDamage);
+                            HPDamage *= attack.armorPenetration;
                         }
-                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0)
+                        else if ((GetArmor() + HPDamage) / GetMaxArmor() > 0)
                         {
-                            AddArmor(HPDamage * 0.7f);
+                            AddArmor(HPDamage);
                             shouldPlayHitReaction = true;
-                            //HPDamage *= 0.7f;
-                            HPDamage = 0;
+                            HPDamage *= attack.armorPenetration;
                         }
                         else // Armor is at 0
                         {
@@ -1648,6 +1646,8 @@ namespace Vi.Core
 
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
+
+            Debug.Log(HPDamage);
 
             if (runtimeWeapon)
             {
