@@ -74,7 +74,8 @@ namespace Vi.ScriptableObjects
             attackSpeedDecrease,
             attackSpeedIncrease,
             abilityCooldownDecrease,
-            abilityCooldownIncrease
+            abilityCooldownIncrease,
+            bleed
         }
 
         [System.Serializable]

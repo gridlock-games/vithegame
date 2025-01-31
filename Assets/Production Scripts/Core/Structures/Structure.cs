@@ -209,12 +209,12 @@ namespace Vi.Core.Structures
         }
 
         protected CombatAgent lastAttackingCombatAgent;
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject, bool ignoresArmor = false)
         {
             if (!IsServer) { Debug.LogError("Structure.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (IsDead) { return false; }
 
-            if (HP.Value + damage <= 0 & !IsDead)
+            if (AddHPWithoutApply(damage) <= 0 & !IsDead)
             {
                 IsDead = true;
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnStructureKill(lastAttackingCombatAgent, this); }
@@ -228,7 +228,7 @@ namespace Vi.Core.Structures
             if (!IsServer) { Debug.LogError("Structure.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (IsDead) { return false; }
 
-            if (HP.Value + damage <= 0 & !IsDead)
+            if (AddHPWithoutApply(damage) <= 0 & !IsDead)
             {
                 IsDead = true;
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnStructureKill(lastAttackingCombatAgent, this); }

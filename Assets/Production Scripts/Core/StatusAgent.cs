@@ -846,6 +846,19 @@ namespace Vi.Core
                         abilityCooldownIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
                     }
                     break;
+                case ActionClip.Status.bleed:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        hittableAgent.ProcessEnvironmentDamage(-GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime, NetworkObject, true);
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
+                    }
+                    break;
                 default:
                     Debug.LogError(StatusEventsForThisObject[statusEventId].status + " has not been implemented!");
                     break;
