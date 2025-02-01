@@ -1,43 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &133443511842867608
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6639250121031075328}
-  m_Layer: 7
-  m_Name: HealthBarParent
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &6639250121031075328
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 133443511842867608}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8673608343410967855}
-  - {fileID: 2818897561637374832}
-  - {fileID: 1002564643142666907}
-  m_Father: {fileID: 2147784674209277300}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1308275241051087899
 GameObject:
   m_ObjectHideFlags: 0
@@ -68,7 +30,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6639250121031075328}
+  m_Father: {fileID: 2147784674209277300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -143,7 +105,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6639250121031075328}
+  m_Father: {fileID: 2147784674209277300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -671,10 +633,14 @@ MonoBehaviour:
   scalingDistanceDivisor: 500
   nameDisplay: {fileID: 7095846274158110464}
   background: {fileID: 4831398379057998925}
-  healthBarParent: {fileID: 6639250121031075328}
   healthFillImage: {fileID: 5812772587367031554}
   interimHealthFillImage: {fileID: 7496229367581369695}
   healthText: {fileID: 9047881861537450979}
+  healthBarGraphics:
+  - {fileID: 4022303697336710478}
+  - {fileID: 7496229367581369695}
+  - {fileID: 5812772587367031554}
+  - {fileID: 9047881861537450979}
   statusIconLayoutGroup: {fileID: 5744767898449179600}
 --- !u!225 &8622354700707930082
 CanvasGroup:
@@ -745,7 +711,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6639250121031075328}
+  m_Father: {fileID: 2147784674209277300}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -819,7 +785,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3152131815582684736}
-  - {fileID: 6639250121031075328}
+  - {fileID: 8673608343410967855}
+  - {fileID: 2818897561637374832}
+  - {fileID: 1002564643142666907}
   - {fileID: 3952354506870513417}
   - {fileID: 6618808089412551752}
   - {fileID: 7095846274158110527}

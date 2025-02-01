@@ -1358,6 +1358,11 @@ namespace Vi.Core
                             }
                         }
                     }
+
+                    if (networkListEvent.Value.id >= 0)
+                    {
+                        StartCoroutine(WebRequestManager.Singleton.GetCharacterAttributes(networkListEvent.Value.character._id.ToString()));
+                    }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;

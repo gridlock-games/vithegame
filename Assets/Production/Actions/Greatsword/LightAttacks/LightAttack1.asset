@@ -2763,6 +2763,8 @@ MonoBehaviour:
   avatarLayer: 0
   transitionTime: 0.1
   dodgeCancelTransitionTime: 0.1
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
@@ -2776,6 +2778,7 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.18
   recoveryNormalizedTime: 0.25
   isAffectedByRage: 1
@@ -2843,6 +2846,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  abilityBufferTime: 0
   actionClipSoundEffects: []
   statusesToApplyToSelfOnActivate: []
   statusesToApplyToTargetOnHit: []

@@ -74,7 +74,8 @@ namespace Vi.ScriptableObjects
             attackSpeedDecrease,
             attackSpeedIncrease,
             abilityCooldownDecrease,
-            abilityCooldownIncrease
+            abilityCooldownIncrease,
+            bleed
         }
 
         [System.Serializable]
@@ -228,6 +229,7 @@ namespace Vi.ScriptableObjects
         public float recoveryNormalizedTime = 0.75f;
         public bool isAffectedByRage = true;
         public float damage = 20;
+        public float armorPenetration = 0.3f;
         public float healAmount = 0;
         public float staminaDamage = 0;
         public float healthPenaltyOnMiss = 0;

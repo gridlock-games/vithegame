@@ -3067,6 +3067,98 @@ namespace Vi.Core
             }
         }
 
+        public struct CharacterAttributesResponse
+        {
+            public int level;
+            public float attack;
+            public float mattack;
+            public float defense;
+            public float mdefense;
+            public float hp;
+            public float stamina;
+            public float critChance;
+            public float crit;
+            public float baseHP;
+            public float baseST;
+            public float baseAtk;
+            public float baseMatk;
+            public float weaponABaseAtk;
+            public float weaponBBaseAtk;
+        }
+
+        public CharacterAttributesResponse FindCharacterAttributesInLookup(string characterId)
+        {
+            if (characterAttributesLookup.TryGetValue(characterId, out CharacterAttributesResponse response))
+            {
+                return response;
+            }
+            else
+            {
+                Debug.LogWarning("Can't find character attributes for character id in lookup dictionary " + characterId);
+                return default;
+            }
+        }
+
+        private Dictionary<string, CharacterAttributesResponse> characterAttributesLookup = new Dictionary<string, CharacterAttributesResponse>();
+        public IEnumerator GetCharacterAttributes(string characterId)
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacterAttribute/" + characterId);
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in WebRequestManager.GetCharacterAttributes() " + getRequest.error + APIURL + "characters/" + "getCharacterAttribute/" + characterId);
+                getRequest.Dispose();
+                yield break;
+            }
+            string json = getRequest.downloadHandler.text;
+            if (characterAttributesLookup.ContainsKey(characterId))
+            {
+                characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterAttributesResponse>(json);
+            }
+            else
+            {
+                characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterAttributesResponse>(json));
+            }
+
+            getRequest.Dispose();
+        }
+
+        public IEnumerator UpdateCharacterExp(string characterId, int charExpToAdd)
+        {
+            UpdateCharacterExpPutPayload payload = new UpdateCharacterExpPutPayload()
+            {
+                charId = characterId,
+                charExp = charExpToAdd
+            };
+
+            string json = JsonUtility.ToJson(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateServerProgress()" + putRequest.error);
+            }
+            putRequest.Dispose();
+        }
+
+        private struct UpdateCharacterExpPutPayload
+        {
+            public string charId;
+            public int charExp;
+        }
+
         private void Start()
         {
             StartCoroutine(Initialize());

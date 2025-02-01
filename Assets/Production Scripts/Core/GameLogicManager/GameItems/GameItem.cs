@@ -36,7 +36,7 @@ namespace Vi.Core.GameModeManagers
             return OnHit(attacker);
         }
 
-        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
+        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject, bool ignoresArmor = false) { return false; }
         public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
     }
 }

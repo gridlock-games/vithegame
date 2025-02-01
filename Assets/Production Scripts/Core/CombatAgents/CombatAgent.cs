@@ -1480,18 +1480,16 @@ namespace Vi.Core
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
+                        if ((GetArmor() + HPDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddArmor(HPDamage * 0.7f);
-                            //HPDamage *= 0.7f;
-                            HPDamage = 0;
+                            AddArmor(HPDamage);
+                            HPDamage *= attack.armorPenetration;
                         }
-                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0)
+                        else if ((GetArmor() + HPDamage) / GetMaxArmor() > 0)
                         {
-                            AddArmor(HPDamage * 0.7f);
+                            AddArmor(HPDamage);
                             shouldPlayHitReaction = true;
-                            //HPDamage *= 0.7f;
-                            HPDamage = 0;
+                            HPDamage *= attack.armorPenetration;
                         }
                         else // Armor is at 0
                         {
@@ -1649,6 +1647,8 @@ namespace Vi.Core
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
 
+            Debug.Log(HPDamage);
+
             if (runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)
@@ -1765,29 +1765,34 @@ namespace Vi.Core
             return (applyAilmentRegardless, attackAilment);
         }
 
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject, bool ignoresArmor = false)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
+            bool hitsArmor = GetArmor() > 0 & !ignoresArmor;
 
-                if (lastAttackingCombatAgent)
+            if (ailment.Value != ActionClip.Ailment.Death & !hitsArmor)
+            {
+                if (Mathf.Approximately(AddHPWithoutApply(damage), 0) | AddHPWithoutApply(damage) <= 0)
                 {
-                    SetKiller(lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    ailment.Value = ActionClip.Ailment.Death;
+                    AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
+
+                    if (lastAttackingCombatAgent)
+                    {
+                        SetKiller(lastAttackingCombatAgent);
+                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
+                    }
+                    else
+                    {
+                        killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
+                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    }
                 }
             }
 
-            if (GetArmor() > 0)
+            if (hitsArmor)
             {
                 AddArmor(damage);
             }
@@ -1805,7 +1810,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            if (AddHPWithoutApply(damage) <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
                 AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
