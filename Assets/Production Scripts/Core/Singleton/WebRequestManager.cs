@@ -1362,6 +1362,7 @@ namespace Vi.Core
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
                         "null", "null", "null", 1,
+                        new CharacterAttributes(),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -1374,6 +1375,7 @@ namespace Vi.Core
                         "null",
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name,
                         "null", 1,
+                        new CharacterAttributes(),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -1414,6 +1416,7 @@ namespace Vi.Core
 
                 equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
                 1,
+                new CharacterAttributes(),
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
@@ -1556,7 +1559,9 @@ namespace Vi.Core
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level,
+                CharacterAttributes characterAttributes,
+                Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 loadoutPreset1.loadoutSlot = "1";
                 loadoutPreset2.loadoutSlot = "2";
@@ -1573,7 +1578,7 @@ namespace Vi.Core
                 this.beard = beard;
                 this.brows = brows;
                 this.hair = hair;
-                attributes = new CharacterAttributes();
+                attributes = characterAttributes;
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
@@ -2394,7 +2399,7 @@ namespace Vi.Core
                 //    loadout4Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                 //    raceAndGender);
 
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, attributes,
                     loadout1Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout1Index].ToLoadout(),
                     loadout2Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout2Index].ToLoadout(),
                     loadout3Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout3Index].ToLoadout(),
@@ -2739,7 +2744,6 @@ namespace Vi.Core
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
                     string split = splitStrings[i].Replace("},", ",");
-
                     switch (split)
                     {
                         case "strength":
@@ -2798,7 +2802,7 @@ namespace Vi.Core
                             {
                                 if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
                                 {
-                                    attributes.strength = result;
+                                    attributes.dexterity = result;
                                 }
                                 else
                                 {
@@ -3145,6 +3149,18 @@ namespace Vi.Core
             public float weaponBBaseAtk;
         }
 
+        public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
+        {
+            if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public CharacterStats FindCharacterAttributesInLookup(string characterId)
         {
             if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
@@ -3244,6 +3260,18 @@ namespace Vi.Core
             {
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterAttributes()" + putRequest.error);
             }
+            else
+            {
+                if (characterAttributesLookup.ContainsKey(characterId))
+                {
+                    characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterStats>(putRequest.downloadHandler.text);
+                }
+                else
+                {
+                    characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterStats>(putRequest.downloadHandler.text));
+                }
+            }
+
             putRequest.Dispose();
 
             yield return GetCharacterAttributes(characterId);
