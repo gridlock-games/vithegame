@@ -1761,6 +1761,33 @@ namespace Vi.Core
             return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
         }
 
+        public void SetCharAttributes(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        {
+            if (GetGameMode() != GameMode.None) { return; }
+            if (!ContainsId(dataId)) { return; }
+
+            if (IsServer)
+            {
+                PlayerData playerData = GetPlayerData(dataId);
+                WebRequestManager.Character newChar = playerData.character.SetStat(attributeType, newValue);
+                playerData.character = newChar;
+                SetPlayerData(playerData);
+
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                    playerData.character.attributes));
+            }
+            else
+            {
+                SetCharAttributesRpc(dataId, attributeType, newValue);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)]
+        private void SetCharAttributesRpc(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        {
+            SetCharAttributes(dataId, attributeType, newValue);
+        }
+
         private NetworkList<PlayerData> playerDataList;
         private List<PlayerData> cachedPlayerDataList = new List<PlayerData>();
         private List<int> cachedIdList = new List<int>();

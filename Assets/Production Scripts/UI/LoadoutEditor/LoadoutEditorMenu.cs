@@ -77,6 +77,14 @@ namespace Vi.UI
             }
         }
 
+        public void ResetCharStats()
+        {
+            foreach (WebRequestManager.Character.AttributeType value in System.Enum.GetValues(typeof(WebRequestManager.Character.AttributeType)))
+            {
+                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, value, 0);
+            }
+        }
+
         public void OpenCharacterSection()
         {
             characterSectionParent.SetActive(true);

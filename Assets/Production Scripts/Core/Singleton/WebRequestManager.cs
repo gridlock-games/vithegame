@@ -745,6 +745,7 @@ namespace Vi.Core
             foreach (Character character in Characters)
             {
                 yield return GetCharacterInventory(character);
+                yield return GetCharacterAttributes(character._id.ToString());
             }
 
             // This adds all weapons to the inventory if we're in the editor
@@ -848,6 +849,7 @@ namespace Vi.Core
                 }
 
                 yield return GetCharacterInventory(CharacterById._id.ToString());
+                yield return GetCharacterAttributes(CharacterById._id.ToString());
 
                 LastCharacterByIdWasSuccessful = true;
                 IsGettingCharacterById = false;
@@ -1704,6 +1706,63 @@ namespace Vi.Core
                     loadoutPreset4.capeGearItemId, loadoutPreset4.robeGearItemId, loadoutPreset4.weapon1ItemId,
                     loadoutPreset4.weapon2ItemId, loadoutSlot == 3);
 
+                return copy;
+            }
+
+            public enum AttributeType
+            {
+                Strength,
+                Vitality,
+                Agility,
+                Dexterity,
+                Intelligence
+            }
+
+            public int GetStat(AttributeType attributeType)
+            {
+                switch (attributeType)
+                {
+                    case AttributeType.Strength:
+                        return attributes.strength;
+                    case AttributeType.Vitality:
+                        return attributes.vitality;
+                    case AttributeType.Agility:
+                        return attributes.agility;
+                    case AttributeType.Dexterity:
+                        return attributes.dexterity;
+                    case AttributeType.Intelligence:
+                        return attributes.intelligence;
+                    default:
+                        Debug.LogError("Unsure how to handle attribute type " + attributeType);
+                        break;
+                }
+                return 0;
+            }
+
+            public Character SetStat(AttributeType attributeType, int newValue)
+            {
+                Character copy = this;
+                switch (attributeType)
+                {
+                    case AttributeType.Strength:
+                        copy.attributes.strength = newValue;
+                        break;
+                    case AttributeType.Vitality:
+                        copy.attributes.vitality = newValue;
+                        break;
+                    case AttributeType.Agility:
+                        copy.attributes.agility = newValue;
+                        break;
+                    case AttributeType.Dexterity:
+                        copy.attributes.dexterity = newValue;
+                        break;
+                    case AttributeType.Intelligence:
+                        copy.attributes.intelligence = newValue;
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle attribute type " + attributeType);
+                        break;
+                }
                 return copy;
             }
         }
@@ -3067,7 +3126,7 @@ namespace Vi.Core
             }
         }
 
-        public struct CharacterAttributesResponse
+        public struct CharacterStats
         {
             public int level;
             public float attack;
@@ -3086,9 +3145,9 @@ namespace Vi.Core
             public float weaponBBaseAtk;
         }
 
-        public CharacterAttributesResponse FindCharacterAttributesInLookup(string characterId)
+        public CharacterStats FindCharacterAttributesInLookup(string characterId)
         {
-            if (characterAttributesLookup.TryGetValue(characterId, out CharacterAttributesResponse response))
+            if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
             {
                 return response;
             }
@@ -3099,7 +3158,7 @@ namespace Vi.Core
             }
         }
 
-        private Dictionary<string, CharacterAttributesResponse> characterAttributesLookup = new Dictionary<string, CharacterAttributesResponse>();
+        private Dictionary<string, CharacterStats> characterAttributesLookup = new Dictionary<string, CharacterStats>();
         public IEnumerator GetCharacterAttributes(string characterId)
         {
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacterAttribute/" + characterId);
@@ -3114,11 +3173,11 @@ namespace Vi.Core
             string json = getRequest.downloadHandler.text;
             if (characterAttributesLookup.ContainsKey(characterId))
             {
-                characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterAttributesResponse>(json);
+                characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterStats>(json);
             }
             else
             {
-                characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterAttributesResponse>(json));
+                characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterStats>(json));
             }
 
             getRequest.Dispose();
@@ -3135,20 +3194,20 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+                putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.UpdateServerProgress()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterExp()" + putRequest.error);
             }
             putRequest.Dispose();
         }
@@ -3157,6 +3216,43 @@ namespace Vi.Core
         {
             public string charId;
             public int charExp;
+        }
+
+        public IEnumerator UpdateCharacterAttributes(string characterId, CharacterAttributes newAttributes)
+        {
+            UpdateCharacterAttributesPutPayload payload = new UpdateCharacterAttributesPutPayload()
+            {
+                charId = characterId,
+                attributes = newAttributes
+            };
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterAttributes()" + putRequest.error);
+            }
+            putRequest.Dispose();
+
+            yield return GetCharacterAttributes(characterId);
+        }
+
+        private struct UpdateCharacterAttributesPutPayload
+        {
+            public string charId;
+            public CharacterAttributes attributes;
         }
 
         private void Start()
