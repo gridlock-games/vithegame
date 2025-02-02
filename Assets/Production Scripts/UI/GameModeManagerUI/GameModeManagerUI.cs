@@ -400,6 +400,11 @@ namespace Vi.UI
             }
         }
 
+        private void OnLevelUp()
+        {
+
+        }
+
         private bool displayRewardsHasBeenRun;
         private Coroutine displayRewardsCoroutine;
         private IEnumerator DisplayRewards()
@@ -437,6 +442,12 @@ namespace Vi.UI
                 expGainedBar.fillAmount = Mathf.LerpUnclamped(minExpFillAmount, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
                 yield return null;
+            }
+
+            if (stats.currentExp + gameModeManager.ExpEarnedFromMatch >= stats.expToNextLv)
+            {
+                levelText.text = "Lv " + (stats.level+1).ToString();
+                OnLevelUp();
             }
 
             yield return new WaitForSeconds(transitionWaitTime);
