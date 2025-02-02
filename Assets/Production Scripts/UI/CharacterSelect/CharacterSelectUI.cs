@@ -746,6 +746,23 @@ namespace Vi.UI
         {
             updateDisplayCharacterRunning = true;
 
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+            {
+                maxHPText.text = characterStats.hp.ToString();
+                maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
+            }
+            else // Set Default values
+            {
+                maxHPText.text = "0000";
+                maxDefenseText.text = "0000";
+            }
+
+            strengthFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Strength) / 100f;
+            vitalityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Vitality) / 100f;
+            dexterityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Dexterity) / 100f;
+            agilityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Agility) / 100f;
+            intelligenceFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Intelligence) / 100f;
+
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
 
@@ -826,23 +843,6 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
-
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
-            {
-                maxHPText.text = characterStats.hp.ToString();
-                maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
-            }
-            else // Set Default values
-            {
-                maxHPText.text = "0000";
-                maxDefenseText.text = "0000";
-            }
-
-            strengthFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Strength) / 100f;
-            vitalityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Vitality) / 100f;
-            dexterityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Dexterity) / 100f;
-            agilityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Agility) / 100f;
-            intelligenceFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Intelligence) / 100f;
 
             if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
             {
