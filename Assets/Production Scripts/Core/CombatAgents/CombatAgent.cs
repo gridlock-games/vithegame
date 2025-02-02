@@ -1647,8 +1647,6 @@ namespace Vi.Core
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
 
-            Debug.Log(HPDamage);
-
             if (runtimeWeapon)
             {
                 foreach (ActionVFX actionVFX in attack.actionVFXList)

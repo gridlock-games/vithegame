@@ -745,6 +745,7 @@ namespace Vi.Core
             foreach (Character character in Characters)
             {
                 yield return GetCharacterInventory(character);
+                yield return GetCharacterAttributes(character._id.ToString());
             }
 
             // This adds all weapons to the inventory if we're in the editor
@@ -848,6 +849,7 @@ namespace Vi.Core
                 }
 
                 yield return GetCharacterInventory(CharacterById._id.ToString());
+                yield return GetCharacterAttributes(CharacterById._id.ToString());
 
                 LastCharacterByIdWasSuccessful = true;
                 IsGettingCharacterById = false;
@@ -1360,6 +1362,7 @@ namespace Vi.Core
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
                         "null", "null", "null", 1,
+                        new CharacterAttributes(),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -1372,6 +1375,7 @@ namespace Vi.Core
                         "null",
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name,
                         "null", 1,
+                        new CharacterAttributes(),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -1412,6 +1416,7 @@ namespace Vi.Core
 
                 equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
                 1,
+                new CharacterAttributes(),
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
@@ -1554,7 +1559,9 @@ namespace Vi.Core
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level, Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
+            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level,
+                CharacterAttributes characterAttributes,
+                Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
                 loadoutPreset1.loadoutSlot = "1";
                 loadoutPreset2.loadoutSlot = "2";
@@ -1571,7 +1578,7 @@ namespace Vi.Core
                 this.beard = beard;
                 this.brows = brows;
                 this.hair = hair;
-                attributes = new CharacterAttributes();
+                attributes = characterAttributes;
                 userId = Singleton.currentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
@@ -1704,6 +1711,63 @@ namespace Vi.Core
                     loadoutPreset4.capeGearItemId, loadoutPreset4.robeGearItemId, loadoutPreset4.weapon1ItemId,
                     loadoutPreset4.weapon2ItemId, loadoutSlot == 3);
 
+                return copy;
+            }
+
+            public enum AttributeType
+            {
+                Strength,
+                Vitality,
+                Agility,
+                Dexterity,
+                Intelligence
+            }
+
+            public int GetStat(AttributeType attributeType)
+            {
+                switch (attributeType)
+                {
+                    case AttributeType.Strength:
+                        return attributes.strength;
+                    case AttributeType.Vitality:
+                        return attributes.vitality;
+                    case AttributeType.Agility:
+                        return attributes.agility;
+                    case AttributeType.Dexterity:
+                        return attributes.dexterity;
+                    case AttributeType.Intelligence:
+                        return attributes.intelligence;
+                    default:
+                        Debug.LogError("Unsure how to handle attribute type " + attributeType);
+                        break;
+                }
+                return 0;
+            }
+
+            public Character SetStat(AttributeType attributeType, int newValue)
+            {
+                Character copy = this;
+                switch (attributeType)
+                {
+                    case AttributeType.Strength:
+                        copy.attributes.strength = newValue;
+                        break;
+                    case AttributeType.Vitality:
+                        copy.attributes.vitality = newValue;
+                        break;
+                    case AttributeType.Agility:
+                        copy.attributes.agility = newValue;
+                        break;
+                    case AttributeType.Dexterity:
+                        copy.attributes.dexterity = newValue;
+                        break;
+                    case AttributeType.Intelligence:
+                        copy.attributes.intelligence = newValue;
+                        break;
+                    default:
+                        Debug.LogError("Unsure how to handle attribute type " + attributeType);
+                        break;
+                }
                 return copy;
             }
         }
@@ -2335,7 +2399,7 @@ namespace Vi.Core
                 //    loadout4Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                 //    raceAndGender);
 
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level,
+                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, attributes,
                     loadout1Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout1Index].ToLoadout(),
                     loadout2Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout2Index].ToLoadout(),
                     loadout3Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout3Index].ToLoadout(),
@@ -2680,7 +2744,6 @@ namespace Vi.Core
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
                     string split = splitStrings[i].Replace("},", ",");
-
                     switch (split)
                     {
                         case "strength":
@@ -2739,7 +2802,7 @@ namespace Vi.Core
                             {
                                 if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
                                 {
-                                    attributes.strength = result;
+                                    attributes.dexterity = result;
                                 }
                                 else
                                 {
@@ -3067,7 +3130,7 @@ namespace Vi.Core
             }
         }
 
-        public struct CharacterAttributesResponse
+        public struct CharacterStats
         {
             public int level;
             public float attack;
@@ -3086,9 +3149,21 @@ namespace Vi.Core
             public float weaponBBaseAtk;
         }
 
-        public CharacterAttributesResponse FindCharacterAttributesInLookup(string characterId)
+        public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
         {
-            if (characterAttributesLookup.TryGetValue(characterId, out CharacterAttributesResponse response))
+            if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public CharacterStats FindCharacterAttributesInLookup(string characterId)
+        {
+            if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
             {
                 return response;
             }
@@ -3099,7 +3174,7 @@ namespace Vi.Core
             }
         }
 
-        private Dictionary<string, CharacterAttributesResponse> characterAttributesLookup = new Dictionary<string, CharacterAttributesResponse>();
+        private Dictionary<string, CharacterStats> characterAttributesLookup = new Dictionary<string, CharacterStats>();
         public IEnumerator GetCharacterAttributes(string characterId)
         {
             UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacterAttribute/" + characterId);
@@ -3114,11 +3189,11 @@ namespace Vi.Core
             string json = getRequest.downloadHandler.text;
             if (characterAttributesLookup.ContainsKey(characterId))
             {
-                characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterAttributesResponse>(json);
+                characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterStats>(json);
             }
             else
             {
-                characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterAttributesResponse>(json));
+                characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterStats>(json));
             }
 
             getRequest.Dispose();
@@ -3135,20 +3210,20 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "/characters/updateCharacterExp", jsonData);
+                putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Put request error in WebRequestManager.UpdateServerProgress()" + putRequest.error);
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterExp()" + putRequest.error);
             }
             putRequest.Dispose();
         }
@@ -3157,6 +3232,55 @@ namespace Vi.Core
         {
             public string charId;
             public int charExp;
+        }
+
+        public IEnumerator UpdateCharacterAttributes(string characterId, CharacterAttributes newAttributes)
+        {
+            UpdateCharacterAttributesPutPayload payload = new UpdateCharacterAttributesPutPayload()
+            {
+                charId = characterId,
+                attributes = newAttributes
+            };
+
+            string json = JsonConvert.SerializeObject(payload);
+            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+            putRequest.SetRequestHeader("Content-Type", "application/json");
+            yield return putRequest.SendWebRequest();
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+                putRequest.SetRequestHeader("Content-Type", "application/json");
+                yield return putRequest.SendWebRequest();
+            }
+
+            if (putRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Put request error in WebRequestManager.UpdateCharacterAttributes()" + putRequest.error);
+            }
+            else
+            {
+                if (characterAttributesLookup.ContainsKey(characterId))
+                {
+                    characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterStats>(putRequest.downloadHandler.text);
+                }
+                else
+                {
+                    characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterStats>(putRequest.downloadHandler.text));
+                }
+            }
+
+            putRequest.Dispose();
+
+            yield return GetCharacterAttributes(characterId);
+        }
+
+        private struct UpdateCharacterAttributesPutPayload
+        {
+            public string charId;
+            public CharacterAttributes attributes;
         }
 
         private void Start()

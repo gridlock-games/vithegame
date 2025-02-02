@@ -16,13 +16,21 @@ namespace Vi.UI
         [Header("Loadout Editor Menu")]
         [SerializeField] private Button[] loadoutButtons;
         [SerializeField] private Camera characterPreviewCamera;
-        [SerializeField] private GameObject gearsSectionParent;
-        [SerializeField] private GameObject characterSectionParent;
-        [SerializeField] private Text characterNameText;
         [SerializeField] private Button openCharacterSectionButton;
         [SerializeField] private Button openGearsSectionButton;
-        [SerializeField] private Text underConstructionAlertText;
-        [SerializeField] private Button[] buttonsThatOpenConstructionAlert;
+
+        [Header("Gears Section")]
+        [SerializeField] private GameObject gearsSectionParent;
+        [SerializeField] private CharacterStatElement[] gearSectionCharacterStatElements;
+
+        [Header("Character Section")]
+        [SerializeField] private GameObject characterSectionParent;
+        [SerializeField] private Text characterNameText;
+        [SerializeField] private Text characterLevelText;
+        [SerializeField] private Text maxHPText;
+        [SerializeField] private Text maxDefenseText;
+        [SerializeField] private Text availableSkillPointsText;
+        [SerializeField] private CharacterStatElement[] charSectionCharacterStatElements;
 
         [Header("Weapon Select Menu")]
         [SerializeField] private WeaponSelectMenu weaponSelectMenu;
@@ -58,28 +66,7 @@ namespace Vi.UI
         private void Start()
         {
             characterNameText.text = attributes.CachedPlayerData.character.name.ToString();
-
             OpenGearsSection();
-
-            underConstructionAlertText.text = "";
-            foreach (Button button in buttonsThatOpenConstructionAlert)
-            {
-                button.onClick.AddListener(OpenConstructionAlert);
-            }
-        }
-
-        private void OpenConstructionAlert()
-        {
-            underConstructionAlertText.text = "Coming Soon!";
-            if (constructionAlertCoroutine != null) { StopCoroutine(constructionAlertCoroutine); }
-            constructionAlertCoroutine = StartCoroutine(ClearConstructionAlert());
-        }
-
-        private Coroutine constructionAlertCoroutine;
-        private IEnumerator ClearConstructionAlert()
-        {
-            yield return new WaitForSeconds(2);
-            underConstructionAlertText.text = "";
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
@@ -87,6 +74,14 @@ namespace Vi.UI
             if (previewObject)
             {
                 previewObject.transform.rotation *= Quaternion.Euler(0, -delta.x * 0.25f, 0);
+            }
+        }
+
+        public void ResetCharStats()
+        {
+            foreach (WebRequestManager.Character.AttributeType value in System.Enum.GetValues(typeof(WebRequestManager.Character.AttributeType)))
+            {
+                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, value, 0);
             }
         }
 
