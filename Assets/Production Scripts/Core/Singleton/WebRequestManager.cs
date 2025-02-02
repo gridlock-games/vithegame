@@ -3133,6 +3133,9 @@ namespace Vi.Core
         public struct CharacterStats
         {
             public int level;
+            public float currentExp;
+            public float expToNextLv;
+            public float nextStatPointRwd;
             public float attack;
             public float mattack;
             public float defense;
@@ -3199,7 +3202,7 @@ namespace Vi.Core
             getRequest.Dispose();
         }
 
-        public IEnumerator UpdateCharacterExp(string characterId, int charExpToAdd)
+        public IEnumerator UpdateCharacterExp(string characterId, float charExpToAdd)
         {
             UpdateCharacterExpPutPayload payload = new UpdateCharacterExpPutPayload()
             {
@@ -3225,13 +3228,33 @@ namespace Vi.Core
             {
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterExp()" + putRequest.error);
             }
+            else
+            {
+                UpdateCharacterExpResponse response = JsonConvert.DeserializeObject<UpdateCharacterExpResponse>(putRequest.downloadHandler.text);
+                if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats stats))
+                {
+                    stats.level = response.currentLv;
+                    stats.expToNextLv = response.expToNextLv;
+                    stats.nextStatPointRwd = response.nextStatPointRwd;
+                    characterAttributesLookup[characterId] = stats;
+                }
+            }
+
             putRequest.Dispose();
         }
 
         private struct UpdateCharacterExpPutPayload
         {
             public string charId;
-            public int charExp;
+            public float charExp;
+        }
+
+        private struct UpdateCharacterExpResponse
+        {
+            public string status;
+            public int expToNextLv;
+            public int nextStatPointRwd;
+            public int currentLv;
         }
 
         public IEnumerator UpdateCharacterAttributes(string characterId, CharacterAttributes newAttributes)

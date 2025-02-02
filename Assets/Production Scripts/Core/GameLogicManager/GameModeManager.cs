@@ -469,7 +469,7 @@ namespace Vi.Core.GameModeManagers
         }
 
         private NetworkList<int> winningPlayerDataIds;
-        public int ExpEarnedFromMatch { get; private set; } = -1;
+        public float ExpEarnedFromMatch { get; private set; } = -1;
         public int TokensEarnedFromMatch { get; private set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
@@ -523,7 +523,7 @@ namespace Vi.Core.GameModeManagers
                     if (playerData.id > 0)
                     {
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
-                        int expAward = playerScore.GetExpReward();
+                        float expAward = playerScore.GetExpReward();
                         expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
                         PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
                     }
@@ -534,7 +534,7 @@ namespace Vi.Core.GameModeManagers
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
-                    int expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                    float expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
                     ExpEarnedFromMatch += expToAward;
                 }
             }
@@ -1231,7 +1231,7 @@ namespace Vi.Core.GameModeManagers
                 isValid = true;
             }
 
-            public int GetExpReward()
+            public float GetExpReward()
             {
                 return cumulativeKills * 5 + cumulativeAssists * 3;
             }

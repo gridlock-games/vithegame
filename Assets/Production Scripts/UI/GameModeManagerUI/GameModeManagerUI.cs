@@ -413,8 +413,9 @@ namespace Vi.UI
 
             gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
-            levelText.text = "Lv " + WebRequestManager.Singleton.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString()).level.ToString();
-            expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString() + " XP";
+            WebRequestManager.CharacterStats stats = WebRequestManager.Singleton.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
+            levelText.text = "Lv " + stats.level.ToString();
+            expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString("F0") + " XP";
 
             float t = 0;
             while (!Mathf.Approximately(t, 1))
@@ -425,14 +426,15 @@ namespace Vi.UI
                 yield return null;
             }
 
-            // TODO change this to be calculated based on exp to next level and current exp earned
-            float maxExpFillAmount = 0.7f;
+            // Calculated based on exp to next level and current exp earned
+            float minExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp);
+            float maxExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv + gameModeManager.ExpEarnedFromMatch, stats.currentExp);
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
-                expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
+                expGainedBar.fillAmount = Mathf.LerpUnclamped(minExpFillAmount, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
                 yield return null;
             }
