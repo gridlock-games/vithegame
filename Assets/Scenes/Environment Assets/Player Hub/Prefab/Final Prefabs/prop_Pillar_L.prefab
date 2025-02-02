@@ -96,6 +96,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4197152935443626441}
+    - targetCorrespondingSourceObject: {fileID: 7410979508658159265, guid: 237b0493d65713c48becc5090bfe9946,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5671315432019780242}
   m_SourcePrefab: {fileID: 100100000, guid: 237b0493d65713c48becc5090bfe9946, type: 3}
 --- !u!1 &3110591392382063890 stripped
 GameObject:
@@ -126,3 +130,26 @@ CapsuleCollider:
   m_Height: 8.219485
   m_Direction: 1
   m_Center: {x: 0.011856496, y: 3.250154, z: 0.0044095516}
+--- !u!1 &4698227672262350562 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7410979508658159265, guid: 237b0493d65713c48becc5090bfe9946,
+    type: 3}
+  m_PrefabInstance: {fileID: 2876220945035372611}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5671315432019780242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698227672262350562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ab644a74c053d940ac736c7f7870ccc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 5
+  fluctuationInterval: 0
+  fluctuationAmount: 0
+  fluctuationDuration: 0
+  rotationDirection: 1
