@@ -422,6 +422,11 @@ namespace Vi.UI
             levelText.text = "Lv " + stats.level.ToString();
             expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString("F0") + " XP";
 
+            // Calculated based on exp to next level and current exp earned
+            float minExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp);
+            float maxExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp + gameModeManager.ExpEarnedFromMatch);
+            expGainedBar.fillAmount = Mathf.LerpUnclamped(minExpFillAmount, maxExpFillAmount, 0);
+
             float t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -431,9 +436,6 @@ namespace Vi.UI
                 yield return null;
             }
 
-            // Calculated based on exp to next level and current exp earned
-            float minExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp);
-            float maxExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv + gameModeManager.ExpEarnedFromMatch, stats.currentExp);
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
