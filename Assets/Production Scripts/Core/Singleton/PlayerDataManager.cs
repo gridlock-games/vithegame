@@ -1766,14 +1766,10 @@ namespace Vi.Core
             if (GetGameMode() != GameMode.None) { return; }
             if (!ContainsId(dataId)) { return; }
 
-            PlayerData playerData = GetPlayerData(dataId);
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(playerData.character._id.ToString(), out var stats))
-            {
-                if (stats.GetAvailableSkillPoints(playerData.character.attributes) <= 0) { return; }
-            }
-
             if (IsServer)
             {
+                PlayerData playerData = GetPlayerData(dataId);
+                if (newAttributes.Equals(playerData.character.attributes)) { return; }
                 WebRequestManager.Character newChar = playerData.character;
                 newChar.attributes = newAttributes;
                 playerData.character = newChar;
@@ -1799,14 +1795,15 @@ namespace Vi.Core
             if (GetGameMode() != GameMode.None) { return; }
             if (!ContainsId(dataId)) { return; }
 
-            PlayerData playerData = GetPlayerData(dataId);
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(playerData.character._id.ToString(), out var stats))
-            {
-                if (stats.GetAvailableSkillPoints(playerData.character.attributes) <= 0) { return; }
-            }
+            //PlayerData playerData = GetPlayerData(dataId);
+            //if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(playerData.character._id.ToString(), out var stats))
+            //{
+            //    if (stats.GetAvailableSkillPoints(playerData.character.attributes) <= 0) { return; }
+            //}
 
             if (IsServer)
             {
+                PlayerData playerData = GetPlayerData(dataId);
                 WebRequestManager.Character newChar = playerData.character.SetStat(attributeType, newValue);
                 playerData.character = newChar;
                 SetPlayerData(playerData);

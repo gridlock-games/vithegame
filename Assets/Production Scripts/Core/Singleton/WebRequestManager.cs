@@ -2730,13 +2730,23 @@ namespace Vi.Core
             }
         }
 
-        public struct CharacterAttributes : INetworkSerializable
+        public struct CharacterAttributes : INetworkSerializable, System.IEquatable<CharacterAttributes>
         {
             public int strength;
             public int vitality;
             public int agility;
             public int dexterity;
             public int intelligence;
+
+            public string ToLogString()
+            {
+                return strength + " " + vitality + " " + agility + " " + dexterity + " " + intelligence;
+                //return "Strength: " + strength
+                //    + "\nVitality: " + vitality
+                //    + "\nAgility: " + agility
+                //    + "\nDexterity: " + dexterity
+                //    + "\nIntelligence: " + intelligence;
+            }
 
             public static CharacterAttributes FromCharacterJsonExtract(List<string> splitStrings)
             {
@@ -2843,6 +2853,15 @@ namespace Vi.Core
                 serializer.SerializeValue(ref agility);
                 serializer.SerializeValue(ref dexterity);
                 serializer.SerializeValue(ref intelligence);
+            }
+
+            public bool Equals(CharacterAttributes other)
+            {
+                return strength == other.strength
+                    & vitality == other.vitality
+                    & agility == other.agility
+                    & dexterity == other.dexterity
+                    & intelligence == other.intelligence;
             }
         }
 

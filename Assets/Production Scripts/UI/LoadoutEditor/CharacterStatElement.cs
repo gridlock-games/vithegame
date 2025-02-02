@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Core.CombatAgents;
-using static Vi.Core.PlayerDataManager;
+using UnityEngine.Events;
 
 namespace Vi.UI
 {
@@ -14,7 +14,12 @@ namespace Vi.UI
         [SerializeField] private Image progressBar;
         [SerializeField] private Button addPointButton;
 
+        public WebRequestManager.Character.AttributeType AttributeType { get { return attributeType; } }
+        public Button GetAddPointButton() { return addPointButton; }
+
         public int CurrentStatCount { get; set; }
+
+        public UnityAction<CharacterStatElement, int> OnStatCountChange;
 
         private void OnEnable()
         {
@@ -23,7 +28,8 @@ namespace Vi.UI
             UpdateDisplay();
 
             if (!addPointButton) { return; }
-            addPointButton.gameObject.SetActive(PlayerDataManager.Singleton.GetGameMode() == GameMode.None);
+            addPointButton.interactable = CurrentStatCount < 100 & GetAvailableSkillPoints() > 0;
+            addPointButton.gameObject.SetActive(PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None);
             addPointButton.onClick.AddListener(UpdateAttribute);
         }
 
@@ -33,7 +39,7 @@ namespace Vi.UI
             addPointButton.onClick.RemoveListener(UpdateAttribute);
         }
 
-        private void UpdateAttribute()
+        private int GetAvailableSkillPoints()
         {
             int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             int availableSkillPoints = 0;
@@ -42,24 +48,33 @@ namespace Vi.UI
                 if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(WebRequestManager.Singleton.Characters[characterIndex]._id.ToString(), out var stats))
                 {
                     availableSkillPoints = stats.GetAvailableSkillPoints(WebRequestManager.Singleton.Characters[characterIndex].attributes);
-                    if (availableSkillPoints <= 0) { return; }
+                    return availableSkillPoints;
                 }
             }
+            return 0;
+        }
 
-            if (CurrentStatCount >= 100) { return; }
+        private void UpdateAttribute()
+        {
+            addPointButton.interactable = CurrentStatCount < 100 & GetAvailableSkillPoints() > 0;
+            if (!addPointButton.interactable) { return; }
 
             CurrentStatCount++;
             PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, attributeType, CurrentStatCount);
 
             UpdateDisplay();
 
-            addPointButton.interactable = CurrentStatCount < 100 & availableSkillPoints > 0;
-
+            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             if (characterIndex != -1)
             {
                 WebRequestManager.Character newCharacter = PlayerDataManager.Singleton.LocalPlayerData.character.SetStat(attributeType, CurrentStatCount);
                 WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
             }
+
+            int availableStatPoints = GetAvailableSkillPoints();
+            addPointButton.interactable = CurrentStatCount < 100 & availableStatPoints > 0;
+
+            OnStatCountChange?.Invoke(this, availableStatPoints);
         }
 
         public void UpdateDisplay()

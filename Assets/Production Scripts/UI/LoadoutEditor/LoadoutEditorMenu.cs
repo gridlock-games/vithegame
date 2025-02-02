@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private Text maxHPText;
         [SerializeField] private Text maxDefenseText;
         [SerializeField] private Text availableSkillPointsText;
+        [SerializeField] private Button resetStatsButton;
         [SerializeField] private CharacterStatElement[] charSectionCharacterStatElements;
 
         [Header("Weapon Select Menu")]
@@ -75,6 +76,7 @@ namespace Vi.UI
                 maxHPText.text = characterStats.hp.ToString();
                 maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
                 availableSkillPointsText.text = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes).ToString();
+                resetStatsButton.interactable = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes) < characterStats.nextStatPointRwd;
             }
             else // Set Default values
             {
@@ -82,6 +84,29 @@ namespace Vi.UI
                 maxHPText.text = "0000";
                 maxDefenseText.text = "0000";
                 availableSkillPointsText.text = "0";
+                resetStatsButton.interactable = true;
+            }
+
+            foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
+            {
+                characterStatElement.OnStatCountChange += (statEle, availableSkillPoints) =>
+                {
+                    availableSkillPointsText.text = availableSkillPoints.ToString();
+                    foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
+                    {
+                        if (characterStatElement == statEle) { continue; }
+                        characterStatElement.GetAddPointButton().interactable = availableSkillPoints > 0;
+                    }
+
+                    if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+                    {
+                        resetStatsButton.interactable = availableSkillPoints < characterStats.nextStatPointRwd;
+                    }
+                    else
+                    {
+                        resetStatsButton.interactable = true;
+                    }
+                };
             }
         }
 
@@ -95,10 +120,7 @@ namespace Vi.UI
 
         public void ResetCharStats()
         {
-            foreach (WebRequestManager.Character.AttributeType value in System.Enum.GetValues(typeof(WebRequestManager.Character.AttributeType)))
-            {
-                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new WebRequestManager.CharacterAttributes());
-            }
+            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new WebRequestManager.CharacterAttributes());
 
             int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             if (characterIndex != -1)
@@ -118,7 +140,20 @@ namespace Vi.UI
             {
                 element.CurrentStatCount = 0;
                 element.UpdateDisplay();
+                element.GetAddPointButton().interactable = true;
             }
+
+            string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            {
+                availableSkillPointsText.text = characterStats.nextStatPointRwd.ToString();
+            }
+            else // Set Default values
+            {
+                availableSkillPointsText.text = "0";
+            }
+
+            resetStatsButton.interactable = false;
         }
 
         public void OpenCharacterSection()
@@ -135,6 +170,13 @@ namespace Vi.UI
             gearsSectionParent.SetActive(true);
             openCharacterSectionButton.interactable = true;
             openGearsSectionButton.interactable = false;
+
+            // Refresh character stat display
+            //foreach (CharacterStatElement characterStatElement in gearSectionCharacterStatElements)
+            //{
+            //    characterStatElement.CurrentStatCount = PlayerDataManager.Singleton.LocalPlayerData.character.GetStat(characterStatElement.AttributeType);
+            //    characterStatElement.UpdateDisplay();
+            //}
         }
 
         [SerializeField] private Light previewLightPrefab;
