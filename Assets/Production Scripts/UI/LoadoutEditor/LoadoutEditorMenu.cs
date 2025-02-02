@@ -97,7 +97,27 @@ namespace Vi.UI
         {
             foreach (WebRequestManager.Character.AttributeType value in System.Enum.GetValues(typeof(WebRequestManager.Character.AttributeType)))
             {
-                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, value, 0);
+                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new WebRequestManager.CharacterAttributes());
+            }
+
+            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            if (characterIndex != -1)
+            {
+                var newCharacter = WebRequestManager.Singleton.Characters[characterIndex];
+                newCharacter.attributes = new WebRequestManager.CharacterAttributes();
+                WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
+            }
+
+            foreach (CharacterStatElement element in gearSectionCharacterStatElements)
+            {
+                element.CurrentStatCount = 0;
+                element.UpdateDisplay();
+            }
+
+            foreach (CharacterStatElement element in charSectionCharacterStatElements)
+            {
+                element.CurrentStatCount = 0;
+                element.UpdateDisplay();
             }
         }
 
@@ -120,11 +140,16 @@ namespace Vi.UI
         [SerializeField] private Light previewLightPrefab;
 
         private GameObject previewLightInstance;
-
         private GameObject previewObject;
-        private void CreatePreview()
+        private WebRequestManager.Loadout lastLoadoutEvaluated;
+        private void CreatePreview(bool force)
         {
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+
+            if (!force)
+            {
+                if (character.GetActiveLoadout().EqualsIgnoringSlot(lastLoadoutEvaluated)) { return; }
+            }
 
             if (!previewObject)
             {
@@ -156,6 +181,7 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+            lastLoadoutEvaluated = character.GetActiveLoadout();
         }
 
         private void OnDestroy()
@@ -186,7 +212,7 @@ namespace Vi.UI
         {
             if (characterPreviewCamera) { characterPreviewCamera.enabled = true; }
 
-            CreatePreview();
+            CreatePreview(true);
             int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
@@ -223,7 +249,7 @@ namespace Vi.UI
         {
             if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
             {
-                CreatePreview();
+                CreatePreview(false);
             }
         }
 
