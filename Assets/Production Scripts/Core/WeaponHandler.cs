@@ -11,6 +11,7 @@ using Vi.Core.Weapons;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core
 {
@@ -73,7 +74,11 @@ namespace Vi.Core
             else
             {
                 combatAgent.AnimationHandler.Animator.runtimeAnimatorController = AnimatorOverrideControllerInstance;
-                combatAgent.AnimationHandler.Animator.SetFloat("MVPSpeed", weaponInstance.GetMVPAnimationSpeed());
+                
+                if (combatAgent is Attributes)
+                {
+                    combatAgent.AnimationHandler.Animator.SetFloat("MVPSpeed", weaponInstance.GetMVPAnimationSpeed());
+                }
             }
             
             EquipWeapon();
