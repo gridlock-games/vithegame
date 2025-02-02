@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
-using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -1475,7 +1474,6 @@ namespace Vi.UI
         {
             if (UIElementHighlightInstance) { Destroy(UIElementHighlightInstance); }
             UIElementHighlightInstance = Instantiate(UIElementHighlightPrefab.gameObject, parentRT, true);
-            Debug.Log("Create");
         }
 
         public void RandomizeCharacter()
