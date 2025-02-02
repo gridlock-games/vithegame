@@ -3135,7 +3135,7 @@ namespace Vi.Core
             public int level;
             public float currentExp;
             public float expToNextLv;
-            public float nextStatPointRwd;
+            public int nextStatPointRwd;
             public float attack;
             public float mattack;
             public float defense;
@@ -3150,6 +3150,18 @@ namespace Vi.Core
             public float baseMatk;
             public float weaponABaseAtk;
             public float weaponBBaseAtk;
+
+            public int GetAvailableSkillPoints(CharacterAttributes characterAttributes)
+            {
+                int value = nextStatPointRwd;
+                value -= characterAttributes.strength;
+                value -= characterAttributes.vitality;
+                value -= characterAttributes.agility;
+                value -= characterAttributes.dexterity;
+                value -= characterAttributes.intelligence;
+                value = Mathf.Max(value, 0);
+                return value;
+            }
         }
 
         public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
@@ -3252,7 +3264,7 @@ namespace Vi.Core
         private struct UpdateCharacterExpResponse
         {
             public string status;
-            public int expToNextLv;
+            public float expToNextLv;
             public int nextStatPointRwd;
             public int currentLv;
         }

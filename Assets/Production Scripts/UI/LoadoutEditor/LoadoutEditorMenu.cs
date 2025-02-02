@@ -67,6 +67,22 @@ namespace Vi.UI
         {
             characterNameText.text = attributes.CachedPlayerData.character.name.ToString();
             OpenGearsSection();
+
+            string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            {
+                characterLevelText.text = characterStats.level.ToString();
+                maxHPText.text = characterStats.hp.ToString();
+                maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
+                availableSkillPointsText.text = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes).ToString();
+            }
+            else // Set Default values
+            {
+                characterLevelText.text = "1";
+                maxHPText.text = "0000";
+                maxDefenseText.text = "0000";
+                availableSkillPointsText.text = "0";
+            }
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
