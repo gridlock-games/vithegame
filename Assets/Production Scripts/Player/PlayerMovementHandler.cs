@@ -9,7 +9,6 @@ using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using System.Collections;
-using static Vi.Core.WebRequestManager;
 using Unity.Netcode.Components;
 
 namespace Vi.Player
@@ -905,6 +904,8 @@ namespace Vi.Player
 
         private IEnumerator AutomatedConnectToRandomLobby()
         {
+            Debug.Log("Autoconnecting to random lobby");
+
             if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
             if (!IsLocalPlayer) { yield break; }
 

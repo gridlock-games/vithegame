@@ -230,6 +230,7 @@ namespace Vi.UI
                 {
                     if (rand < 0.1f)
                     {
+                        Debug.Log("Returning to Hub on Random Chance");
                         returnToHubButton.onClick.Invoke();
                         yield break;
                     }
@@ -238,18 +239,22 @@ namespace Vi.UI
             
             yield return new WaitUntil(() => lockCharacterButton.gameObject.activeSelf & lockCharacterButton.interactable);
 
+            Debug.Log("Locking Character");
             lockCharacterButton.onClick.Invoke();
 
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
 
-            if (leftTeamParent.addBotButton.gameObject.activeSelf & leftTeamParent.addBotButton.interactable)
+            if (PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count == 1)
             {
+                yield return new WaitUntil(() => leftTeamParent.addBotButton.gameObject.activeSelf & leftTeamParent.addBotButton.interactable);
+                Debug.Log("Adding a bot");
                 leftTeamParent.addBotButton.onClick.Invoke();
             }
-            
-            yield return new WaitForSeconds(1);
+
+            yield return new WaitForSeconds(0.5f);
             yield return new WaitUntil(() => startGameButton.gameObject.activeSelf & startGameButton.interactable);
 
+            Debug.Log("Starting Game");
             startGameButton.onClick.Invoke();
         }
 
