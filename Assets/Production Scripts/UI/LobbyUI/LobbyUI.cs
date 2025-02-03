@@ -214,6 +214,24 @@ namespace Vi.UI
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(18.07f, 0, 0);
                 characterPreviewImage.texture = characterPreviewCamera.targetTexture;
             }
+
+            StartCoroutine(AutomatedClientLogic());
+        }
+
+        private IEnumerator AutomatedClientLogic()
+        {
+            if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+
+            yield return new WaitForSeconds(5);
+
+            yield return new WaitUntil(() => lockCharacterButton.gameObject.activeSelf & lockCharacterButton.interactable);
+
+            lockCharacterButton.onClick.Invoke();
+
+            yield return new WaitForSeconds(1);
+            yield return new WaitUntil(() => startGameButton.gameObject.activeSelf & startGameButton.interactable);
+
+            startGameButton.onClick.Invoke();
         }
 
         private void SyncRoomSettingsFields()
