@@ -3348,7 +3348,7 @@ namespace Vi.Core
         private IEnumerator Initialize()
         {
 #if UNITY_SERVER && !UNITY_EDITOR
-            if (FasterPlayerPrefs.IsAutomatedClient)
+            if (!FasterPlayerPrefs.IsAutomatedClient)
             {
                 yield return GetPublicIP();
                 APIURL = "http://" + PublicIP + ":80/";
