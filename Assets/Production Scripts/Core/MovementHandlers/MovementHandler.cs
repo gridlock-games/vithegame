@@ -372,6 +372,11 @@ namespace Vi.Core.MovementHandlers
 			bool shouldUseZoomSensMultiplier = false;
             if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }
             
+			if (FasterPlayerPrefs.IsAutomatedClient)
+			{
+                lookInput = Random.insideUnitCircle * Random.Range(0f, 30);
+            }
+
 			Vector2 adjustedLookInput = shouldUseZoomSensMultiplier ? lookInput * zoomSensitivityMultiplier : lookInput;
 			adjustedLookInput *= lookSensitivity;
 			adjustedLookInput /= QualitySettings.resolutionScalingFixedDPIFactor > 0 ? QualitySettings.resolutionScalingFixedDPIFactor : 1;
@@ -397,6 +402,12 @@ namespace Vi.Core.MovementHandlers
 			{
 				if (!moveAction.enabled) { return Vector2.zero; }
 			}
+
+			if (FasterPlayerPrefs.IsAutomatedClient)
+			{
+				moveInput = Random.insideUnitCircle * Random.Range(0f, 1);
+			}
+
 			return moveInput;
 		}
 
