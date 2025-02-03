@@ -222,8 +222,22 @@ namespace Vi.UI
         {
             if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
 
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(8);
 
+            // Randomly return to hub if possible
+            float rand = Random.Range(0f, 1);
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                if (WebRequestManager.Singleton.HubServers[0].port == "7777")
+                {
+                    if (rand < 0.3f)
+                    {
+                        returnToHubButton.onClick.Invoke();
+                        yield break;
+                    }
+                }
+            }
+            
             yield return new WaitUntil(() => lockCharacterButton.gameObject.activeSelf & lockCharacterButton.interactable);
 
             lockCharacterButton.onClick.Invoke();

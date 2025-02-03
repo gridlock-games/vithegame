@@ -877,9 +877,22 @@ namespace Vi.Player
             NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
 
             StartCoroutine(AutomatedClientLogic());
+            StartCoroutine(AutomatedClientMovementLogic());
         }
 
         #region Automated Client Logic
+        private IEnumerator AutomatedClientMovementLogic()
+        {
+            if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+
+            while (true)
+            {
+                SetLookInput(Random.insideUnitCircle * Random.Range(-2f, 2));
+                SetMoveInput(Random.insideUnitCircle * Random.Range(-1f, 1));
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+
         private IEnumerator AutomatedClientLogic()
         {
             if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
