@@ -8,6 +8,7 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Collections;
 
 namespace Vi.Player
 {
@@ -874,7 +875,142 @@ namespace Vi.Player
             base.OnSpawnFromPool();
             interpolationRigidbody.transform.SetParent(null, true);
             NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
+
+            StartCoroutine(AutomatedClientLogic());
         }
+
+        #region Automated Client Logic
+        private IEnumerator AutomatedClientLogic()
+        {
+            if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+
+            yield return new WaitUntil(() => IsSpawned);
+
+            float chargeAttackDuration = 1;
+            float chargeWaitDuration = 2;
+            float lastChargeAttackTime = Time.time;
+
+            float dodgeWaitDuration = 5;
+            float lastDodgeTime = Time.time;
+
+            float weaponSwapDuration = 20;
+            float lastWeaponSwapTime = Time.time;
+
+            float abilityWaitDuration = 3;
+            float lastAbilityTime = Time.time;
+
+            float bufferTime = 0.5f;
+
+            while (true)
+            {
+                if (Time.time - lastChargeAttackTime > chargeWaitDuration)
+                {
+                    weaponHandler.HeavyAttack(true);
+
+                    yield return new WaitForSeconds(chargeAttackDuration);
+
+                    lastChargeAttackTime = Time.time;
+                    weaponHandler.HeavyAttack(false);
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastWeaponSwapTime > weaponSwapDuration | combatAgent.LoadoutManager.WeaponNameThatCanFlashAttack != null)
+                {
+                    combatAgent.LoadoutManager.SwitchWeapon();
+                    lastWeaponSwapTime = Time.time;
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (weaponHandler.CanADS)
+                {
+                    weaponHandler.AimDownSights(true);
+                    weaponHandler.LightAttack(true);
+                }
+                else
+                {
+                    weaponHandler.LightAttack(true);
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastDodgeTime > dodgeWaitDuration)
+                {
+                    OnDodge();
+                    lastDodgeTime = Time.time;
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastAbilityTime > abilityWaitDuration)
+                {
+                    if (combatAgent.GetRage() / combatAgent.GetMaxRage() >= 1)
+                    {
+                        combatAgent.OnActivateRage();
+                        lastAbilityTime = Time.time;
+                    }
+                    else
+                    {
+                        List<int> abilitiesOffCooldown = new List<int>();
+                        for (int i = 1; i < 5; i++)
+                        {
+                            switch (i)
+                            {
+                                case 1:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility1()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 2:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility2()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 3:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility3()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 4:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility4()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                default:
+                                    Debug.LogError("Unsure how to handle ability num " + i);
+                                    break;
+                            }
+                        }
+
+                        if (abilitiesOffCooldown.Count == 0)
+                        {
+                            lastAbilityTime = Time.time;
+                        }
+                        else
+                        {
+                            int abilityNum = abilitiesOffCooldown[Random.Range(0, abilitiesOffCooldown.Count)];
+                            if (abilityNum == 1)
+                            {
+                                weaponHandler.Ability1(true);
+                            }
+                            else if (abilityNum == 2)
+                            {
+                                weaponHandler.Ability2(true);
+                            }
+                            else if (abilityNum == 3)
+                            {
+                                weaponHandler.Ability3(true);
+                            }
+                            else if (abilityNum == 4)
+                            {
+                                weaponHandler.Ability4(true);
+                            }
+                            else
+                            {
+                                Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
+                            }
+                            lastAbilityTime = Time.time;
+                        }
+                    }
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+            }
+        }
+        #endregion
 
         protected override void OnReturnToPool()
         {

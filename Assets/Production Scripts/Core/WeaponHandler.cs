@@ -942,7 +942,7 @@ namespace Vi.Core
 
         public void LightAttack(bool isPressed)
         {
-            if (IsLocalPlayer)
+            if (IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
             {
                 if (lightAttackMode == "PRESS")
                 {
@@ -1053,7 +1053,7 @@ namespace Vi.Core
         public void AimDownSights(bool isPressed)
         {
             if (!CanADS) { Debug.LogWarning("Calling AimDownSights() but we can't ADS!"); return; }
-            if (IsLocalPlayer)
+            if (IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
             {
                 if (zoomMode == "TOGGLE")
                 {
@@ -1159,7 +1159,7 @@ namespace Vi.Core
 
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX & IsLocalPlayer)
+                if (actionClip.previewActionVFX & IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
                 {
                     if (isPressed) // If we are holding down the key
                     {
@@ -1209,7 +1209,7 @@ namespace Vi.Core
 
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX & IsLocalPlayer)
+                if (actionClip.previewActionVFX & IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
                 {
                     if (isPressed) // If we are holding down the key
                     {
@@ -1259,7 +1259,7 @@ namespace Vi.Core
 
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX & IsLocalPlayer)
+                if (actionClip.previewActionVFX & IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
                 {
                     if (isPressed) // If we are holding down the key
                     {
@@ -1309,7 +1309,7 @@ namespace Vi.Core
 
             if (actionClip != null)
             {
-                if (actionClip.previewActionVFX & IsLocalPlayer)
+                if (actionClip.previewActionVFX & IsLocalPlayer & !FasterPlayerPrefs.IsAutomatedClient)
                 {
                     if (isPressed) // If we are holding down the key
                     {
