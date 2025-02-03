@@ -238,8 +238,8 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
-        private const string automatedClientUsername = "roxasodale91";
-        private const string automatedClientPassword = "123456";
+        private const string automatedClientUsername = "LightPat";
+        private const string automatedClientPassword = "patrick11";
 
         private bool startAutomatedClientCalled;
 
@@ -249,6 +249,7 @@ namespace Vi.UI
             startAutomatedClientCalled = true;
             AudioListener.volume = 0;
 
+            FasterPlayerPrefs.IsAutomatedClient = true;
             StartCoroutine(LaunchAutoClient());
         }
 
