@@ -475,6 +475,12 @@ namespace Vi.Core.GameModeManagers
         {
             if (!current) { return; }
 
+            if (FasterPlayerPrefs.IsAutomatedClient)
+            {
+                ReturnToHub();
+                return;
+            }
+
             StartCoroutine(AwardExpBasedOnWin());
 
             if (IsClient)
@@ -537,6 +543,33 @@ namespace Vi.Core.GameModeManagers
                     float expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
                     ExpEarnedFromMatch += expToAward;
                 }
+            }
+        }
+
+        private void ReturnToHub()
+        {
+            Debug.Log("[AUTOMATED CLIENT] Returning to Hub on Game Over");
+
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
+            PersistentLocalObjects.Singleton.StartCoroutine(ReturnToHubCoroutine());
+        }
+
+        private IEnumerator ReturnToHubCoroutine()
+        {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.WasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.StartClient();
             }
         }
 
