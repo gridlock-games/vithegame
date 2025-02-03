@@ -895,16 +895,19 @@ namespace Vi.Player
                 SetMoveInput(Random.insideUnitCircle * Random.Range(-1f, 1));
                 yield return new WaitForSeconds(0.25f);
 
-                if (Time.time - startTime > 15)
+                if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(AutomatedConnectToRandomLobby());
+                    if (Time.time - startTime > 15)
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(AutomatedConnectToRandomLobby());
+                    }
                 }
             }
         }
 
         private IEnumerator AutomatedConnectToRandomLobby()
         {
-            Debug.Log("Autoconnecting to random lobby");
+            Debug.Log("[AUTOMATED CLIENT] Autoconnecting to random lobby");
 
             if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
             if (!IsLocalPlayer) { yield break; }

@@ -548,7 +548,7 @@ namespace Vi.Core.GameModeManagers
 
         private void ReturnToHub()
         {
-            Debug.Log("Returning to Hub on Game Over");
+            Debug.Log("[AUTOMATED CLIENT] Returning to Hub on Game Over");
 
             if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
 
