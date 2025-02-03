@@ -243,6 +243,13 @@ namespace Vi.UI
             lockCharacterButton.onClick.Invoke();
 
             yield return new WaitForSeconds(1);
+
+            if (leftTeamParent.addBotButton.gameObject.activeSelf & leftTeamParent.addBotButton.interactable)
+            {
+                leftTeamParent.addBotButton.onClick.Invoke();
+            }
+            
+            yield return new WaitForSeconds(1);
             yield return new WaitUntil(() => startGameButton.gameObject.activeSelf & startGameButton.interactable);
 
             startGameButton.onClick.Invoke();
