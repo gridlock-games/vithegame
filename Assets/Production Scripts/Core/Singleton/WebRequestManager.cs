@@ -2730,13 +2730,23 @@ namespace Vi.Core
             }
         }
 
-        public struct CharacterAttributes : INetworkSerializable
+        public struct CharacterAttributes : INetworkSerializable, System.IEquatable<CharacterAttributes>
         {
             public int strength;
             public int vitality;
             public int agility;
             public int dexterity;
             public int intelligence;
+
+            public string ToLogString()
+            {
+                return strength + " " + vitality + " " + agility + " " + dexterity + " " + intelligence;
+                //return "Strength: " + strength
+                //    + "\nVitality: " + vitality
+                //    + "\nAgility: " + agility
+                //    + "\nDexterity: " + dexterity
+                //    + "\nIntelligence: " + intelligence;
+            }
 
             public static CharacterAttributes FromCharacterJsonExtract(List<string> splitStrings)
             {
@@ -2843,6 +2853,15 @@ namespace Vi.Core
                 serializer.SerializeValue(ref agility);
                 serializer.SerializeValue(ref dexterity);
                 serializer.SerializeValue(ref intelligence);
+            }
+
+            public bool Equals(CharacterAttributes other)
+            {
+                return strength == other.strength
+                    & vitality == other.vitality
+                    & agility == other.agility
+                    & dexterity == other.dexterity
+                    & intelligence == other.intelligence;
             }
         }
 
@@ -3133,6 +3152,9 @@ namespace Vi.Core
         public struct CharacterStats
         {
             public int level;
+            public float currentExp;
+            public float expToNextLv;
+            public int nextStatPointRwd;
             public float attack;
             public float mattack;
             public float defense;
@@ -3147,6 +3169,18 @@ namespace Vi.Core
             public float baseMatk;
             public float weaponABaseAtk;
             public float weaponBBaseAtk;
+
+            public int GetAvailableSkillPoints(CharacterAttributes characterAttributes)
+            {
+                int value = nextStatPointRwd;
+                value -= characterAttributes.strength;
+                value -= characterAttributes.vitality;
+                value -= characterAttributes.agility;
+                value -= characterAttributes.dexterity;
+                value -= characterAttributes.intelligence;
+                value = Mathf.Max(value, 0);
+                return value;
+            }
         }
 
         public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
@@ -3199,7 +3233,7 @@ namespace Vi.Core
             getRequest.Dispose();
         }
 
-        public IEnumerator UpdateCharacterExp(string characterId, int charExpToAdd)
+        public IEnumerator UpdateCharacterExp(string characterId, float charExpToAdd)
         {
             UpdateCharacterExpPutPayload payload = new UpdateCharacterExpPutPayload()
             {
@@ -3225,13 +3259,33 @@ namespace Vi.Core
             {
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterExp()" + putRequest.error);
             }
+            else
+            {
+                UpdateCharacterExpResponse response = JsonConvert.DeserializeObject<UpdateCharacterExpResponse>(putRequest.downloadHandler.text);
+                if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats stats))
+                {
+                    stats.level = response.currentLv;
+                    stats.expToNextLv = response.expToNextLv;
+                    stats.nextStatPointRwd = response.nextStatPointRwd;
+                    characterAttributesLookup[characterId] = stats;
+                }
+            }
+
             putRequest.Dispose();
         }
 
         private struct UpdateCharacterExpPutPayload
         {
             public string charId;
-            public int charExp;
+            public float charExp;
+        }
+
+        private struct UpdateCharacterExpResponse
+        {
+            public string status;
+            public float expToNextLv;
+            public int nextStatPointRwd;
+            public int currentLv;
         }
 
         public IEnumerator UpdateCharacterAttributes(string characterId, CharacterAttributes newAttributes)

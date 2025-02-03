@@ -30,6 +30,7 @@ namespace Vi.UI
         [SerializeField] private Text maxHPText;
         [SerializeField] private Text maxDefenseText;
         [SerializeField] private Text availableSkillPointsText;
+        [SerializeField] private Button resetStatsButton;
         [SerializeField] private CharacterStatElement[] charSectionCharacterStatElements;
 
         [Header("Weapon Select Menu")]
@@ -67,6 +68,46 @@ namespace Vi.UI
         {
             characterNameText.text = attributes.CachedPlayerData.character.name.ToString();
             OpenGearsSection();
+
+            string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            {
+                characterLevelText.text = characterStats.level.ToString();
+                maxHPText.text = characterStats.hp.ToString();
+                maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
+                availableSkillPointsText.text = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes).ToString();
+                resetStatsButton.interactable = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes) < characterStats.nextStatPointRwd;
+            }
+            else // Set Default values
+            {
+                characterLevelText.text = "1";
+                maxHPText.text = "0000";
+                maxDefenseText.text = "0000";
+                availableSkillPointsText.text = "0";
+                resetStatsButton.interactable = true;
+            }
+
+            foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
+            {
+                characterStatElement.OnStatCountChange += (statEle, availableSkillPoints) =>
+                {
+                    availableSkillPointsText.text = availableSkillPoints.ToString();
+                    foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
+                    {
+                        if (characterStatElement == statEle) { continue; }
+                        characterStatElement.GetAddPointButton().interactable = availableSkillPoints > 0;
+                    }
+
+                    if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+                    {
+                        resetStatsButton.interactable = availableSkillPoints < characterStats.nextStatPointRwd;
+                    }
+                    else
+                    {
+                        resetStatsButton.interactable = true;
+                    }
+                };
+            }
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
@@ -79,10 +120,40 @@ namespace Vi.UI
 
         public void ResetCharStats()
         {
-            foreach (WebRequestManager.Character.AttributeType value in System.Enum.GetValues(typeof(WebRequestManager.Character.AttributeType)))
+            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new WebRequestManager.CharacterAttributes());
+
+            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            if (characterIndex != -1)
             {
-                PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, value, 0);
+                var newCharacter = WebRequestManager.Singleton.Characters[characterIndex];
+                newCharacter.attributes = new WebRequestManager.CharacterAttributes();
+                WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
             }
+
+            foreach (CharacterStatElement element in gearSectionCharacterStatElements)
+            {
+                element.CurrentStatCount = 0;
+                element.UpdateDisplay();
+            }
+
+            foreach (CharacterStatElement element in charSectionCharacterStatElements)
+            {
+                element.CurrentStatCount = 0;
+                element.UpdateDisplay();
+                element.GetAddPointButton().interactable = true;
+            }
+
+            string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            {
+                availableSkillPointsText.text = characterStats.nextStatPointRwd.ToString();
+            }
+            else // Set Default values
+            {
+                availableSkillPointsText.text = "0";
+            }
+
+            resetStatsButton.interactable = false;
         }
 
         public void OpenCharacterSection()
@@ -99,16 +170,28 @@ namespace Vi.UI
             gearsSectionParent.SetActive(true);
             openCharacterSectionButton.interactable = true;
             openGearsSectionButton.interactable = false;
+
+            // Refresh character stat display
+            //foreach (CharacterStatElement characterStatElement in gearSectionCharacterStatElements)
+            //{
+            //    characterStatElement.CurrentStatCount = PlayerDataManager.Singleton.LocalPlayerData.character.GetStat(characterStatElement.AttributeType);
+            //    characterStatElement.UpdateDisplay();
+            //}
         }
 
         [SerializeField] private Light previewLightPrefab;
 
         private GameObject previewLightInstance;
-
         private GameObject previewObject;
-        private void CreatePreview()
+        private WebRequestManager.Loadout lastLoadoutEvaluated;
+        private void CreatePreview(bool force)
         {
             WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+
+            if (!force)
+            {
+                if (character.GetActiveLoadout().EqualsIgnoringSlot(lastLoadoutEvaluated)) { return; }
+            }
 
             if (!previewObject)
             {
@@ -140,6 +223,7 @@ namespace Vi.UI
             }
 
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(character.raceAndGender, character.GetActiveLoadout(), character._id.ToString());
+            lastLoadoutEvaluated = character.GetActiveLoadout();
         }
 
         private void OnDestroy()
@@ -170,7 +254,7 @@ namespace Vi.UI
         {
             if (characterPreviewCamera) { characterPreviewCamera.enabled = true; }
 
-            CreatePreview();
+            CreatePreview(true);
             int activeLoadoutSlot = 0;
             for (int i = 0; i < loadoutButtons.Length; i++)
             {
@@ -207,7 +291,7 @@ namespace Vi.UI
         {
             if (PlayerDataManager.Singleton.DataListWasUpdatedThisFrame)
             {
-                CreatePreview();
+                CreatePreview(false);
             }
         }
 

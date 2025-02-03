@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Vi.Core;
 using Vi.Core.CombatAgents;
-using static Vi.Core.PlayerDataManager;
+using UnityEngine.Events;
 
 namespace Vi.UI
 {
@@ -14,15 +14,22 @@ namespace Vi.UI
         [SerializeField] private Image progressBar;
         [SerializeField] private Button addPointButton;
 
-        private int currentStatCount;
+        public WebRequestManager.Character.AttributeType AttributeType { get { return attributeType; } }
+        public Button GetAddPointButton() { return addPointButton; }
+
+        public int CurrentStatCount { get; set; }
+
+        public UnityAction<CharacterStatElement, int> OnStatCountChange;
 
         private void OnEnable()
         {
             headerText.text = attributeType.ToString().ToUpper();
-            currentStatCount = PlayerDataManager.Singleton.LocalPlayerData.character.GetStat(attributeType);
+            CurrentStatCount = PlayerDataManager.Singleton.LocalPlayerData.character.GetStat(attributeType);
             UpdateDisplay();
 
             if (!addPointButton) { return; }
+            addPointButton.interactable = CurrentStatCount < 100 & GetAvailableSkillPoints() > 0;
+            addPointButton.gameObject.SetActive(PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None);
             addPointButton.onClick.AddListener(UpdateAttribute);
         }
 
@@ -32,30 +39,48 @@ namespace Vi.UI
             addPointButton.onClick.RemoveListener(UpdateAttribute);
         }
 
-        private void UpdateAttribute()
+        private int GetAvailableSkillPoints()
         {
-            if (currentStatCount >= 100) { return; }
-
-            WebRequestManager.Character localCharacter = PlayerDataManager.Singleton.LocalPlayerData.character;
-            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, attributeType, localCharacter.GetStat(attributeType) + 1);
-
-            currentStatCount++;
-            UpdateDisplay();
-
-            addPointButton.interactable = currentStatCount < 100;
-
-            int index = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
-            if (index != -1)
+            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            int availableSkillPoints = 0;
+            if (characterIndex != -1)
             {
-                WebRequestManager.Character newCharacter = PlayerDataManager.Singleton.LocalPlayerData.character.SetStat(attributeType, localCharacter.GetStat(attributeType) + 1);
-                WebRequestManager.Singleton.Characters[index] = newCharacter;
+                if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(WebRequestManager.Singleton.Characters[characterIndex]._id.ToString(), out var stats))
+                {
+                    availableSkillPoints = stats.GetAvailableSkillPoints(WebRequestManager.Singleton.Characters[characterIndex].attributes);
+                    return availableSkillPoints;
+                }
             }
+            return 0;
         }
 
-        private void UpdateDisplay()
+        private void UpdateAttribute()
         {
-            progressText.text = currentStatCount.ToString() + " / 100";
-            progressBar.fillAmount = currentStatCount / 100f;
+            addPointButton.interactable = CurrentStatCount < 100 & GetAvailableSkillPoints() > 0;
+            if (!addPointButton.interactable) { return; }
+
+            CurrentStatCount++;
+            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, attributeType, CurrentStatCount);
+
+            UpdateDisplay();
+
+            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            if (characterIndex != -1)
+            {
+                WebRequestManager.Character newCharacter = PlayerDataManager.Singleton.LocalPlayerData.character.SetStat(attributeType, CurrentStatCount);
+                WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
+            }
+
+            int availableStatPoints = GetAvailableSkillPoints();
+            addPointButton.interactable = CurrentStatCount < 100 & availableStatPoints > 0;
+
+            OnStatCountChange?.Invoke(this, availableStatPoints);
+        }
+
+        public void UpdateDisplay()
+        {
+            progressText.text = CurrentStatCount.ToString() + " / 100";
+            progressBar.fillAmount = CurrentStatCount / 100f;
         }
     }
 }
