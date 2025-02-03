@@ -9,6 +9,8 @@ using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
 using System.Collections;
+using static Vi.Core.WebRequestManager;
+using Unity.Netcode.Components;
 
 namespace Vi.Player
 {
@@ -885,12 +887,33 @@ namespace Vi.Player
         {
             if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
 
+            float startTime = Time.time;
+
             while (true)
             {
                 SetLookInput(Random.insideUnitCircle * Random.Range(-2f, 2));
                 SetMoveInput(Random.insideUnitCircle * Random.Range(-1f, 1));
                 yield return new WaitForSeconds(0.25f);
+
+                if (Time.time - startTime > 15)
+                {
+                    PersistentLocalObjects.Singleton.StartCoroutine(AutomatedConnectToRandomLobby());
+                }
             }
+        }
+
+        private IEnumerator AutomatedConnectToRandomLobby()
+        {
+            if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
+
+            WebRequestManager.Server server = WebRequestManager.Singleton.LobbyServers[Random.Range(0, WebRequestManager.Singleton.LobbyServers.Length)];
+            Unity.Netcode.Transports.UTP.UnityTransport networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.SetConnectionData(server.ip, ushort.Parse(server.port), FasterPlayerPrefs.serverListenAddress);
+
+            NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
+            NetworkManager.Singleton.StartClient();
         }
 
         private IEnumerator AutomatedClientLogic()
