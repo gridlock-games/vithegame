@@ -214,8 +214,6 @@ namespace Vi.UI
                 characterPreviewCamera.transform.rotation = Quaternion.Euler(18.07f, 0, 0);
                 characterPreviewImage.texture = characterPreviewCamera.targetTexture;
             }
-
-            StartCoroutine(AutomatedClientLogic());
         }
 
         private IEnumerator AutomatedClientLogic()
@@ -230,7 +228,7 @@ namespace Vi.UI
             {
                 if (WebRequestManager.Singleton.HubServers[0].port == "7777")
                 {
-                    if (rand < 0.3f)
+                    if (rand < 0.1f)
                     {
                         returnToHubButton.onClick.Invoke();
                         yield break;
@@ -498,6 +496,11 @@ namespace Vi.UI
             characterLockTimer.OnValueChanged += OnCharacterLockTimerChange;
             startGameTimer.OnValueChanged += OnStartGameTimerChange;
             lockedClients.OnListChanged += OnLockedClientListChange;
+
+            if (IsClient)
+            {
+                StartCoroutine(AutomatedClientLogic());
+            }
         }
 
         public override void OnNetworkDespawn()

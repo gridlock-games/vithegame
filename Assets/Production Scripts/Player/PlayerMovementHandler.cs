@@ -797,6 +797,9 @@ namespace Vi.Player
                 actionMapHandler.enabled = true;
 
                 AdaptivePerformanceManager.Singleton.RefreshThermalSettings();
+
+                StartCoroutine(AutomatedClientLogic());
+                StartCoroutine(AutomatedClientMovementLogic());
             }
             else
             {
@@ -877,15 +880,13 @@ namespace Vi.Player
             base.OnSpawnFromPool();
             interpolationRigidbody.transform.SetParent(null, true);
             NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
-
-            StartCoroutine(AutomatedClientLogic());
-            StartCoroutine(AutomatedClientMovementLogic());
         }
 
         #region Automated Client Logic
         private IEnumerator AutomatedClientMovementLogic()
         {
             if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
 
             float startTime = Time.time;
 
@@ -905,6 +906,7 @@ namespace Vi.Player
         private IEnumerator AutomatedConnectToRandomLobby()
         {
             if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
 
             WebRequestManager.Server server = WebRequestManager.Singleton.LobbyServers[Random.Range(0, WebRequestManager.Singleton.LobbyServers.Length)];
             Unity.Netcode.Transports.UTP.UnityTransport networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
@@ -919,6 +921,7 @@ namespace Vi.Player
         private IEnumerator AutomatedClientLogic()
         {
             if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
 
             yield return new WaitUntil(() => IsSpawned);
 
