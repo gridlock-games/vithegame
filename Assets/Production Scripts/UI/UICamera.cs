@@ -10,8 +10,7 @@ namespace Vi.UI
     [RequireComponent(typeof(Camera))]
     public class UICamera : MonoBehaviour
     {
-        [SerializeField] private string[] layerMask = new string[] { "UI" };
-        [SerializeField] private Camera particleUICamera;
+        [SerializeField] private string[] layerMask = new string[] { "UI", "UIParticle" };
 
         private static List<UICamera> UICameras = new List<UICamera>();
 
@@ -64,15 +63,6 @@ namespace Vi.UI
             }
             //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { return MainCamera; }
             else { return UICameras[^1].attachedUICamera; }
-        }
-
-        public static Camera GetActiveUIParticleCamera()
-        {
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            {
-                return null;
-            }
-            else { return UICameras[^1].particleUICamera; }
         }
 
         private bool lastCamState;
