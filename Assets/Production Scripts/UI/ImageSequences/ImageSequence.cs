@@ -11,7 +11,13 @@ namespace Vi.UI
     [CreateAssetMenu(fileName = "ImageSequence", menuName = "Production/Image Sequence")]
     public class ImageSequence : ScriptableObject
     {
+        public int FrameRate { get { return frameRate; } }
+        [SerializeField] private int frameRate = 60;
         [SerializeField] private List<Sprite> sprites;
+
+        public Sprite this[int index] { get { return sprites[index]; } }
+
+        public int Length { get { return sprites.Count; } }
 
 #if UNITY_EDITOR
         [ContextMenu("Find Images")]
