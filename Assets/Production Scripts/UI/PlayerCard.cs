@@ -8,6 +8,7 @@ using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using UnityEngine.Video;
 
 namespace Vi.UI
 {
@@ -41,9 +42,9 @@ namespace Vi.UI
 
         [Header("Rage UI")]
         [SerializeField] private RenderTexture ragingRT;
-        [SerializeField] private GameObject ragingPreviewPrefab;
         [SerializeField] private RenderTexture rageReadyRT;
-        [SerializeField] private GameObject rageReadyPreviewPrefab;
+        [SerializeField] private VideoPlayer rageReadyVideoPlayerPrefab;
+        [SerializeField] private VideoPlayer ragingVideoPlayerPrefab;
         [SerializeField] private RawImage rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
@@ -139,18 +140,17 @@ namespace Vi.UI
             staminaAndArmorAreDisabled = true;
         }
 
-        private static GameObject ragingPreviewInstance;
-        private static GameObject rageReadyPreviewInstance;
+        private static VideoPlayer rageReadyVideoPlayerInstance;
+        private static VideoPlayer ragingVideoPlayerInstance;
 
         private Canvas canvas;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
-
             experienceProgressImage.fillAmount = 0;
 
-            if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
-            if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
+            if (!rageReadyVideoPlayerInstance) { rageReadyVideoPlayerInstance = Instantiate(rageReadyVideoPlayerPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
+            if (!ragingVideoPlayerInstance) { ragingVideoPlayerInstance = Instantiate(ragingVideoPlayerPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
         }
 
         private void OnEnable()

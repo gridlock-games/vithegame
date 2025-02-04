@@ -23,7 +23,7 @@ namespace Vi.UI
 
         public void PlayWorldPoint(Vector3 worldSpacePosition)
         {
-            Camera cam = UICamera.GetActiveUIParticleCamera();
+            Camera cam = UICamera.GetActiveUICamera();
             if (cam == null) { Debug.LogWarning("No UI camera!"); return; }
             if (!cam.enabled) { Debug.LogWarning("UI Particle Camera is disabled!"); }
 
@@ -38,7 +38,7 @@ namespace Vi.UI
 
         public void PlayScreenPoint(Vector3 screenPoint)
         {
-            Camera cam = UICamera.GetActiveUIParticleCamera();
+            Camera cam = UICamera.GetActiveUICamera();
             if (cam == null) { Debug.LogWarning("No UI camera!"); return; }
             if (!cam.enabled) { Debug.LogWarning("UI Particle Camera is disabled!"); }
 
