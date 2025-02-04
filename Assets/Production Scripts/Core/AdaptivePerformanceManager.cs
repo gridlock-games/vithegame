@@ -213,6 +213,11 @@ namespace Vi.Core
                     return;
                 }
             }
+            else
+            {
+                QualitySettings.globalTextureMipmapLimit = 0;
+                return;
+            }
 
             if (temperatureLevel > 1.75f)
             {
@@ -247,6 +252,11 @@ namespace Vi.Core
                 {
                     value = Mathf.Max(value, 1);
                 }
+            }
+            else
+            {
+                QualitySettings.resolutionScalingFixedDPIFactor = 1;
+                return;
             }
 
             QualitySettings.resolutionScalingFixedDPIFactor = value;

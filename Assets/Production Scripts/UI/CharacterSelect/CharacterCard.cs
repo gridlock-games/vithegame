@@ -63,7 +63,15 @@ namespace Vi.UI
             lockedParent.SetActive(false);
 
             nameText.text = character.name.ToString();
-            levelText.text = "Lv." + character.experience.ToString();
+
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            {
+                levelText.text = "Lv." + stats.level.ToString();
+            }
+            else
+            {
+                levelText.text = "Lv." + character.level.ToString();
+            }
 
             SetSelectedState(true);
         }
