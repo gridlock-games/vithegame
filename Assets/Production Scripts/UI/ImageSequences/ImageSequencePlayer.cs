@@ -25,12 +25,8 @@ namespace Vi.UI
             image = GetComponent<Image>();
         }
 
-        private void OnEnable()
+        private void Start()
         {
-            imageSequence = null;
-            spriteCounter = 0;
-            timer = 0;
-
             UpdateDisplay();
         }
 

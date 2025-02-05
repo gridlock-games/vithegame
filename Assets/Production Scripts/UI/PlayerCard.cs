@@ -178,7 +178,7 @@ namespace Vi.UI
             {
                 DisableStaminaAndArmorDisplay();
             }
-            rageStatusIndicator.color = new Color(1, 1, 1, 0);
+
             RefreshLevelingSystem();
         }
 
@@ -230,6 +230,9 @@ namespace Vi.UI
 
                 graphic.material = materialInstance;
             }
+
+            rageImageSequencePlayer.ChangeImageSequence(null);
+            rageStatusIndicator.color = new Color(1, 1, 1, 0);
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
