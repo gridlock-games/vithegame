@@ -155,13 +155,11 @@ namespace Vi.UI
 
             if (!rageReadyImageSequenceHandle.IsValid())
             {
-                Debug.Log(rageReadyImageSequenceHandle.IsValid());
                 rageReadyImageSequenceHandle = rageReadyImageSequence.LoadAssetAsync<ImageSequence>();
                 rageReadyImageSequenceHandle.Completed += (imageSequence) =>
                 {
                     rageReadyImageSequenceLoaded = true;
                 };
-                Debug.Log(rageReadyImageSequenceHandle.IsValid());
             }
             
             if (!ragingImageSequenceHandle.IsValid())
@@ -361,7 +359,7 @@ namespace Vi.UI
                         rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
-                        rageStatusIndicator.sprite = null;
+                        rageImageSequencePlayer.ChangeImageSequence(null);
                         rageStatusIndicator.color = new Color(1, 1, 1, 0);
                         break;
                     default:

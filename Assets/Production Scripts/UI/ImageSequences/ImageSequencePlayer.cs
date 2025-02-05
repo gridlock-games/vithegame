@@ -39,13 +39,12 @@ namespace Vi.UI
             if (imageSequence == null)
             {
                 image.sprite = null;
-                image.color = StringUtility.SetColorAlpha(image.color, 0);
+                timer = 0;
             }
             else
             {
                 spriteCounter++;
                 image.sprite = imageSequence[spriteCounter % imageSequence.Length];
-                image.color = StringUtility.SetColorAlpha(image.color, 1);
             }
         }
 
@@ -64,6 +63,7 @@ namespace Vi.UI
             if (timer >= (1f / imageSequence.FrameRate))
             {
                 UpdateDisplay();
+                timer -= 1f / imageSequence.FrameRate;
             }
         }
     }
