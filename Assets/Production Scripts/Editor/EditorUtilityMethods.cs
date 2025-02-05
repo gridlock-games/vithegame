@@ -405,26 +405,29 @@ namespace Vi.Editor
                     }
 
                     int targetMobileImportSize = assetPath.Contains("Environment Assets") ? 1024 : 256;
-                    if (!importer.GetPlatformTextureSettings("Android").overridden
+                    if (defaultSettings.maxTextureSize > targetMobileImportSize)
+                    {
+                        if (!importer.GetPlatformTextureSettings("Android").overridden
                         | importer.GetPlatformTextureSettings("Android").maxTextureSize < targetMobileImportSize)
-                    {
-                        TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
-                        androidSettings.name = "Android";
-                        androidSettings.overridden = true;
-                        androidSettings.maxTextureSize = 256;
-                        importer.SetPlatformTextureSettings(androidSettings);
-                        shouldReimport = true;
-                    }
+                        {
+                            TextureImporterPlatformSettings androidSettings = new TextureImporterPlatformSettings();
+                            androidSettings.name = "Android";
+                            androidSettings.overridden = true;
+                            androidSettings.maxTextureSize = 256;
+                            importer.SetPlatformTextureSettings(androidSettings);
+                            shouldReimport = true;
+                        }
 
-                    if (!importer.GetPlatformTextureSettings("iPhone").overridden
-                        | importer.GetPlatformTextureSettings("iPhone").maxTextureSize != importer.GetPlatformTextureSettings("Android").maxTextureSize)
-                    {
-                        TextureImporterPlatformSettings iPhoneSettings = new TextureImporterPlatformSettings();
-                        iPhoneSettings.name = "iPhone";
-                        iPhoneSettings.overridden = true;
-                        iPhoneSettings.maxTextureSize = importer.GetPlatformTextureSettings("Android").maxTextureSize;
-                        importer.SetPlatformTextureSettings(iPhoneSettings);
-                        shouldReimport = true;
+                        if (!importer.GetPlatformTextureSettings("iPhone").overridden
+                            | importer.GetPlatformTextureSettings("iPhone").maxTextureSize != importer.GetPlatformTextureSettings("Android").maxTextureSize)
+                        {
+                            TextureImporterPlatformSettings iPhoneSettings = new TextureImporterPlatformSettings();
+                            iPhoneSettings.name = "iPhone";
+                            iPhoneSettings.overridden = true;
+                            iPhoneSettings.maxTextureSize = importer.GetPlatformTextureSettings("Android").maxTextureSize;
+                            importer.SetPlatformTextureSettings(iPhoneSettings);
+                            shouldReimport = true;
+                        }
                     }
 
                     if (shouldReimport) { importer.SaveAndReimport(); }
