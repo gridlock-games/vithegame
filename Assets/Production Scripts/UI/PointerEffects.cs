@@ -67,10 +67,6 @@ namespace Vi.UI
                     if (playerInput.currentActionMap?.name != "UI")
                     {
                         clickParticle.gameObject.SetActive(false);
-
-                        //particleCam = UICamera.GetActiveUIParticleCamera();
-                        //if (particleCam) { particleCam.enabled = false; }
-
                         return;
                     }
                 }
