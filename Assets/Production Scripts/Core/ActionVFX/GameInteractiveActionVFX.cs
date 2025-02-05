@@ -159,7 +159,7 @@ namespace Vi.Core.VFX
             return OnHit(attacker);
         }
 
-        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject) { return false; }
+        public bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject, bool ignoresArmor = false) { return false; }
         public bool ProcessEnvironmentDamageWithHitReaction(float damage, NetworkObject attackingNetworkObject) { return false; }
 
         private Dictionary<HittableAgent, List<int>> collisionStatusTracker = new Dictionary<HittableAgent, List<int>>();

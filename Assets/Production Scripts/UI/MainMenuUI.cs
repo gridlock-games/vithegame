@@ -238,8 +238,8 @@ namespace Vi.UI
             NetSceneManager.Singleton.LoadScene("Lobby");
         }
 
-        private const string automatedClientUsername = "roxasodale91";
-        private const string automatedClientPassword = "123456";
+        private const string automatedClientUsername = "LightPat";
+        private const string automatedClientPassword = "patrick11";
 
         private bool startAutomatedClientCalled;
 
@@ -249,6 +249,7 @@ namespace Vi.UI
             startAutomatedClientCalled = true;
             AudioListener.volume = 0;
 
+            FasterPlayerPrefs.IsAutomatedClient = true;
             StartCoroutine(LaunchAutoClient());
         }
 
@@ -263,12 +264,12 @@ namespace Vi.UI
 
             yield return Login();
 
-            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); yield break; }
+            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); startAutomatedClientCalled = false; yield break; }
 
             WebRequestManager.Singleton.RefreshCharacters();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
 
-            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); yield break; }
+            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); startAutomatedClientCalled = false; yield break; }
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
 
@@ -276,7 +277,7 @@ namespace Vi.UI
             WebRequestManager.Singleton.RefreshServers();
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
 
-            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); yield break; }
+            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); startAutomatedClientCalled = false; yield break; }
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
@@ -286,6 +287,8 @@ namespace Vi.UI
 
         public void LoginWithVi()
         {
+            FasterPlayerPrefs.IsPlayingOffline = false;
+
             if (FasterPlayerPrefs.Singleton.HasString("username")) { usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username"); } else { usernameInput.text = ""; }
             if (FasterPlayerPrefs.Singleton.HasString("password")) { passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password"); } else { passwordInput.text = ""; }
 
@@ -513,9 +516,19 @@ namespace Vi.UI
         private const string facebookSignInClientId = "461749126721789";
         private const string facebookSignInSecretId = "c59261b57e535726b45dad280071d34d";
 
+        public void LoginAsOfflineGuest()
+        {
+            FasterPlayerPrefs.IsPlayingOffline = true;
+            WebRequestManager.Singleton.CheckGameVersion(true);
+
+            initialParent.SetActive(false);
+            initialErrorText.text = "";
+        }
+
         public void LoginWithGoogle()
         {
             Debug.Log("Logging in with Google");
+            FasterPlayerPrefs.IsPlayingOffline = false;
             dlpSetupAndLogin(DeepLinkProcessing.loginSiteSource.google);
             openDialogue("Google");
             GoogleAuth.Auth(googleSignInClientId, googleSignInSecretId, (success, error, tokenData) =>
@@ -686,6 +699,7 @@ namespace Vi.UI
 
         public void Logout()
         {
+            FasterPlayerPrefs.IsPlayingOffline = false;
             WebRequestManager.Singleton.Logout();
             initialParent.SetActive(true);
             FasterPlayerPrefs.Singleton.DeleteKey("LastSignInType");

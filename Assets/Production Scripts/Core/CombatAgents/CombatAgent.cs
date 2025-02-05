@@ -34,16 +34,16 @@ namespace Vi.Core
         private List<CombatAgent> slaves = new List<CombatAgent>();
 
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
-        protected NetworkVariable<float> spirit = new NetworkVariable<float>();
+        protected NetworkVariable<float> armor = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetStamina() { return stamina.Value; }
-        public float GetSpirit() { return spirit.Value; }
+        public float GetArmor() { return armor.Value; }
         public float GetRage() { return rage.Value; }
 
         public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
         public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
-        public float GetMaxSpirit() { return WeaponHandler.GetWeapon().GetMaxSpirit() + SessionProgressionHandler.MaxSpiritBonus; }
+        public float GetMaxArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
         public float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -71,33 +71,33 @@ namespace Vi.Core
             }
         }
 
-        protected virtual bool ShouldUseSpirit() { return true; }
+        protected virtual bool ShouldUseArmor() { return true; }
 
         protected virtual bool ShouldUseRage() { return true; }
 
-        public void AddSpirit(float amount)
+        public void AddArmor(float amount)
         {
-            if (!ShouldUseSpirit()) { return; }
+            if (!ShouldUseArmor()) { return; }
 
-            if (amount < 0) { amount *= StatusAgent.SpiritReductionMultiplier; }
-            if (amount > 0) { amount *= StatusAgent.SpiritIncreaseMultiplier; }
+            if (amount < 0) { amount *= StatusAgent.ArmorReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.ArmorIncreaseMultiplier; }
 
             if (amount > 0)
             {
-                if (spirit.Value < GetMaxSpirit())
+                if (armor.Value < GetMaxArmor())
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
+                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (spirit.Value > GetMaxSpirit())
+                if (armor.Value > GetMaxArmor())
                 {
-                    spirit.Value += amount;
+                    armor.Value += amount;
                 }
                 else
                 {
-                    spirit.Value = Mathf.Clamp(spirit.Value + amount, 0, GetMaxSpirit());
+                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
                 }
             }
         }
@@ -153,6 +153,38 @@ namespace Vi.Core
             }
         }
 
+        [SerializeField] private PooledObject armorDestroyedVFX;
+        [SerializeField] private AudioClip armorDestroyedAudio;
+        private List<PooledObject> armorDestroyedVFXInstances = new List<PooledObject>();
+        private void OnArmorChanged(float prev, float current)
+        {
+            if (Mathf.Approximately(prev, 0)) { return; }
+            if (!Mathf.Approximately(current, 0)) { return; }
+            if (current > prev) { return; }
+
+            if (ShouldUseArmor())
+            {
+                StartCoroutine(PlayArmorVFX());
+            }
+        }
+
+        private IEnumerator PlayArmorVFX()
+        {
+            if (armorDestroyedVFX)
+            {
+                PooledObject instance = ObjectPoolingManager.SpawnObject(armorDestroyedVFX, transform);
+                armorDestroyedVFXInstances.Add(instance);
+
+                if (armorDestroyedAudio)
+                {
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, armorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                }
+
+                yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
+                armorDestroyedVFXInstances.Remove(instance);
+            }
+        }
+
         public AnimationHandler AnimationHandler { get; private set; }
         public PhysicsMovementHandler MovementHandler { get; private set; }
         public WeaponHandler WeaponHandler { get; private set; }
@@ -178,6 +210,15 @@ namespace Vi.Core
         {
             if (rageAtMaxVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref rageAtMaxVFXInstance); }
             if (ragingVFXInstance) { ObjectPoolingManager.ReturnObjectToPool(ref ragingVFXInstance); }
+
+            foreach (PooledObject instance in armorDestroyedVFXInstances)
+            {
+                if (instance.IsSpawned)
+                {
+                    ObjectPoolingManager.ReturnObjectToPool(instance);
+                }
+            }
+            armorDestroyedVFXInstances.Clear();
         }
 
         [SerializeField] private AudioClip rageStartAudio;
@@ -231,6 +272,7 @@ namespace Vi.Core
         {
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
+            armor.OnValueChanged += OnArmorChanged;
             rage.OnValueChanged += OnRageChanged;
 
             LastAliveStartTime = Time.time;
@@ -263,13 +305,14 @@ namespace Vi.Core
             yield return new WaitUntil(() => IsSpawned);
             yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = GetMaxHP();
-            spirit.Value = GetMaxSpirit();
+            armor.Value = GetMaxArmor();
         }
 
         public override void OnNetworkDespawn()
         {
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
+            armor.OnValueChanged -= OnArmorChanged;
             rage.OnValueChanged -= OnRageChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
@@ -716,14 +759,14 @@ namespace Vi.Core
 
         [Rpc(SendTo.Server)] private void ActivateRageServerRpc() { ActivateRage(); }
 
-        public void ResetStats(float hpPercentage, bool resetStamina, bool resetSpirit, bool resetRage)
+        public void ResetStats(float hpPercentage, bool resetStamina, bool resetArmor, bool resetRage)
         {
             damageMappingThisLife.Clear();
             HP.Value = GetMaxHP() * hpPercentage;
             if (resetStamina)
                 stamina.Value = 0;
-            if (resetSpirit)
-                spirit.Value = GetMaxSpirit();
+            if (resetArmor)
+                armor.Value = GetMaxArmor();
             if (resetRage)
                 rage.Value = 0;
         }
@@ -817,8 +860,8 @@ namespace Vi.Core
 
         public const float minStaminaPercentageToBeAbleToBlock = 0.3f;
 
-        protected const float notBlockingSpiritHitReactionPercentage = 0.4f;
-        protected const float blockingSpiritHitReactionPercentage = 0.5f;
+        protected const float notBlockingArmorHitReactionPercentage = 0.4f;
+        protected const float blockingArmorHitReactionPercentage = 0.5f;
 
         protected const float rageDamageMultiplier = 1.15f;
 
@@ -1423,53 +1466,54 @@ namespace Vi.Core
             if (!IsRaging) { AddRage(victimRageToBeAddedOnHit); }
 
             float attackAngle = Vector3.SignedAngle(transform.forward, (hitSourcePosition - transform.position).normalized, Vector3.up);
-            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, WeaponHandler.IsBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
+            bool isBlocking = false;
+            ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
             float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
             HPDamage *= attacker.StatusAgent.DamageMultiplier;
             HPDamage *= damageMultiplier;
 
             bool shouldPlayHitReaction;
-            if (ShouldUseSpirit())
+            if (ShouldUseArmor())
             {
                 shouldPlayHitReaction = false;
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= notBlockingSpiritHitReactionPercentage)
+                        if ((GetArmor() + HPDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddSpirit(HPDamage * 0.7f);
-                            HPDamage *= 0.7f;
+                            AddArmor(HPDamage);
+                            HPDamage *= attack.armorPenetration;
                         }
-                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0)
+                        else if ((GetArmor() + HPDamage) / GetMaxArmor() > 0)
                         {
-                            AddSpirit(HPDamage * 0.7f);
+                            AddArmor(HPDamage);
                             shouldPlayHitReaction = true;
-                            HPDamage *= 0.7f;
+                            HPDamage *= attack.armorPenetration;
                         }
-                        else // Spirit is at 0
+                        else // Armor is at 0
                         {
-                            AddSpirit(HPDamage);
+                            AddArmor(HPDamage);
                             shouldPlayHitReaction = true;
                         }
                         break;
                     case ActionClip.HitReactionType.Blocking:
-                        if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() >= blockingSpiritHitReactionPercentage) // If spirit is greater than or equal to 50%
+                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= blockingArmorHitReactionPercentage) // If armor is greater than or equal to 50%
                         {
-                            AddSpirit(HPDamage * 0.5f);
+                            AddArmor(HPDamage * 0.5f);
                             HPDamage = 0;
                         }
-                        else if ((GetSpirit() + HPDamage * 0.7f) / GetMaxSpirit() > 0) // If spirit is greater than 0% and less than 50%
+                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0) // If armor is greater than 0% and less than 50%
                         {
-                            AddSpirit(-GetMaxSpirit());
+                            AddArmor(-GetMaxArmor());
                             AddStamina(-GetMaxStamina() * 0.3f);
                             shouldPlayHitReaction = true;
                             HPDamage *= 0.7f;
                         }
-                        else // Spirit is at 0
+                        else // Armor is at 0
                         {
                             AddStamina(-GetMaxStamina() * 0.3f);
-                            AddSpirit(HPDamage);
+                            AddArmor(HPDamage);
                             if (GetStamina() <= 0)
                             {
                                 if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
@@ -1566,7 +1610,7 @@ namespace Vi.Core
                         if (attack.shouldPlayHitReaction
                             | ailment.Value != ActionClip.Ailment.None // For knockup follow up attacks
                             | AnimationHandler.IsCharging()
-                            | shouldPlayHitReaction) // For spirit logic
+                            | shouldPlayHitReaction) // For armor logic
                         {
                             AnimationHandler.PlayAction(hitReaction);
                             hitReactionWasPlayed = true;
@@ -1594,14 +1638,11 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                if (!Mathf.Approximately(HPDamage, 0))
-                {
-                    RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment);
-                    float prevHP = GetHP();
-                    AddHP(HPDamage);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
-                    AddDamageToMapping(attacker, prevHP - GetHP());
-                }
+                RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment, GetArmor() > 0, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+                float prevHP = GetHP();
+                AddHP(HPDamage);
+                if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
+                AddDamageToMapping(attacker, prevHP - GetHP());
 
                 EvaluateAilment(attackAilment, applyAilmentRegardless, hitSourcePosition, attacker, attackingNetworkObject, attack, hitReaction);
             }
@@ -1722,30 +1763,43 @@ namespace Vi.Core
             return (applyAilmentRegardless, attackAilment);
         }
 
-        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject)
+        public override bool ProcessEnvironmentDamage(float damage, NetworkObject attackingNetworkObject, bool ignoresArmor = false)
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
-            {
-                ailment.Value = ActionClip.Ailment.Death;
-                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
+            bool hitsArmor = GetArmor() > 0 & !ignoresArmor;
 
-                if (lastAttackingCombatAgent)
+            if (ailment.Value != ActionClip.Ailment.Death & !hitsArmor)
+            {
+                if (Mathf.Approximately(AddHPWithoutApply(damage), 0) | AddHPWithoutApply(damage) <= 0)
                 {
-                    SetKiller(lastAttackingCombatAgent);
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
-                }
-                else
-                {
-                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
-                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    ailment.Value = ActionClip.Ailment.Death;
+                    AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
+
+                    if (lastAttackingCombatAgent)
+                    {
+                        SetKiller(lastAttackingCombatAgent);
+                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
+                    }
+                    else
+                    {
+                        killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
+                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
+                    }
                 }
             }
 
-            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(); }
-            AddHP(damage);
+            if (hitsArmor)
+            {
+                AddArmor(damage);
+            }
+            else
+            {
+                AddHP(damage);
+            }
+
+            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(GetArmor() > 0); }
             return true;
         }
 
@@ -1754,7 +1808,7 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
-            if (HP.Value + damage <= 0 & ailment.Value != ActionClip.Ailment.Death)
+            if (AddHPWithoutApply(damage) <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
                 ailment.Value = ActionClip.Ailment.Death;
                 AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
@@ -1776,7 +1830,7 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None);
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None, GetArmor() > 0, Weapon.WeaponMaterial.Metal);
             AddHP(damage);
             return true;
         }
@@ -1844,35 +1898,60 @@ namespace Vi.Core
 
         private float lastRenderHitFixedTime = -5;
 
-        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        protected void RenderHit(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment, bool isArmorHit, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHit() should only be called from the server"); return; }
 
             lastRenderHitFixedTime = Time.fixedTime;
 
-            GlowRenderer.RenderHit();
+            if (isArmorHit)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                GlowRenderer.RenderHit();
+            }
+
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
             {
                 if (attacker.TryGetComponent(out CombatAgent attackingCombatAgent))
                 {
-                    PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
-                    AudioManager.Singleton.PlayClipAtPoint(gameObject,
-                        attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
-                        impactPosition, Weapon.hitSoundEffectVolume);
-
-                    RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment);
+                    if (isArmorHit)
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetBlockVFXPrefab(), impactPosition, Quaternion.identity)));
+                        AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                            ailment == ActionClip.Ailment.None ? attackingCombatAgent.GetBlockingHitSoundEffect(attackingWeaponMaterial) : attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                            impactPosition, Weapon.hitSoundEffectVolume);
+                    }
+                    else
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(ObjectPoolingManager.SpawnObject(GetHitVFXPrefab(), impactPosition, Quaternion.identity)));
+                        AudioManager.Singleton.PlayClipAtPoint(gameObject,
+                            attackingCombatAgent.GetHitSoundEffect(armorType, weaponBone, ailment),
+                            impactPosition, Weapon.hitSoundEffectVolume);
+                    }
+                    RenderHitClientRpc(attackerNetObjId, impactPosition, armorType, weaponBone, ailment, isArmorHit, attackingWeaponMaterial);
                 }
             }
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
-        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment)
+        private void RenderHitClientRpc(ulong attackerNetObjId, Vector3 impactPosition, Weapon.ArmorType armorType, Weapon.WeaponBone weaponBone, ActionClip.Ailment ailment, bool isArmorHit, Weapon.WeaponMaterial attackingWeaponMaterial)
         {
             lastRenderHitFixedTime = Time.fixedTime;
 
             // This check is for late joining clients
             if (!GlowRenderer) { return; }
-            GlowRenderer.RenderHit();
+
+            if (isArmorHit)
+            {
+                GlowRenderer.RenderBlock();
+            }
+            else
+            {
+                GlowRenderer.RenderHit();
+            }
 
             if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(attackerNetObjId, out NetworkObject attacker))
             {
@@ -1886,28 +1965,42 @@ namespace Vi.Core
             }
         }
 
-        protected void RenderHitGlowOnly()
+        protected void RenderHitGlowOnly(bool isBlockedByArmor)
         {
             if (!IsServer) { Debug.LogError("Attributes.RenderHitGlowOnly() should only be called from the server"); return; }
 
             if (GlowRenderer)
             {
-                GlowRenderer.RenderHit();
+                if (isBlockedByArmor)
+                {
+                    GlowRenderer.RenderBlock();
+                }
+                else
+                {
+                    GlowRenderer.RenderHit();
+                }
             }
             else
             {
                 Debug.LogError("No Glow Renderer! " + this);
                 return;
             }
-            RenderHitGlowOnlyClientRpc();
+            RenderHitGlowOnlyClientRpc(isBlockedByArmor);
         }
 
         [Rpc(SendTo.NotServer, Delivery = RpcDelivery.Unreliable)]
-        private void RenderHitGlowOnlyClientRpc()
+        private void RenderHitGlowOnlyClientRpc(bool isBlockedByArmor)
         {
             if (GlowRenderer)
             {
-                GlowRenderer.RenderHit();
+                if (isBlockedByArmor)
+                {
+                    GlowRenderer.RenderBlock();
+                }
+                else
+                {
+                    GlowRenderer.RenderHit();
+                }
             }
             else
             {

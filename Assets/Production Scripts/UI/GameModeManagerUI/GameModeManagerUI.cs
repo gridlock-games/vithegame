@@ -37,11 +37,11 @@ namespace Vi.UI
 
         [Header("Rewards")]
         [SerializeField] private RectTransform rewardsSectionParent;
+        [SerializeField] private Text levelText;
         [SerializeField] private Text rewardsHeaderText;
         [SerializeField] private Text viEssenceEarnedText;
         [SerializeField] private AnimationCurve rewardsAppearanceCurve;
         [SerializeField] private UIParticleSystem sparkleEffect;
-        [SerializeField] private UIParticleSystem[] rewardsParticleSystems;
         [SerializeField] private Image viEssenceRewardsImage;
 
         [Header("MVP Presentation")]
@@ -258,7 +258,7 @@ namespace Vi.UI
                         StartCoroutine(transitionController.PlayTransition());
                     }
 
-                    if (transitionController)
+                    if (transitionController.TransitionPeakReached)
                     {
                         MVPCanvas.enabled = true;
                         MVPCanvasGroup.alpha = 1;
@@ -399,6 +399,11 @@ namespace Vi.UI
             }
         }
 
+        private void OnLevelUp()
+        {
+
+        }
+
         private bool displayRewardsHasBeenRun;
         private Coroutine displayRewardsCoroutine;
         private IEnumerator DisplayRewards()
@@ -412,7 +417,14 @@ namespace Vi.UI
 
             gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
-            expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString() + " XP";
+            WebRequestManager.CharacterStats stats = WebRequestManager.Singleton.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
+            levelText.text = "Lv " + stats.level.ToString();
+            expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString("F0") + " XP";
+
+            // Calculated based on exp to next level and current exp earned
+            float minExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp);
+            float maxExpFillAmount = Mathf.InverseLerp(0, stats.expToNextLv, stats.currentExp + gameModeManager.ExpEarnedFromMatch);
+            expGainedBar.fillAmount = Mathf.LerpUnclamped(minExpFillAmount, maxExpFillAmount, 0);
 
             float t = 0;
             while (!Mathf.Approximately(t, 1))
@@ -423,16 +435,20 @@ namespace Vi.UI
                 yield return null;
             }
 
-            // TODO change this to be calculated based on exp to next level and current exp earned
-            float maxExpFillAmount = 0.7f;
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
                 t += Time.deltaTime * UIAnimationTimeMultiplier;
                 t = Mathf.Clamp01(t);
-                expGainedBar.fillAmount = Mathf.LerpUnclamped(0, maxExpFillAmount, t);
+                expGainedBar.fillAmount = Mathf.LerpUnclamped(minExpFillAmount, maxExpFillAmount, t);
                 expMessageParent.transform.localScale = expMessageCurve.EvaluateNormalized(t);
                 yield return null;
+            }
+
+            if (stats.currentExp + gameModeManager.ExpEarnedFromMatch >= stats.expToNextLv)
+            {
+                levelText.text = "Lv " + (stats.level+1).ToString();
+                OnLevelUp();
             }
 
             yield return new WaitForSeconds(transitionWaitTime);
@@ -502,11 +518,6 @@ namespace Vi.UI
                 yield return null;
             }
 
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(killsParticleLocation.position);
-            }
-
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -516,11 +527,6 @@ namespace Vi.UI
                 yield return null;
             }
 
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(deathsParticleLocation.position);
-            }
-
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -528,11 +534,6 @@ namespace Vi.UI
                 t = Mathf.Clamp01(t);
                 assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
-            }
-
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(assistsParticleLocation.position);
             }
 
             if (showAccountCard)

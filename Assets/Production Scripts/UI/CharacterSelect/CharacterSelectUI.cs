@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using System.Text.RegularExpressions;
 using Vi.Utility;
 using TMPro;
-using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -38,7 +37,6 @@ namespace Vi.UI
 
         [Header("Character Select")]
         [SerializeField] private GameObject characterSelectParent;
-
         [SerializeField] private CharacterCard[] characterCardInstances;
         [SerializeField] private Transform characterCardParent;
         [SerializeField] private Button selectCharacterButton;
@@ -57,10 +55,16 @@ namespace Vi.UI
 
         [Header("Stats Section")]
         [SerializeField] private GameObject statsParent;
+        [SerializeField] private Text maxHPText;
+        [SerializeField] private Text maxDefenseText;
+        [SerializeField] private Image strengthFill;
+        [SerializeField] private Image vitalityFill;
+        [SerializeField] private Image dexterityFill;
+        [SerializeField] private Image agilityFill;
+        [SerializeField] private Image intelligenceFill;
 
         [Header("Gear Section")]
         [SerializeField] private GameObject gearParent;
-
         [SerializeField] private WeaponDisplayElement primaryWeaponDisplayElement;
         [SerializeField] private WeaponDisplayElement secondaryWeaponDisplayElement;
         [SerializeField] private CharacterReference.EquipmentType[] equipmentTypeKeys;
@@ -68,7 +72,6 @@ namespace Vi.UI
 
         [Header("Character Customization")]
         [SerializeField] private GameObject characterCustomizationParent;
-
         [SerializeField] private Transform customizationRowsParentLeft;
         [SerializeField] private Transform customizationRowsParentRight;
         [SerializeField] private CharacterCustomizationRow characterCustomizationRowPrefab;
@@ -229,6 +232,11 @@ namespace Vi.UI
             foreach (ImageOnDragData data in GetComponentsInChildren<ImageOnDragData>(true))
             {
                 data.OnDragEvent += OnCharPreviewDrag;
+            }
+
+            if (Debug.isDebugBuild)
+            {
+                trainingRoomMapOptions.Add("Empty Scene");
             }
 
             trainingRoomMapDropdown.ClearOptions();
@@ -742,10 +750,27 @@ namespace Vi.UI
         {
             updateDisplayCharacterRunning = true;
 
+            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+            {
+                maxHPText.text = characterStats.hp.ToString();
+                maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
+            }
+            else // Set Default values
+            {
+                maxHPText.text = "0000";
+                maxDefenseText.text = "0000";
+            }
+
+            strengthFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Strength) / 100f;
+            vitalityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Vitality) / 100f;
+            dexterityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Dexterity) / 100f;
+            agilityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Agility) / 100f;
+            intelligenceFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Intelligence) / 100f;
+
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
 
-            var playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
+            CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
             if (string.IsNullOrWhiteSpace(character.model.ToString()))
             {
                 if (previewObject)
@@ -1469,7 +1494,12 @@ namespace Vi.UI
         {
             FasterPlayerPrefs.Singleton.SetBool("TutorialInProgress", true);
 
-            if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
+            if (FasterPlayerPrefs.IsPlayingOffline)
+            {
+                CreateUIElementHighlight((RectTransform)selectCharacterButton.transform);
+                selectCharacterButton.interactable = true;
+            }
+            else if (string.IsNullOrEmpty(selectedCharacter._id.ToString()))
             {
                 CreateUIElementHighlight((RectTransform)characterCardInstances[0].transform);
             }

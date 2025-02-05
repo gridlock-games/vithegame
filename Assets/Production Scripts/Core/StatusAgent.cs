@@ -38,8 +38,8 @@ namespace Vi.Core
             DamageReductionMultiplier = 1;
             DamageReceivedMultiplier = 1;
             HealingMultiplier = 1;
-            SpiritIncreaseMultiplier = 1;
-            SpiritReductionMultiplier = 1;
+            ArmorIncreaseMultiplier = 1;
+            ArmorReductionMultiplier = 1;
 
             ActiveStatusesWasUpdatedThisFrame = default;
 
@@ -86,7 +86,7 @@ namespace Vi.Core
         private static readonly List<ActionClip.Status> negativeStatuses = new List<ActionClip.Status>()
         {
             ActionClip.Status.damageReceivedMultiplier,
-            ActionClip.Status.spiritReductionMultiplier,
+            ActionClip.Status.armorReductionMultiplier,
             ActionClip.Status.burning,
             ActionClip.Status.poisoned,
             ActionClip.Status.drain,
@@ -227,8 +227,8 @@ namespace Vi.Core
         public float DamageReductionMultiplier { get; private set; } = 1;
         public float DamageReceivedMultiplier { get; private set; } = 1;
         public float HealingMultiplier { get; private set; } = 1;
-        public float SpiritIncreaseMultiplier { get; private set; } = 1;
-        public float SpiritReductionMultiplier { get; private set; } = 1;
+        public float ArmorIncreaseMultiplier { get; private set; } = 1;
+        public float ArmorReductionMultiplier { get; private set; } = 1;
 
         private NetworkVariable<float> movementSpeedDecreaseAmount = new NetworkVariable<float>();
         private NetworkVariable<float> movementSpeedDecreasePercentage = new NetworkVariable<float>();
@@ -360,14 +360,14 @@ namespace Vi.Core
             return changeAmount;
         }
 
-        private float GetSpiritChangeAmount(ActionClip.StatusPayload statusPayload)
+        private float GetArmorChangeAmount(ActionClip.StatusPayload statusPayload)
         {
             if (!combatAgent) { return 0; }
 
             float changeAmount;
             if (statusPayload.valueIsPercentage)
             {
-                changeAmount = combatAgent.GetMaxSpirit() * statusPayload.value;
+                changeAmount = combatAgent.GetMaxArmor() * statusPayload.value;
             }
             else
             {
@@ -470,8 +470,8 @@ namespace Vi.Core
 
                     HealingMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
-                case ActionClip.Status.spiritIncreaseMultiplier:
-                    SpiritIncreaseMultiplier *= StatusEventsForThisObject[statusEventId].value;
+                case ActionClip.Status.armorIncreaseMultiplier:
+                    ArmorIncreaseMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -484,10 +484,10 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    SpiritIncreaseMultiplier /= StatusEventsForThisObject[statusEventId].value;
+                    ArmorIncreaseMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
-                case ActionClip.Status.spiritReductionMultiplier:
-                    SpiritReductionMultiplier *= StatusEventsForThisObject[statusEventId].value;
+                case ActionClip.Status.armorReductionMultiplier:
+                    ArmorReductionMultiplier *= StatusEventsForThisObject[statusEventId].value;
 
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
@@ -500,7 +500,7 @@ namespace Vi.Core
                         yield return null;
                     }
 
-                    SpiritReductionMultiplier /= StatusEventsForThisObject[statusEventId].value;
+                    ArmorReductionMultiplier /= StatusEventsForThisObject[statusEventId].value;
                     break;
                 case ActionClip.Status.burning:
                     elapsedTime = 0;
@@ -692,13 +692,13 @@ namespace Vi.Core
                     }
 
                     break;
-                case ActionClip.Status.spiritRegeneration:
+                case ActionClip.Status.armorRegeneration:
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         if (combatAgent)
                         {
-                            combatAgent.AddSpirit(GetSpiritChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                            combatAgent.AddArmor(GetArmorChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
                         }
 
                         elapsedTime += Time.deltaTime;
@@ -844,6 +844,19 @@ namespace Vi.Core
                     else
                     {
                         abilityCooldownIncreaseAmount.Value -= StatusEventsForThisObject[statusEventId].value;
+                    }
+                    break;
+                case ActionClip.Status.bleed:
+                    elapsedTime = 0;
+                    while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
+                    {
+                        hittableAgent.ProcessEnvironmentDamage(-GetHPChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime, NetworkObject, true);
+                        elapsedTime += Time.deltaTime;
+                        if (StatusEventsForThisObject[statusEventId].associatedWithCurrentWeapon)
+                        {
+                            if (stopAllStatusesAssociatedWithWeapon) { break; }
+                        }
+                        yield return null;
                     }
                     break;
                 default:

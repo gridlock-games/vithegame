@@ -43,7 +43,7 @@ namespace Vi.Core.GameModeManagers
             DontRespawn,
             ResetStats,
             ResetHP,
-            ResetHPAndSpirit
+            ResetHPAndArmor
         }
 
         public bool LevelingEnabled { get { return levelingEnabled; } }
@@ -469,11 +469,21 @@ namespace Vi.Core.GameModeManagers
         }
 
         private NetworkList<int> winningPlayerDataIds;
-        public int ExpEarnedFromMatch { get; private set; } = -1;
+        public float ExpEarnedFromMatch { get; private set; } = -1;
         public int TokensEarnedFromMatch { get; private set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
-            if (current & IsClient)
+            if (!current) { return; }
+
+            if (FasterPlayerPrefs.IsAutomatedClient)
+            {
+                ReturnToHub();
+                return;
+            }
+
+            StartCoroutine(AwardExpBasedOnWin());
+
+            if (IsClient)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
@@ -485,7 +495,7 @@ namespace Vi.Core.GameModeManagers
                         PlayerDataManager.Singleton.GetGameMode(),
                         localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
 
-                    ExpEarnedFromMatch = 100;
+                    ExpEarnedFromMatch += localPlayerScore.GetExpReward();
 
                     // TODO Change this to use web requests on the server
                     if (GameModeManager.Singleton.LevelingEnabled)
@@ -505,6 +515,61 @@ namespace Vi.Core.GameModeManagers
                             + localPlayerScore.cumulativeAssists);
                     }
                 }
+            }
+        }
+
+        private IEnumerator AwardExpBasedOnWin()
+        {
+            yield return new WaitUntil(() => GetGameWinnerIds().Count > 0);
+
+            if (IsServer)
+            {
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
+                {
+                    if (playerData.id > 0)
+                    {
+                        PlayerScore playerScore = GetPlayerScore(playerData.id);
+                        float expAward = playerScore.GetExpReward();
+                        expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+                    }
+                }
+            }
+
+            if (IsClient)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                {
+                    float expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                    ExpEarnedFromMatch += expToAward;
+                }
+            }
+        }
+
+        private void ReturnToHub()
+        {
+            Debug.Log("[AUTOMATED CLIENT] Returning to Hub on Game Over");
+
+            if (NetworkManager.Singleton.IsListening) { NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown); }
+
+            NetSceneManager.Singleton.LoadScene("Character Select");
+            PersistentLocalObjects.Singleton.StartCoroutine(ReturnToHubCoroutine());
+        }
+
+        private IEnumerator ReturnToHubCoroutine()
+        {
+            if (NetworkManager.Singleton.IsListening)
+            {
+                PlayerDataManager.Singleton.WasDisconnectedByClient = true;
+                NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+                yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            }
+
+            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            {
+                yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.StartClient();
             }
         }
 
@@ -805,7 +870,7 @@ namespace Vi.Core.GameModeManagers
                                 }
                             }
                             break;
-                        case RespawnType.ResetHPAndSpirit:
+                        case RespawnType.ResetHPAndArmor:
                             foreach (Attributes attributes in PlayerDataManager.Singleton.GetActivePlayerObjects())
                             {
                                 if (attributes.GetAilment() == ActionClip.Ailment.Death)
@@ -1197,6 +1262,11 @@ namespace Vi.Core.GameModeManagers
                 damageRecievedThisRound = 0;
                 roundWins = 0;
                 isValid = true;
+            }
+
+            public float GetExpReward()
+            {
+                return cumulativeKills * 5 + cumulativeAssists * 3;
             }
 
             public void ResetRoundVariables()

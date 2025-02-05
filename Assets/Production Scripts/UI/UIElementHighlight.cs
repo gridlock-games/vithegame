@@ -6,9 +6,6 @@ namespace Vi.UI
 {
     public class UIElementHighlight : MonoBehaviour
     {
-        private const float speed = 40;
-        private const float maxOffset = 20;
-
         private float positionOffset;
 
         private RectTransform rt;
@@ -24,17 +21,19 @@ namespace Vi.UI
             rt.position = pos;
             rt.localRotation = Quaternion.identity;
             rt.localScale = Vector3.ClampMagnitude(rt.localScale, 1.732f);
+
+            minPosition = rt.anchoredPosition;
+            maxPosition = rt.anchoredPosition + new Vector2(0, 20);
         }
 
-        private float directionMultiplier = 1;
+        private const float speed = 2;
+
+        private Vector2 maxPosition;
+        private Vector2 minPosition;
         private void Update()
         {
-            if (Mathf.Abs(positionOffset) >= maxOffset) { directionMultiplier *= -1; }
-
-            float amount = Time.deltaTime * speed * directionMultiplier;
-            positionOffset = Mathf.Clamp(positionOffset + amount, -maxOffset, maxOffset);
-
-            rt.anchoredPosition += new Vector2(0, amount);
+            float normalizedTime = Mathf.PingPong(Time.time * speed, 1);
+            rt.anchoredPosition = Vector2.Lerp(minPosition, maxPosition, normalizedTime);
         }
     }
 }

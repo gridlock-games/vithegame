@@ -27,10 +27,10 @@ namespace Vi.UI
         [Header("Object Assignments")]
         [SerializeField] private Text nameDisplay;
         [SerializeField] private Image background;
-        [SerializeField] private RectTransform healthBarParent;
         [SerializeField] private Image healthFillImage;
         [SerializeField] private Image interimHealthFillImage;
         [SerializeField] private Text healthText;
+        [SerializeField] private Graphic[] healthBarGraphics;
 
         [Header("Status UI")]
         [SerializeField] private StatusIconLayoutGroup statusIconLayoutGroup;
@@ -40,6 +40,8 @@ namespace Vi.UI
         private CombatAgent combatAgent;
         private CanvasGroup[] canvasGroups;
 
+        private Vector3[] originalHealthBarGraphicScales;
+
         private void Awake()
         {
             pooledObject = GetComponent<PooledObject>();
@@ -48,12 +50,18 @@ namespace Vi.UI
 
             pooledObject.OnSpawnFromPool += OnSpawnFromPool;
             pooledObject.OnReturnToPool += OnReturnToPool;
+
+            originalHealthBarGraphicScales = new Vector3[healthBarGraphics.Length];
+            for (int i = 0; i < healthBarGraphics.Length; i++)
+            {
+                originalHealthBarGraphicScales[i] = healthBarGraphics[i].transform.localScale;
+            }
         }
 
         private void OnEnable()
         {
             transform.localScale = Vector3.zero;
-            healthBarParent.localScale = Vector3.zero;
+            SetHealthBarScale(Vector3.zero);
             healthText.enabled = false;
 
             if (!combatAgent)
@@ -87,13 +95,14 @@ namespace Vi.UI
                 transform.position = combatAgent.transform.position;
                 transform.rotation = combatAgent.transform.rotation;
                 transform.localScale = Vector3.zero;
-                healthBarParent.localScale = Vector3.zero;
+                SetHealthBarScale(Vector3.zero);
             }
             RefreshStatus();
         }
 
         private void OnSpawnFromPool()
         {
+            currentHealthBarScale = Vector3.one;
             if (combatAgent)
             {
                 transform.position = combatAgent.transform.position;
@@ -105,7 +114,7 @@ namespace Vi.UI
                 transform.rotation = Quaternion.identity;
             }
             transform.localScale = Vector3.zero;
-            healthBarParent.localScale = Vector3.zero;
+            SetHealthBarScale(Vector3.zero);
         }
 
         private void OnReturnToPool()
@@ -118,10 +127,20 @@ namespace Vi.UI
             transform.position = Vector3.zero;
             transform.rotation = Quaternion.identity;
             transform.localScale = Vector3.zero;
-            healthBarParent.localScale = Vector3.zero;
+            SetHealthBarScale(Vector3.zero);
 
             lastHP = -1;
             lastMaxHP = -1;
+        }
+
+        private Vector3 currentHealthBarScale;
+        private void SetHealthBarScale(Vector3 newScale)
+        {
+            for (int i = 0; i < healthBarGraphics.Length; i++)
+            {
+                healthBarGraphics[i].transform.localScale = Vector3.Scale(originalHealthBarGraphicScales[i], newScale);
+            }
+            currentHealthBarScale = newScale;
         }
 
         private void RefreshStatus()
@@ -263,12 +282,12 @@ namespace Vi.UI
                     if (localCombatAgent.WeaponHandler.CanAim) { healthBarLocalScaleTarget = Vector3.one; }
                 }
             }
-            healthBarParent.localScale = Vector3.Lerp(healthBarParent.localScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed);
+            SetHealthBarScale(Vector3.Lerp(currentHealthBarScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed));
             healthText.enabled = team != PlayerDataManager.Team.Peaceful;
 
-            float HP = combatAgent.GetHP();
+            float HP = combatAgent.GetHP() + combatAgent.GetArmor();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-            float maxHP = combatAgent.GetMaxHP();
+            float maxHP = combatAgent.GetMaxHP() + combatAgent.GetMaxArmor();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
@@ -279,7 +298,11 @@ namespace Vi.UI
             lastHP = HP;
             lastMaxHP = maxHP;
 
-            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, combatAgent.GetHP() / combatAgent.GetMaxHP(), Time.deltaTime * PlayerCard.fillSpeed);
+            float armor = combatAgent.GetArmor();
+            if (armor < 0.1f & armor > 0) { armor = 0.1f; }
+            float maxArmor = combatAgent.GetMaxArmor();
+
+            interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
         }
     }
 }

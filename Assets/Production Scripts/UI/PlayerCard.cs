@@ -8,6 +8,9 @@ using System.Linq;
 using Vi.Core.CombatAgents;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
+using UnityEngine.Video;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.UI
 {
@@ -32,19 +35,18 @@ namespace Vi.UI
         [SerializeField] private Image bottomStaminaBorder;
         [SerializeField] private Image staminaBackground;
 
-        [Header("Spirit UI")]
-        [SerializeField] private Text spiritText;
-        [SerializeField] private Image spiritFillImage;
-        [SerializeField] private Image interimSpiritFillImage;
-        [SerializeField] private Image bottomSpiritBorder;
-        [SerializeField] private Image spiritBackground;
+        [Header("Armor UI")]
+        [SerializeField] private Text armorText;
+        [SerializeField] private Image armorFillImage;
+        [SerializeField] private Image interimArmorFillImage;
+        [SerializeField] private Image bottomArmorBorder;
+        [SerializeField] private Image armorBackground;
 
         [Header("Rage UI")]
-        [SerializeField] private RenderTexture ragingRT;
-        [SerializeField] private GameObject ragingPreviewPrefab;
-        [SerializeField] private RenderTexture rageReadyRT;
-        [SerializeField] private GameObject rageReadyPreviewPrefab;
-        [SerializeField] private RawImage rageStatusIndicator;
+        [SerializeField] private ImageSequencePlayer rageImageSequencePlayer;
+        [SerializeField] private AssetReference rageReadyImageSequence;
+        [SerializeField] private AssetReference ragingImageSequence;
+        [SerializeField] private Image rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
@@ -104,8 +106,8 @@ namespace Vi.UI
         }
 
         [SerializeField] private bool isRightSideCard;
-        private bool staminaAndSpiritAreDisabled;
-        private void DisableStaminaAndSpiritDisplay()
+        private bool staminaAndArmorAreDisabled;
+        private void DisableStaminaAndArmorDisplay()
         {
             staminaFillImage.gameObject.SetActive(false);
             interimStaminaFillImage.gameObject.SetActive(false);
@@ -113,11 +115,11 @@ namespace Vi.UI
             bottomStaminaBorder.gameObject.SetActive(false);
             staminaBackground.gameObject.SetActive(false);
 
-            spiritFillImage.gameObject.SetActive(false);
-            interimSpiritFillImage.gameObject.SetActive(false);
-            spiritText.gameObject.SetActive(false);
-            bottomSpiritBorder.gameObject.SetActive(false);
-            spiritBackground.gameObject.SetActive(false);
+            armorFillImage.gameObject.SetActive(false);
+            interimArmorFillImage.gameObject.SetActive(false);
+            armorText.gameObject.SetActive(false);
+            bottomArmorBorder.gameObject.SetActive(false);
+            armorBackground.gameObject.SetActive(false);
 
             if (isRightSideCard)
             {
@@ -136,28 +138,45 @@ namespace Vi.UI
                 ((RectTransform)interimHealthFillImage.transform).anchoredPosition = ((RectTransform)interimStaminaFillImage.transform).anchoredPosition;
             }
 
-            staminaAndSpiritAreDisabled = true;
+            staminaAndArmorAreDisabled = true;
         }
 
-        private static GameObject ragingPreviewInstance;
-        private static GameObject rageReadyPreviewInstance;
+        private static AsyncOperationHandle<ImageSequence> rageReadyImageSequenceHandle;
+        private static AsyncOperationHandle<ImageSequence> ragingImageSequenceHandle;
+
+        private static bool rageReadyImageSequenceLoaded;
+        private static bool ragingImageSequenceLoaded;
 
         private Canvas canvas;
         private void Awake()
         {
             canvas = GetComponent<Canvas>();
-
             experienceProgressImage.fillAmount = 0;
 
-            if (!ragingPreviewInstance) { ragingPreviewInstance = Instantiate(ragingPreviewPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
-            if (!rageReadyPreviewInstance) { rageReadyPreviewInstance = Instantiate(rageReadyPreviewPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
+            if (!rageReadyImageSequenceHandle.IsValid())
+            {
+                rageReadyImageSequenceHandle = rageReadyImageSequence.LoadAssetAsync<ImageSequence>();
+                rageReadyImageSequenceHandle.Completed += (imageSequence) =>
+                {
+                    rageReadyImageSequenceLoaded = true;
+                };
+            }
+            
+            if (!ragingImageSequenceHandle.IsValid())
+            {
+                ragingImageSequenceHandle = ragingImageSequence.LoadAssetAsync<ImageSequence>();
+                ragingImageSequenceHandle.Completed += (imageSequence) =>
+                {
+                    ragingImageSequenceLoaded = true;
+                };
+            }
         }
 
         private void OnEnable()
         {
             if (!IsMainCard())
             {
-                DisableStaminaAndSpiritDisplay();
+                DisableStaminaAndArmorDisplay();
             }
 
             RefreshLevelingSystem();
@@ -197,12 +216,12 @@ namespace Vi.UI
 
             healthFillImage.fillAmount = 0;
             staminaFillImage.fillAmount = 0;
-            spiritFillImage.fillAmount = 0;
+            armorFillImage.fillAmount = 0;
             rageFillImage.fillAmount = 0;
 
             interimHealthFillImage.fillAmount = 0;
             interimStaminaFillImage.fillAmount = 0;
-            interimSpiritFillImage.fillAmount = 0;
+            interimArmorFillImage.fillAmount = 0;
             interimRageFillImage.fillAmount = 0;
 
             foreach (Graphic graphic in GetComponentsInChildren<Graphic>(true))
@@ -211,6 +230,9 @@ namespace Vi.UI
 
                 graphic.material = materialInstance;
             }
+
+            rageImageSequencePlayer.ChangeImageSequence(null);
+            rageStatusIndicator.color = new Color(1, 1, 1, 0);
         }
 
         private static readonly Color aliveTintColor = new Color(1, 1, 1, 1);
@@ -222,12 +244,12 @@ namespace Vi.UI
 
         private float lastHP = -1;
         private float lastStamina = -1;
-        private float lastSpirit = -1;
+        private float lastArmor = -1;
         private float lastRage = -1;
 
         private float lastMaxHP = -1;
         private float lastMaxStamina = -1;
-        private float lastMaxSpirit = -1;
+        private float lastMaxArmor = -1;
         private float lastMaxRage = -1;
 
         private void Update()
@@ -235,11 +257,14 @@ namespace Vi.UI
             if (!combatAgent) { canvas.enabled = false; return; }
 
             float HP = combatAgent.GetHP();
+            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetArmor(); }
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
             float rage = combatAgent.GetRage();
 
             float maxHP = combatAgent.GetMaxHP();
+            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxArmor(); }
+
             float maxRage = combatAgent.GetMaxRage();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
@@ -265,13 +290,13 @@ namespace Vi.UI
                 experienceProgressImage.fillAmount = Mathf.Lerp(experienceProgressImage.fillAmount, combatAgent.SessionProgressionHandler.ExperienceAsPercentTowardsNextLevel, Time.deltaTime * fillSpeed);
             }
             
-            if (!staminaAndSpiritAreDisabled)
+            if (!staminaAndArmorAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                float spirit = combatAgent.GetSpirit();
+                float armor = combatAgent.GetArmor();
 
                 float maxStamina = combatAgent.GetMaxStamina();
-                float maxSpirit = combatAgent.GetMaxSpirit();
+                float maxArmor = combatAgent.GetMaxArmor();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
@@ -279,21 +304,21 @@ namespace Vi.UI
                     staminaFillImage.fillAmount = stamina / maxStamina;
                 }
 
-                if (!Mathf.Approximately(lastSpirit, spirit) | !Mathf.Approximately(lastMaxSpirit, maxSpirit))
+                if (!Mathf.Approximately(lastArmor, armor) | !Mathf.Approximately(lastMaxArmor, maxArmor))
                 {
-                    spiritText.text = "SP " + StringUtility.FormatDynamicFloatForUI(spirit) + " / " + maxSpirit.ToString("F0");
-                    spiritFillImage.fillAmount = spirit / maxSpirit;
+                    armorText.text = "AR " + StringUtility.FormatDynamicFloatForUI(armor) + " / " + maxArmor.ToString("F0");
+                    armorFillImage.fillAmount = armor / maxArmor;
                 }
 
                 // Interim images - these update every frame
                 interimStaminaFillImage.fillAmount = Mathf.Lerp(interimStaminaFillImage.fillAmount, stamina / maxStamina, Time.deltaTime * fillSpeed);
-                interimSpiritFillImage.fillAmount = Mathf.Lerp(interimSpiritFillImage.fillAmount, spirit / maxSpirit, Time.deltaTime * fillSpeed);
+                interimArmorFillImage.fillAmount = Mathf.Lerp(interimArmorFillImage.fillAmount, armor / maxArmor, Time.deltaTime * fillSpeed);
 
                 lastStamina = stamina;
-                lastSpirit = spirit;
+                lastArmor = armor;
 
                 lastMaxStamina = maxStamina;
-                lastMaxSpirit = maxSpirit;
+                lastMaxArmor = maxArmor;
             }
 
             // Interim images - these update every frame
@@ -324,20 +349,20 @@ namespace Vi.UI
                 currentRageStatus = RageStatus.CannotActivateRage;
             }
 
-            if (currentRageStatus != lastRageStatus)
+            if (currentRageStatus != lastRageStatus & rageReadyImageSequenceLoaded & ragingImageSequenceLoaded)
             {
                 switch (currentRageStatus)
                 {
                     case RageStatus.IsRaging:
-                        rageStatusIndicator.texture = ragingRT;
+                        rageImageSequencePlayer.ChangeImageSequence(ragingImageSequenceHandle.Result);
                         rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CanActivateRage:
-                        rageStatusIndicator.texture = rageReadyRT;
+                        rageImageSequencePlayer.ChangeImageSequence(rageReadyImageSequenceHandle.Result);
                         rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
-                        rageStatusIndicator.texture = null;
+                        rageImageSequencePlayer.ChangeImageSequence(null);
                         rageStatusIndicator.color = new Color(1, 1, 1, 0);
                         break;
                     default:
@@ -345,7 +370,11 @@ namespace Vi.UI
                         break;
                 }
             }
-            lastRageStatus = currentRageStatus;
+
+            if (rageReadyImageSequenceLoaded & ragingImageSequenceLoaded)
+            {
+                lastRageStatus = currentRageStatus;
+            }
         }
 
         private RageStatus lastRageStatus = RageStatus.None;

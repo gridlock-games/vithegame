@@ -31,7 +31,7 @@ namespace Vi.Core
 
         public float MaxHPBonus { get { return Level * 4; } }
         public float MaxStaminaBonus { get { return Level * 4; } }
-        public float MaxSpiritBonus { get { return Level * 4; } }
+        public float MaxArmorBonus { get { return Level * 4; } }
 
         public float BaseDamageBonus { get { return Level; } }
 
@@ -57,7 +57,7 @@ namespace Vi.Core
             {
                 combatAgent.AddHP(MaxHPBonus);
                 combatAgent.AddStamina(MaxStaminaBonus);
-                combatAgent.AddSpirit(MaxSpiritBonus);
+                combatAgent.AddArmor(MaxArmorBonus);
             }
         }
 
@@ -154,8 +154,8 @@ namespace Vi.Core
                     case "Stamina Regeneration":
                         RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.staminaRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
-                    case "Spirit Regeneration":
-                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.spiritRegeneration, 0.1f, true, buffDuration, 0, false));
+                    case "Armor Regeneration":
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.armorRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
                     case "Ability Cooldown Reduction":
                         RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.abilityCooldownDecrease, 0.2f, true, buffDuration, 0, false));

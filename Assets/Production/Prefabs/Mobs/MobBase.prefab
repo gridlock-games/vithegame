@@ -57,7 +57,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1985030379
+  GlobalObjectIdHash: 4001288591
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -78,6 +78,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c5fa6fbe5d925b4b8c95999f99172f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blacklistedStatuses: 
+  statusVFXDefinitions: []
 --- !u!114 &1544070057548558332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90,6 +92,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15e4601c5acc5b14dac14ba210ed1605, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  excludeFromKillFeed: 0
+  armorDestroyedVFX: {fileID: -5338236817657967816, guid: 6858e08108a42a747b887b19cc89fca4,
+    type: 3}
+  armorDestroyedAudio: {fileID: 8300000, guid: 6fbc3d1fde5734320a9074fed722f622, type: 3}
   rageStartAudio: {fileID: 8300000, guid: 60cef9975a14343e7804f5bd15d9c4fb, type: 3}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
@@ -112,6 +118,8 @@ MonoBehaviour:
   deathExplosionDelay: 0
   deathVFX: {fileID: 0}
   deathVFXAttack: {fileID: 0}
+  canBeIncapacitated: 0
+  disableHitReactions: 0
   wasStaggeredThisFrame: 0
   weaponOption:
     name: 
@@ -177,6 +185,8 @@ MonoBehaviour:
   gravityScale: 2
   targetingType: 2
   targetingSwitchDistance: 11
+  targetingConstrainedByDistance: 0
+  maxTargetDistance: 0
   canFly: 0
   flightMovement:
     serializedVersion: 2
@@ -194,6 +204,8 @@ MonoBehaviour:
   ability2DistanceMax: 4
   canSuicide: 0
   suicideDistance: 0
+  suicideIsConstrainedByTime: 0
+  suicideTimer: 0
   canRage: 0
   HPRagePercent: 0.5
 --- !u!114 &6305487504955697137
@@ -219,6 +231,8 @@ MonoBehaviour:
     type: 3}
   healthPotionAudio: {fileID: 8300000, guid: 83696402b45a74a03adf704b9093a864, type: 3}
   staminaPotionAudio: {fileID: 8300000, guid: 82f826d83d9884ce485659b8c5760804, type: 3}
+  reviveCanvas: {fileID: 0}
+  reviveImage: {fileID: 0}
 --- !u!114 &7433792095065490293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -379,6 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   physicMaterial: {fileID: 13400000, guid: b38b82410ffe81a438e2c3c17bf3523d, type: 2}
   staticWallBody: {fileID: 0}
+  radiusMultiplier: 1
 --- !u!1001 &3846051666542777627
 PrefabInstance:
   m_ObjectHideFlags: 0

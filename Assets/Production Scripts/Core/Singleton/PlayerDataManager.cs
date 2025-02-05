@@ -1358,6 +1358,11 @@ namespace Vi.Core
                             }
                         }
                     }
+
+                    if (networkListEvent.Value.id >= 0)
+                    {
+                        StartCoroutine(WebRequestManager.Singleton.GetCharacterAttributes(networkListEvent.Value.character._id.ToString()));
+                    }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
                     break;
@@ -1754,6 +1759,68 @@ namespace Vi.Core
             // Return channel with the lowest number of players in it
             int lowestCountIndex = channelCounts.FindIndex(item => item == channelCounts.Min());
             return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
+        }
+
+        public void SetCharAttributes(int dataId, WebRequestManager.CharacterAttributes newAttributes)
+        {
+            if (GetGameMode() != GameMode.None) { return; }
+            if (!ContainsId(dataId)) { return; }
+
+            if (IsServer)
+            {
+                PlayerData playerData = GetPlayerData(dataId);
+                if (newAttributes.Equals(playerData.character.attributes)) { return; }
+                WebRequestManager.Character newChar = playerData.character;
+                newChar.attributes = newAttributes;
+                playerData.character = newChar;
+                SetPlayerData(playerData);
+
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                    playerData.character.attributes));
+            }
+            else
+            {
+                SetCharAttributesRpc(dataId, newAttributes);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)]
+        private void SetCharAttributesRpc(int dataId, WebRequestManager.CharacterAttributes newAttributes)
+        {
+            SetCharAttributes(dataId, newAttributes);
+        }
+
+        public void SetCharAttributes(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        {
+            if (GetGameMode() != GameMode.None) { return; }
+            if (!ContainsId(dataId)) { return; }
+
+            //PlayerData playerData = GetPlayerData(dataId);
+            //if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(playerData.character._id.ToString(), out var stats))
+            //{
+            //    if (stats.GetAvailableSkillPoints(playerData.character.attributes) <= 0) { return; }
+            //}
+
+            if (IsServer)
+            {
+                PlayerData playerData = GetPlayerData(dataId);
+                WebRequestManager.Character newChar = playerData.character.SetStat(attributeType, newValue);
+                playerData.character = newChar;
+                SetPlayerData(playerData);
+
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                    playerData.character.attributes));
+            }
+            else
+            {
+                SetCharAttributesRpc(dataId, attributeType, newValue);
+            }
+        }
+
+        [Rpc(SendTo.Server, RequireOwnership = false)]
+        private void SetCharAttributesRpc(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        {
+            SetCharAttributes(dataId, attributeType, newValue);
         }
 
         private NetworkList<PlayerData> playerDataList;

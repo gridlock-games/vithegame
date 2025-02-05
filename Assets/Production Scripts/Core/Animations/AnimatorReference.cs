@@ -30,7 +30,7 @@ namespace Vi.Core
                 WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
                 browsReplacementDefinition == null ? (WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Brows) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Brows].name.Replace("(Clone)", "") : "") : browsReplacementDefinition.skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Hair) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Hair].name.Replace("(Clone)", "") : "",
-                currentCharacter.level, currentCharacter.loadoutPreset1, currentCharacter.loadoutPreset2, currentCharacter.loadoutPreset3, currentCharacter.loadoutPreset4, currentCharacter.raceAndGender
+                currentCharacter.level, currentCharacter.attributes, currentCharacter.loadoutPreset1, currentCharacter.loadoutPreset2, currentCharacter.loadoutPreset3, currentCharacter.loadoutPreset4, currentCharacter.raceAndGender
             );
 
             if (newChar.beard == "EmptyWearableEquipment") { newChar.beard = "null"; }

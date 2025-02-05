@@ -55,8 +55,8 @@ namespace Vi.ScriptableObjects
         [SerializeField] private float maxStamina = 100;
         [SerializeField] private float staminaRecoveryRate = 5;
         [SerializeField] private float staminaDelay = 1;
-        [Header("Spirit")]
-        [SerializeField] private float maxSpirit = 100;
+        [Header("Armor")]
+        [SerializeField] private float maxArmor = 100;
         [Header("Rage")]
         [SerializeField] private float maxRage = 100;
         [SerializeField] private float rageRecoveryRate = 0;
@@ -88,7 +88,7 @@ namespace Vi.ScriptableObjects
 
         public float GetMaxHP() { return maxHP; }
         public float GetMaxStamina() { return maxStamina; }
-        public float GetMaxSpirit() { return maxSpirit; }
+        public float GetMaxArmor() { return maxArmor; }
         public float GetMaxRage() { return maxRage; }
         public float GetStaminaDelay() { return staminaDelay; }
         public float GetStaminaRecoveryRate() { return staminaRecoveryRate; }

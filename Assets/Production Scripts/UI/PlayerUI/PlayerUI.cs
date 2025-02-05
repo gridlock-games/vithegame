@@ -22,8 +22,6 @@ namespace Vi.UI
 
         public Image GetHeavyAttackButton() { return heavyAttackButton; }
 
-        public RectTransform GetBlockingButton() { return blockingButton.rectTransform; }
-
         public RectTransform GetDodgeButton() { return dodgeButton.rectTransform; }
 
         public PlayerCard GetMainPlayerCard() { return playerCard; }
@@ -92,7 +90,6 @@ namespace Vi.UI
         [SerializeField] private Image heavyAttackButton;
         [SerializeField] private Sprite aimIcon;
         [SerializeField] private Sprite heavyAttackIcon;
-        [SerializeField] private Image blockingButton;
         [SerializeField] private Image lookJoystickCenter;
         [SerializeField] private RectTransform switchWeaponButton;
         [SerializeField] private RectTransform onScreenReloadButton;
@@ -245,8 +242,6 @@ namespace Vi.UI
             if (!dodgeAction.enabled) { return; }
             playerMovementHandler.OnDodge();
         }
-
-        public void Block(bool isPressed) { attributes.WeaponHandler.Block(isPressed); }
 
         public void Rage() { attributes.OnActivateRage(); }
 
@@ -594,7 +589,6 @@ namespace Vi.UI
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     if (!mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = true; }
-                    if (blockingButton.raycastTarget) { blockingButton.raycastTarget = false; }
 
                     ability1.CrossFadeOpacity(0);
                     ability2.CrossFadeOpacity(0);
@@ -604,12 +598,6 @@ namespace Vi.UI
                     staminaPotionCard.CrossFadeOpacity(0);
                     overrideDodgeColor = true;
 
-                    float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
-                    if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
-                    {
-                        blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
-                    }
-                    
                     float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
                     {
@@ -638,7 +626,6 @@ namespace Vi.UI
                 if (mobileInteractableImage.gameObject.activeInHierarchy)
                 {
                     if (mobileInteractableImage.raycastTarget) { mobileInteractableImage.raycastTarget = false; }
-                    if (!blockingButton.raycastTarget) { blockingButton.raycastTarget = true; }
 
                     float newInteractableImageAlpha = Mathf.MoveTowards(mobileInteractableImage.color.a, 0, Time.deltaTime * alphaTransitionSpeed);
                     if (!Mathf.Approximately(newInteractableImageAlpha, mobileInteractableImage.color.a))
@@ -654,12 +641,6 @@ namespace Vi.UI
                         ability4.CrossFadeOpacity(1);
                         healthPotionCard.CrossFadeOpacity(1);
                         staminaPotionCard.CrossFadeOpacity(1);
-
-                        float newBlockingButtonAlpha = Mathf.MoveTowards(blockingButton.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
-                        if (!Mathf.Approximately(blockingButton.color.a, newBlockingButtonAlpha))
-                        {
-                            blockingButton.color = StringUtility.SetColorAlpha(blockingButton.color, newBlockingButtonAlpha);
-                        }
 
                         float newLookJoystickAlpha = Mathf.MoveTowards(lookJoystickCenter.color.a, 1, Time.deltaTime * alphaTransitionSpeed);
                         if (!Mathf.Approximately(lookJoystickCenter.color.a, newLookJoystickAlpha))
