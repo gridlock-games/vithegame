@@ -42,7 +42,6 @@ namespace Vi.UI
         [SerializeField] private Text viEssenceEarnedText;
         [SerializeField] private AnimationCurve rewardsAppearanceCurve;
         [SerializeField] private UIParticleSystem sparkleEffect;
-        [SerializeField] private UIParticleSystem[] rewardsParticleSystems;
         [SerializeField] private Image viEssenceRewardsImage;
 
         [Header("MVP Presentation")]
@@ -519,11 +518,6 @@ namespace Vi.UI
                 yield return null;
             }
 
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(killsParticleLocation.position);
-            }
-
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -533,11 +527,6 @@ namespace Vi.UI
                 yield return null;
             }
 
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(deathsParticleLocation.position);
-            }
-
             t = 0;
             while (!Mathf.Approximately(t, 1))
             {
@@ -545,11 +534,6 @@ namespace Vi.UI
                 t = Mathf.Clamp01(t);
                 assistsParent.localScale = Vector3.LerpUnclamped(Vector3.zero, Vector3.one, scaleLerpTimeCurve.Evaluate(t));
                 yield return null;
-            }
-
-            foreach (UIParticleSystem ps in rewardsParticleSystems)
-            {
-                ps.PlayWorldPoint(assistsParticleLocation.position);
             }
 
             if (showAccountCard)
