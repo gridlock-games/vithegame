@@ -3348,8 +3348,11 @@ namespace Vi.Core
         private IEnumerator Initialize()
         {
 #if UNITY_SERVER && !UNITY_EDITOR
-            yield return GetPublicIP();
-            APIURL = "http://" + PublicIP + ":80/";
+            if (!FasterPlayerPrefs.IsAutomatedClient)
+            {
+                yield return GetPublicIP();
+                APIURL = "http://" + PublicIP + ":80/";
+            }
 #endif
             CheckGameVersion(false);
             yield return null;

@@ -10,8 +10,7 @@ namespace Vi.UI
     [RequireComponent(typeof(Camera))]
     public class UICamera : MonoBehaviour
     {
-        [SerializeField] private string[] layerMask = new string[] { "UI" };
-        [SerializeField] private Camera particleUICamera;
+        [SerializeField] private string[] layerMask = new string[] { "UI", "UIParticle" };
 
         private static List<UICamera> UICameras = new List<UICamera>();
 
@@ -62,17 +61,8 @@ namespace Vi.UI
             {
                 return null;
             }
-            //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { return MainCamera; }
+            else if (mainCamera) { return mainCamera; }
             else { return UICameras[^1].attachedUICamera; }
-        }
-
-        public static Camera GetActiveUIParticleCamera()
-        {
-            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null)
-            {
-                return null;
-            }
-            else { return UICameras[^1].particleUICamera; }
         }
 
         private bool lastCamState;
@@ -83,7 +73,7 @@ namespace Vi.UI
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Null) { attachedUICamera.enabled = false; }
             //else if (NetworkManager.Singleton.IsServer) { cam.enabled = false; }
             //else if (MainCamera & !SceneLoadingUI.IsDisplaying) { cam.enabled = false; }
-            else { attachedUICamera.enabled = UICameras[^1] == this; }
+            else { attachedUICamera.enabled = UICameras[^1] == this & !mainCamera; }
 
             if (attachedUICamera.enabled != lastCamState)
             {
@@ -105,27 +95,27 @@ namespace Vi.UI
             {
                 if (audioListener) { Destroy(audioListener); }
 
-                if (cameraData.renderType == CameraRenderType.Base)
-                {
-                    cameraData.renderType = CameraRenderType.Overlay;
-                    for (int i = 0; i < allCameras.Length; i++)
-                    {
-                        mainCameraData.cameraStack.Add(allCameras[i]);
-                    }
-                }
+                //if (cameraData.renderType == CameraRenderType.Base)
+                //{
+                //    cameraData.renderType = CameraRenderType.Overlay;
+                //    for (int i = 0; i < allCameras.Length; i++)
+                //    {
+                //        mainCameraData.cameraStack.Add(allCameras[i]);
+                //    }
+                //}
             }
             else if (attachedUICamera.enabled)
             {
                 if (!audioListener & !FindMainCamera.MainCamera) { audioListener = gameObject.AddComponent<AudioListener>(); }
                 
-                if (cameraData.renderType == CameraRenderType.Overlay)
-                {
-                    for (int i = 0; i < allCameras.Length; i++)
-                    {
-                        mainCameraData.cameraStack.Remove(allCameras[i]);
-                    }
-                    cameraData.renderType = CameraRenderType.Base;
-                }
+                //if (cameraData.renderType == CameraRenderType.Overlay)
+                //{
+                //    for (int i = 0; i < allCameras.Length; i++)
+                //    {
+                //        mainCameraData.cameraStack.Remove(allCameras[i]);
+                //    }
+                //    cameraData.renderType = CameraRenderType.Base;
+                //}
             }
 
             if (mainCamera) { if (audioListener) { Destroy(audioListener); } }
@@ -133,13 +123,13 @@ namespace Vi.UI
 
         private void OnDestroy()
         {
-            if (cameraData.renderType == CameraRenderType.Overlay)
-            {
-                for (int i = 0; i < allCameras.Length; i++)
-                {
-                    mainCameraData.cameraStack.Remove(allCameras[i]);
-                }
-            }
+            //if (cameraData.renderType == CameraRenderType.Overlay)
+            //{
+            //    for (int i = 0; i < allCameras.Length; i++)
+            //    {
+            //        mainCameraData.cameraStack.Remove(allCameras[i]);
+            //    }
+            //}
             UICameras.Remove(this);
         }
     }

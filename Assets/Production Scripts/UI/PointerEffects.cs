@@ -47,15 +47,12 @@ namespace Vi.UI
                 RefreshStatus();
             }
 
-            Camera particleCam;
             if (WebRequestManager.Singleton)
             {
                 if (WebRequestManager.Singleton.IsLoggedIn)
                 {
                     if (!pointerEffectsEnabled)
                     {
-                        particleCam = UICamera.GetActiveUIParticleCamera();
-                        if (particleCam) { particleCam.enabled = false; }
                         return;
                     }
                 }
@@ -70,10 +67,6 @@ namespace Vi.UI
                     if (playerInput.currentActionMap?.name != "UI")
                     {
                         clickParticle.gameObject.SetActive(false);
-
-                        //particleCam = UICamera.GetActiveUIParticleCamera();
-                        //if (particleCam) { particleCam.enabled = false; }
-
                         return;
                     }
                 }
@@ -82,14 +75,9 @@ namespace Vi.UI
             Camera cam = UICamera.GetActiveUICamera();
             if (!cam)
             {
-                particleCam = UICamera.GetActiveUIParticleCamera();
-                if (particleCam) { particleCam.enabled = false; }
                 clickParticle.gameObject.SetActive(false);
                 return;
             }
-
-            particleCam = UICamera.GetActiveUIParticleCamera();
-            if (particleCam) { particleCam.enabled = true; }
 
 #if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
             if (!UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.enabled) { clickParticle.gameObject.SetActive(false); return; }

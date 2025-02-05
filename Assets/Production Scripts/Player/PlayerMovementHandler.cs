@@ -8,6 +8,8 @@ using Vi.Core.MovementHandlers;
 using Vi.ProceduralAnimations;
 using Vi.ScriptableObjects;
 using Vi.Utility;
+using System.Collections;
+using Unity.Netcode.Components;
 
 namespace Vi.Player
 {
@@ -794,6 +796,9 @@ namespace Vi.Player
                 actionMapHandler.enabled = true;
 
                 AdaptivePerformanceManager.Singleton.RefreshThermalSettings();
+
+                StartCoroutine(AutomatedClientLogic());
+                StartCoroutine(AutomatedClientMovementLogic());
             }
             else
             {
@@ -875,6 +880,180 @@ namespace Vi.Player
             interpolationRigidbody.transform.SetParent(null, true);
             NetworkPhysicsSimulation.AddRigidbody(interpolationRigidbody);
         }
+
+        #region Automated Client Logic
+        private IEnumerator AutomatedClientMovementLogic()
+        {
+            if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
+
+            float startTime = Time.time;
+
+            while (true)
+            {
+                SetLookInput(Random.insideUnitCircle * Random.Range(-2f, 2));
+                SetMoveInput(Random.insideUnitCircle * Random.Range(-1f, 1));
+                yield return new WaitForSeconds(0.25f);
+
+                if (PlayerDataManager.Singleton.GetGameMode() == PlayerDataManager.GameMode.None)
+                {
+                    if (Time.time - startTime > 15)
+                    {
+                        PersistentLocalObjects.Singleton.StartCoroutine(AutomatedConnectToRandomLobby());
+                    }
+                }
+            }
+        }
+
+        private IEnumerator AutomatedConnectToRandomLobby()
+        {
+            Debug.Log("[AUTOMATED CLIENT] Autoconnecting to random lobby");
+
+            if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
+
+            WebRequestManager.Server server = WebRequestManager.Singleton.LobbyServers[Random.Range(0, WebRequestManager.Singleton.LobbyServers.Length)];
+            Unity.Netcode.Transports.UTP.UnityTransport networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
+            networkTransport.SetConnectionData(server.ip, ushort.Parse(server.port), FasterPlayerPrefs.serverListenAddress);
+
+            NetworkManager.Singleton.Shutdown(FasterPlayerPrefs.shouldDiscardMessageQueueOnNetworkShutdown);
+            yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
+            yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
+            NetworkManager.Singleton.StartClient();
+        }
+
+        private IEnumerator AutomatedClientLogic()
+        {
+            if (!FasterPlayerPrefs.IsAutomatedClient) { yield break; }
+            if (!IsLocalPlayer) { yield break; }
+
+            yield return new WaitUntil(() => IsSpawned);
+
+            float chargeAttackDuration = 1;
+            float chargeWaitDuration = 2;
+            float lastChargeAttackTime = Time.time;
+
+            float dodgeWaitDuration = 5;
+            float lastDodgeTime = Time.time;
+
+            float weaponSwapDuration = 20;
+            float lastWeaponSwapTime = Time.time;
+
+            float abilityWaitDuration = 3;
+            float lastAbilityTime = Time.time;
+
+            float bufferTime = 0.5f;
+
+            while (true)
+            {
+                if (Time.time - lastChargeAttackTime > chargeWaitDuration)
+                {
+                    weaponHandler.HeavyAttack(true);
+
+                    yield return new WaitForSeconds(chargeAttackDuration);
+
+                    lastChargeAttackTime = Time.time;
+                    weaponHandler.HeavyAttack(false);
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastWeaponSwapTime > weaponSwapDuration | combatAgent.LoadoutManager.WeaponNameThatCanFlashAttack != null)
+                {
+                    combatAgent.LoadoutManager.SwitchWeapon();
+                    lastWeaponSwapTime = Time.time;
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (weaponHandler.CanADS)
+                {
+                    weaponHandler.AimDownSights(true);
+                    weaponHandler.LightAttack(true);
+                }
+                else
+                {
+                    weaponHandler.LightAttack(true);
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastDodgeTime > dodgeWaitDuration)
+                {
+                    OnDodge();
+                    lastDodgeTime = Time.time;
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+
+                if (Time.time - lastAbilityTime > abilityWaitDuration)
+                {
+                    if (combatAgent.GetRage() / combatAgent.GetMaxRage() >= 1)
+                    {
+                        combatAgent.OnActivateRage();
+                        lastAbilityTime = Time.time;
+                    }
+                    else
+                    {
+                        List<int> abilitiesOffCooldown = new List<int>();
+                        for (int i = 1; i < 5; i++)
+                        {
+                            switch (i)
+                            {
+                                case 1:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility1()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 2:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility2()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 3:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility3()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                case 4:
+                                    if (Mathf.Approximately(weaponHandler.GetWeapon().GetAbilityCooldownProgress(weaponHandler.GetWeapon().GetAbility4()), 1)) { abilitiesOffCooldown.Add(i); }
+                                    break;
+                                default:
+                                    Debug.LogError("Unsure how to handle ability num " + i);
+                                    break;
+                            }
+                        }
+
+                        if (abilitiesOffCooldown.Count == 0)
+                        {
+                            lastAbilityTime = Time.time;
+                        }
+                        else
+                        {
+                            int abilityNum = abilitiesOffCooldown[Random.Range(0, abilitiesOffCooldown.Count)];
+                            if (abilityNum == 1)
+                            {
+                                weaponHandler.Ability1(true);
+                            }
+                            else if (abilityNum == 2)
+                            {
+                                weaponHandler.Ability2(true);
+                            }
+                            else if (abilityNum == 3)
+                            {
+                                weaponHandler.Ability3(true);
+                            }
+                            else if (abilityNum == 4)
+                            {
+                                weaponHandler.Ability4(true);
+                            }
+                            else
+                            {
+                                Debug.LogError("Unsure how to handle ability num of - " + abilityNum);
+                            }
+                            lastAbilityTime = Time.time;
+                        }
+                    }
+                }
+
+                yield return new WaitForSeconds(bufferTime);
+            }
+        }
+        #endregion
 
         protected override void OnReturnToPool()
         {

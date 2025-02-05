@@ -30,7 +30,6 @@ namespace Vi.UI
 
         private Vector2 maxPosition;
         private Vector2 minPosition;
-        private float directionMultiplier = 1;
         private void Update()
         {
             float normalizedTime = Mathf.PingPong(Time.time * speed, 1);

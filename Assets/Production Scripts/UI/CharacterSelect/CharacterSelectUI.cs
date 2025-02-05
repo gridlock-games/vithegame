@@ -234,6 +234,11 @@ namespace Vi.UI
                 data.OnDragEvent += OnCharPreviewDrag;
             }
 
+            if (Debug.isDebugBuild)
+            {
+                trainingRoomMapOptions.Add("Empty Scene");
+            }
+
             trainingRoomMapDropdown.ClearOptions();
             trainingRoomMapDropdown.AddOptions(trainingRoomMapOptions);
         }

@@ -34,6 +34,8 @@ namespace Vi.Utility
 #endif
         }
 
+        public static bool IsAutomatedClient { get; set; }
+
         public static bool IsMobilePlatform
         {
             get { return Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
@@ -78,6 +80,8 @@ namespace Vi.Utility
 #if (UNITY_IOS || UNITY_ANDROID)
             UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 #endif
+
+            IsAutomatedClient = System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-automated-client") != -1;
         }
 
 #if (UNITY_IOS || UNITY_ANDROID)
