@@ -53,13 +53,7 @@ namespace Vi.Core
                 if (FasterPlayerPrefs.Singleton.GetString("LastApplicationVersion") != Application.version)
                 {
                     // Just updated, execute this code
-                    if (FasterPlayerPrefs.Singleton.HasBool("IsDiscordVerified")) { FasterPlayerPrefs.Singleton.DeleteKey("IsDiscordVerified"); }
-                    if (FasterPlayerPrefs.Singleton.HasInt("RenderDistance")) { FasterPlayerPrefs.Singleton.DeleteKey("RenderDistance"); }
-
-                    if (FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.DeleteKey("DPIScalingFactor"); }
                     if (FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.DeleteKey("PostProcessingEnabled"); }
-
-                    if (FasterPlayerPrefs.Singleton.HasBool("ThermalEventsEnabled")) { FasterPlayerPrefs.Singleton.DeleteKey("ThermalEventsEnabled"); }
                 }
             }
 
@@ -163,7 +157,7 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", QualitySettings.GetQualityLevel() > 0); }
+            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", FasterPlayerPrefs.IsMobilePlatform ? 0.5f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = 1;
 
