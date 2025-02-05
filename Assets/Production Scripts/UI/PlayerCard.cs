@@ -9,6 +9,8 @@ using Vi.Core.CombatAgents;
 using Vi.Utility;
 using Vi.Core.GameModeManagers;
 using UnityEngine.Video;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace Vi.UI
 {
@@ -41,11 +43,10 @@ namespace Vi.UI
         [SerializeField] private Image armorBackground;
 
         [Header("Rage UI")]
-        [SerializeField] private RenderTexture ragingRT;
-        [SerializeField] private RenderTexture rageReadyRT;
-        [SerializeField] private VideoPlayer rageReadyVideoPlayerPrefab;
-        [SerializeField] private VideoPlayer ragingVideoPlayerPrefab;
-        [SerializeField] private RawImage rageStatusIndicator;
+        [SerializeField] private ImageSequencePlayer rageImageSequencePlayer;
+        [SerializeField] private AssetReference rageReadyImageSequence;
+        [SerializeField] private AssetReference ragingImageSequence;
+        [SerializeField] private Image rageStatusIndicator;
         [SerializeField] private Image rageFillImage;
         [SerializeField] private Image interimRageFillImage;
 
@@ -140,8 +141,11 @@ namespace Vi.UI
             staminaAndArmorAreDisabled = true;
         }
 
-        private static VideoPlayer rageReadyVideoPlayerInstance;
-        private static VideoPlayer ragingVideoPlayerInstance;
+        private static AsyncOperationHandle<ImageSequence> rageReadyImageSequenceHandle;
+        private static AsyncOperationHandle<ImageSequence> ragingImageSequenceHandle;
+
+        private static bool rageReadyImageSequenceLoaded;
+        private static bool ragingImageSequenceLoaded;
 
         private Canvas canvas;
         private void Awake()
@@ -149,8 +153,23 @@ namespace Vi.UI
             canvas = GetComponent<Canvas>();
             experienceProgressImage.fillAmount = 0;
 
-            if (!rageReadyVideoPlayerInstance) { rageReadyVideoPlayerInstance = Instantiate(rageReadyVideoPlayerPrefab, new Vector3(-50, 100, 0), Quaternion.identity); }
-            if (!ragingVideoPlayerInstance) { ragingVideoPlayerInstance = Instantiate(ragingVideoPlayerPrefab, new Vector3(50, 100, 0), Quaternion.identity); }
+            if (!rageReadyImageSequenceHandle.IsValid())
+            {
+                rageReadyImageSequenceHandle = rageReadyImageSequence.LoadAssetAsync<ImageSequence>();
+                rageReadyImageSequenceHandle.Completed += (imageSequence) =>
+                {
+                    rageReadyImageSequenceLoaded = true;
+                };
+            }
+            
+            if (!ragingImageSequenceHandle.IsValid())
+            {
+                ragingImageSequenceHandle = ragingImageSequence.LoadAssetAsync<ImageSequence>();
+                ragingImageSequenceHandle.Completed += (imageSequence) =>
+                {
+                    ragingImageSequenceLoaded = true;
+                };
+            }
         }
 
         private void OnEnable()
@@ -159,7 +178,7 @@ namespace Vi.UI
             {
                 DisableStaminaAndArmorDisplay();
             }
-
+            rageStatusIndicator.color = new Color(1, 1, 1, 0);
             RefreshLevelingSystem();
         }
 
@@ -327,20 +346,20 @@ namespace Vi.UI
                 currentRageStatus = RageStatus.CannotActivateRage;
             }
 
-            if (currentRageStatus != lastRageStatus)
+            if (currentRageStatus != lastRageStatus & rageReadyImageSequenceLoaded & ragingImageSequenceLoaded)
             {
                 switch (currentRageStatus)
                 {
                     case RageStatus.IsRaging:
-                        rageStatusIndicator.texture = ragingRT;
+                        rageImageSequencePlayer.ChangeImageSequence(ragingImageSequenceHandle.Result);
                         rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CanActivateRage:
-                        rageStatusIndicator.texture = rageReadyRT;
+                        rageImageSequencePlayer.ChangeImageSequence(rageReadyImageSequenceHandle.Result);
                         rageStatusIndicator.color = new Color(1, 1, 1, levelText.enabled ? 0.4f : 1);
                         break;
                     case RageStatus.CannotActivateRage:
-                        rageStatusIndicator.texture = null;
+                        rageImageSequencePlayer.ChangeImageSequence(null);
                         rageStatusIndicator.color = new Color(1, 1, 1, 0);
                         break;
                     default:
@@ -348,7 +367,11 @@ namespace Vi.UI
                         break;
                 }
             }
-            lastRageStatus = currentRageStatus;
+
+            if (rageReadyImageSequenceLoaded & ragingImageSequenceLoaded)
+            {
+                lastRageStatus = currentRageStatus;
+            }
         }
 
         private RageStatus lastRageStatus = RageStatus.None;

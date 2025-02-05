@@ -540,13 +540,20 @@ MonoBehaviour:
   interimArmorFillImage: {fileID: 1128668944168095683}
   bottomArmorBorder: {fileID: 1456438271516473357}
   armorBackground: {fileID: 8088568553903798972}
-  ragingRT: {fileID: 8400000, guid: e5584dcd3550792419a7a57efd1a4783, type: 2}
-  rageReadyRT: {fileID: 8400000, guid: 3bd71b23b417a914b9a25448b268fdfb, type: 2}
-  rageReadyVideoPlayerPrefab: {fileID: 7321560943198008921, guid: 24737c34e4f3cc1479fd5b0bf654bbe0,
-    type: 3}
-  ragingVideoPlayerPrefab: {fileID: 3518936828917027742, guid: 3bb30d250d7cc90498bd1bace94cf069,
-    type: 3}
-  rageStatusIndicator: {fileID: 7472773967375568070}
+  rageImageSequencePlayer: {fileID: 3024807589053000435}
+  rageReadyImageSequence:
+    m_AssetGUID: 797b90963e4cfdf4591976c5102d70e8
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  ragingImageSequence:
+    m_AssetGUID: 6d000a550d420934ca421e86e4c5b200
+    m_SubObjectName: 
+    m_SubObjectGUID: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  rageStatusIndicator: {fileID: 2115803003040113740}
   rageFillImage: {fileID: 1679784692164774126}
   interimRageFillImage: {fileID: 1679784692164774126}
   experienceProgressImage: {fileID: 6499195464566354458}
@@ -950,8 +957,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3215993823360860822}
   - component: {fileID: 5702138708828826317}
-  - component: {fileID: 7472773967375568070}
+  - component: {fileID: 2115803003040113740}
   - component: {fileID: 6229777764179897264}
+  - component: {fileID: 3024807589053000435}
   m_Layer: 5
   m_Name: RageStatusIndicator
   m_TagString: Untagged
@@ -986,7 +994,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5200774436804024062}
   m_CullTransparentMesh: 1
---- !u!114 &7472773967375568070
+--- !u!114 &2115803003040113740
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -995,24 +1003,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 5200774436804024062}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 0}
-  m_UVRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!223 &6229777764179897264
 Canvas:
   m_ObjectHideFlags: 0
@@ -1036,6 +1047,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &3024807589053000435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200774436804024062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db5a724406108e743962c6a4c488bae1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  imageSequences: []
 --- !u!1 &5296905871556508051
 GameObject:
   m_ObjectHideFlags: 0
