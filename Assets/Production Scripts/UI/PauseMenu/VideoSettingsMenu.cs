@@ -416,7 +416,7 @@ namespace Vi.UI
             {
                 case 0:
                     shadowsDropdown.value = 0;
-                    postProcessingToggle.isOn = false;
+                    postProcessingToggle.isOn = true;
                     break;
                 case 1:
                     shadowsDropdown.value = 1;
