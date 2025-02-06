@@ -404,7 +404,21 @@ namespace Vi.Editor
                         shouldReimport = true;
                     }
 
-                    int targetMobileImportSize = assetPath.Contains("Environment Assets") ? 1024 : 256;
+                    bool isEnvironmentAsset = assetPath.Contains("Environment Assets");
+
+                    if (isEnvironmentAsset)
+                    {
+                        if (defaultSettings.maxTextureSize < 2048)
+                        {
+                            defaultSettings.maxTextureSize = 2048;
+                            defaultSettings.compressionQuality = 100;
+                            defaultSettings.crunchedCompression = true;
+                            importer.SetPlatformTextureSettings(defaultSettings);
+                            shouldReimport = true;
+                        }
+                    }
+
+                    int targetMobileImportSize = isEnvironmentAsset ? 1024 : 256;
                     if (defaultSettings.maxTextureSize > targetMobileImportSize)
                     {
                         if (!importer.GetPlatformTextureSettings("Android").overridden
