@@ -841,28 +841,10 @@ namespace Vi.Editor
                 Material mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
                 if (mat)
                 {
-                    // TODO Remove
-                    if (mat.shader.name != "Shader Graphs/Character and Weapon Shader") { continue; }
-
                     if (!mat.enableInstancing)
                     {
-                        //Debug.Log(mat + " no instancing");
-
-                        //mat.enableInstancing = true;
-                        //EditorUtility.SetDirty(mat);
-                    }
-
-                    if (mat.HasTexture("_Normal_Map") & mat.HasTexture("_Base_Color"))
-                    {
-                        if (!mat.GetTexture("_Normal_Map"))
-                        {
-                            Debug.Log(mat + " has no normal map");
-                            Texture baseColor = mat.GetTexture("_Base_Color");
-                            if (!baseColor)
-                            {
-                                Debug.Log(mat + " has no base color map");
-                            }
-                        }
+                        mat.enableInstancing = true;
+                        EditorUtility.SetDirty(mat);
                     }
                 }
                 EditorUtility.UnloadUnusedAssetsImmediate();
