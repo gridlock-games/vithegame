@@ -833,18 +833,41 @@ namespace Vi.Editor
         {
             List<string> paths = new List<string>();
             paths.AddRange(Directory.GetFiles(@"Assets\PackagedPrefabs", "*.mat", SearchOption.AllDirectories));
-            foreach (string path in paths)
+            for (int i = 0; i < paths.Count; i++)
             {
-                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (EditorUtility.DisplayCancelableProgressBar("Enabling GPU Instancing",
+                    i.ToString() + " out of " + paths.Count, (float)i / paths.Count)) { break; }
+
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
                 if (mat)
                 {
+                    // TODO Remove
+                    if (mat.shader.name != "Shader Graphs/Character and Weapon Shader") { continue; }
+
                     if (!mat.enableInstancing)
                     {
-                        mat.enableInstancing = true;
-                        EditorUtility.SetDirty(mat);
+                        //Debug.Log(mat + " no instancing");
+
+                        //mat.enableInstancing = true;
+                        //EditorUtility.SetDirty(mat);
+                    }
+
+                    if (mat.HasTexture("_Normal_Map") & mat.HasTexture("_Base_Color"))
+                    {
+                        if (!mat.GetTexture("_Normal_Map"))
+                        {
+                            Debug.Log(mat + " has no normal map");
+                            Texture baseColor = mat.GetTexture("_Base_Color");
+                            if (!baseColor)
+                            {
+                                Debug.Log(mat + " has no base color map");
+                            }
+                        }
                     }
                 }
+                EditorUtility.UnloadUnusedAssetsImmediate();
             }
+            EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
         }
 
