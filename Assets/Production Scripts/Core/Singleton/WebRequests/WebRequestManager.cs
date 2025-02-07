@@ -12,6 +12,7 @@ using Vi.Utility;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using static Vi.Core.ServerManager;
 
 namespace Vi.Core
 {
@@ -19,8 +20,80 @@ namespace Vi.Core
     [RequireComponent(typeof(ServerManager))]
     [RequireComponent(typeof(CharacterManager))]
     [RequireComponent(typeof(LeaderboardManager))]
+    [RequireComponent(typeof(ItemShopManager))]
     public class WebRequestManager : MonoBehaviour
     {
+        // Get Request Template
+        //public IEnumerator GetRequestTemplate()
+        //{
+        //    UnityWebRequest getRequest = UnityWebRequest.Get(url);
+        //    yield return getRequest.SendWebRequest();
+
+        //    if (getRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        Debug.LogError("Get Request Error in GetRequestTemplate() " + getRequest.error);
+        //        getRequest.Dispose();
+        //        yield break;
+        //    }
+
+        //    getRequest.Dispose();
+        //}
+
+        // Post Request Template
+        //public IEnumerator PostRequestTemplate(string parameter)
+        //{
+        //    Payload payload = new Payload(parameter);
+
+        //    string json = JsonConvert.SerializeObject(payload);
+        //    byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+        //    UnityWebRequest postRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+        //    postRequest.SetRequestHeader("Content-Type", "application/json");
+        //    yield return postRequest.SendWebRequest();
+
+        //    // Send again to get around unity bug
+        //    if (postRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        postRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+        //        postRequest.SetRequestHeader("Content-Type", "application/json");
+        //        yield return postRequest.SendWebRequest();
+        //    }
+
+        //    if (postRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        Debug.LogError("Put request error in PutRequestTemplate()" + postRequest.error);
+        //    }
+
+        //    postRequest.Dispose();
+        //}
+
+        // Put Request Template
+        //public IEnumerator PutRequestTemplate(string parameter)
+        //{
+        //    Payload payload = new Payload(parameter);
+
+        //    string json = JsonUtility.ToJson(payload);
+        //    byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+
+        //    UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "updateCharacterCosmetic", jsonData);
+        //    putRequest.SetRequestHeader("Content-Type", "application/json");
+        //    yield return putRequest.SendWebRequest();
+
+        //    if (putRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        putRequest = UnityWebRequest.Put(url, jsonData);
+        //        putRequest.SetRequestHeader("Content-Type", "application/json");
+        //        yield return putRequest.SendWebRequest();
+        //    }
+
+        //    if (putRequest.result != UnityWebRequest.Result.Success)
+        //    {
+        //        Debug.LogError("Put request error in PutRequestTemplate()" + putRequest.error);
+        //    }
+
+        //    putRequest.Dispose();
+        //}
+
         private static WebRequestManager _singleton;
 
         public static WebRequestManager Singleton
@@ -35,6 +108,7 @@ namespace Vi.Core
         public ServerManager ServerManager { get; private set; }
         public CharacterManager CharacterManager { get; private set; }
         public LeaderboardManager LeaderboardManager { get; private set; }
+        public ItemShopManager ItemShopManager { get; private set; }
 
         private void Awake()
         {
@@ -42,6 +116,7 @@ namespace Vi.Core
             ServerManager = GetComponent<ServerManager>();
             CharacterManager = GetComponent<CharacterManager>();
             LeaderboardManager = GetComponent<LeaderboardManager>();
+            ItemShopManager = GetComponent<ItemShopManager>();
 
             _singleton = this;
 
