@@ -404,7 +404,21 @@ namespace Vi.Editor
                         shouldReimport = true;
                     }
 
-                    int targetMobileImportSize = assetPath.Contains("Environment Assets") ? 1024 : 256;
+                    bool isEnvironmentAsset = assetPath.Contains("Environment Assets");
+
+                    if (isEnvironmentAsset)
+                    {
+                        if (defaultSettings.maxTextureSize < 2048)
+                        {
+                            defaultSettings.maxTextureSize = 2048;
+                            defaultSettings.compressionQuality = 100;
+                            defaultSettings.crunchedCompression = true;
+                            importer.SetPlatformTextureSettings(defaultSettings);
+                            shouldReimport = true;
+                        }
+                    }
+
+                    int targetMobileImportSize = isEnvironmentAsset ? 1024 : 256;
                     if (defaultSettings.maxTextureSize > targetMobileImportSize)
                     {
                         if (!importer.GetPlatformTextureSettings("Android").overridden
@@ -833,9 +847,12 @@ namespace Vi.Editor
         {
             List<string> paths = new List<string>();
             paths.AddRange(Directory.GetFiles(@"Assets\PackagedPrefabs", "*.mat", SearchOption.AllDirectories));
-            foreach (string path in paths)
+            for (int i = 0; i < paths.Count; i++)
             {
-                Material mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (EditorUtility.DisplayCancelableProgressBar("Enabling GPU Instancing",
+                    i.ToString() + " out of " + paths.Count, (float)i / paths.Count)) { break; }
+
+                Material mat = AssetDatabase.LoadAssetAtPath<Material>(paths[i]);
                 if (mat)
                 {
                     if (!mat.enableInstancing)
@@ -844,7 +861,9 @@ namespace Vi.Editor
                         EditorUtility.SetDirty(mat);
                     }
                 }
+                EditorUtility.UnloadUnusedAssetsImmediate();
             }
+            EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
         }
 
