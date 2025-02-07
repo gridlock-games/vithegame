@@ -53,7 +53,7 @@ namespace Vi.UI
             SetSelectedState(true);
         }
 
-        public void InitializeAsCharacter(WebRequestManager.Character character)
+        public void InitializeAsCharacter(CharacterManager.Character character)
         {
             Button.interactable = true;
             isSelected = false;
@@ -64,7 +64,7 @@ namespace Vi.UI
 
             nameText.text = character.name.ToString();
 
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
                 levelText.text = "Lv." + stats.level.ToString();
             }

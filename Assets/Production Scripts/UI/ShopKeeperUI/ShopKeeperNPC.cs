@@ -42,7 +42,7 @@ namespace Vi.UI
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
                 // If this weapon option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
+                bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
 
@@ -53,7 +53,7 @@ namespace Vi.UI
                     | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
 
                 // If this armor option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
+                bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
         }
@@ -123,29 +123,29 @@ namespace Vi.UI
                         var pants = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Pants);
                         if (pants != null)
                         {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, pants.itemWebId);
+                            yield return WebRequestManager.Singleton.CharacterManager.AddItemToInventory(characterId, pants.itemWebId);
                         }
-                        bool setSuccess = WebRequestManager.Singleton.InventoryAddWasSuccessful;
+                        bool setSuccess = WebRequestManager.Singleton.CharacterManager.InventoryAddWasSuccessful;
 
                         var boots = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Boots);
                         if (boots != null)
                         {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, boots.itemWebId);
+                            yield return WebRequestManager.Singleton.CharacterManager.AddItemToInventory(characterId, boots.itemWebId);
                         }
-                        setSuccess &= WebRequestManager.Singleton.InventoryAddWasSuccessful;
+                        setSuccess &= WebRequestManager.Singleton.CharacterManager.InventoryAddWasSuccessful;
 
                         var belt = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Belt);
                         if (belt != null)
                         {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, belt.itemWebId);
+                            yield return WebRequestManager.Singleton.CharacterManager.AddItemToInventory(characterId, belt.itemWebId);
                         }
-                        setSuccess &= WebRequestManager.Singleton.InventoryAddWasSuccessful;
+                        setSuccess &= WebRequestManager.Singleton.CharacterManager.InventoryAddWasSuccessful;
 
                         if (setSuccess)
                         {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
-                            setSuccess = WebRequestManager.Singleton.InventoryAddWasSuccessful;
-                            if (setSuccess) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
+                            yield return WebRequestManager.Singleton.CharacterManager.AddItemToInventory(characterId, itemId);
+                            setSuccess = WebRequestManager.Singleton.CharacterManager.InventoryAddWasSuccessful;
+                            if (setSuccess) { yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId); }
                         }
 
                         PurchaseClientRpc(purchaserClientId, setSuccess, characterId, itemId, price);
@@ -154,9 +154,9 @@ namespace Vi.UI
                 }
             }
 
-            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
-            bool success = WebRequestManager.Singleton.InventoryAddWasSuccessful;
-            if (success) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
+            yield return WebRequestManager.Singleton.CharacterManager.AddItemToInventory(characterId, itemId);
+            bool success = WebRequestManager.Singleton.CharacterManager.InventoryAddWasSuccessful;
+            if (success) { yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId); }
             PurchaseClientRpc(purchaserClientId, success, characterId, itemId, price);
         }
 
@@ -165,7 +165,7 @@ namespace Vi.UI
         {
             if (purchaseSuccessful)
             {
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId));
             }
 
             if (purchaserClientId == NetworkManager.LocalClientId)

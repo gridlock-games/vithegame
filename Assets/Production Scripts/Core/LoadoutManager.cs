@@ -156,7 +156,7 @@ namespace Vi.Core
         }
 
         private Coroutine applyLoadoutCoroutine;
-        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn = false)
+        public void ApplyLoadout(CharacterReference.RaceAndGender raceAndGender, CharacterManager.Loadout loadout, string characterId, bool waitForRespawn = false)
         {
             if (applyLoadoutCoroutine != null) { StopCoroutine(applyLoadoutCoroutine); }
             if (gameObject.activeInHierarchy)
@@ -193,7 +193,7 @@ namespace Vi.Core
             canApplyLoadoutThisFrame = false;
         }
 
-        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, WebRequestManager.Loadout loadout, string characterId, bool waitForRespawn)
+        public IEnumerator ApplyLoadoutCoroutine(CharacterReference.RaceAndGender raceAndGender, CharacterManager.Loadout loadout, string characterId, bool waitForRespawn)
         {
             // This will happen when a player hasn't made a loadout in one of its slots yet
             // TODO change this to only modify the loadout's invalid values
@@ -208,25 +208,25 @@ namespace Vi.Core
 
             if (!string.IsNullOrWhiteSpace(characterId))
             {
-                if (!WebRequestManager.HasCharacterInventory(characterId))
+                if (!CharacterManager.HasCharacterInventory(characterId))
                 {
-                    yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
+                    yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId);
                 }
                 else if (IsSpawned) // When spawned, changes to a character's loadout may occur at runtime, therefore we need to refresh the character's inventory if an item doesn't exist on this instance
                 {
                     foreach (string inventoryID in loadout.GetLoadoutItemIDsAsArray())
                     {
                         if (string.IsNullOrWhiteSpace(inventoryID)) { continue; }
-                        if (!WebRequestManager.HasInventoryItem(characterId, inventoryID))
+                        if (!CharacterManager.HasInventoryItem(characterId, inventoryID))
                         {
-                            yield return WebRequestManager.Singleton.GetCharacterInventory(characterId);
+                            yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId);
                             break;
                         }
                     }
                 }
             }
             
-            if (WebRequestManager.TryGetInventoryItem(characterId, loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(characterId, loadout.weapon1ItemId.ToString(), out CharacterManager.InventoryItem weapon1InventoryItem))
             {
                 if (weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out CharacterReference.WeaponOption weaponOption))
                 {
@@ -249,7 +249,7 @@ namespace Vi.Core
                 }
             }
 
-            if (WebRequestManager.TryGetInventoryItem(characterId, loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(characterId, loadout.weapon2ItemId.ToString(), out CharacterManager.InventoryItem weapon2InventoryItem))
             {
                 if (weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out CharacterReference.WeaponOption weaponOption))
                 {
@@ -295,7 +295,7 @@ namespace Vi.Core
             foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in loadout.GetLoadoutArmorPiecesAsDictionary())
             {
                 CharacterReference.WearableEquipmentOption wearableEquipmentOption = null;
-                if (WebRequestManager.TryGetInventoryItem(characterId, kvp.Value.ToString(), out WebRequestManager.InventoryItem equipmentInventoryItem))
+                if (CharacterManager.TryGetInventoryItem(characterId, kvp.Value.ToString(), out CharacterManager.InventoryItem equipmentInventoryItem))
                 {
                     wearableEquipmentOption = wearableEquipmentOptions.Find(item => item.itemWebId == equipmentInventoryItem.itemId._id);
                 }
@@ -332,14 +332,14 @@ namespace Vi.Core
                 if (combatAgent is Attributes attributes)
                 {
                     PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(attributes.GetPlayerDataId());
-                    int index = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == playerData.character._id);
+                    int index = WebRequestManager.Singleton.CharacterManager.Characters.FindIndex(item => item._id == playerData.character._id);
                     if (index == -1)
                     {
-                        WebRequestManager.Singleton.Characters.Add(playerData.character);
+                        WebRequestManager.Singleton.CharacterManager.Characters.Add(playerData.character);
                     }
                     else
                     {
-                        WebRequestManager.Singleton.Characters[index] = playerData.character;
+                        WebRequestManager.Singleton.CharacterManager.Characters[index] = playerData.character;
                     }
                 }
             }

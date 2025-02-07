@@ -869,7 +869,7 @@ namespace Vi.UI
         {
             if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+            CharacterManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
             if (previewObject)
             {
@@ -1045,10 +1045,10 @@ namespace Vi.UI
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
 
-            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
+            CharacterManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
 
             CharacterReference.WeaponOption primaryOption;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out CharacterManager.InventoryItem weapon1InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out primaryOption))
                 {
@@ -1062,7 +1062,7 @@ namespace Vi.UI
             }
 
             CharacterReference.WeaponOption secondaryOption;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out CharacterManager.InventoryItem weapon2InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out secondaryOption))
                 {
@@ -1075,8 +1075,8 @@ namespace Vi.UI
                 secondaryOption = null;
             }
 
-            if (primaryOption == null) { primaryOption = WebRequestManager.GetDefaultPrimaryWeapon(); }
-            if (secondaryOption == null) { secondaryOption = WebRequestManager.GetDefaultSecondaryWeapon(); }
+            if (primaryOption == null) { primaryOption = CharacterManager.GetDefaultPrimaryWeapon(); }
+            if (secondaryOption == null) { secondaryOption = CharacterManager.GetDefaultSecondaryWeapon(); }
 
             if (primaryOption != null)
             {

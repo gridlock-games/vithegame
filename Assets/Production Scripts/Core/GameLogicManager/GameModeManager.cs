@@ -531,7 +531,7 @@ namespace Vi.Core.GameModeManagers
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
                         float expAward = playerScore.GetExpReward();
                         expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
-                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
                     }
                 }
             }

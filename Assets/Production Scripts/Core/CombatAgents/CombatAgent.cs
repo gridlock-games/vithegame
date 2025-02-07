@@ -47,7 +47,7 @@ namespace Vi.Core
             {
                 return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
             }
-            else if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
                 return Mathf.Max(stats.hp, stats.baseHP) + SessionProgressionHandler.MaxHPBonus;
             }
@@ -65,7 +65,7 @@ namespace Vi.Core
             {
                 return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
             }
-            else if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
                 return stats.defense + stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
             }

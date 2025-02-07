@@ -817,7 +817,7 @@ namespace Vi.Core
             {
                 botClientId--;
 
-                WebRequestManager.Character botCharacter = WebRequestManager.Singleton.GetRandomizedCharacter(useDefaultPrimaryWeapon);
+                CharacterManager.Character botCharacter = WebRequestManager.Singleton.CharacterManager.GetRandomizedCharacter(useDefaultPrimaryWeapon);
                 botCharacter.name = GetRandomPlayerName(botCharacter.raceAndGender);
                 PlayerData botData = new PlayerData(botClientId,
                     defaultChannel,
@@ -1361,7 +1361,7 @@ namespace Vi.Core
 
                     if (networkListEvent.Value.id >= 0)
                     {
-                        StartCoroutine(WebRequestManager.Singleton.GetCharacterAttributes(networkListEvent.Value.character._id.ToString()));
+                        StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterAttributes(networkListEvent.Value.character._id.ToString()));
                     }
                     break;
                 case NetworkListEvent<PlayerData>.EventType.Insert:
@@ -1655,7 +1655,7 @@ namespace Vi.Core
                     if (clientId >= 0)
                     {
                         PlayerData playerData = GetPlayerData((int)clientId);
-                        WebRequestManager.Loadout activeLoadout = playerData.character.GetActiveLoadout();
+                        CharacterManager.Loadout activeLoadout = playerData.character.GetActiveLoadout();
 
                         int loadoutSlotIndex = serverSideOriginalLoadouts.FindIndex(item => item.Item1 == playerData.id);
                         if (loadoutSlotIndex != -1)
@@ -1685,13 +1685,13 @@ namespace Vi.Core
             }
         }
 
-        private IEnumerator ExecuteLoadoutSwap(PlayerData playerData, WebRequestManager.Loadout loadout)
+        private IEnumerator ExecuteLoadoutSwap(PlayerData playerData, CharacterManager.Loadout loadout)
         {
-            if (loadout.EqualsIgnoringSlot(WebRequestManager.Loadout.GetEmptyLoadout()))
+            if (loadout.EqualsIgnoringSlot(CharacterManager.Loadout.GetEmptyLoadout()))
             {
-                yield return WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), loadout);
+                yield return WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), loadout);
             }
-            yield return WebRequestManager.Singleton.UseCharacterLoadout(playerData.character._id.ToString(), loadout.loadoutSlot.ToString());
+            yield return WebRequestManager.Singleton.CharacterManager.UseCharacterLoadout(playerData.character._id.ToString(), loadout.loadoutSlot.ToString());
         }
 
         private IEnumerator ReturnToCharacterSelectOnServerShutdown()
@@ -1761,7 +1761,7 @@ namespace Vi.Core
             return lowestCountIndex == -1 ? defaultChannel : lowestCountIndex;
         }
 
-        public void SetCharAttributes(int dataId, WebRequestManager.CharacterAttributes newAttributes)
+        public void SetCharAttributes(int dataId, CharacterManager.CharacterAttributes newAttributes)
         {
             if (GetGameMode() != GameMode.None) { return; }
             if (!ContainsId(dataId)) { return; }
@@ -1770,12 +1770,12 @@ namespace Vi.Core
             {
                 PlayerData playerData = GetPlayerData(dataId);
                 if (newAttributes.Equals(playerData.character.attributes)) { return; }
-                WebRequestManager.Character newChar = playerData.character;
+                CharacterManager.Character newChar = playerData.character;
                 newChar.attributes = newAttributes;
                 playerData.character = newChar;
                 SetPlayerData(playerData);
 
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(playerData.character._id.ToString(),
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterAttributes(playerData.character._id.ToString(),
                     playerData.character.attributes));
 
                 GetCharAttributesRpc(playerData.character._id.ToString());
@@ -1789,16 +1789,16 @@ namespace Vi.Core
         [Rpc(SendTo.NotServer)]
         private void GetCharAttributesRpc(string characterId)
         {
-            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterAttributes(characterId));
+            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterAttributes(characterId));
         }
 
         [Rpc(SendTo.Server, RequireOwnership = false)]
-        private void SetCharAttributesRpc(int dataId, WebRequestManager.CharacterAttributes newAttributes)
+        private void SetCharAttributesRpc(int dataId, CharacterManager.CharacterAttributes newAttributes)
         {
             SetCharAttributes(dataId, newAttributes);
         }
 
-        public void SetCharAttributes(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        public void SetCharAttributes(int dataId, CharacterManager.Character.AttributeType attributeType, int newValue)
         {
             if (GetGameMode() != GameMode.None) { return; }
             if (!ContainsId(dataId)) { return; }
@@ -1812,11 +1812,11 @@ namespace Vi.Core
             if (IsServer)
             {
                 PlayerData playerData = GetPlayerData(dataId);
-                WebRequestManager.Character newChar = playerData.character.SetStat(attributeType, newValue);
+                CharacterManager.Character newChar = playerData.character.SetStat(attributeType, newValue);
                 playerData.character = newChar;
                 SetPlayerData(playerData);
 
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(playerData.character._id.ToString(),
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterAttributes(playerData.character._id.ToString(),
                     playerData.character.attributes));
 
                 GetCharAttributesRpc(playerData.character._id.ToString());
@@ -1828,7 +1828,7 @@ namespace Vi.Core
         }
 
         [Rpc(SendTo.Server, RequireOwnership = false)]
-        private void SetCharAttributesRpc(int dataId, WebRequestManager.Character.AttributeType attributeType, int newValue)
+        private void SetCharAttributesRpc(int dataId, CharacterManager.Character.AttributeType attributeType, int newValue)
         {
             SetCharAttributes(dataId, attributeType, newValue);
         }
@@ -1843,7 +1843,7 @@ namespace Vi.Core
         {
             public int id;
             public int channel;
-            public WebRequestManager.Character character;
+            public CharacterManager.Character character;
             public Team team;
 
             public PlayerData(int id)
@@ -1854,7 +1854,7 @@ namespace Vi.Core
                 team = Team.Environment;
             }
 
-            public PlayerData(int id, int channel, WebRequestManager.Character character, Team team)
+            public PlayerData(int id, int channel, CharacterManager.Character character, Team team)
             {
                 this.id = id;
                 this.channel = channel;

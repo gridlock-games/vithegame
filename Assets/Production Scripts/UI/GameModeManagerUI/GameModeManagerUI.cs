@@ -417,7 +417,7 @@ namespace Vi.UI
 
             gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
-            WebRequestManager.CharacterStats stats = WebRequestManager.Singleton.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
+            CharacterManager.CharacterStats stats = WebRequestManager.Singleton.CharacterManager.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
             levelText.text = "Lv " + stats.level.ToString();
             expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString("F0") + " XP";
 
@@ -570,7 +570,7 @@ namespace Vi.UI
             MVPDeathsText.text = playerScoreToPreview.cumulativeDeaths.ToString();
             MVPAssistsText.text = playerScoreToPreview.cumulativeAssists.ToString();
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
+            CharacterManager.Character character = PlayerDataManager.Singleton.GetPlayerData(playerScoreToPreview.id).character;
             CharacterReference.PlayerModelOption playerModelOption = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(character.raceAndGender);
 
             RemoveCharPreview();
