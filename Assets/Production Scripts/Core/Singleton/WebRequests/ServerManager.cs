@@ -340,7 +340,7 @@ namespace Vi.Core
 
         private void Start()
         {
-
+            StartCoroutine(Initialize());
         }
 
         private IEnumerator Initialize()
