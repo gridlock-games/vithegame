@@ -450,7 +450,7 @@ namespace Vi.Core
         private void Awake()
         {
             animator = GetComponent<Animator>();
-            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
+            animator.cullingMode = FasterPlayerPrefs.IsServerPlatform | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
 
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();

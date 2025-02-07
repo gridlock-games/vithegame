@@ -34,7 +34,7 @@ namespace Vi.Core
             NetSceneManager.SetTargetFrameRate();
             StartCoroutine(LoadScenes());
 
-            if (!WebRequestManager.IsServerBuild())
+            if (!FasterPlayerPrefs.IsServerPlatform)
             {
                 FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(continuationAction: task =>
                 {

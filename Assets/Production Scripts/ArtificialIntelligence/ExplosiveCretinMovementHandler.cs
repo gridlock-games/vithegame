@@ -6,6 +6,7 @@ using Unity.Netcode;
 using Vi.Core.VFX;
 using UnityEngine.AI;
 using Vi.Core.MovementHandlers;
+using Vi.Utility;
 
 namespace Vi.ArtificialIntelligence
 {
@@ -19,7 +20,7 @@ namespace Vi.ArtificialIntelligence
         {
             base.Awake();
             animator = GetComponent<Animator>();
-            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
+            animator.cullingMode = FasterPlayerPrefs.IsServerPlatform | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.CullCompletely;
             actionVFX = GetComponent<GameInteractiveActionVFX>();
             gameplayTargetFinder = GetComponent<GameplayTargetFinder>();
             SetDestination(transform.position);

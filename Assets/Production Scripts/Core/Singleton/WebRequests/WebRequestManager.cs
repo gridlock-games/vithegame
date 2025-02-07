@@ -15,6 +15,9 @@ using UnityEngine.SceneManagement;
 
 namespace Vi.Core
 {
+    [RequireComponent(typeof(UserManager))]
+    [RequireComponent(typeof(ServerManager))]
+    [RequireComponent(typeof(CharacterManager))]
     public class WebRequestManager : MonoBehaviour
     {
         private static WebRequestManager _singleton;
@@ -27,20 +30,21 @@ namespace Vi.Core
             }
         }
 
+        private UserManager userManager;
+        private ServerManager serverManager;
+        private CharacterManager characterManager;
         private void Awake()
         {
+            userManager = GetComponent<UserManager>();
+            serverManager = GetComponent<ServerManager>();
+            characterManager = GetComponent<CharacterManager>();
+
             _singleton = this;
 
             if (FasterPlayerPrefs.Singleton.HasString("APIURL"))
             {
                 SetAPIURL(FasterPlayerPrefs.Singleton.GetString("APIURL"));
             }
-        }
-
-        public static bool IsServerBuild()
-        {
-            RuntimePlatform[] includedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
-            return includedRuntimePlatforms.Contains(Application.platform);
         }
 
         public const string ProdAPIURL = "http://38.60.246.146:80/";

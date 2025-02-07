@@ -727,7 +727,7 @@ namespace Vi.UI
                 button.interactable = false;
             }
 
-            if (!WebRequestManager.IsServerBuild())
+            if (!FasterPlayerPrefs.IsServerPlatform)
             {
                 auth = FirebaseAuth.DefaultInstance;
                 if (WebRequestManager.Singleton.IsLoggedIn & FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
