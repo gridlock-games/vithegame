@@ -1084,7 +1084,7 @@ namespace Vi.UI
         {
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
 
             primaryWeaponDisplayElement.gameObject.SetActive(false);
             secondaryWeaponDisplayElement.gameObject.SetActive(false);
@@ -1193,9 +1193,9 @@ namespace Vi.UI
                 }
             }
 
-            if (!WebRequestManager.Singleton.IsRefreshingServers)
+            if (!WebRequestManager.Singleton.ServerManager.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.HubServers)
+                foreach (ServerManager.Server server in WebRequestManager.Singleton.ServerManager.HubServers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -1206,7 +1206,7 @@ namespace Vi.UI
                 }
 
 #if UNITY_EDITOR
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                foreach (ServerManager.Server server in WebRequestManager.Singleton.ServerManager.LobbyServers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -1535,16 +1535,16 @@ namespace Vi.UI
             goToTrainingRoomButton.interactable = false;
             trainingRoomSettingsButton.interactable = false;
 
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
 
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (!WebRequestManager.Singleton.GameIsUpToDate) { yield break; }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
-                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 StartClient();
             }
             else
@@ -1572,7 +1572,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);

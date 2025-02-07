@@ -262,12 +262,12 @@ namespace Vi.Isolated
             {
                 yield return WebRequestManager.Singleton.SetGameVersion();
 
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
+                yield return WebRequestManager.Singleton.ServerManager.ServerPostRequest(new ServerManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString(), ""));
             }
             else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
             {
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
+                yield return WebRequestManager.Singleton.ServerManager.ServerPostRequest(new ServerManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString(), ""));
             }
             else

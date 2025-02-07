@@ -565,10 +565,10 @@ namespace Vi.Core.GameModeManagers
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }

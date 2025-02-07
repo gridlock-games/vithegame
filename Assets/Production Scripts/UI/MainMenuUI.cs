@@ -151,14 +151,14 @@ namespace Vi.UI
                 }
                 else
                 {
-                    yield return WebRequestManager.Singleton.GetPublicIP();
-                    serverIP = WebRequestManager.Singleton.PublicIP;
+                    yield return WebRequestManager.Singleton.ServerManager.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.ServerManager.PublicIP;
                 }
             }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.SetConnectionData(serverIP, hubPort, FasterPlayerPrefs.serverListenAddress);
@@ -209,17 +209,17 @@ namespace Vi.UI
                 }
                 else
                 {
-                    yield return WebRequestManager.Singleton.GetPublicIP();
-                    serverIP = WebRequestManager.Singleton.PublicIP;
+                    yield return WebRequestManager.Singleton.ServerManager.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.ServerManager.PublicIP;
                 }
             }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == serverIP))
+            foreach (ServerManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.ServerManager.LobbyServers, item => item.ip == serverIP))
             {
                 portList.Add(int.Parse(server.port));
             }
@@ -274,13 +274,13 @@ namespace Vi.UI
             NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
-            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); startAutomatedClientCalled = false; yield break; }
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); startAutomatedClientCalled = false; yield break; }
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+            networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
             
             NetworkManager.Singleton.StartClient();
         }
@@ -412,7 +412,7 @@ namespace Vi.UI
 
         public void GoToCharacterSelect()
         {
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
@@ -894,9 +894,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startHubServerButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {

@@ -224,9 +224,9 @@ namespace Vi.UI
 
             // Randomly return to hub if possible
             float rand = Random.Range(0f, 1);
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
-                if (WebRequestManager.Singleton.HubServers[0].port == "7777")
+                if (WebRequestManager.Singleton.ServerManager.HubServers[0].port == "7777")
                 {
                     if (rand < 0.1f)
                     {
@@ -591,10 +591,10 @@ namespace Vi.UI
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }

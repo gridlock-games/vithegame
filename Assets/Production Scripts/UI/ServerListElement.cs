@@ -16,7 +16,7 @@ namespace Vi.UI
         [SerializeField] private Text regionText;
         [SerializeField] private Text pingText;
 
-        public WebRequestManager.Server Server { get; private set; }
+        public ServerManager.Server Server { get; private set; }
         public float pingTime { get; private set; } = Mathf.Infinity;
 
         private Button button;
@@ -33,7 +33,7 @@ namespace Vi.UI
             networkTransport.SetConnectionData(Server.ip, ushort.Parse(Server.port), FasterPlayerPrefs.serverListenAddress);
         }
 
-        public void Initialize(MonoBehaviour UIParent, WebRequestManager.Server server)
+        public void Initialize(MonoBehaviour UIParent, ServerManager.Server server)
         {
             Server = server;
             serverNameText.text = server.label;

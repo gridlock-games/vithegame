@@ -1344,7 +1344,7 @@ namespace Vi.Core
                         }
 
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
+                        StartCoroutine(WebRequestManager.Singleton.ServerManager.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
                             kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode()),
                             kvp.Key ? kvp.Value.character._id.ToString() : ""));
 
@@ -1371,7 +1371,7 @@ namespace Vi.Core
                     if (IsServer)
                     {
                         KeyValuePair<bool, PlayerData> kvp = GetLobbyLeader();
-                        StartCoroutine(WebRequestManager.Singleton.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
+                        StartCoroutine(WebRequestManager.Singleton.ServerManager.UpdateServerPopulation(GetPlayerDataListWithSpectators().Count(item => item.id >= 0),
                             kvp.Key ? kvp.Value.character.name.ToString() : GetGameModeString(GetGameMode()),
                             kvp.Key ? kvp.Value.character._id.ToString() : ""));
 

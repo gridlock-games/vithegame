@@ -488,12 +488,12 @@ namespace Vi.Core
             if (networkListEvent.Type == NetworkListEvent<int>.EventType.Add)
             {
                 LoadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
+                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.ServerManager.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
             }
             else if (networkListEvent.Type == NetworkListEvent<int>.EventType.Remove | networkListEvent.Type == NetworkListEvent<int>.EventType.RemoveAt)
             {
                 UnloadScenePayload(scenePayloads[networkListEvent.Value]);
-                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
+                if (IsServer) { PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.ServerManager.UpdateServerProgress(ShouldSpawnPlayerCached ? 0 : 1)); }
             }
 
             if (IsClient)

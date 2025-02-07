@@ -4,6 +4,6 @@ namespace Vi.Core
 {
     public class UserManager : MonoBehaviour
     {
-
+        
     }
 }
