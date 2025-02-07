@@ -52,7 +52,17 @@ namespace Vi.Core
 
         private string APIURL = ProdAPIURL;
 
-        public string GetAPIURL() { return APIURL[0..^1]; }
+        public string GetAPIURL(bool removeTrailingSlash)
+        {
+            if (removeTrailingSlash)
+            {
+                return APIURL[0..^1];
+            }
+            else
+            {
+                return APIURL;
+            }
+        }
 
         public void SetAPIURL(string newAPIURL)
         {

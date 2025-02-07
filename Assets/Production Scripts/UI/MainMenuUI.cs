@@ -720,7 +720,7 @@ namespace Vi.UI
             startAutoClientButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
-            APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL();
+            APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL(true);
 
             foreach (Button button in authenticationButtons)
             {
@@ -894,9 +894,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {
