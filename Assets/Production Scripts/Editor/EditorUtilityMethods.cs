@@ -107,6 +107,18 @@ namespace Vi.Editor
             }
             return actionClips;
         }
+
+        [MenuItem("Tools/Mass Edit Action Clips")]
+        private static void MassEditActionClips()
+        {
+            foreach (ActionClip actionClip in GetActionClips())
+            {
+                actionClip.armorPenetration = 0;
+                EditorUtility.SetDirty(actionClip);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         #endregion
 
         #region
