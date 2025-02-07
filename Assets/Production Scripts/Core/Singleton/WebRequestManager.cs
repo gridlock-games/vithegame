@@ -3220,6 +3220,7 @@ namespace Vi.Core
                 getRequest.Dispose();
                 yield break;
             }
+
             string json = getRequest.downloadHandler.text;
             if (characterAttributesLookup.ContainsKey(characterId))
             {

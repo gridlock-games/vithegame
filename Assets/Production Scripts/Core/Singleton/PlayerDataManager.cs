@@ -1775,13 +1775,21 @@ namespace Vi.Core
                 playerData.character = newChar;
                 SetPlayerData(playerData);
 
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(playerData.character._id.ToString(),
                     playerData.character.attributes));
+
+                GetCharAttributesRpc(playerData.character._id.ToString());
             }
             else
             {
                 SetCharAttributesRpc(dataId, newAttributes);
             }
+        }
+
+        [Rpc(SendTo.NotServer)]
+        private void GetCharAttributesRpc(string characterId)
+        {
+            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterAttributes(characterId));
         }
 
         [Rpc(SendTo.Server, RequireOwnership = false)]
@@ -1808,8 +1816,10 @@ namespace Vi.Core
                 playerData.character = newChar;
                 SetPlayerData(playerData);
 
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterAttributes(playerData.character._id.ToString(),
                     playerData.character.attributes));
+
+                GetCharAttributesRpc(playerData.character._id.ToString());
             }
             else
             {

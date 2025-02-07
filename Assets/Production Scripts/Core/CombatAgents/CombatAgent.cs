@@ -41,9 +41,40 @@ namespace Vi.Core
         public float GetArmor() { return armor.Value; }
         public float GetRage() { return rage.Value; }
 
-        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
+        public override float GetMaxHP()
+        {
+            if (!NetworkObject.IsPlayerObject)
+            {
+                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
+            }
+            else if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            {
+                return Mathf.Max(stats.hp, stats.baseHP) + SessionProgressionHandler.MaxHPBonus;
+            }
+            else
+            {
+                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
+            }
+        }
+
         public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
-        public float GetMaxArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
+
+        public float GetMaxArmor()
+        {
+            if (!NetworkObject.IsPlayerObject)
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats stats))
+            {
+                return stats.defense + stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+        }
+
         public float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public void AddStamina(float amount, bool activateCooldown = true)
