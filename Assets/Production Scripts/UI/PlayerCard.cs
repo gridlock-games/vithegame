@@ -257,13 +257,13 @@ namespace Vi.UI
             if (!combatAgent) { canvas.enabled = false; return; }
 
             float HP = combatAgent.GetHP();
-            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetArmor(); }
+            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetPhysicalArmor(); }
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
             float rage = combatAgent.GetRage();
 
             float maxHP = combatAgent.GetMaxHP();
-            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxArmor(); }
+            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxPhysicalArmor(); }
 
             float maxRage = combatAgent.GetMaxRage();
 
@@ -293,10 +293,10 @@ namespace Vi.UI
             if (!staminaAndArmorAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                float armor = combatAgent.GetArmor();
+                float armor = combatAgent.GetPhysicalArmor();
 
                 float maxStamina = combatAgent.GetMaxStamina();
-                float maxArmor = combatAgent.GetMaxArmor();
+                float maxArmor = combatAgent.GetMaxPhysicalArmor();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {

@@ -66,6 +66,7 @@ namespace Vi.Editor
         private SerializedProperty spRecoveryNormalizedTime;
         private SerializedProperty spIsAffectedByRage;
         private SerializedProperty spDamage;
+        private SerializedProperty spMagicalDamage;
         private SerializedProperty spArmorPenetration;
         private SerializedProperty spHealAmount;
         private SerializedProperty spStaminaDamage;
@@ -189,6 +190,7 @@ namespace Vi.Editor
             spRecoveryNormalizedTime = serializedObject.FindProperty("recoveryNormalizedTime");
             spIsAffectedByRage = serializedObject.FindProperty("isAffectedByRage");
             spDamage = serializedObject.FindProperty("damage");
+            spMagicalDamage = serializedObject.FindProperty("magicalDamage");
             spArmorPenetration = serializedObject.FindProperty("armorPenetration");
             spHealAmount = serializedObject.FindProperty("healAmount");
             spStaminaDamage = serializedObject.FindProperty("staminaDamage");
@@ -420,6 +422,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spMagicalDamage);
                 EditorGUILayout.PropertyField(spArmorPenetration);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -507,6 +510,7 @@ namespace Vi.Editor
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spAgentStaminaCost);
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spMagicalDamage);
                 EditorGUILayout.PropertyField(spArmorPenetration);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -593,6 +597,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spMagicalDamage);
                 EditorGUILayout.PropertyField(spArmorPenetration);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -682,6 +687,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spMagicalDamage);
                 EditorGUILayout.PropertyField(spArmorPenetration);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);
@@ -764,6 +770,7 @@ namespace Vi.Editor
 
                 EditorGUILayout.Space();
                 EditorGUILayout.PropertyField(spDamage);
+                EditorGUILayout.PropertyField(spMagicalDamage);
                 EditorGUILayout.PropertyField(spArmorPenetration);
                 EditorGUILayout.PropertyField(spHealAmount);
                 EditorGUILayout.PropertyField(spStaminaDamage);

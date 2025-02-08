@@ -285,22 +285,18 @@ namespace Vi.UI
             SetHealthBarScale(Vector3.Lerp(currentHealthBarScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed));
             healthText.enabled = team != PlayerDataManager.Team.Peaceful;
 
-            float HP = combatAgent.GetHP() + combatAgent.GetArmor();
+            float HP = combatAgent.GetHP() + combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-            float maxHP = combatAgent.GetMaxHP() + combatAgent.GetMaxArmor();
+            float maxHP = combatAgent.GetMaxHP() + combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
-                healthText.text = "HP " + StringUtility.FormatDynamicFloatForUI(HP) + " / " + maxHP.ToString("F0");
+                healthText.text = StringUtility.FormatDynamicFloatForUI(HP) + " / " + maxHP.ToString("F0");
                 healthFillImage.fillAmount = HP / maxHP;
             }
 
             lastHP = HP;
             lastMaxHP = maxHP;
-
-            float armor = combatAgent.GetArmor();
-            if (armor < 0.1f & armor > 0) { armor = 0.1f; }
-            float maxArmor = combatAgent.GetMaxArmor();
 
             interimHealthFillImage.fillAmount = Mathf.Lerp(interimHealthFillImage.fillAmount, HP / maxHP, Time.deltaTime * PlayerCard.fillSpeed);
         }
