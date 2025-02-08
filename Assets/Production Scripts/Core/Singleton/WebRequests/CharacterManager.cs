@@ -173,7 +173,13 @@ namespace Vi.Core
 
                     CharacterById = characterJson.ToCharacter();
 
-                    CharacterJson.DeserializeJson(json);
+                    if (!CharacterById.HasActiveLoadout())
+                    {
+                        getRequest.Dispose();
+                        LastCharacterByIdWasSuccessful = false;
+                        IsGettingCharacterById = false;
+                        yield break;
+                    }
                 }
                 catch (System.Exception e)
                 {
@@ -996,12 +1002,18 @@ namespace Vi.Core
                 }
             }
 
+            public bool HasActiveLoadout()
+            {
+                return loadoutPreset1.active | loadoutPreset2.active | loadoutPreset3.active | loadoutPreset4.active;
+            }
+
             public Loadout GetActiveLoadout()
             {
                 if (loadoutPreset1.active) { return loadoutPreset1; }
                 if (loadoutPreset2.active) { return loadoutPreset2; }
                 if (loadoutPreset3.active) { return loadoutPreset3; }
                 if (loadoutPreset4.active) { return loadoutPreset4; }
+                Debug.LogWarning("Character has no active loadout! " + _id);
                 return loadoutPreset1;
             }
 
@@ -1153,6 +1165,22 @@ namespace Vi.Core
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
+            }
+
+            public override string ToString()
+            {
+                return "Slot: " + loadoutSlot + " Active: " + active
+                    + "\nHelm Id: " + helmGearItemId
+                    + "\nChest Id: " + chestArmorGearItemId
+                    + "\nShoulders Id: " + shouldersGearItemId
+                    + "\nBoots Id: " + bootsGearItemId
+                    + "\nPants Id: " + pantsGearItemId
+                    + "\nBelt Id: " + beltGearItemId
+                    + "\nGloves Id: " + glovesGearItemId
+                    + "\nCape Id: " + capeGearItemId
+                    + "\nRobe Id: " + robeGearItemId
+                    + "\nWeapon 1 Id: " + weapon1ItemId
+                    + "\nWeapon 2 Id: " + weapon2ItemId;
             }
 
             public static Loadout GetEmptyLoadout()

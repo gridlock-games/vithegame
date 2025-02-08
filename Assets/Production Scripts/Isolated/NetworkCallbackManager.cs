@@ -239,7 +239,7 @@ namespace Vi.Isolated
                 }
                 else
                 {
-                    NetworkManager.Singleton.DisconnectClient(clientId, "Invalid Character Id.");
+                    NetworkManager.Singleton.DisconnectClient(clientId, "Invalid Character");
                 }
             }
 
