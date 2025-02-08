@@ -504,15 +504,11 @@ namespace Vi.Core.GameModeManagers
                         if (kvp.Value)
                         {
                             TokensEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
-                            FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + kvp.Value.SessionProgressionHandler.Essences);
                         }
                     }
                     else
                     {
                         TokensEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
-                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens")
-                            + localPlayerScore.cumulativeKills
-                            + localPlayerScore.cumulativeAssists);
                     }
                 }
             }
