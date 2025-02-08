@@ -168,7 +168,7 @@ namespace Vi.UI
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
-                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout, true));
 
                 playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);

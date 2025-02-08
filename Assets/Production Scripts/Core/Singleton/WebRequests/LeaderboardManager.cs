@@ -63,9 +63,9 @@ namespace Vi.Core
             }
         }
 
-        public IEnumerator SendKillsLeaderboardResult(string charId, string playerName, PlayerDataManager.GameMode gameMode, int kills, int deaths, int assists)
+        public IEnumerator SendKillsLeaderboardResult(string charId, string playerName, PlayerDataManager.GameMode gameMode, bool win, int kills, int deaths, int assists)
         {
-            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, playerName, gameMode, kills, deaths, assists);
+            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, playerName, gameMode, win, kills, deaths, assists);
 
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -92,6 +92,7 @@ namespace Vi.Core
         {
             public string playerName;
             public string gameMode;
+            public bool win;
             public int kills;
             public int deaths;
             public int assists;
@@ -104,13 +105,14 @@ namespace Vi.Core
             public KillsRecord record;
             public string boardType;
 
-            public KillsLeaderboardResultPayload(string charId, string playerName, PlayerDataManager.GameMode gameMode, int kills, int deaths, int assists)
+            public KillsLeaderboardResultPayload(string charId, string playerName, PlayerDataManager.GameMode gameMode, bool win, int kills, int deaths, int assists)
             {
                 this.charId = charId;
                 record = new KillsRecord()
                 {
                     playerName = playerName,
                     gameMode = PlayerDataManager.GetGameModeString(gameMode),
+                    win = win,
                     kills = kills,
                     deaths = deaths,
                     assists = assists,

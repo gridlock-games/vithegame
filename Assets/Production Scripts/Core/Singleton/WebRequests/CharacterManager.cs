@@ -99,24 +99,24 @@ namespace Vi.Core
             }
 
             // This adds all weapons to the inventory if we're in the editor
-            //# if UNITY_EDITOR
-            //            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            //            foreach (Character character in Characters)
-            //            {
-            //                foreach (var weaponOption in weaponOptions)
-            //                {
-            //                    if (!inventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
-            //                    {
-            //                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-            //                    }
-            //                }
-            //            }
+#if UNITY_EDITOR
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            foreach (Character character in Characters)
+            {
+                foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
+                {
+                    if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
+                    {
+                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+                    }
+                }
+            }
 
-            //            foreach (Character character in Characters)
-            //            {
-            //                yield return GetCharacterInventory(character);
-            //            }
-            //# endif
+            foreach (Character character in Characters)
+            {
+                yield return GetCharacterInventory(character);
+            }
+#endif
 
             IsRefreshingCharacters = false;
         }
@@ -173,7 +173,13 @@ namespace Vi.Core
 
                     CharacterById = characterJson.ToCharacter();
 
-                    CharacterJson.DeserializeJson(json);
+                    if (!CharacterById.HasActiveLoadout())
+                    {
+                        getRequest.Dispose();
+                        LastCharacterByIdWasSuccessful = false;
+                        IsGettingCharacterById = false;
+                        yield break;
+                    }
                 }
                 catch (System.Exception e)
                 {
@@ -497,8 +503,9 @@ namespace Vi.Core
             }
         }
 
+#if UNITY_EDITOR
         public bool InventoryAddWasSuccessful { get; private set; }
-        public IEnumerator AddItemToInventory(string charId, string itemId)
+        private IEnumerator AddItemToInventory(string charId, string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) { Debug.LogWarning("You are trying to add an item to a character's inventory that has an id of null or whitespace"); yield break; }
 
@@ -545,8 +552,9 @@ namespace Vi.Core
                 this.itemId = itemId;
             }
         }
+#endif
 
-        public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout)
+        public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout, bool callUseLoadout)
         {
             if (!int.TryParse(newLoadout.loadoutSlot.ToString(), out int result))
             {
@@ -566,6 +574,13 @@ namespace Vi.Core
             newLoadout.bootsGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
             newLoadout.weapon1ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
             newLoadout.weapon2ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
+
+            // Uncomment this to test invalid loadout strings
+            //Debug.Log(newLoadout.ToString());
+            //foreach (FixedString64Bytes id in newLoadout.GetLoadoutAsList())
+            //{
+            //    Debug.Log(id + " " + HasInventoryItem(characterId, id.ToString()));
+            //}
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
@@ -588,6 +603,11 @@ namespace Vi.Core
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
+
+            if (callUseLoadout)
+            {
+                yield return UseCharacterLoadout(characterId, newLoadout.loadoutSlot.ToString());
+            }
         }
 
         public IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
@@ -669,11 +689,7 @@ namespace Vi.Core
 
             character._id = postRequest.downloadHandler.text;
 
-            yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender));
-
-            yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender), true);
 
             postRequest.Dispose();
         }
@@ -996,12 +1012,18 @@ namespace Vi.Core
                 }
             }
 
+            public bool HasActiveLoadout()
+            {
+                return loadoutPreset1.active | loadoutPreset2.active | loadoutPreset3.active | loadoutPreset4.active;
+            }
+
             public Loadout GetActiveLoadout()
             {
                 if (loadoutPreset1.active) { return loadoutPreset1; }
                 if (loadoutPreset2.active) { return loadoutPreset2; }
                 if (loadoutPreset3.active) { return loadoutPreset3; }
                 if (loadoutPreset4.active) { return loadoutPreset4; }
+                Debug.LogWarning("Character has no active loadout! " + _id);
                 return loadoutPreset1;
             }
 
@@ -1153,6 +1175,22 @@ namespace Vi.Core
                 this.weapon1ItemId = weapon1ItemId;
                 this.weapon2ItemId = weapon2ItemId;
                 this.active = active;
+            }
+
+            public override string ToString()
+            {
+                return "Slot: " + loadoutSlot + " Active: " + active
+                    + "\nHelm Id: " + helmGearItemId
+                    + "\nChest Id: " + chestArmorGearItemId
+                    + "\nShoulders Id: " + shouldersGearItemId
+                    + "\nBoots Id: " + bootsGearItemId
+                    + "\nPants Id: " + pantsGearItemId
+                    + "\nBelt Id: " + beltGearItemId
+                    + "\nGloves Id: " + glovesGearItemId
+                    + "\nCape Id: " + capeGearItemId
+                    + "\nRobe Id: " + robeGearItemId
+                    + "\nWeapon 1 Id: " + weapon1ItemId
+                    + "\nWeapon 2 Id: " + weapon2ItemId;
             }
 
             public static Loadout GetEmptyLoadout()

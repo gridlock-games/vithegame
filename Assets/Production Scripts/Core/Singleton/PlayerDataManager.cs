@@ -1689,7 +1689,7 @@ namespace Vi.Core
         {
             if (loadout.EqualsIgnoringSlot(CharacterManager.Loadout.GetEmptyLoadout()))
             {
-                yield return WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), loadout);
+                yield return WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), loadout, false);
             }
             yield return WebRequestManager.Singleton.CharacterManager.UseCharacterLoadout(playerData.character._id.ToString(), loadout.loadoutSlot.ToString());
         }

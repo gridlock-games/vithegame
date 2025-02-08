@@ -91,7 +91,10 @@ namespace Vi.Core.GameModeManagers
 
         protected override void OnGameOverChanged(bool prev, bool current)
         {
-            if (current & IsClient)
+            base.OnGameOverChanged(prev, current);
+            if (!current) { return; }
+
+            if (IsClient)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
@@ -105,6 +108,8 @@ namespace Vi.Core.GameModeManagers
                         localPlayerScore.cumulativeDamageDealt));
                 }
             }
+
+            ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
         }
 
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)

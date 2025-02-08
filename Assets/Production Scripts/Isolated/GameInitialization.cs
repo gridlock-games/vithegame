@@ -54,6 +54,8 @@ namespace Vi.Core
                 {
                     // Just updated, execute this code
                     if (FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.DeleteKey("PostProcessingEnabled"); }
+                    if (FasterPlayerPrefs.Singleton.HasBool("Tokens")) { FasterPlayerPrefs.Singleton.DeleteKey("Tokens"); }
+                    if (FasterPlayerPrefs.Singleton.HasString("LastLoginTime")) { FasterPlayerPrefs.Singleton.DeleteKey("LastLoginTime"); }
                 }
             }
 
@@ -92,27 +94,6 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasInt("SpeakerMode")) { FasterPlayerPrefs.Singleton.SetInt("SpeakerMode", (int)AudioSettings.GetConfiguration().speakerMode); }
             if (!FasterPlayerPrefs.Singleton.HasInt("SampleRate")) { FasterPlayerPrefs.Singleton.SetInt("SampleRate", AudioSettings.GetConfiguration().sampleRate); }
-
-            if (!FasterPlayerPrefs.Singleton.HasInt("Tokens")) { FasterPlayerPrefs.Singleton.SetInt("Tokens", 5); }
-
-            if (FasterPlayerPrefs.Singleton.HasString("LastLoginTime"))
-            {
-                if (System.DateTime.TryParse(FasterPlayerPrefs.Singleton.GetString("LastLoginTime"), out System.DateTime lastLoginTime))
-                {
-                    if (lastLoginTime.Day != System.DateTime.UtcNow.Day)
-                    {
-                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + 5);
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Error while parsing datetime string " + FasterPlayerPrefs.Singleton.GetString("LastLoginTime"));
-                }
-            }
-            else
-            {
-                FasterPlayerPrefs.Singleton.SetString("LastLoginTime", System.DateTime.UtcNow.ToString());
-            }
 
             if (!FasterPlayerPrefs.Singleton.HasBool("InvertMouse")) { FasterPlayerPrefs.Singleton.SetBool("InvertMouse", false); }
             if (!FasterPlayerPrefs.Singleton.HasFloat("MouseXSensitivity")) { FasterPlayerPrefs.Singleton.SetFloat("MouseXSensitivity", 0.2f); }
