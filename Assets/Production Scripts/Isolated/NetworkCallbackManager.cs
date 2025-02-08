@@ -225,16 +225,16 @@ namespace Vi.Isolated
             addPlayerDataRunning = true;
 
             yield return new WaitUntil(() => PlayerDataManager.Singleton);
-            WebRequestManager.Singleton.GetCharacterById(characterId);
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsGettingCharacterById);
+            WebRequestManager.Singleton.CharacterManager.GetCharacterById(characterId);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.CharacterManager.IsGettingCharacterById);
             // If the game crashed, or the player disconnected for some reason, don't add their data
             if (NetworkManager.Singleton.ConnectedClientsIds.Contains(clientId))
             {
-                if (WebRequestManager.Singleton.LastCharacterByIdWasSuccessful)
+                if (WebRequestManager.Singleton.CharacterManager.LastCharacterByIdWasSuccessful)
                 {
                     PlayerDataManager.Singleton.AddPlayerData(new PlayerDataManager.PlayerData((int)clientId,
                     channel,
-                    WebRequestManager.Singleton.CharacterById,
+                    WebRequestManager.Singleton.CharacterManager.CharacterById,
                     team));
                 }
                 else
@@ -262,12 +262,12 @@ namespace Vi.Isolated
             {
                 yield return WebRequestManager.Singleton.SetGameVersion();
 
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
+                yield return WebRequestManager.Singleton.ServerManager.ServerPostRequest(new ServerManager.ServerPostPayload(0, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     1, networkTransport.ConnectionData.Address, "Hub", networkTransport.ConnectionData.Port.ToString(), ""));
             }
             else if (NetSceneManager.Singleton.IsSceneGroupLoaded("Lobby"))
             {
-                yield return WebRequestManager.Singleton.ServerPostRequest(new WebRequestManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
+                yield return WebRequestManager.Singleton.ServerManager.ServerPostRequest(new ServerManager.ServerPostPayload(1, PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators().Count,
                     0, networkTransport.ConnectionData.Address, "Lobby", networkTransport.ConnectionData.Port.ToString(), ""));
             }
             else

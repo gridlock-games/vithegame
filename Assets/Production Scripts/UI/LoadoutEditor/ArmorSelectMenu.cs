@@ -94,7 +94,7 @@ namespace Vi.UI
 
         private List<Button> buttonList = new List<Button>();
         private int playerDataId;
-        private List<WebRequestManager.InventoryItem> inventory;
+        private List<CharacterManager.InventoryItem> inventory;
         public void Initialize(CharacterReference.EquipmentType equipmentType, int loadoutSlot, int playerDataId)
         {
             this.playerDataId = playerDataId;
@@ -102,37 +102,37 @@ namespace Vi.UI
             List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
             CharacterReference.WearableEquipmentOption initialWearableEquipmentOption = null;
 
-            inventory = WebRequestManager.GetInventory(playerData.character._id.ToString());
+            inventory = CharacterManager.GetInventory(playerData.character._id.ToString());
 
             foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> kvp in playerData.character.GetActiveLoadout().GetLoadoutArmorPiecesAsDictionary())
             {
                 if (kvp.Key == equipmentType)
                 {
-                    if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), kvp.Value.ToString(), out WebRequestManager.InventoryItem equipmentInventoryItem))
+                    if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), kvp.Value.ToString(), out CharacterManager.InventoryItem equipmentInventoryItem))
                     {
-                        initialWearableEquipmentOption = WebRequestManager.GetEquipmentOption(equipmentInventoryItem, playerData.character.raceAndGender);
+                        initialWearableEquipmentOption = CharacterManager.GetEquipmentOption(equipmentInventoryItem, playerData.character.raceAndGender);
                     }
                     break;
                 }
             }
 
             Button invokeThis = null;
-            if (WebRequestManager.NullableEquipmentTypes.Contains(equipmentType))
+            if (CharacterManager.NullableEquipmentTypes.Contains(equipmentType))
             {
                 LoadoutOptionElement emptyEle = Instantiate(loadoutOptionPrefab.gameObject, weaponOptionScrollParent).GetComponent<LoadoutOptionElement>();
                 emptyEle.InitializeEquipment(null, playerData.character.raceAndGender);
                 Button emptyButton = emptyEle.GetComponentInChildren<Button>();
                 emptyButton.onClick.AddListener(delegate { ChangeArmor(emptyButton, equipmentType, null,
-                    WebRequestManager.InventoryItem.GetEmptyInventoryItem(), loadoutSlot, wearableEquipmentOptions); });
+                    CharacterManager.InventoryItem.GetEmptyInventoryItem(), loadoutSlot, wearableEquipmentOptions); });
                 buttonList.Add(emptyButton);
 
                 invokeThis = emptyButton;
             }
             
             // Create UI buttons for each item in our inventory
-            foreach (WebRequestManager.InventoryItem inventoryItem in inventory)
+            foreach (CharacterManager.InventoryItem inventoryItem in inventory)
             {
-                CharacterReference.WearableEquipmentOption wearableEquipmentOption = WebRequestManager.GetEquipmentOption(inventoryItem, playerData.character.raceAndGender);
+                CharacterReference.WearableEquipmentOption wearableEquipmentOption = CharacterManager.GetEquipmentOption(inventoryItem, playerData.character.raceAndGender);
 
                 if (wearableEquipmentOption == null) { continue; }
                 if (wearableEquipmentOption.equipmentType != equipmentType) { continue; }
@@ -168,7 +168,7 @@ namespace Vi.UI
         //}
 
         private void ChangeArmor(Button button, CharacterReference.EquipmentType equipmentType, CharacterReference.WearableEquipmentOption wearableEquipmentOption,
-            WebRequestManager.InventoryItem inventoryItem, int loadoutSlot, List<CharacterReference.WearableEquipmentOption> allOptions)
+            CharacterManager.InventoryItem inventoryItem, int loadoutSlot, List<CharacterReference.WearableEquipmentOption> allOptions)
         {
             foreach (Button b in buttonList)
             {
@@ -177,7 +177,7 @@ namespace Vi.UI
             button.interactable = false;
 
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            CharacterManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
             string inventoryItemId = inventoryItem.id;
             switch (equipmentType)
@@ -250,7 +250,7 @@ namespace Vi.UI
 
             if (!newLoadout.Equals(playerData.character.GetActiveLoadout()))
             {
-                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
 
                 playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);

@@ -909,10 +909,10 @@ namespace Vi.Player
         {
             Debug.Log("[AUTOMATED CLIENT] Autoconnecting to random lobby");
 
-            if (WebRequestManager.Singleton.LobbyServers.Length == 0) { yield break; }
+            if (WebRequestManager.Singleton.ServerManager.LobbyServers.Length == 0) { yield break; }
             if (!IsLocalPlayer) { yield break; }
 
-            WebRequestManager.Server server = WebRequestManager.Singleton.LobbyServers[Random.Range(0, WebRequestManager.Singleton.LobbyServers.Length)];
+            ServerManager.Server server = WebRequestManager.Singleton.ServerManager.LobbyServers[Random.Range(0, WebRequestManager.Singleton.ServerManager.LobbyServers.Length)];
             Unity.Netcode.Transports.UTP.UnityTransport networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.SetConnectionData(server.ip, ushort.Parse(server.port), FasterPlayerPrefs.serverListenAddress);
 

@@ -280,22 +280,22 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "LOADING CHARACTERS";
 
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.CharacterManager.IsRefreshingCharacters);
 
             if (characterCardsAreDirty)
             {
-                WebRequestManager.Singleton.RefreshCharacters();
-                yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+                WebRequestManager.Singleton.CharacterManager.RefreshCharacters();
+                yield return new WaitUntil(() => !WebRequestManager.Singleton.CharacterManager.IsRefreshingCharacters);
             }
 
             bool addButtonCreated = false;
             bool invokeFirstCharacterCard = false;
             for (int i = 0; i < characterCardInstances.Length; i++)
             {
-                if (i < WebRequestManager.Singleton.Characters.Count)
+                if (i < WebRequestManager.Singleton.CharacterManager.Characters.Count)
                 {
                     invokeFirstCharacterCard = true;
-                    WebRequestManager.Character character = WebRequestManager.Singleton.Characters[i];
+                    CharacterManager.Character character = WebRequestManager.Singleton.CharacterManager.Characters[i];
                     characterCardInstances[i].InitializeAsCharacter(character);
                     characterCardInstances[i].Button.onClick.RemoveAllListeners();
                     characterCardInstances[i].Button.onClick.AddListener(delegate { UpdateSelectedCharacter(character); });
@@ -505,7 +505,7 @@ namespace Vi.UI
                 int rowToSetIndex = rowsToSetAsArrows.FindIndex(item => item.Item1 == rowElement);
                 rowsToSetAsArrows[rowToSetIndex].Item2.Add(textureAverageColor);
 
-                var defaultChar = WebRequestManager.Singleton.GetDefaultCharacter(raceAndGender);
+                var defaultChar = WebRequestManager.Singleton.CharacterManager.GetDefaultCharacter(raceAndGender);
                 switch (characterMaterial.materialApplicationLocation)
                 {
                     case CharacterReference.MaterialApplicationLocation.Body:
@@ -708,13 +708,13 @@ namespace Vi.UI
 
         [SerializeField] private RawImage characterPreviewImage;
         [SerializeField] private RawImage characterCustomizationPreviewImage;
-        private Queue<WebRequestManager.Character> characterQueue = new Queue<WebRequestManager.Character>();
+        private Queue<CharacterManager.Character> characterQueue = new Queue<CharacterManager.Character>();
 
         private void ProcessCharacterQueue()
         {
             while (characterQueue.Count > 0)
             {
-                WebRequestManager.Character character = characterQueue.Dequeue();
+                CharacterManager.Character character = characterQueue.Dequeue();
 
                 bool idsAreEqual = selectedCharacter._id == character._id;
                 bool raceAndGendersAreEqual = selectedCharacter.raceAndGender == character.raceAndGender;
@@ -746,11 +746,11 @@ namespace Vi.UI
 
         private Coroutine updateCharCoroutine;
         private bool updateDisplayCharacterRunning;
-        private IEnumerator UpdateDisplayCharacter(WebRequestManager.Character character)
+        private IEnumerator UpdateDisplayCharacter(CharacterManager.Character character)
         {
             updateDisplayCharacterRunning = true;
 
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(character._id.ToString(), out CharacterManager.CharacterStats characterStats))
             {
                 maxHPText.text = characterStats.hp.ToString();
                 maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
@@ -761,11 +761,11 @@ namespace Vi.UI
                 maxDefenseText.text = "0000";
             }
 
-            strengthFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Strength) / 100f;
-            vitalityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Vitality) / 100f;
-            dexterityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Dexterity) / 100f;
-            agilityFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Agility) / 100f;
-            intelligenceFill.fillAmount = character.GetStat(WebRequestManager.Character.AttributeType.Intelligence) / 100f;
+            strengthFill.fillAmount = character.GetStat(CharacterManager.Character.AttributeType.Strength) / 100f;
+            vitalityFill.fillAmount = character.GetStat(CharacterManager.Character.AttributeType.Vitality) / 100f;
+            dexterityFill.fillAmount = character.GetStat(CharacterManager.Character.AttributeType.Dexterity) / 100f;
+            agilityFill.fillAmount = character.GetStat(CharacterManager.Character.AttributeType.Agility) / 100f;
+            intelligenceFill.fillAmount = character.GetStat(CharacterManager.Character.AttributeType.Intelligence) / 100f;
 
             goToTrainingRoomButton.interactable = true;
             characterNameInputField.text = character.name.ToString();
@@ -848,7 +848,7 @@ namespace Vi.UI
 
             previewObject.GetComponent<AnimationHandler>().ChangeCharacter(character);
 
-            if (WebRequestManager.HasCharacterInventory(character._id.ToString()))
+            if (CharacterManager.HasCharacterInventory(character._id.ToString()))
             {
                 primaryWeaponDisplayElement.gameObject.SetActive(true);
                 secondaryWeaponDisplayElement.gameObject.SetActive(true);
@@ -872,7 +872,7 @@ namespace Vi.UI
                     equipmentImageValues[i].gameObject.SetActive(false);
                 }
 
-                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, WebRequestManager.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
+                if (previewObject & shouldCreateNewModel) { previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, CharacterManager.GetDefaultDisplayLoadout(raceAndGender), character._id.ToString()); }
             }
 
             if (shouldCreateNewModel & characterCustomizationParent.activeSelf) { RefreshMaterialsAndEquipmentOptions(raceAndGender); }
@@ -900,11 +900,11 @@ namespace Vi.UI
             updateDisplayCharacterRunning = false;
         }
 
-        private WebRequestManager.Character selectedCharacter;
+        private CharacterManager.Character selectedCharacter;
         private GameObject previewObject;
         private LoadoutManager loadoutManager;
 
-        private void UpdateSelectedCharacter(WebRequestManager.Character character)
+        private void UpdateSelectedCharacter(CharacterManager.Character character)
         {
             characterQueue.Enqueue(character);
         }
@@ -940,7 +940,7 @@ namespace Vi.UI
 
             weaponClassPreviewImage.sprite = weaponOption.weaponIcon;
 
-            WebRequestManager.Loadout loadout = WebRequestManager.GetDefaultDisplayLoadout(raceAndGender);
+            CharacterManager.Loadout loadout = CharacterManager.GetDefaultDisplayLoadout(raceAndGender);
             loadout.weapon1ItemId = weaponOption.itemWebId;
             previewObject.GetComponent<LoadoutManager>().ApplyLoadout(raceAndGender, loadout, selectedCharacter._id.ToString());
 
@@ -1048,7 +1048,7 @@ namespace Vi.UI
             var raceAndGender = System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender);
             CharacterReference.PlayerModelOption option = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterModel(raceAndGender);
             if (option == null) { Debug.LogError("Can't find player model option for " + selectedRace + " " + selectedGender); return; }
-            WebRequestManager.Character character = selectedCharacter;
+            CharacterManager.Character character = selectedCharacter;
             character.model = option.model.name;
             character.raceAndGender = raceAndGender;
             character.bodyColor = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name;
@@ -1084,7 +1084,7 @@ namespace Vi.UI
         {
             networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
 
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
 
             primaryWeaponDisplayElement.gameObject.SetActive(false);
             secondaryWeaponDisplayElement.gameObject.SetActive(false);
@@ -1193,9 +1193,9 @@ namespace Vi.UI
                 }
             }
 
-            if (!WebRequestManager.Singleton.IsRefreshingServers)
+            if (!WebRequestManager.Singleton.ServerManager.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.HubServers)
+                foreach (ServerManager.Server server in WebRequestManager.Singleton.ServerManager.HubServers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -1206,7 +1206,7 @@ namespace Vi.UI
                 }
 
 #if UNITY_EDITOR
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                foreach (ServerManager.Server server in WebRequestManager.Singleton.ServerManager.LobbyServers)
                 {
                     if (!serverListElementList.Find(item => item.Server._id == server._id))
                     {
@@ -1294,8 +1294,8 @@ namespace Vi.UI
             returnButton.onClick.RemoveAllListeners();
             returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
-            selectedCharacter = new WebRequestManager.Character();
-            UpdateSelectedCharacter(WebRequestManager.Singleton.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
+            selectedCharacter = new CharacterManager.Character();
+            UpdateSelectedCharacter(WebRequestManager.Singleton.CharacterManager.GetDefaultCharacter(System.Enum.Parse<CharacterReference.RaceAndGender>(selectedRace + selectedGender)));
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "CREATE";
             isEditingExistingCharacter = false;
 
@@ -1314,7 +1314,7 @@ namespace Vi.UI
             playUltimateAnimation = true;
         }
 
-        private void OpenCharacterCustomization(WebRequestManager.Character character)
+        private void OpenCharacterCustomization(CharacterManager.Character character)
         {
             returnButton.gameObject.SetActive(true);
             characterSelectParent.SetActive(false);
@@ -1323,7 +1323,7 @@ namespace Vi.UI
             returnButton.onClick.RemoveAllListeners();
             returnButton.onClick.AddListener(() => StartCoroutine(OpenCharacterSelect()));
 
-            selectedCharacter = new WebRequestManager.Character();
+            selectedCharacter = new CharacterManager.Character();
             UpdateSelectedCharacter(character);
             finishCharacterCustomizationButton.GetComponentInChildren<Text>().text = "APPLY";
             isEditingExistingCharacter = true;
@@ -1360,7 +1360,7 @@ namespace Vi.UI
             UpdateSelectedCharacter(default);
         }
 
-        private IEnumerator ApplyCharacterChanges(WebRequestManager.Character character)
+        private IEnumerator ApplyCharacterChanges(CharacterManager.Character character)
         {
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
@@ -1370,7 +1370,7 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "UPLOADING CHARACTER";
 
-            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterPostRequest(character);
+            yield return isEditingExistingCharacter ? WebRequestManager.Singleton.CharacterManager.UpdateCharacterCosmetics(character) : WebRequestManager.Singleton.CharacterManager.CharacterPostRequest(character);
 
             characterCardsAreDirty = true;
 
@@ -1381,17 +1381,17 @@ namespace Vi.UI
             returnButton.interactable = true;
             characterNameInputField.interactable = true;
 
-            if (string.IsNullOrWhiteSpace(WebRequestManager.Singleton.CharacterCreationError))
+            if (string.IsNullOrWhiteSpace(WebRequestManager.Singleton.CharacterManager.CharacterCreationError))
             {
                 StartCoroutine(OpenCharacterSelect(false));
             }
             else
             {
-                characterNameInputErrorText.text = WebRequestManager.Singleton.CharacterCreationError;
+                characterNameInputErrorText.text = WebRequestManager.Singleton.CharacterManager.CharacterCreationError;
             }
         }
 
-        private IEnumerator DeleteCharacterCoroutine(WebRequestManager.Character character)
+        private IEnumerator DeleteCharacterCoroutine(CharacterManager.Character character)
         {
             RefreshButtonInteractability(true);
             finishCharacterCustomizationButton.interactable = false;
@@ -1407,7 +1407,7 @@ namespace Vi.UI
             webRequestStatusText.gameObject.SetActive(true);
             webRequestStatusText.text = "DELETING CHARACTER";
 
-            yield return WebRequestManager.Singleton.CharacterDisableRequest(character._id.ToString());
+            yield return WebRequestManager.Singleton.CharacterManager.CharacterDisableRequest(character._id.ToString());
 
             characterCardsAreDirty = true;
 
@@ -1535,16 +1535,16 @@ namespace Vi.UI
             goToTrainingRoomButton.interactable = false;
             trainingRoomSettingsButton.interactable = false;
 
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             WebRequestManager.Singleton.CheckGameVersion(false);
 
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & !WebRequestManager.Singleton.IsCheckingGameVersion);
 
             if (!WebRequestManager.Singleton.GameIsUpToDate) { yield break; }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
-                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 StartClient();
             }
             else
@@ -1572,7 +1572,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);

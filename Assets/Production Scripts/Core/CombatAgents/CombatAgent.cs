@@ -41,9 +41,40 @@ namespace Vi.Core
         public float GetArmor() { return armor.Value; }
         public float GetRage() { return rage.Value; }
 
-        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
+        public override float GetMaxHP()
+        {
+            if (!NetworkObject.IsPlayerObject)
+            {
+                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
+            }
+            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return Mathf.Max(stats.hp, stats.baseHP) + SessionProgressionHandler.MaxHPBonus;
+            }
+            else
+            {
+                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
+            }
+        }
+
         public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
-        public float GetMaxArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
+
+        public float GetMaxArmor()
+        {
+            if (!NetworkObject.IsPlayerObject)
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.defense + stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+        }
+
         public float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 
         public void AddStamina(float amount, bool activateCooldown = true)
@@ -1423,6 +1454,43 @@ namespace Vi.Core
             return CastHitResultToBoolean(ProcessHit(false, attacker, attackingNetworkObject, attack, impactPosition, hitSourcePosition, hitCounter, runtimeWeapon, damageMultiplier));
         }
 
+        private struct DamageDispersion
+        {
+            public float healthDamage;
+            public float armorDamage;
+
+            public DamageDispersion(float healthDamage, float armorDamage)
+            {
+                this.healthDamage = healthDamage;
+                this.armorDamage = armorDamage;
+            }
+
+            public override string ToString()
+            {
+                return $"Armor Damage: {armorDamage}, Health Damage: {healthDamage}";
+            }
+        }
+
+        private DamageDispersion GetArmorDamageDispersion(float totalDamage, float armorPenetration)
+        {
+            if (totalDamage > 0) { Debug.LogWarning("Why is damage is a positive number?????"); }
+
+            totalDamage = Mathf.Abs(totalDamage);
+
+            // Clamp armor penetration between 0 and 1
+            armorPenetration = Mathf.Clamp01(armorPenetration);
+
+            // Calculate damage that bypasses armor
+            float bypassDamage = (totalDamage * armorPenetration);
+            float remainingDamage = totalDamage - bypassDamage;
+
+            // Calculate armor and health damage
+            float armorDamage = Mathf.Min(remainingDamage, GetArmor());
+            float healthDamage = bypassDamage + Mathf.Max(remainingDamage - GetArmor(), 0);
+            
+            return new DamageDispersion(-healthDamage, -armorDamage);
+        }
+
         private bool wasIncapacitatedThisLife;
 
         [SerializeField] private bool canBeIncapacitated;
@@ -1480,16 +1548,17 @@ namespace Vi.Core
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        if ((GetArmor() + HPDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
+                        DamageDispersion damageDispersion = GetArmorDamageDispersion(HPDamage, attack.armorPenetration);
+                        if ((GetArmor() + damageDispersion.armorDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddArmor(HPDamage);
-                            HPDamage *= attack.armorPenetration;
+                            AddArmor(damageDispersion.armorDamage);
+                            HPDamage = damageDispersion.healthDamage;
                         }
-                        else if ((GetArmor() + HPDamage) / GetMaxArmor() > 0)
+                        else if ((GetArmor() + damageDispersion.armorDamage) / GetMaxArmor() > 0)
                         {
-                            AddArmor(HPDamage);
+                            AddArmor(damageDispersion.armorDamage);
+                            HPDamage = damageDispersion.healthDamage;
                             shouldPlayHitReaction = true;
-                            HPDamage *= attack.armorPenetration;
                         }
                         else // Armor is at 0
                         {

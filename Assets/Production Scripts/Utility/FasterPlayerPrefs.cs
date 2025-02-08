@@ -41,6 +41,15 @@ namespace Vi.Utility
             get { return Application.platform == RuntimePlatform.Android | Application.platform == RuntimePlatform.IPhonePlayer; }
         }
 
+        public static bool IsServerPlatform
+        {
+            get
+            {
+                RuntimePlatform[] includedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
+                return includedRuntimePlatforms.Contains(Application.platform);
+            }
+        }
+
         public static NetworkReachability InternetReachability
         {
             get

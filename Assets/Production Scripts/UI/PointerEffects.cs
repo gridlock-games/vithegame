@@ -49,7 +49,7 @@ namespace Vi.UI
 
             if (WebRequestManager.Singleton)
             {
-                if (WebRequestManager.Singleton.IsLoggedIn)
+                if (WebRequestManager.Singleton.UserManager.IsLoggedIn)
                 {
                     if (!pointerEffectsEnabled)
                     {

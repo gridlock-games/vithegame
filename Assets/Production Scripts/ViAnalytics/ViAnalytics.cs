@@ -83,7 +83,7 @@ namespace ViNetAnalytics
 
             Debug.Log("SendingData");
             //Begin Transfer - Held for Dataprivacy test
-            using (UnityWebRequest sentRequest = UnityWebRequest.PostWwwForm($"{WebRequestManager.Singleton.GetAPIURL()}/game/saveDeviceInfo", jsonDataConverted))
+            using (UnityWebRequest sentRequest = UnityWebRequest.PostWwwForm($"{WebRequestManager.Singleton.GetAPIURL(true)}/game/saveDeviceInfo", jsonDataConverted))
             {
                 yield return sentRequest.SendWebRequest();
 

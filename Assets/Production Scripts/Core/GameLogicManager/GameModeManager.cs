@@ -489,7 +489,7 @@ namespace Vi.Core.GameModeManagers
                 {
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
 
-                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendKillsLeaderboardResult(
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
                         PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
                         PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.GetGameMode(),
@@ -531,7 +531,7 @@ namespace Vi.Core.GameModeManagers
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
                         float expAward = playerScore.GetExpReward();
                         expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
-                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
                     }
                 }
             }
@@ -565,10 +565,10 @@ namespace Vi.Core.GameModeManagers
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }

@@ -1,683 +1,26 @@
+using UnityEngine;
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Networking;
-using Unity.Netcode;
-using Unity.Collections;
-using Vi.ScriptableObjects;
-using System.Text.RegularExpressions;
-using System.Linq;
 using Vi.Utility;
-using UnityEngine.UI;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
+using System.Text.RegularExpressions;
+using Vi.ScriptableObjects;
+using System.Linq;
+using Unity.Collections;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
-    public class WebRequestManager : MonoBehaviour
+    public class CharacterManager : MonoBehaviour
     {
-        private static WebRequestManager _singleton;
-
-        public static WebRequestManager Singleton
+        public void StopCharacterRefresh()
         {
-            get
-            {
-                return _singleton;
-            }
-        }
-
-        private void Awake()
-        {
-            _singleton = this;
-
-            if (FasterPlayerPrefs.Singleton.HasString("APIURL"))
-            {
-                SetAPIURL(FasterPlayerPrefs.Singleton.GetString("APIURL"));
-            }
-        }
-
-        public static bool IsServerBuild()
-        {
-            RuntimePlatform[] includedRuntimePlatforms = new RuntimePlatform[] { RuntimePlatform.LinuxServer, RuntimePlatform.OSXServer, RuntimePlatform.WindowsServer };
-            return includedRuntimePlatforms.Contains(Application.platform);
-        }
-
-        public const string ProdAPIURL = "http://38.60.246.146:80/";
-        public const string DevAPIURL = "http://154.90.36.42:80/";
-
-        private string APIURL = ProdAPIURL;
-
-        public string GetAPIURL() { return APIURL[0..^1]; }
-
-        public void SetAPIURL(string newAPIURL)
-        {
-            APIURL = newAPIURL + "/";
-            FasterPlayerPrefs.Singleton.SetString("APIURL", newAPIURL);
-
-            CheckGameVersion(true);
-            Logout();
-        }
-
-        public string PublicIP { get; private set; }
-        public IEnumerator GetPublicIP()
-        {
-            UnityWebRequest getRequest = UnityWebRequest.Get("http://icanhazip.com");
-            yield return getRequest.SendWebRequest();
-
-            servers.Clear();
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.GetPublicIP() " + getRequest.error);
-                getRequest.Dispose();
-                IsRefreshingServers = false;
-                yield break;
-            }
-            PublicIP = getRequest.downloadHandler.text.Replace("\\r\\n", "").Replace("\\n", "").Trim();
-        }
-
-        public bool IsRefreshingServers { get; private set; }
-        public Server[] LobbyServers { get; private set; } = new Server[0];
-        public Server[] HubServers { get; private set; } = new Server[0];
-
-        private List<Server> servers = new List<Server>();
-        public void RefreshServers() { StartCoroutine(ServerGetRequest()); }
-        private IEnumerator ServerGetRequest()
-        {
-            if (IsRefreshingServers) { yield break; }
-            IsRefreshingServers = true;
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "servers/duels");
-            yield return getRequest.SendWebRequest();
-
-            servers.Clear();
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.ServerGetRequest() " + getRequest.error + APIURL + "servers/duels");
-                getRequest.Dispose();
-                IsRefreshingServers = false;
-                yield break;
-            }
-            string json = getRequest.downloadHandler.text;
-            try
-            {
-                if (json != "[]")
-                {
-                    foreach (string jsonSplit in json.Split("},"))
-                    {
-                        string finalJsonElement = jsonSplit;
-                        if (finalJsonElement[0] == '[')
-                            finalJsonElement = finalJsonElement.Remove(0, 1);
-                        if (finalJsonElement[^1] == ']')
-                            finalJsonElement = finalJsonElement.Remove(finalJsonElement.Length - 1, 1);
-                        if (finalJsonElement[^1] != '}')
-                            finalJsonElement += "}";
-                        servers.Add(JsonUtility.FromJson<Server>(finalJsonElement));
-                    }
-                }
-            }
-            catch
-            {
-                servers = new List<Server>() { new Server("1", 0, 0, 0, "127.0.0.1", "Hub Localhost", "", "7777", ""), new Server("2", 1, 0, 0, "127.0.0.1", "Lobby Localhost", "", "7776", "") };
-            }
-
-            if (NetworkManager.Singleton.IsServer)
-            {
-                HubServers = servers.FindAll(item => item.type == 0).ToArray();
-                LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
-            }
-            else // Not the server
-            {
-                if (FasterPlayerPrefs.Singleton.GetBool("AllowLocalhostServers"))
-                {
-                    if (servers.Count(item => item.ip == "127.0.0.1") > 0)
-                    {
-                        servers.RemoveAll(item => item.ip != "127.0.0.1");
-                    }
-                }
-                else
-                {
-                    servers.RemoveAll(item => item.ip == "127.0.0.1");
-                }
-
-                if (FasterPlayerPrefs.Singleton.GetBool("AllowLANServers"))
-                {
-                    if (servers.Count(item => item.ip.StartsWith("192.168.")) > 0)
-                    {
-                        servers.RemoveAll(item => !item.ip.StartsWith("192.168."));
-                    }
-                }
-                else
-                {
-                    servers.RemoveAll(item => item.ip.StartsWith("192.168."));
-                }
-
-                HubServers = servers.FindAll(item => item.type == 0).ToArray();
-                LobbyServers = servers.FindAll(item => item.type == 1).ToArray();
-
-                if (HubServers.Length == 0)
-                {
-                    HubServers = LobbyServers.ToArray();
-                }
-            }
-
-            getRequest.Dispose();
-            IsRefreshingServers = false;
-        }
-
-        public IEnumerator UpdateServerProgress(int progress)
-        {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
-            if (!thisServerCreated) { yield break; }
-
-            ServerProgressPayload payload = new ServerProgressPayload(thisServer._id, progress);
-
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
-
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
-                putRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return putRequest.SendWebRequest();
-            }
-
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.UpdateServerProgress()" + putRequest.error);
-            }
-            putRequest.Dispose();
-        }
-
-        public IEnumerator UpdateServerPopulation(int population, string label, string hostCharId)
-        {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server put request from a server!"); yield break; }
-            if (!thisServerCreated) { yield break; }
-
-            ServerPopulationPayload payload = new ServerPopulationPayload(thisServer._id, population, thisServer.type == 0 ? "Hub" : label == "" ? "Lobby" : label, hostCharId);
-
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
-            putRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return putRequest.SendWebRequest();
-
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                putRequest = UnityWebRequest.Put(APIURL + "servers/duels", jsonData);
-                putRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return putRequest.SendWebRequest();
-            }
-
-            if (putRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.UpdateServerPopulation()" + putRequest.error);
-            }
-            putRequest.Dispose();
-        }
-
-        private Server thisServer;
-        private bool thisServerCreated;
-        public IEnumerator ServerPostRequest(ServerPostPayload payload)
-        {
-            if (!NetworkManager.Singleton.IsServer) { Debug.LogError("Should only call server post request from a server!"); yield break; }
-
-            yield return ServerGetRequest();
-
-            foreach (Server server in servers)
-            {
-                if (payload.ip == server.ip & payload.port == server.port)
-                {
-                    thisServer = server;
-                    thisServerCreated = true;
-                    Debug.LogWarning("Server already exists in API!");
-                    yield break;
-                }
-            }
-
-            WWWForm form = new WWWForm();
-            form.AddField("type", payload.type);
-            form.AddField("population", payload.population);
-            form.AddField("progress", payload.progress);
-            form.AddField("ip", payload.ip);
-            form.AddField("label", payload.label);
-            form.AddField("port", payload.port);
-            form.AddField("hostCharId", payload.hostCharId);
-
-            UnityWebRequest postRequest = UnityWebRequest.Post(APIURL + "servers/duels", form);
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.ServerPostRequest()" + postRequest.error);
-                yield break;
-            }
-
-            thisServer = JsonConvert.DeserializeObject<Server>(postRequest.downloadHandler.text);
-
-            postRequest.Dispose();
-
-            yield return ServerGetRequest();
-
-            thisServerCreated = true;
-        }
-
-        public bool IsDeletingServer { get; private set; }
-        public void DeleteServer(string serverId) { StartCoroutine(DeleteServerCoroutine(serverId)); }
-        private IEnumerator DeleteServerCoroutine(string serverId)
-        {
-            IsDeletingServer = true;
-            ServerDeletePayload payload = new ServerDeletePayload(serverId);
-
-            string json = JsonUtility.ToJson(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
-            deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
-            deleteRequest.SetRequestHeader("Content-Type", "application/json");
-            deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
-            yield return deleteRequest.SendWebRequest();
-
-            if (deleteRequest.result != UnityWebRequest.Result.Success)
-            {
-                deleteRequest = UnityWebRequest.Delete(APIURL + "servers/duels");
-                deleteRequest.method = UnityWebRequest.kHttpVerbDELETE;
-                deleteRequest.SetRequestHeader("Content-Type", "application/json");
-                deleteRequest.uploadHandler = new UploadHandlerRaw(jsonData);
-                yield return deleteRequest.SendWebRequest();
-            }
-
-            if (deleteRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Delete request error in LobbyManagerNPC.DeleteLobby() " + deleteRequest.error);
-            }
-            deleteRequest.Dispose();
-            IsDeletingServer = false;
-        }
-
-        public struct Server
-        {
-            public string _id;
-            public int type;
-            public int population;
-            public int progress;
-            public string ip;
-            public string label;
-            public string __v;
-            public string port;
-            public string hostCharId;
-
-            public Server(string _id, int type, int population, int progress, string ip, string label, string __v, string port, string hostCharId)
-            {
-                this._id = _id;
-                this.type = type;
-                this.population = population;
-                this.progress = progress;
-                this.ip = ip;
-                this.label = label;
-                this.__v = __v;
-                this.port = port;
-                this.hostCharId = hostCharId;
-            }
-        }
-
-        public struct ServerPostPayload
-        {
-            public int type;
-            public int population;
-            public int progress;
-            public string ip;
-            public string label;
-            public string port;
-            public string hostCharId;
-
-            public ServerPostPayload(int type, int population, int progress, string ip, string label, string port, string hostCharId)
-            {
-                this.type = type;
-                this.population = population;
-                this.progress = progress;
-                this.ip = ip;
-                this.label = label;
-                this.port = port;
-                this.hostCharId = hostCharId;
-            }
-        }
-
-        private struct ServerProgressPayload
-        {
-            public string serverId;
-            public int progress;
-
-            public ServerProgressPayload(string serverId, int progress)
-            {
-                this.serverId = serverId;
-                this.progress = progress;
-            }
-        }
-
-        private struct ServerPopulationPayload
-        {
-            public string serverId;
-            public int population;
-            public string label;
-            public string hostCharId;
-
-            public ServerPopulationPayload(string serverId, int population, string label, string hostCharId)
-            {
-                this.serverId = serverId;
-                this.population = population;
-                this.label = label;
-                this.hostCharId = hostCharId;
-            }
-        }
-
-        private struct ServerDeletePayload
-        {
-            public string serverId;
-
-            public ServerDeletePayload(string serverId)
-            {
-                this.serverId = serverId;
-            }
-        }
-
-        public IEnumerator CreateAccount(string username, string email, string password)
-        {
-            IsLoggingIn = true;
-            LogInErrorText = "";
-            CreateAccountPayload payload = new CreateAccountPayload(username, email, password, true);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/create", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "auth/users/create", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.CreateAccount() " + postRequest.error);
-            }
-            else
-            {
-                CreateAccountResultPayload badResultPayload = JsonConvert.DeserializeObject<CreateAccountResultPayload>(postRequest.downloadHandler.text);
-
-                if (badResultPayload.mes == null)
-                {
-                    CreateAccountSuccessPayload goodResultPayload = JsonConvert.DeserializeObject<CreateAccountSuccessPayload>(postRequest.downloadHandler.text);
-                }
-                else
-                {
-                    LogInErrorText = badResultPayload.mes;
-                }
-            }
-
-            switch (postRequest.result)
-            {
-                case UnityWebRequest.Result.InProgress:
-                    LogInErrorText = "Request in Progress";
-                    break;
-                case UnityWebRequest.Result.ConnectionError:
-                    LogInErrorText = "Server Offline";
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    LogInErrorText = "Protocol Error";
-                    break;
-                case UnityWebRequest.Result.DataProcessingError:
-                    LogInErrorText = "Data Processing Error";
-                    break;
-            }
-
-            postRequest.Dispose();
-            IsLoggingIn = false;
-        }
-
-        private struct CreateAccountPayload
-        {
-            public string username;
-            public string email;
-            public string password;
-            public bool isPlayer;
-
-            public CreateAccountPayload(string username, string email, string password, bool isPlayer)
-            {
-                this.username = username;
-                this.email = email;
-                this.password = password;
-                this.isPlayer = isPlayer;
-            }
-        }
-
-        private struct CreateAccountResultPayload
-        {
-            public string mes;
-        }
-
-        private struct CreateAccountSuccessPayload
-        {
-            public string username;
-            public bool isPlayer;
-            public List<string> dateCreated;
-            public string id;
-        }
-
-        // TODO Change the string at the end to be the account ID of whoever we sign in under
-        //private string currentlyLoggedInUserId = "652b4e237527296665a5059b";
-        public bool IsLoggedIn { get; private set; }
-        public bool IsLoggingIn { get; private set; }
-        public string LogInErrorText { get; private set; }
-        private string currentlyLoggedInUserId = "";
-
-        public void ResetLogInErrorText() { LogInErrorText = ""; }
-
-        public IEnumerator Login(string username, string password)
-        {
-            IsLoggingIn = true;
-            LogInErrorText = "";
-            LoginPayload payload = new LoginPayload(username, password);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-            
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "auth/users/login", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
-                IsLoggedIn = false;
-                currentlyLoggedInUserId = "";
-            }
-            else
-            {
-                LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
-                IsLoggedIn = loginResultPayload.login;
-                currentlyLoggedInUserId = loginResultPayload.userId;
-
-                if (!IsLoggedIn)
-                {
-                    LogInErrorText = "Invalid Username or Password";
-                    if (postRequest.downloadHandler.text.Contains("isVerified"))
-                    {
-                        LogInErrorText = "Verify Your Email";
-                    }
-                }
-            }
-
-            switch (postRequest.result)
-            {
-                case UnityWebRequest.Result.InProgress:
-                    LogInErrorText = "Request in Progress";
-                    break;
-                case UnityWebRequest.Result.ConnectionError:
-                    LogInErrorText = "Server Offline";
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    LogInErrorText = "Protocol Error";
-                    break;
-                case UnityWebRequest.Result.DataProcessingError:
-                    LogInErrorText = "Data Processing Error";
-                    break;
-            }
-
-            postRequest.Dispose();
-            IsLoggingIn = false;
-
-            if (IsLoggedIn)
-            {
-                RefreshCharacters();
-            }
-        }
-
-        public IEnumerator LoginWithFirebaseUserId(string email, string firebaseUserId)
-        {
-            IsLoggingIn = true;
-            LogInErrorText = "";
-            LoginWithFirebaseUserIdPayload payload = new LoginWithFirebaseUserIdPayload(email, firebaseUserId);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "auth/users/firebaseAuth", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "auth/users/firebaseAuth", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.Login() " + postRequest.error);
-
-                IsLoggedIn = false;
-                currentlyLoggedInUserId = "";
-            }
-            else
-            {
-                LoginResultPayload loginResultPayload = JsonConvert.DeserializeObject<LoginResultPayload>(postRequest.downloadHandler.text);
-                IsLoggedIn = loginResultPayload.login;
-                currentlyLoggedInUserId = loginResultPayload.userId;
-
-                if (!IsLoggedIn)
-                {
-                    LogInErrorText = "Login Failed. This is probably a bug on our end.";
-                }
-            }
-
-            switch (postRequest.result)
-            {
-                case UnityWebRequest.Result.InProgress:
-                    LogInErrorText = "Request in Progress";
-                    break;
-                case UnityWebRequest.Result.ConnectionError:
-                    LogInErrorText = "Server Offline";
-                    break;
-                case UnityWebRequest.Result.ProtocolError:
-                    LogInErrorText = "Protocol Error";
-                    break;
-                case UnityWebRequest.Result.DataProcessingError:
-                    LogInErrorText = "Data Processing Error";
-                    break;
-            }
-
-            postRequest.Dispose();
-            IsLoggingIn = false;
-
-            if (IsLoggedIn)
-            {
-                RefreshCharacters();
-            }
-        }
-
-        public void Logout()
-        {
-            IsLoggedIn = false;
-            currentlyLoggedInUserId = "";
-            LogInErrorText = default;
-
             if (characterGetRequestRoutine != null)
             {
                 StopCoroutine(characterGetRequestRoutine);
             }
             IsRefreshingCharacters = false;
-        }
-
-        public struct LoginPayload
-        {
-            public string username;
-            public string password;
-
-            public LoginPayload(string username, string password)
-            {
-                this.username = username;
-                this.password = password;
-            }
-        }
-
-        private struct LoginResultPayload
-        {
-            public string userId;
-            public bool login;
-            public bool isPlayer;
-
-            public LoginResultPayload(string userId, bool login, bool isPlayer)
-            {
-                this.userId = userId;
-                this.login = login;
-                this.isPlayer = isPlayer;
-            }
-        }
-
-        private struct LoginWithFirebaseUserIdPayload
-        {
-            public string email;
-            public string firebaseUserId;
-
-            public LoginWithFirebaseUserIdPayload(string email, string firebaseUserId)
-            {
-                this.email = email;
-                this.firebaseUserId = firebaseUserId;
-            }
-        }
-
-        public struct CreateUserPayload
-        {
-            public string username;
-            public string email;
-            public string password;
-            public bool isPlayer;
-
-            public CreateUserPayload(string username, string email, string password)
-            {
-                this.username = username;
-                this.email = email;
-                this.password = password;
-                isPlayer = true;
-            }
         }
 
         public List<Character> Characters { get; private set; } = new List<Character>();
@@ -705,13 +48,13 @@ namespace Vi.Core
             }
             else
             {
-                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + currentlyLoggedInUserId);
+                UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId);
                 yield return getRequest.SendWebRequest();
 
                 Characters.Clear();
                 if (getRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + APIURL + "characters/" + currentlyLoggedInUserId);
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterGetRequest() " + WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId);
                     getRequest.Dispose();
                     yield break;
                 }
@@ -749,24 +92,24 @@ namespace Vi.Core
             }
 
             // This adds all weapons to the inventory if we're in the editor
-//# if UNITY_EDITOR
-//            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-//            foreach (Character character in Characters)
-//            {
-//                foreach (var weaponOption in weaponOptions)
-//                {
-//                    if (!inventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
-//                    {
-//                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-//                    }
-//                }
-//            }
+            //# if UNITY_EDITOR
+            //            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            //            foreach (Character character in Characters)
+            //            {
+            //                foreach (var weaponOption in weaponOptions)
+            //                {
+            //                    if (!inventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
+            //                    {
+            //                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+            //                    }
+            //                }
+            //            }
 
-//            foreach (Character character in Characters)
-//            {
-//                yield return GetCharacterInventory(character);
-//            }
-//# endif
+            //            foreach (Character character in Characters)
+            //            {
+            //                yield return GetCharacterInventory(character);
+            //            }
+            //# endif
 
             IsRefreshingCharacters = false;
         }
@@ -787,12 +130,12 @@ namespace Vi.Core
             {
                 if (IsGettingCharacterById) { yield break; }
                 IsGettingCharacterById = true;
-                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacter/" + characterId);
+                UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getCharacter/" + characterId);
                 yield return getRequest.SendWebRequest();
 
                 if (getRequest.result != UnityWebRequest.Result.Success)
                 {
-                    Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + APIURL + "characters/" + "getCharacter/" + characterId);
+                    Debug.LogError("Get Request Error in WebRequestManager.CharacterByIdGetRequest() " + WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getCharacter/" + characterId);
                     getRequest.Dispose();
                     LastCharacterByIdWasSuccessful = false;
                     IsGettingCharacterById = false;
@@ -864,13 +207,13 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "updateCharacterCosmetic", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "updateCharacterCosmetic", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "updateCharacterCosmetic", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -1006,7 +349,7 @@ namespace Vi.Core
             }
             else
             {
-                UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
+                UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getInventory/" + characterId);
                 yield return getRequest.SendWebRequest();
 
                 if (getRequest.result != UnityWebRequest.Result.Success)
@@ -1028,7 +371,7 @@ namespace Vi.Core
 
         public IEnumerator GetCharacterInventory(string characterId)
         {
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getInventory/" + characterId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getInventory/" + characterId);
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
@@ -1157,13 +500,13 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            UnityWebRequest postRequest = new UnityWebRequest(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                postRequest = new UnityWebRequest(APIURL + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest = new UnityWebRequest(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "setInventory", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
                 postRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return postRequest.SendWebRequest();
             }
@@ -1222,13 +565,13 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "saveLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "saveLoadOut", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "saveLoadOut", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -1252,13 +595,13 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "useLoadOut", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "useLoadOut", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "useLoadOut", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -1292,13 +635,13 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+            UnityWebRequest postRequest = new UnityWebRequest(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
             postRequest.SetRequestHeader("Content-Type", "application/json");
             yield return postRequest.SendWebRequest();
 
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
-                postRequest = new UnityWebRequest(APIURL + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
+                postRequest = new UnityWebRequest(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "createCharacterCosmetic", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
                 postRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return postRequest.SendWebRequest();
             }
@@ -1335,13 +678,13 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "disableCharacter", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/" + "disableCharacter", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "disableCharacter", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -1439,7 +782,7 @@ namespace Vi.Core
         public static Loadout GetDefaultDisplayLoadout(CharacterReference.RaceAndGender raceAndGender)
         {
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(raceAndGender);
-            
+
             return new Loadout("1",
                 "",
                 armorOptions.Find(item => item.isBasicGear & item.equipmentType == CharacterReference.EquipmentType.Chest & item.groupName == "Winterstalk").itemWebId,
@@ -1579,7 +922,7 @@ namespace Vi.Core
                 this.brows = brows;
                 this.hair = hair;
                 attributes = characterAttributes;
-                userId = Singleton.currentlyLoggedInUserId;
+                userId = WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId;
                 this.level = level;
                 this.loadoutPreset1 = loadoutPreset1;
                 this.loadoutPreset2 = loadoutPreset2;
@@ -1624,7 +967,7 @@ namespace Vi.Core
                         return loadoutPreset4;
                     default:
                         Debug.LogError("You haven't associated a loadout property to the following loadout slot: " + loadoutSlot);
-                        return Singleton.GetRandomizedLoadout(raceAndGender);
+                        return WebRequestManager.Singleton.CharacterManager.GetRandomizedLoadout(raceAndGender);
                 }
             }
 
@@ -2709,7 +2052,7 @@ namespace Vi.Core
                                 }
                                 else
                                 {
-                                    Debug.LogError("Error while parsing " + splitStrings[i + 1 ][1..^3]);
+                                    Debug.LogError("Error while parsing " + splitStrings[i + 1][1..^3]);
                                 }
                             }
                             else
@@ -2906,171 +2249,6 @@ namespace Vi.Core
             }
         }
 
-        public IEnumerator SendHordeModeLeaderboardResult(string charId, string playerName, PlayerDataManager.GameMode gameMode, float clearTime, int wave, float damageDealt)
-        {
-            HordeModeLeaderboardResultPayload payload = new HordeModeLeaderboardResultPayload(charId, playerName, gameMode, clearTime, wave, damageDealt);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.SendHordeModeLeaderboardResult()" + postRequest.error);
-            }
-            postRequest.Dispose();
-        }
-
-        public struct HordeModeRecord
-        {
-            public string playerName;
-            public string gameMode;
-            public int wave;
-            public float clearTime;
-            public float damageDealt;
-        }
-
-        private struct HordeModeLeaderboardResultPayload
-        {
-            public string charId;
-            public HordeModeRecord record;
-            public string boardType;
-
-            public HordeModeLeaderboardResultPayload(string charId, string playerName, PlayerDataManager.GameMode gameMode, float clearTime, int wave, float damageDealt)
-            {
-                this.charId = charId;
-                record = new HordeModeRecord()
-                {
-                    playerName = playerName,
-                    gameMode = PlayerDataManager.GetGameModeString(gameMode),
-                    wave = wave,
-                    clearTime = clearTime,
-                    damageDealt = damageDealt
-                };
-                boardType = "horde";
-            }
-        }
-
-        public IEnumerator SendKillsLeaderboardResult(string charId, string playerName, PlayerDataManager.GameMode gameMode, int kills, int deaths, int assists)
-        {
-            KillsLeaderboardResultPayload payload = new KillsLeaderboardResultPayload(charId, playerName, gameMode, kills, deaths, assists);
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "characters/postLeaderBoard", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Put request error in WebRequestManager.SendKillsLeaderboardResult()" + postRequest.error);
-            }
-            postRequest.Dispose();
-        }
-
-        public struct KillsRecord
-        {
-            public string playerName;
-            public string gameMode;
-            public int kills;
-            public int deaths;
-            public int assists;
-            public float KDA;
-        }
-
-        private struct KillsLeaderboardResultPayload
-        {
-            public string charId;
-            public KillsRecord record;
-            public string boardType;
-
-            public KillsLeaderboardResultPayload(string charId, string playerName, PlayerDataManager.GameMode gameMode, int kills, int deaths, int assists)
-            {
-                this.charId = charId;
-                record = new KillsRecord()
-                {
-                    playerName = playerName,
-                    gameMode = PlayerDataManager.GetGameModeString(gameMode),
-                    kills = kills,
-                    deaths = deaths,
-                    assists = assists,
-                    KDA = deaths == 0 ? kills + assists : (kills + assists) / (float)deaths
-                };
-                boardType = "kills";
-            }
-        }
-
-        public List<KillsLeaderboardEntry> killsLeaderboardEntries { get; private set; } = new List<KillsLeaderboardEntry>();
-        public List<HordeLeaderboardEntry> hordeLeaderboardEntries { get; private set; } = new List<HordeLeaderboardEntry>();
-
-        public IEnumerator GetLeaderboard()
-        {
-            // Kills leaderboard
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderBoardSummary/kills");
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.GetLeaderboard()");
-                getRequest.Dispose();
-                yield break;
-            }
-            string json = getRequest.downloadHandler.text;
-
-            killsLeaderboardEntries = JsonConvert.DeserializeObject<List<KillsLeaderboardEntry>>(json);
-
-            getRequest.Dispose();
-
-            // Horde mode leaderboard
-            getRequest = UnityWebRequest.Get(APIURL + "characters/getLeaderboard/horde");
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.GetLeaderboard()");
-                getRequest.Dispose();
-                yield break;
-            }
-            json = getRequest.downloadHandler.text;
-
-            hordeLeaderboardEntries = JsonConvert.DeserializeObject<List<HordeLeaderboardEntry>>(json);
-
-            getRequest.Dispose();
-        }
-
-        public struct KillsLeaderboardEntry
-        {
-            public string boardType;
-            public string charId;
-            public KillsRecord record;
-        }
-
-        public struct HordeLeaderboardEntry
-        {
-            public string boardType;
-            public string charId;
-            public HordeModeRecord record;
-            public string dateCreated;
-        }
-
         private struct CharacterCosmeticPutPayload
         {
             public string id;
@@ -3211,15 +2389,16 @@ namespace Vi.Core
         private Dictionary<string, CharacterStats> characterAttributesLookup = new Dictionary<string, CharacterStats>();
         public IEnumerator GetCharacterAttributes(string characterId)
         {
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "characters/" + "getCharacterAttribute/" + characterId);
+            UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getCharacterAttribute/" + characterId);
             yield return getRequest.SendWebRequest();
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in WebRequestManager.GetCharacterAttributes() " + getRequest.error + APIURL + "characters/" + "getCharacterAttribute/" + characterId);
+                Debug.LogError("Get Request Error in WebRequestManager.GetCharacterAttributes() " + getRequest.error + WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getCharacterAttribute/" + characterId);
                 getRequest.Dispose();
                 yield break;
             }
+
             string json = getRequest.downloadHandler.text;
             if (characterAttributesLookup.ContainsKey(characterId))
             {
@@ -3244,13 +2423,13 @@ namespace Vi.Core
             string json = JsonUtility.ToJson(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/updateCharacterExp", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/updateCharacterExp", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/updateCharacterExp", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -3299,13 +2478,13 @@ namespace Vi.Core
             string json = JsonConvert.SerializeObject(payload);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
-            UnityWebRequest putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+            UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/setCharAttribute", jsonData);
             putRequest.SetRequestHeader("Content-Type", "application/json");
             yield return putRequest.SendWebRequest();
 
             if (putRequest.result != UnityWebRequest.Result.Success)
             {
-                putRequest = UnityWebRequest.Put(APIURL + "characters/setCharAttribute", jsonData);
+                putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/setCharAttribute", jsonData);
                 putRequest.SetRequestHeader("Content-Type", "application/json");
                 yield return putRequest.SendWebRequest();
             }
@@ -3335,374 +2514,6 @@ namespace Vi.Core
         {
             public string charId;
             public CharacterAttributes attributes;
-        }
-
-        private void Start()
-        {
-            StartCoroutine(Initialize());
-#if UNITY_EDITOR
-            //StartCoroutine(CreateItems());
-#endif
-        }
-
-        private IEnumerator Initialize()
-        {
-#if UNITY_SERVER && !UNITY_EDITOR
-            if (!FasterPlayerPrefs.IsAutomatedClient)
-            {
-                yield return GetPublicIP();
-                APIURL = "http://" + PublicIP + ":80/";
-            }
-#endif
-            CheckGameVersion(false);
-            yield return null;
-        }
-
-        private void Update()
-        {
-            if (thisServerCreated)
-            {
-                if (!IsRefreshingServers)
-                {
-                    RefreshServers();
-
-                    if (thisServer.type == 0) // Hub
-                    {
-                        if (!System.Array.Exists(HubServers, item => item._id == thisServer._id))
-                        {
-                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            FasterPlayerPrefs.QuitGame();
-                        }
-                    }
-                    else if (thisServer.type == 1) // Lobby
-                    {
-                        if (!System.Array.Exists(LobbyServers, item => item._id == thisServer._id))
-                        {
-                            Debug.Log(thisServer._id + " This server doesn't exist in the API, quitting now");
-                            FasterPlayerPrefs.QuitGame();
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError("Not sure how to handle server type: " + thisServer.type);
-                    }
-                }
-            }
-        }
-
-#if UNITY_EDITOR
-        private IEnumerator CreateItems()
-        {
-            if (!Application.isEditor) { Debug.LogError("Trying to create items from a non-editor instance!"); yield break; }
-
-            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable) { Debug.LogWarning("No internet connection, can't create items"); yield break; }
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "items/getItems");
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.CreateItems() " + getRequest.error + APIURL + "servers/duels");
-                getRequest.Dispose();
-                yield break;
-            }
-
-            List<Item> itemList = JsonConvert.DeserializeObject<List<Item>>(getRequest.downloadHandler.text);
-
-            getRequest.Dispose();
-
-            yield return new WaitUntil(() => PlayerDataManager.IsCharacterReferenceLoaded());
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-
-            for (int i = 0; i < weaponOptions.Length; i++)
-            {
-                CharacterReference.WeaponOption weaponOption = weaponOptions[i];
-
-                if (itemList.Exists(item => item._id == weaponOption.itemWebId)) { continue; }
-
-                Debug.Log("Creating weapon item: " + (i + 1) + " of " + weaponOptions.Length + " " + weaponOption.weapon.name);
-
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.WEAPON, weaponOption.name, 1, 1, 1, 1, 1, 1, false, false, false, weaponOption.isBasicGear,
-                    weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name, weaponOption.weapon.name);
-
-                string json = JsonConvert.SerializeObject(payload);
-                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                    postRequest.SetRequestHeader("Content-Type", "application/json");
-                    yield return postRequest.SendWebRequest();
-                }
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Post request error in WebRequestManager.CreateItems()" + postRequest.error);
-                }
-
-                weaponOption.itemWebId = postRequest.downloadHandler.text;
-                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
-
-                postRequest.Dispose();
-            }
-
-            List<CharacterReference.WearableEquipmentOption> wearableEquipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetAllArmorEquipmentOptions();
-
-            for (int i = 0; i < wearableEquipmentOptions.Count; i++)
-            {
-                CharacterReference.WearableEquipmentOption wearableEquipmentOption = wearableEquipmentOptions[i];
-
-                if (CharacterReference.equipmentTypesThatAreForCharacterCustomization.Contains(wearableEquipmentOption.equipmentType)) { continue; }
-                if (itemList.Exists(item => item._id == wearableEquipmentOption.itemWebId)) { continue; }
-
-                Debug.Log("Creating armor item: " + (i + 1) + " of " + wearableEquipmentOptions.Count + " " + wearableEquipmentOption.name);
-
-                CreateItemPayload payload = new CreateItemPayload(ItemClass.ARMOR, wearableEquipmentOption.name, 1, 1, 1, 1, 1, 1, false, false, false, wearableEquipmentOption.isBasicGear,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.HumanFemale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcMale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name,
-                    wearableEquipmentOption.GetModel(CharacterReference.RaceAndGender.OrcFemale, PlayerDataManager.Singleton.GetCharacterReference().EmptyWearableEquipment).name);
-
-                string json = JsonConvert.SerializeObject(payload);
-                byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-                UnityWebRequest postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    postRequest = new UnityWebRequest(APIURL + "items/createItem", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                    postRequest.SetRequestHeader("Content-Type", "application/json");
-                    yield return postRequest.SendWebRequest();
-                }
-
-                if (postRequest.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Post request error in WebRequestManager.CreateItems()" + postRequest.error);
-                }
-
-                wearableEquipmentOption.itemWebId = postRequest.downloadHandler.text;
-                UnityEditor.EditorUtility.SetDirty(PlayerDataManager.Singleton.GetCharacterReference());
-
-                postRequest.Dispose();
-            }
-        }
-
-        private struct CreateItemPayload
-        {
-            public string @class;
-            public string name;
-            public int weight;
-
-            [JsonProperty("attributes.strength")]
-            public int attributesstrength;
-
-            [JsonProperty("attributes.agility")]
-            public int attributesagility;
-
-            [JsonProperty("attributes.zzzz")]
-            public int attributeszzzz;
-
-            [JsonProperty("attributes.vitality")]
-            public int attributesvitality;
-
-            [JsonProperty("attributes.dexterity")]
-            public int attributesdexterity;
-            public bool isCraftOnly;
-            public bool isCashExclusive;
-            public bool isPassExclusive;
-            public ModelNames modelNames;
-            public bool isBasicGear;
-
-            public CreateItemPayload(ItemClass @class, string name, int weight,
-                int attributesstrength, int attributesagility, int attributeszzzz, int attributesvitality, int attributesdexterity,
-                bool isCraftOnly, bool isCashExclusive, bool isPassExclusive, bool isBasicGear,
-                string humanMaleModelName, string humanFemaleModelName, string orcMaleModelName, string orcFemaleModelName)
-            {
-                this.@class = @class.ToString();
-                this.name = name;
-                this.weight = weight;
-                this.attributesstrength = attributesstrength;
-                this.attributesagility = attributesagility;
-                this.attributeszzzz = attributeszzzz;
-                this.attributesvitality = attributesvitality;
-                this.attributesdexterity = attributesdexterity;
-                this.isCraftOnly = isCraftOnly;
-                this.isCashExclusive = isCashExclusive;
-                this.isPassExclusive = isPassExclusive;
-                this.modelNames = new ModelNames(humanMaleModelName, humanFemaleModelName, orcMaleModelName, orcFemaleModelName);
-                this.isBasicGear = isBasicGear;
-            }
-        }
-
-        private enum ItemClass
-        {
-            WEAPON,
-            ARMOR,
-            ETC
-        }
-
-        private struct Item
-        {
-            public string _id;
-            public string @class;
-            public string name;
-            public int weight;
-            private ItemAttributes attributes;
-            public string isCraftOnly;
-            public bool isCashExclusive;
-            public bool isPassExclusive;
-            public string modelName;
-            public int __v;
-            public string id;
-
-            private struct ItemAttributes
-            {
-                public int str;
-                public int agi;
-                public int @int;
-                public int vit;
-                public int dex;
-            }
-
-        }
-#endif
-
-        public void CheckGameVersion(bool force)
-        {
-            if (!force)
-            {
-                if (IsCheckingGameVersion) { return; }
-            }
-            if (gameVersionCheckCoroutine != null) { StopCoroutine(gameVersionCheckCoroutine); }
-            gameVersionCheckCoroutine = StartCoroutine(CheckGameVersionRequest());
-        }
-
-        public bool GameIsUpToDate { get; private set; }
-        public string GameVersionErrorMessage { get; private set; } = "";
-
-        public string GetGameVersion() { return gameVersion.Version; }
-
-        [SerializeField] private GameObject alertBoxPrefab;
-        public bool IsCheckingGameVersion { get; private set; }
-        private GameVersion gameVersion;
-        private Coroutine gameVersionCheckCoroutine;
-        private IEnumerator CheckGameVersionRequest()
-        {
-            if (FasterPlayerPrefs.InternetReachability == NetworkReachability.NotReachable)
-            {
-                yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
-
-                if (!FasterPlayerPrefs.IsPlayingOffline)
-                {
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version, are you connected to the internet?";
-                    GameIsUpToDate = true;
-                    GameVersionErrorMessage = "";
-                }
-
-                IsLoggedIn = true;
-                currentlyLoggedInUserId = "";
-
-                if (IsLoggedIn)
-                {
-                    RefreshCharacters();
-                }
-                yield break;
-            }
-
-            IsCheckingGameVersion = true;
-
-            UnityWebRequest getRequest = UnityWebRequest.Get(APIURL + "game/version");
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in WebRequestManager.VersionGetRequest() " + getRequest.error + APIURL + "game/version");
-                getRequest.Dispose();
-                if (FasterPlayerPrefs.InternetReachability != NetworkReachability.NotReachable)
-                {
-                    yield return new WaitUntil(() => SceneManager.GetActiveScene() == gameObject.scene);
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Error while checking game version. Servers may be offline.";
-                }
-                IsCheckingGameVersion = false;
-                yield break;
-            }
-
-            Version version = JsonConvert.DeserializeObject<Version>(getRequest.downloadHandler.text);
-            gameVersion = version.gameversion;
-
-            getRequest.Dispose();
-
-            GameIsUpToDate = Application.version == gameVersion.Version;
-            GameVersionErrorMessage = "";
-
-            IsCheckingGameVersion = false;
-
-            if (SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
-            {
-                if (float.Parse(Application.version) > float.Parse(gameVersion.Version))
-                {
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Servers not updated yet, online play is unavailable.";
-                    GameVersionErrorMessage = "SERVERS NOT UPDATED YET";
-                }
-                else if (float.Parse(Application.version) < float.Parse(gameVersion.Version))
-                {
-                    Instantiate(alertBoxPrefab).GetComponentInChildren<Text>().text = "Game is out of date, please update.";
-                    GameVersionErrorMessage = "GAME IS OUT OF DATE";
-                }
-            }
-        }
-
-        private class GameVersion
-        {
-            public string Version;
-            public string Type;
-
-            public GameVersion(string version, string type)
-            {
-                Version = version;
-                Type = type;
-            }
-        }
-
-        private class Version
-        {
-            public GameVersion gameversion;
-
-            public Version(string version, string type)
-            {
-                gameversion = new GameVersion(version, type);
-            }
-        }
-
-        public IEnumerator SetGameVersion()
-        {
-            Version payload = new Version(Application.version, "Live");
-
-            string json = JsonConvert.SerializeObject(payload);
-            byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
-
-            UnityWebRequest postRequest = new UnityWebRequest(APIURL + "game/version", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-            postRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return postRequest.SendWebRequest();
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                postRequest = new UnityWebRequest(APIURL + "game/version", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
-                postRequest.SetRequestHeader("Content-Type", "application/json");
-                yield return postRequest.SendWebRequest();
-            }
-
-            if (postRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Post request error in WebRequestManager.SetGameVersion()" + postRequest.error);
-            }
-            postRequest.Dispose();
         }
     }
 }

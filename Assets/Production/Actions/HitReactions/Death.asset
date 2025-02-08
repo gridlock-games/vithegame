@@ -255,10 +255,14 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  XAngleRotationOffset: 0
   YAngleRotationOffset: 0
+  ZAngleRotationOffset: 0
   avatarLayer: 0
   transitionTime: 0.15
   dodgeCancelTransitionTime: 0.15
+  rootMotionTruncateOffset: 0.15
+  truncatedTransitionOutTime: 0.15
   animationSpeed: 1
   recoveryAnimationSpeed: 1
   agentStaminaCost: 20
@@ -272,10 +276,12 @@ MonoBehaviour:
   chargeTimeDamageMultiplier: 5
   enhancedChargeDamageMultiplier: 1
   chargePenaltyDamage: 10
+  chargeAttackChargingVFX: {fileID: 0}
   attackingNormalizedTime: 0.25
   recoveryNormalizedTime: 0.75
   isAffectedByRage: 1
   damage: 20
+  armorPenetration: 0
   healAmount: 0
   staminaDamage: 0
   healthPenaltyOnMiss: 0
@@ -290,7 +296,45 @@ MonoBehaviour:
   isFollowUpAttack: 0
   ailment: 6
   grabAttackClip: {fileID: 0}
+  grabAttackRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   grabVictimClip: {fileID: 0}
+  grabVictimRootMotionData:
+    curveX:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveY:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    curveZ:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
   ailmentHitDefinition: 
   dodgeLock: 0
   canCancelLightAttacks: 0
@@ -301,6 +345,7 @@ MonoBehaviour:
   canBeCancelledByAbilities: 0
   abilityImageIcon: {fileID: 0}
   abilityCooldownTime: 5
+  abilityBufferTime: 0
   actionClipSoundEffects:
   - raceAndGenders: 00000000
     audioClips:
@@ -384,6 +429,7 @@ MonoBehaviour:
   canLunge: 0
   minLungeDistance: 2.5
   maxLungeDistance: 5
+  bladeSizeMultiplier: {x: 1, y: 1, z: 1}
   aimDuringAnticipation: 0
   aimDuringAttack: 0
   aimDuringRecovery: 0

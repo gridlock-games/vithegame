@@ -8,13 +8,13 @@ namespace Vi.UI
 {
     public class CharacterStatElement : MonoBehaviour
     {
-        [SerializeField] private WebRequestManager.Character.AttributeType attributeType;
+        [SerializeField] private CharacterManager.Character.AttributeType attributeType;
         [SerializeField] private Text headerText;
         [SerializeField] private Text progressText;
         [SerializeField] private Image progressBar;
         [SerializeField] private Button addPointButton;
 
-        public WebRequestManager.Character.AttributeType AttributeType { get { return attributeType; } }
+        public CharacterManager.Character.AttributeType AttributeType { get { return attributeType; } }
         public Button GetAddPointButton() { return addPointButton; }
 
         public int CurrentStatCount { get; set; }
@@ -41,13 +41,13 @@ namespace Vi.UI
 
         private int GetAvailableSkillPoints()
         {
-            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            int characterIndex = WebRequestManager.Singleton.CharacterManager.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             int availableSkillPoints = 0;
             if (characterIndex != -1)
             {
-                if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(WebRequestManager.Singleton.Characters[characterIndex]._id.ToString(), out var stats))
+                if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(WebRequestManager.Singleton.CharacterManager.Characters[characterIndex]._id.ToString(), out var stats))
                 {
-                    availableSkillPoints = stats.GetAvailableSkillPoints(WebRequestManager.Singleton.Characters[characterIndex].attributes);
+                    availableSkillPoints = stats.GetAvailableSkillPoints(WebRequestManager.Singleton.CharacterManager.Characters[characterIndex].attributes);
                     return availableSkillPoints;
                 }
             }
@@ -64,11 +64,11 @@ namespace Vi.UI
 
             UpdateDisplay();
 
-            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            int characterIndex = WebRequestManager.Singleton.CharacterManager.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             if (characterIndex != -1)
             {
-                WebRequestManager.Character newCharacter = PlayerDataManager.Singleton.LocalPlayerData.character.SetStat(attributeType, CurrentStatCount);
-                WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
+                CharacterManager.Character newCharacter = PlayerDataManager.Singleton.LocalPlayerData.character.SetStat(attributeType, CurrentStatCount);
+                WebRequestManager.Singleton.CharacterManager.Characters[characterIndex] = newCharacter;
             }
 
             int availableStatPoints = GetAvailableSkillPoints();

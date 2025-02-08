@@ -21,7 +21,7 @@ namespace Vi.UI
         [SerializeField] private Text clearTimeText;
         [SerializeField] private Text damageDealtText;
 
-        public void Initialize(WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry)
+        public void Initialize(LeaderboardManager.HordeLeaderboardEntry hordeLeaderboardEntry)
         {
             dateText.text = hordeLeaderboardEntry.dateCreated;
             playerNameText.text = hordeLeaderboardEntry.record.playerName;
@@ -30,7 +30,7 @@ namespace Vi.UI
             damageDealtText.text = hordeLeaderboardEntry.record.damageDealt.ToString("F2");
         }
 
-        public void Initialize(WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry)
+        public void Initialize(LeaderboardManager.KillsLeaderboardEntry killsLeaderboardEntry)
         {
             playerNameText.text = killsLeaderboardEntry.record.playerName;
             killsText.text = killsLeaderboardEntry.record.kills.ToString();
