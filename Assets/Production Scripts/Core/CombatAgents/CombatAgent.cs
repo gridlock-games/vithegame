@@ -1538,6 +1538,11 @@ namespace Vi.Core
             if (physicalDamage > 0) { Debug.LogWarning("Why is physical damage is a positive number?????"); }
             if (magicalDamage > 0) { Debug.LogWarning("Why is magical damage is a positive number?????"); }
 
+            if (!ShouldUseArmor())
+            {
+                return new DamageDispersion(physicalDamage, magicalDamage, 0, 0);
+            }
+
             physicalDamage = Mathf.Abs(physicalDamage);
             magicalDamage = Mathf.Abs(magicalDamage);
 

@@ -99,24 +99,24 @@ namespace Vi.Core
             }
 
             // This adds all weapons to the inventory if we're in the editor
-            //# if UNITY_EDITOR
-            //            var weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            //            foreach (Character character in Characters)
-            //            {
-            //                foreach (var weaponOption in weaponOptions)
-            //                {
-            //                    if (!inventoryItems[character._id.ToString()].Exists(item => item.itemId == weaponOption.itemWebId))
-            //                    {
-            //                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-            //                    }
-            //                }
-            //            }
+#if UNITY_EDITOR
+            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            foreach (Character character in Characters)
+            {
+                foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
+                {
+                    if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
+                    {
+                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+                    }
+                }
+            }
 
-            //            foreach (Character character in Characters)
-            //            {
-            //                yield return GetCharacterInventory(character);
-            //            }
-            //# endif
+            foreach (Character character in Characters)
+            {
+                yield return GetCharacterInventory(character);
+            }
+#endif
 
             IsRefreshingCharacters = false;
         }
@@ -503,8 +503,9 @@ namespace Vi.Core
             }
         }
 
+#if UNITY_EDITOR
         public bool InventoryAddWasSuccessful { get; private set; }
-        public IEnumerator AddItemToInventory(string charId, string itemId)
+        private IEnumerator AddItemToInventory(string charId, string itemId)
         {
             if (string.IsNullOrWhiteSpace(itemId)) { Debug.LogWarning("You are trying to add an item to a character's inventory that has an id of null or whitespace"); yield break; }
 
@@ -551,6 +552,7 @@ namespace Vi.Core
                 this.itemId = itemId;
             }
         }
+#endif
 
         public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout)
         {
