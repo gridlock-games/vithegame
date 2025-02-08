@@ -113,8 +113,12 @@ namespace Vi.Editor
         {
             foreach (ActionClip actionClip in GetActionClips())
             {
-                actionClip.armorPenetration = 0;
-                EditorUtility.SetDirty(actionClip);
+                if (AssetDatabase.GetAssetPath(actionClip).Contains("Staff"))
+                {
+                    actionClip.magicalDamage = actionClip.damage;
+                    actionClip.damage = 0;
+                    EditorUtility.SetDirty(actionClip);
+                }
             }
             AssetDatabase.SaveAssets();
         }
