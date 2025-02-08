@@ -261,13 +261,13 @@ namespace Vi.UI
             if (!combatAgent) { canvas.enabled = false; return; }
 
             float HP = combatAgent.GetHP();
-            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor(); }
+            //if (staminaAndArmorAreDisabled) { HP += combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor(); }
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
             float rage = combatAgent.GetRage();
 
             float maxHP = combatAgent.GetMaxHP();
-            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor(); }
+            //if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor(); }
 
             float maxRage = combatAgent.GetMaxRage();
 

@@ -285,9 +285,9 @@ namespace Vi.UI
             SetHealthBarScale(Vector3.Lerp(currentHealthBarScale, team == PlayerDataManager.Team.Peaceful ? Vector3.zero : healthBarLocalScaleTarget, Time.deltaTime * scalingSpeed));
             healthText.enabled = team != PlayerDataManager.Team.Peaceful;
 
-            float HP = combatAgent.GetHP() + combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor();
+            float HP = combatAgent.GetHP();// + combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor();
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
-            float maxHP = combatAgent.GetMaxHP() + combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor();
+            float maxHP = combatAgent.GetMaxHP();// + combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor();
 
             if (!Mathf.Approximately(lastHP, HP) | !Mathf.Approximately(lastMaxHP, maxHP))
             {
