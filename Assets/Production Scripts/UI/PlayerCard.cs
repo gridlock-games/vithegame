@@ -252,18 +252,22 @@ namespace Vi.UI
         private float lastMaxArmor = -1;
         private float lastMaxRage = -1;
 
+        private static readonly Color defaultArmorColor = new Color(5f / 255, 159f / 255, 242f / 255, 1);
+        private static readonly Color physicalArmorDepletedColor = new Color(120f / 255, 127f / 255, 246f / 255, 1);
+        private static readonly Color magicalArmorDepletedColor = new Color(28f / 255, 167f / 255, 236f / 255, 1);
+
         private void Update()
         {
             if (!combatAgent) { canvas.enabled = false; return; }
 
             float HP = combatAgent.GetHP();
-            if (staminaAndArmorAreDisabled) { HP += combatAgent.GetArmor(); }
+            //if (staminaAndArmorAreDisabled) { HP += combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor(); }
             if (HP < 0.1f & HP > 0) { HP = 0.1f; }
 
             float rage = combatAgent.GetRage();
 
             float maxHP = combatAgent.GetMaxHP();
-            if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxArmor(); }
+            //if (staminaAndArmorAreDisabled) { maxHP += combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor(); }
 
             float maxRage = combatAgent.GetMaxRage();
 
@@ -293,10 +297,10 @@ namespace Vi.UI
             if (!staminaAndArmorAreDisabled)
             {
                 float stamina = combatAgent.GetStamina();
-                float armor = combatAgent.GetArmor();
+                float armor = combatAgent.GetPhysicalArmor() + combatAgent.GetMagicalArmor();
 
                 float maxStamina = combatAgent.GetMaxStamina();
-                float maxArmor = combatAgent.GetMaxArmor();
+                float maxArmor = combatAgent.GetMaxPhysicalArmor() + combatAgent.GetMaxMagicalArmor();
 
                 if (!Mathf.Approximately(lastStamina, stamina) | !Mathf.Approximately(lastMaxStamina, maxStamina))
                 {
@@ -308,6 +312,12 @@ namespace Vi.UI
                 {
                     armorText.text = "AR " + StringUtility.FormatDynamicFloatForUI(armor) + " / " + maxArmor.ToString("F0");
                     armorFillImage.fillAmount = armor / maxArmor;
+
+                    Color armorColor = defaultArmorColor;
+                    if (Mathf.Approximately(combatAgent.GetPhysicalArmor(), 0)) { armorColor = physicalArmorDepletedColor; }
+                    else if (Mathf.Approximately(combatAgent.GetMagicalArmor(), 0)) { armorColor = magicalArmorDepletedColor; }
+
+                    armorFillImage.color = armorColor;
                 }
 
                 // Interim images - these update every frame

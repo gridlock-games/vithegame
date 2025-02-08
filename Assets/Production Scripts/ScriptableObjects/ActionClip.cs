@@ -69,7 +69,7 @@ namespace Vi.ScriptableObjects
             immuneToGroundSpells,
             immuneToAilments,
             immuneToNegativeStatuses,
-            armorRegeneration,
+            physicalArmorRegeneration,
             staminaRegeneration,
             attackSpeedDecrease,
             attackSpeedIncrease,
@@ -229,6 +229,7 @@ namespace Vi.ScriptableObjects
         public float recoveryNormalizedTime = 0.75f;
         public bool isAffectedByRage = true;
         public float damage = 20;
+        public float magicalDamage = 0;
         public float armorPenetration = 0;
         public float healAmount = 0;
         public float staminaDamage = 0;

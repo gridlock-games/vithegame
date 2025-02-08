@@ -34,11 +34,13 @@ namespace Vi.Core
         private List<CombatAgent> slaves = new List<CombatAgent>();
 
         protected NetworkVariable<float> stamina = new NetworkVariable<float>();
-        protected NetworkVariable<float> armor = new NetworkVariable<float>();
+        protected NetworkVariable<float> physicalArmor = new NetworkVariable<float>();
+        protected NetworkVariable<float> magicalArmor = new NetworkVariable<float>();
         protected NetworkVariable<float> rage = new NetworkVariable<float>();
 
         public float GetStamina() { return stamina.Value; }
-        public float GetArmor() { return armor.Value; }
+        public float GetPhysicalArmor() { return physicalArmor.Value; }
+        public float GetMagicalArmor() { return magicalArmor.Value; }
         public float GetRage() { return rage.Value; }
 
         public override float GetMaxHP()
@@ -49,7 +51,7 @@ namespace Vi.Core
             }
             else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
-                return Mathf.Max(stats.hp, stats.baseHP) + SessionProgressionHandler.MaxHPBonus;
+                return stats.hp + SessionProgressionHandler.MaxHPBonus;
             }
             else
             {
@@ -59,7 +61,7 @@ namespace Vi.Core
 
         public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
 
-        public float GetMaxArmor()
+        public float GetMaxPhysicalArmor()
         {
             if (!NetworkObject.IsPlayerObject)
             {
@@ -67,7 +69,23 @@ namespace Vi.Core
             }
             else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
-                return stats.defense + stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
+                return stats.defense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+        }
+
+        public float GetMaxMagicalArmor()
+        {
+            if (!NetworkObject.IsPlayerObject)
+            {
+                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
             }
             else
             {
@@ -106,7 +124,7 @@ namespace Vi.Core
 
         protected virtual bool ShouldUseRage() { return true; }
 
-        public void AddArmor(float amount)
+        public void AddPhysicalArmor(float amount)
         {
             if (!ShouldUseArmor()) { return; }
 
@@ -115,20 +133,47 @@ namespace Vi.Core
 
             if (amount > 0)
             {
-                if (armor.Value < GetMaxArmor())
+                if (physicalArmor.Value < GetMaxPhysicalArmor())
                 {
-                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
+                    physicalArmor.Value = Mathf.Clamp(physicalArmor.Value + amount, 0, GetMaxPhysicalArmor());
                 }
             }
             else // Delta is less than or equal to zero
             {
-                if (armor.Value > GetMaxArmor())
+                if (physicalArmor.Value > GetMaxPhysicalArmor())
                 {
-                    armor.Value += amount;
+                    physicalArmor.Value += amount;
                 }
                 else
                 {
-                    armor.Value = Mathf.Clamp(armor.Value + amount, 0, GetMaxArmor());
+                    physicalArmor.Value = Mathf.Clamp(physicalArmor.Value + amount, 0, GetMaxPhysicalArmor());
+                }
+            }
+        }
+
+        public void AddMagicalArmor(float amount)
+        {
+            if (!ShouldUseArmor()) { return; }
+
+            if (amount < 0) { amount *= StatusAgent.ArmorReductionMultiplier; }
+            if (amount > 0) { amount *= StatusAgent.ArmorIncreaseMultiplier; }
+
+            if (amount > 0)
+            {
+                if (magicalArmor.Value < GetMaxMagicalArmor())
+                {
+                    magicalArmor.Value = Mathf.Clamp(magicalArmor.Value + amount, 0, GetMaxMagicalArmor());
+                }
+            }
+            else // Delta is less than or equal to zero
+            {
+                if (magicalArmor.Value > GetMaxMagicalArmor())
+                {
+                    magicalArmor.Value += amount;
+                }
+                else
+                {
+                    magicalArmor.Value = Mathf.Clamp(magicalArmor.Value + amount, 0, GetMaxMagicalArmor());
                 }
             }
         }
@@ -187,7 +232,19 @@ namespace Vi.Core
         [SerializeField] private PooledObject armorDestroyedVFX;
         [SerializeField] private AudioClip armorDestroyedAudio;
         private List<PooledObject> armorDestroyedVFXInstances = new List<PooledObject>();
-        private void OnArmorChanged(float prev, float current)
+        private void OnPhysicalArmorChanged(float prev, float current)
+        {
+            if (Mathf.Approximately(prev, 0)) { return; }
+            if (!Mathf.Approximately(current, 0)) { return; }
+            if (current > prev) { return; }
+
+            if (ShouldUseArmor())
+            {
+                StartCoroutine(PlayArmorVFX());
+            }
+        }
+
+        private void OnMagicalArmorChanged(float prev, float current)
         {
             if (Mathf.Approximately(prev, 0)) { return; }
             if (!Mathf.Approximately(current, 0)) { return; }
@@ -303,7 +360,8 @@ namespace Vi.Core
         {
             ailment.OnValueChanged += OnAilmentChanged;
             HP.OnValueChanged += OnHPChanged;
-            armor.OnValueChanged += OnArmorChanged;
+            physicalArmor.OnValueChanged += OnPhysicalArmorChanged;
+            magicalArmor.OnValueChanged += OnMagicalArmorChanged;
             rage.OnValueChanged += OnRageChanged;
 
             LastAliveStartTime = Time.time;
@@ -336,14 +394,16 @@ namespace Vi.Core
             yield return new WaitUntil(() => IsSpawned);
             yield return new WaitUntil(() => WeaponHandler.WeaponInitialized);
             HP.Value = GetMaxHP();
-            armor.Value = GetMaxArmor();
+            physicalArmor.Value = GetMaxPhysicalArmor();
+            magicalArmor.Value = GetMaxMagicalArmor();
         }
 
         public override void OnNetworkDespawn()
         {
             ailment.OnValueChanged -= OnAilmentChanged;
             HP.OnValueChanged -= OnHPChanged;
-            armor.OnValueChanged -= OnArmorChanged;
+            physicalArmor.OnValueChanged -= OnPhysicalArmorChanged;
+            magicalArmor.OnValueChanged -= OnMagicalArmorChanged;
             rage.OnValueChanged -= OnRageChanged;
 
             if (worldSpaceLabelInstance) { ObjectPoolingManager.ReturnObjectToPool(ref worldSpaceLabelInstance); }
@@ -797,7 +857,10 @@ namespace Vi.Core
             if (resetStamina)
                 stamina.Value = 0;
             if (resetArmor)
-                armor.Value = GetMaxArmor();
+            {
+                physicalArmor.Value = GetMaxPhysicalArmor();
+                magicalArmor.Value = GetMaxMagicalArmor();
+            }
             if (resetRage)
                 rage.Value = 0;
         }
@@ -1456,39 +1519,46 @@ namespace Vi.Core
 
         private struct DamageDispersion
         {
-            public float healthDamage;
-            public float armorDamage;
+            public float physicalHPDamage;
+            public float magicalHPDamage;
+            public float physicalArmorDamage;
+            public float magicalArmorDamage;
 
-            public DamageDispersion(float healthDamage, float armorDamage)
+            public DamageDispersion(float physicalHPDamage, float magicalHPDamage, float physicalArmorDamage, float magicalArmorDamage)
             {
-                this.healthDamage = healthDamage;
-                this.armorDamage = armorDamage;
-            }
-
-            public override string ToString()
-            {
-                return $"Armor Damage: {armorDamage}, Health Damage: {healthDamage}";
+                this.physicalHPDamage = physicalHPDamage;
+                this.magicalHPDamage = magicalHPDamage;
+                this.physicalArmorDamage = physicalArmorDamage;
+                this.magicalArmorDamage = magicalArmorDamage;
             }
         }
 
-        private DamageDispersion GetArmorDamageDispersion(float totalDamage, float armorPenetration)
+        private DamageDispersion GetArmorDamageDispersion(float physicalDamage, float magicalDamage, float armorPenetration)
         {
-            if (totalDamage > 0) { Debug.LogWarning("Why is damage is a positive number?????"); }
+            if (physicalDamage > 0) { Debug.LogWarning("Why is physical damage is a positive number?????"); }
+            if (magicalDamage > 0) { Debug.LogWarning("Why is magical damage is a positive number?????"); }
 
-            totalDamage = Mathf.Abs(totalDamage);
+            physicalDamage = Mathf.Abs(physicalDamage);
+            magicalDamage = Mathf.Abs(magicalDamage);
 
             // Clamp armor penetration between 0 and 1
             armorPenetration = Mathf.Clamp01(armorPenetration);
 
             // Calculate damage that bypasses armor
-            float bypassDamage = (totalDamage * armorPenetration);
-            float remainingDamage = totalDamage - bypassDamage;
+            float physicalBypassDamage = (physicalDamage * armorPenetration);
+            float physicalRemainingDamage = physicalDamage - physicalBypassDamage;
+
+            float magicalBypassDamage = (magicalDamage * armorPenetration);
+            float magicalRemainingDamage = magicalDamage - magicalBypassDamage;
 
             // Calculate armor and health damage
-            float armorDamage = Mathf.Min(remainingDamage, GetArmor());
-            float healthDamage = bypassDamage + Mathf.Max(remainingDamage - GetArmor(), 0);
-            
-            return new DamageDispersion(-healthDamage, -armorDamage);
+            float physicalArmorDamage = Mathf.Min(physicalRemainingDamage, GetPhysicalArmor());
+            float physicalHealthDamage = physicalBypassDamage + Mathf.Max(physicalRemainingDamage - GetPhysicalArmor(), 0);
+
+            float magicalArmorDamage = Mathf.Min(magicalRemainingDamage, GetMagicalArmor());
+            float magicalHealthDamage = magicalBypassDamage + Mathf.Max(magicalRemainingDamage - GetMagicalArmor(), 0);
+
+            return new DamageDispersion(-physicalHealthDamage, -magicalHealthDamage, -physicalArmorDamage, -magicalArmorDamage);
         }
 
         private bool wasIncapacitatedThisLife;
@@ -1537,9 +1607,17 @@ namespace Vi.Core
             bool isBlocking = false;
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
-            float HPDamage = -(attack.damage + SessionProgressionHandler.BaseDamageBonus);
-            HPDamage *= attacker.StatusAgent.DamageMultiplier;
-            HPDamage *= damageMultiplier;
+            float physicalHPDamage = -(attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            physicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
+            physicalHPDamage *= damageMultiplier;
+
+            float magicalHPDamage = -(attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            magicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
+            magicalHPDamage *= damageMultiplier;
+
+            float HPDamage = physicalHPDamage + magicalHPDamage;
+            float originalPhysicalArmor = GetPhysicalArmor();
+            float originalMagicalArmor = GetMagicalArmor();
 
             bool shouldPlayHitReaction;
             if (ShouldUseArmor())
@@ -1548,33 +1626,39 @@ namespace Vi.Core
                 switch (hitReaction.GetHitReactionType())
                 {
                     case ActionClip.HitReactionType.Normal:
-                        DamageDispersion damageDispersion = GetArmorDamageDispersion(HPDamage, attack.armorPenetration);
-                        if ((GetArmor() + damageDispersion.armorDamage) / GetMaxArmor() >= notBlockingArmorHitReactionPercentage)
+                        DamageDispersion damageDispersion = GetArmorDamageDispersion(physicalHPDamage, magicalHPDamage, attack.armorPenetration);
+                        if ((GetPhysicalArmor() + damageDispersion.physicalArmorDamage) / GetMaxPhysicalArmor() >= notBlockingArmorHitReactionPercentage
+                            & (GetMagicalArmor() + damageDispersion.magicalArmorDamage) / GetMaxMagicalArmor() >= notBlockingArmorHitReactionPercentage)
                         {
-                            AddArmor(damageDispersion.armorDamage);
-                            HPDamage = damageDispersion.healthDamage;
+                            AddPhysicalArmor(damageDispersion.physicalArmorDamage);
+                            AddMagicalArmor(damageDispersion.magicalArmorDamage);
+                            HPDamage = damageDispersion.physicalHPDamage + damageDispersion.magicalHPDamage;
                         }
-                        else if ((GetArmor() + damageDispersion.armorDamage) / GetMaxArmor() > 0)
+                        else if ((GetPhysicalArmor() + damageDispersion.physicalArmorDamage) / GetMaxPhysicalArmor() > 0
+                            & (GetMagicalArmor() + damageDispersion.magicalArmorDamage) / GetMaxMagicalArmor() > 0)
                         {
-                            AddArmor(damageDispersion.armorDamage);
-                            HPDamage = damageDispersion.healthDamage;
+                            AddPhysicalArmor(damageDispersion.physicalArmorDamage);
+                            AddMagicalArmor(damageDispersion.magicalArmorDamage);
+                            HPDamage = damageDispersion.physicalHPDamage + damageDispersion.magicalHPDamage;
                             shouldPlayHitReaction = true;
                         }
                         else // Armor is at 0
                         {
-                            AddArmor(HPDamage);
+                            AddPhysicalArmor(HPDamage);
+                            AddMagicalArmor(HPDamage);
                             shouldPlayHitReaction = true;
                         }
                         break;
                     case ActionClip.HitReactionType.Blocking:
-                        if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() >= blockingArmorHitReactionPercentage) // If armor is greater than or equal to 50%
+                        // TODO this needs to be integrated with magical armor logic
+                        if ((GetPhysicalArmor() + HPDamage * 0.7f) / GetMaxPhysicalArmor() >= blockingArmorHitReactionPercentage) // If armor is greater than or equal to 50%
                         {
-                            AddArmor(HPDamage * 0.5f);
+                            AddPhysicalArmor(HPDamage * 0.5f);
                             HPDamage = 0;
                         }
-                        else if ((GetArmor() + HPDamage * 0.7f) / GetMaxArmor() > 0) // If armor is greater than 0% and less than 50%
+                        else if ((GetPhysicalArmor() + HPDamage * 0.7f) / GetMaxPhysicalArmor() > 0) // If armor is greater than 0% and less than 50%
                         {
-                            AddArmor(-GetMaxArmor());
+                            AddPhysicalArmor(-GetMaxPhysicalArmor());
                             AddStamina(-GetMaxStamina() * 0.3f);
                             shouldPlayHitReaction = true;
                             HPDamage *= 0.7f;
@@ -1582,7 +1666,7 @@ namespace Vi.Core
                         else // Armor is at 0
                         {
                             AddStamina(-GetMaxStamina() * 0.3f);
-                            AddArmor(HPDamage);
+                            AddPhysicalArmor(HPDamage);
                             if (GetStamina() <= 0)
                             {
                                 if (attackAilment == ActionClip.Ailment.None) { attackAilment = ActionClip.Ailment.Stagger; }
@@ -1707,7 +1791,14 @@ namespace Vi.Core
             }
             else // Not blocking
             {
-                RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(), runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment, GetArmor() > 0, runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+                // If there is more total HP damage than total armor damage on this hit, render it as an HP hit
+                float totalArmorDamage = (originalPhysicalArmor - GetPhysicalArmor()) + (originalMagicalArmor - GetMagicalArmor());
+
+                RenderHit(attacker.NetworkObjectId, impactPosition, AnimationHandler.GetArmorType(),
+                    runtimeWeapon ? runtimeWeapon.WeaponBone : Weapon.WeaponBone.Root, attackAilment,
+                    Mathf.Abs(HPDamage) < totalArmorDamage | attackAilment != ActionClip.Ailment.None,
+                    runtimeWeapon ? runtimeWeapon.GetWeaponMaterial() : Weapon.WeaponMaterial.Metal);
+
                 float prevHP = GetHP();
                 AddHP(HPDamage);
                 if (GameModeManager.Singleton) { GameModeManager.Singleton.OnDamageOccuring(attacker, this, prevHP - GetHP()); }
@@ -1837,38 +1928,36 @@ namespace Vi.Core
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamage() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
 
-            bool hitsArmor = GetArmor() > 0 & !ignoresArmor;
+            DamageDispersion damageDispersion = GetArmorDamageDispersion(damage / 2, damage / 2, ignoresArmor ? 1 : 0);
+            float HPDamage = damageDispersion.physicalHPDamage + damageDispersion.magicalHPDamage;
 
-            if (ailment.Value != ActionClip.Ailment.Death & !hitsArmor)
+            float originalPhysicalArmor = GetPhysicalArmor();
+            float originalMagicalArmor = GetMagicalArmor();
+
+            if (Mathf.Approximately(AddHPWithoutApply(HPDamage), 0) | AddHPWithoutApply(HPDamage) <= 0)
             {
-                if (Mathf.Approximately(AddHPWithoutApply(damage), 0) | AddHPWithoutApply(damage) <= 0)
-                {
-                    ailment.Value = ActionClip.Ailment.Death;
-                    AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
+                ailment.Value = ActionClip.Ailment.Death;
+                AnimationHandler.PlayAction(WeaponHandler.GetWeapon().GetDeathReaction());
 
-                    if (lastAttackingCombatAgent)
-                    {
-                        SetKiller(lastAttackingCombatAgent);
-                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
-                    }
-                    else
-                    {
-                        killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
-                        if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
-                    }
+                if (lastAttackingCombatAgent)
+                {
+                    SetKiller(lastAttackingCombatAgent);
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnPlayerKill(lastAttackingCombatAgent, this); }
+                }
+                else
+                {
+                    killerNetObjId.Value = attackingNetworkObject ? attackingNetworkObject.NetworkObjectId : 0;
+                    if (GameModeManager.Singleton) { GameModeManager.Singleton.OnEnvironmentKill(this); }
                 }
             }
 
-            if (hitsArmor)
-            {
-                AddArmor(damage);
-            }
-            else
-            {
-                AddHP(damage);
-            }
+            AddPhysicalArmor(damageDispersion.physicalArmorDamage);
+            AddMagicalArmor(damageDispersion.magicalArmorDamage);
+            AddHP(HPDamage);
 
-            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(GetArmor() > 0); }
+            // If there is more total HP damage than total armor damage on this hit, render it as an HP hit
+            float totalArmorDamage = (originalPhysicalArmor - GetPhysicalArmor()) + (originalMagicalArmor - GetMagicalArmor());
+            if (!Mathf.Approximately(damage, 0)) { RenderHitGlowOnly(Mathf.Abs(HPDamage) < totalArmorDamage | ailment.Value == ActionClip.Ailment.Death); }
             return true;
         }
 
@@ -1876,6 +1965,12 @@ namespace Vi.Core
         {
             if (!IsServer) { Debug.LogError("Attributes.ProcessEnvironmentDamageWithHitReaction() should only be called on the server!"); return false; }
             if (ailment.Value == ActionClip.Ailment.Death) { return false; }
+
+            DamageDispersion damageDispersion = GetArmorDamageDispersion(damage / 2, damage / 2, 0);
+            float HPDamage = damageDispersion.physicalHPDamage + damageDispersion.magicalHPDamage;
+
+            float originalPhysicalArmor = GetPhysicalArmor();
+            float originalMagicalArmor = GetMagicalArmor();
 
             if (AddHPWithoutApply(damage) <= 0 & ailment.Value != ActionClip.Ailment.Death)
             {
@@ -1899,8 +1994,14 @@ namespace Vi.Core
                 AnimationHandler.PlayAction(hitReaction);
             }
 
-            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None, GetArmor() > 0, Weapon.WeaponMaterial.Metal);
-            AddHP(damage);
+            AddPhysicalArmor(damageDispersion.physicalArmorDamage);
+            AddMagicalArmor(damageDispersion.magicalArmorDamage);
+            AddHP(HPDamage);
+
+            // If there is more total HP damage than total armor damage on this hit, render it as an HP hit
+            float totalArmorDamage = (originalPhysicalArmor - GetPhysicalArmor()) + (originalMagicalArmor - GetMagicalArmor());
+            RenderHit(attackingNetworkObject.NetworkObjectId, transform.position, GetArmorType(), Weapon.WeaponBone.Root, ActionClip.Ailment.None,
+                Mathf.Abs(HPDamage) < totalArmorDamage | ailment.Value == ActionClip.Ailment.Death, Weapon.WeaponMaterial.Metal);
             return true;
         }
 
