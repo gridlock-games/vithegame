@@ -61,7 +61,7 @@ namespace Vi.Core
 
         //    if (postRequest.result != UnityWebRequest.Result.Success)
         //    {
-        //        Debug.LogError("Put request error in PutRequestTemplate()" + postRequest.error);
+        //        Debug.LogError("Post request error in PutRequestTemplate()" + postRequest.error);
         //    }
 
         //    postRequest.Dispose();
