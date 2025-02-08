@@ -120,25 +120,25 @@ namespace Vi.UI
 
         public void ResetCharStats()
         {
-            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new CharacterManager.CharacterAttributes());
+            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new CharacterManager.CharacterAttributes(1, 1, 1, 1, 1));
 
             int characterIndex = WebRequestManager.Singleton.CharacterManager.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             if (characterIndex != -1)
             {
                 var newCharacter = WebRequestManager.Singleton.CharacterManager.Characters[characterIndex];
-                newCharacter.attributes = new CharacterManager.CharacterAttributes();
+                newCharacter.attributes = new CharacterManager.CharacterAttributes(1, 1, 1, 1, 1);
                 WebRequestManager.Singleton.CharacterManager.Characters[characterIndex] = newCharacter;
             }
 
             foreach (CharacterStatElement element in gearSectionCharacterStatElements)
             {
-                element.CurrentStatCount = 0;
+                element.CurrentStatCount = 1;
                 element.UpdateDisplay();
             }
 
             foreach (CharacterStatElement element in charSectionCharacterStatElements)
             {
-                element.CurrentStatCount = 0;
+                element.CurrentStatCount = 1;
                 element.UpdateDisplay();
                 element.GetAddPointButton().interactable = true;
             }

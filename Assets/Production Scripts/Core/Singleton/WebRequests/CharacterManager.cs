@@ -85,10 +85,17 @@ namespace Vi.Core
                 getRequest.Dispose();
             }
 
-            foreach (Character character in Characters)
+            List<int> indexesThatFailedValidation = new List<int>();
+            for (int i = 0; i < Characters.Count; i++)
             {
-                yield return GetCharacterInventory(character);
-                yield return GetCharacterAttributes(character._id.ToString());
+                yield return GetCharacterInventory(Characters[i]);
+                yield return GetCharacterAttributes(Characters[i]._id.ToString());
+                if (!getCharacterAttributesWasSuccessful) { indexesThatFailedValidation.Add(i); }
+            }
+
+            for (int i = indexesThatFailedValidation.Count; i >= 0; i--)
+            {
+                Characters.RemoveAt(i);
             }
 
             // This adds all weapons to the inventory if we're in the editor
@@ -705,7 +712,7 @@ namespace Vi.Core
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
                         "null", "null", "null", 1,
-                        new CharacterAttributes(),
+                        new CharacterAttributes(1, 1, 1, 1, 1),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -718,7 +725,7 @@ namespace Vi.Core
                         "null",
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name,
                         "null", 1,
-                        new CharacterAttributes(),
+                        new CharacterAttributes(1, 1, 1, 1, 1),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -759,7 +766,7 @@ namespace Vi.Core
 
                 equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
                 1,
-                new CharacterAttributes(),
+                new CharacterAttributes(1, 1, 1, 1, 1),
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
                 GetRandomizedLoadout(raceAndGender),
@@ -870,7 +877,7 @@ namespace Vi.Core
                 beard = character.beard.ToString(),
                 brows = character.brows.ToString(),
                 hair = character.hair.ToString(),
-                attributes = new CharacterAttributes(),
+                attributes = new CharacterAttributes(1, 1, 1, 1, 1),
                 loadOuts = new List<LoadoutJson>(),
                 userId = character.userId.ToString(),
                 slot = character.slot,
@@ -2081,19 +2088,38 @@ namespace Vi.Core
             public int dexterity;
             public int intelligence;
 
-            public string ToLogString()
+            public CharacterAttributes(int strength, int vitality, int agility, int dexterity, int intelligence)
             {
-                return strength + " " + vitality + " " + agility + " " + dexterity + " " + intelligence;
-                //return "Strength: " + strength
-                //    + "\nVitality: " + vitality
-                //    + "\nAgility: " + agility
-                //    + "\nDexterity: " + dexterity
-                //    + "\nIntelligence: " + intelligence;
+                this.strength = strength;
+                this.vitality = vitality;
+                this.agility = agility;
+                this.dexterity = dexterity;
+                this.intelligence = intelligence;
+            }
+
+            public bool AreAnyValuesInvalid()
+            {
+                if (strength <= 0) { return false; }
+                if (vitality <= 0) { return false; }
+                if (agility <= 0) { return false; }
+                if (dexterity <= 0) { return false; }
+                if (intelligence <= 0) { return false; }
+                return true;
+            }
+
+            public override string ToString()
+            {
+                //return strength + " " + vitality + " " + agility + " " + dexterity + " " + intelligence;
+                return "Strength: " + strength
+                    + "\nVitality: " + vitality
+                    + "\nAgility: " + agility
+                    + "\nDexterity: " + dexterity
+                    + "\nIntelligence: " + intelligence;
             }
 
             public static CharacterAttributes FromCharacterJsonExtract(List<string> splitStrings)
             {
-                CharacterAttributes attributes = new CharacterAttributes();
+                CharacterAttributes attributes = new CharacterAttributes(1, 1, 1, 1, 1);
                 for (int i = 0; i < splitStrings.Count; i++)
                 {
                     string split = splitStrings[i].Replace("},", ",");
@@ -2386,9 +2412,12 @@ namespace Vi.Core
             }
         }
 
+        private bool getCharacterAttributesWasSuccessful;
         private Dictionary<string, CharacterStats> characterAttributesLookup = new Dictionary<string, CharacterStats>();
         public IEnumerator GetCharacterAttributes(string characterId)
         {
+            getCharacterAttributesWasSuccessful = false;
+
             UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "getCharacterAttribute/" + characterId);
             yield return getRequest.SendWebRequest();
 
@@ -2400,13 +2429,19 @@ namespace Vi.Core
             }
 
             string json = getRequest.downloadHandler.text;
-            if (characterAttributesLookup.ContainsKey(characterId))
+            if (json == "{}")
+            {
+                Debug.LogWarning("Character Stats Response Body is empty! " + characterId);
+            }
+            else if (characterAttributesLookup.ContainsKey(characterId))
             {
                 characterAttributesLookup[characterId] = JsonConvert.DeserializeObject<CharacterStats>(json);
+                getCharacterAttributesWasSuccessful = true;
             }
             else
             {
                 characterAttributesLookup.Add(characterId, JsonConvert.DeserializeObject<CharacterStats>(json));
+                getCharacterAttributesWasSuccessful = true;
             }
 
             getRequest.Dispose();
@@ -2469,6 +2504,12 @@ namespace Vi.Core
 
         public IEnumerator UpdateCharacterAttributes(string characterId, CharacterAttributes newAttributes)
         {
+            if (newAttributes.AreAnyValuesInvalid())
+            {
+                Debug.Log("Attributes is invalid! " + characterId + "\n" + newAttributes.ToString());
+                yield break;
+            }
+
             UpdateCharacterAttributesPutPayload payload = new UpdateCharacterAttributesPutPayload()
             {
                 charId = characterId,
