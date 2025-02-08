@@ -120,8 +120,6 @@ namespace Vi.UI
         [Rpc(SendTo.Server)]
         private void PurchaseServerRpc(ulong purchaserClientId, ItemShopManager.PurchaseItem[] purchaseItems)
         {
-            
-
             StartCoroutine(PurchaseOnServer(purchaserClientId, purchaseItems));
         }
 
