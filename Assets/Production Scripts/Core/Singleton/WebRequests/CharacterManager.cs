@@ -93,9 +93,9 @@ namespace Vi.Core
                 if (!getCharacterAttributesWasSuccessful) { indexesThatFailedValidation.Add(i); }
             }
 
-            for (int i = indexesThatFailedValidation.Count; i >= 0; i--)
+            for (int i = indexesThatFailedValidation.Count - 1; i >= 0; i--)
             {
-                Characters.RemoveAt(i);
+                Characters.RemoveAt(indexesThatFailedValidation[i]);
             }
 
             // This adds all weapons to the inventory if we're in the editor
@@ -201,7 +201,7 @@ namespace Vi.Core
                 yield return GetCharacterInventory(CharacterById._id.ToString());
                 yield return GetCharacterAttributes(CharacterById._id.ToString());
 
-                LastCharacterByIdWasSuccessful = true;
+                LastCharacterByIdWasSuccessful = getCharacterAttributesWasSuccessful;
                 IsGettingCharacterById = false;
             }
         }
