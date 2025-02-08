@@ -3,11 +3,42 @@ using System.Collections;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 namespace Vi.Core
 {
     public class ItemShopManager : MonoBehaviour
     {
+        public int ViEssenceCount { get; private set; }
+
+        public IEnumerator GetViEssenceOfUser(string userId, System.Action<int> setMyInt)
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "auth/users/getEssenceForUser/" + userId);
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in GetRequestTemplate() " + getRequest.error);
+                getRequest.Dispose();
+                ViEssenceCount = 0;
+                if (setMyInt != null) { setMyInt(0); }
+                yield break;
+            }
+            else if (int.TryParse(getRequest.downloadHandler.text, out int result))
+            {
+                ViEssenceCount = result;
+                if (setMyInt != null) { setMyInt(ViEssenceCount); }
+            }
+            else
+            {
+                Debug.LogWarning("Unable to parse vi essence count from return body: " + getRequest.downloadHandler.text);
+                ViEssenceCount = 0;
+                if (setMyInt != null) { setMyInt(0); }
+            }
+
+            getRequest.Dispose();
+        }
+
         public List<ShopItem> ShopItems {  get; private set; } = new List<ShopItem>();
 
         public IEnumerator GetShopItems()
@@ -36,7 +67,7 @@ namespace Vi.Core
             public int __v;
         }
 
-        public IEnumerator PurchaseItems(string charId, List<PurchaseItem> itemsToPurchase)
+        public IEnumerator PurchaseItems(string charId, List<PurchaseItem> itemsToPurchase, System.Action<bool> purchaseSuccessfulCallback)
         {
             if (itemsToPurchase == null) { Debug.LogWarning("Items to purchase is null!"); yield break; }
             if (itemsToPurchase.Count == 0) { Debug.LogWarning("Items to purchase count is 0!"); yield break; }
@@ -61,6 +92,16 @@ namespace Vi.Core
             if (postRequest.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("Post request error in PurchaseItems()" + postRequest.error);
+                purchaseSuccessfulCallback(false);
+            }
+            else if (bool.TryParse(postRequest.downloadHandler.text, out bool purchaseSuccessful))
+            {
+                purchaseSuccessfulCallback(purchaseSuccessful);
+            }
+            else
+            {
+                Debug.LogWarning("Unable to parse boolean from purchase items request body " + postRequest.downloadHandler.text);
+                purchaseSuccessfulCallback(false);
             }
 
             postRequest.Dispose();
@@ -78,7 +119,7 @@ namespace Vi.Core
             }
         }
 
-        public struct PurchaseItem
+        public struct PurchaseItem : INetworkSerializable
         {
             public string itemId;
             public int qty;
@@ -89,6 +130,13 @@ namespace Vi.Core
                 this.itemId = itemId;
                 this.qty = qty;
                 this.cost = cost;
+            }
+
+            public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+            {
+                serializer.SerializeValue(ref itemId);
+                serializer.SerializeValue(ref qty);
+                serializer.SerializeValue(ref cost);
             }
         }
 
