@@ -554,7 +554,7 @@ namespace Vi.Core
         }
 #endif
 
-        public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout)
+        public IEnumerator UpdateCharacterLoadout(string characterId, Loadout newLoadout, bool callUseLoadout)
         {
             if (!int.TryParse(newLoadout.loadoutSlot.ToString(), out int result))
             {
@@ -574,6 +574,13 @@ namespace Vi.Core
             newLoadout.bootsGearItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.bootsGearItemId | item.id == newLoadout.bootsGearItemId).id ?? "";
             newLoadout.weapon1ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon1ItemId | item.id == newLoadout.weapon1ItemId).id ?? "";
             newLoadout.weapon2ItemId = inventoryItems[characterId].Find(item => item.itemId._id == newLoadout.weapon2ItemId | item.id == newLoadout.weapon2ItemId).id ?? "";
+
+            // Uncomment this to test invalid loadout strings
+            //Debug.Log(newLoadout.ToString());
+            //foreach (FixedString64Bytes id in newLoadout.GetLoadoutAsList())
+            //{
+            //    Debug.Log(id + " " + HasInventoryItem(characterId, id.ToString()));
+            //}
 
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
@@ -596,6 +603,11 @@ namespace Vi.Core
                 Debug.LogError("Put request error in WebRequestManager.UpdateCharacterLoadout()" + putRequest.error);
             }
             putRequest.Dispose();
+
+            if (callUseLoadout)
+            {
+                yield return UseCharacterLoadout(characterId, newLoadout.loadoutSlot.ToString());
+            }
         }
 
         public IEnumerator UseCharacterLoadout(string characterId, string loadoutSlot)
@@ -677,11 +689,7 @@ namespace Vi.Core
 
             character._id = postRequest.downloadHandler.text;
 
-            yield return GetCharacterInventory(postRequest.downloadHandler.text);
-
-            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender));
-
-            yield return UseCharacterLoadout(postRequest.downloadHandler.text, "1");
+            yield return UpdateCharacterLoadout(postRequest.downloadHandler.text, GetDefaultDisplayLoadout(character.raceAndGender), true);
 
             postRequest.Dispose();
         }
