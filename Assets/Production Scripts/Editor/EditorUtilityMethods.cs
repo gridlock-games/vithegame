@@ -304,8 +304,16 @@ namespace Vi.Editor
                     importer.defaultTargetSettings = defaultSettings;
                     shouldReimport = true;
                 }
-                
-                if (importer.GetTargetSettings("Android").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+
+                VideoImporterTargetSettings existingAndroidSettings = importer.GetTargetSettings("Android");
+                if (existingAndroidSettings == null)
+                {
+                    VideoImporterTargetSettings androidSettings = defaultSettings;
+                    androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("Android", androidSettings);
+                    shouldReimport = true;
+                }
+                else if (existingAndroidSettings.spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
                 {
                     VideoImporterTargetSettings androidSettings = defaultSettings;
                     androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
@@ -313,7 +321,15 @@ namespace Vi.Editor
                     shouldReimport = true;
                 }
 
-                if (importer.GetTargetSettings("iPhone").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+                VideoImporterTargetSettings existingIPhoneSettings = importer.GetTargetSettings("iPhone");
+                if (existingIPhoneSettings == null)
+                {
+                    VideoImporterTargetSettings iPhoneSettings = defaultSettings;
+                    iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("iPhone", iPhoneSettings);
+                    shouldReimport = true;
+                }
+                else if (importer.GetTargetSettings("iPhone").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
                 {
                     VideoImporterTargetSettings iPhoneSettings = defaultSettings;
                     iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
