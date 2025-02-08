@@ -278,8 +278,8 @@ namespace Vi.UI
                     gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
                     rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
 
-                    viEssenceEarnedText.text = gameModeManager.TokensEarnedFromMatch.ToString();
-                    if (gameModeManager.TokensEarnedFromMatch > 0)
+                    viEssenceEarnedText.text = gameModeManager.ViEssenceEarnedFromMatch.ToString();
+                    if (gameModeManager.ViEssenceEarnedFromMatch > 0)
                     {
                         viEssenceEarnedText.text += "x";
                     }
@@ -474,7 +474,7 @@ namespace Vi.UI
                     if (t >= 0.7f)
                     {
                         psPlayed = true;
-                        if (gameModeManager.TokensEarnedFromMatch > 0)
+                        if (gameModeManager.ViEssenceEarnedFromMatch > 0)
                         {
                             sparkleEffect.ps.Play();
                             sparkleEffect.transform.position = viEssenceRewardsImage.rectTransform.position;

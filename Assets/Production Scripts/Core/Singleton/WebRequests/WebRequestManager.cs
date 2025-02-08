@@ -12,7 +12,6 @@ using Vi.Utility;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
-using static Vi.Core.ServerManager;
 
 namespace Vi.Core
 {

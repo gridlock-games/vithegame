@@ -468,9 +468,11 @@ namespace Vi.Core.GameModeManagers
             return returnedList;
         }
 
+        [SerializeField] private bool sendKillsLeaderboardResult = true;
+
         private NetworkList<int> winningPlayerDataIds;
         public float ExpEarnedFromMatch { get; private set; } = -1;
-        public int TokensEarnedFromMatch { get; private set; }
+        public int ViEssenceEarnedFromMatch { get; protected set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
             if (!current) { return; }
@@ -481,7 +483,7 @@ namespace Vi.Core.GameModeManagers
                 return;
             }
 
-            StartCoroutine(AwardExpBasedOnWin());
+            StartCoroutine(WaitForGameWinnerIds());
 
             if (IsClient)
             {
@@ -489,32 +491,26 @@ namespace Vi.Core.GameModeManagers
                 {
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
 
-                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
-                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
-                        PlayerDataManager.Singleton.GetGameMode(),
-                        localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
-
                     ExpEarnedFromMatch += localPlayerScore.GetExpReward();
 
-                    // TODO Change this to use web requests on the server
+                    // This is calculated automatically using the leaderboard API, we just set this for the UI
                     if (GameModeManager.Singleton.LevelingEnabled)
                     {
                         KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
                         if (kvp.Value)
                         {
-                            TokensEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
+                            ViEssenceEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
                         }
                     }
                     else
                     {
-                        TokensEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
+                        ViEssenceEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
                     }
                 }
             }
         }
 
-        private IEnumerator AwardExpBasedOnWin()
+        private IEnumerator WaitForGameWinnerIds()
         {
             yield return new WaitUntil(() => GetGameWinnerIds().Count > 0);
 
@@ -528,6 +524,16 @@ namespace Vi.Core.GameModeManagers
                         float expAward = playerScore.GetExpReward();
                         expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
                         PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+
+                        if (sendKillsLeaderboardResult)
+                        {
+                            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
+                                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                                PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                                PlayerDataManager.Singleton.GetGameMode(),
+                                GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id),
+                                playerScore.cumulativeKills, playerScore.cumulativeDeaths, playerScore.cumulativeAssists));
+                        }
                     }
                 }
             }
