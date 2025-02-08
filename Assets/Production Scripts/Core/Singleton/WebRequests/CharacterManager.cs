@@ -2104,7 +2104,7 @@ namespace Vi.Core
                 if (agility <= 0) { return true; }
                 if (dexterity <= 0) { return true; }
                 if (intelligence <= 0) { return true; }
-                return true;
+                return false;
             }
 
             public override string ToString()
