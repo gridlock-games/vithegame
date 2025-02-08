@@ -90,6 +90,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Roughness_Map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -111,6 +115,7 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _Alpha_cut: 1
     - _Ambient_Strength: 1
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
@@ -150,7 +155,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.9063317, g: 0.9063317, b: 0.9063317, a: 1}
-    - _Color: {r: 2.433572, g: 2.433572, b: 2.433572, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 2.6082377, g: 2.6082377, b: 2.6082377, a: 1}
     - _Emission_Color: {r: 0, g: 2, b: 1.9208817, a: 0}
     - _Shadow_Threshold: {r: -0.5, g: 0.5, b: 0, a: 0}
