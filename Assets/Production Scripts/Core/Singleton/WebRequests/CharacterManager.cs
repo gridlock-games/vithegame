@@ -2099,11 +2099,11 @@ namespace Vi.Core
 
             public bool AreAnyValuesInvalid()
             {
-                if (strength <= 0) { return false; }
-                if (vitality <= 0) { return false; }
-                if (agility <= 0) { return false; }
-                if (dexterity <= 0) { return false; }
-                if (intelligence <= 0) { return false; }
+                if (strength <= 0) { return true; }
+                if (vitality <= 0) { return true; }
+                if (agility <= 0) { return true; }
+                if (dexterity <= 0) { return true; }
+                if (intelligence <= 0) { return true; }
                 return true;
             }
 
@@ -2506,7 +2506,7 @@ namespace Vi.Core
         {
             if (newAttributes.AreAnyValuesInvalid())
             {
-                Debug.Log("Attributes is invalid! " + characterId + "\n" + newAttributes.ToString());
+                Debug.LogWarning("Attributes is invalid! " + characterId + "\n" + newAttributes.ToString());
                 yield break;
             }
 
