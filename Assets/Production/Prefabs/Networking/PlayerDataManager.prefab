@@ -74,40 +74,51 @@ MonoBehaviour:
   - gameMode: 0
     gameModeIcon: {fileID: 21300000, guid: abc64bd776c8a644aaa023cb2d83c152, type: 3}
     possibleTeams: 02000000
-    possibleMapSceneGroupNames:
-    - Eclipse Grove
-    maxPlayersOnMap: 0a000000
+    mapOptions:
+    - mapSceneGroupName: Eclipse Grove
+      maxPlayersOnMap: 10
   - gameMode: 1
     gameModeIcon: {fileID: 21300000, guid: 2dab9878bf78f4738a9feee8e93796a9, type: 3}
     possibleTeams: 02000000
-    possibleMapSceneGroupNames:
-    - Eclipse Grove
-    - Octagon Skirmish
-    - Duo's Sanctum
-    - Tutorial Map
-    maxPlayersOnMap: 0a000000040000000600000006000000
+    mapOptions:
+    - mapSceneGroupName: Eclipse Grove
+      maxPlayersOnMap: 10
+    - mapSceneGroupName: Octagon Skirmish
+      maxPlayersOnMap: 4
+    - mapSceneGroupName: Duo's Sanctum
+      maxPlayersOnMap: 6
+    - mapSceneGroupName: Tutorial Map
+      maxPlayersOnMap: 6
+    - mapSceneGroupName: Ascendant Dune
+      maxPlayersOnMap: 10
   - gameMode: 2
     gameModeIcon: {fileID: 21300000, guid: c1fba6348fb964f4eb2c32ee9d279afe, type: 3}
     possibleTeams: 0a0000000b000000
-    possibleMapSceneGroupNames:
-    - Eclipse Grove
-    - Twilight Chasm
-    - Octagon Skirmish
-    - Duo's Sanctum
-    - Tutorial Map
-    maxPlayersOnMap: 0a0000000a000000040000000600000006000000
+    mapOptions:
+    - mapSceneGroupName: Eclipse Grove
+      maxPlayersOnMap: 10
+    - mapSceneGroupName: Twilight Chasm
+      maxPlayersOnMap: 10
+    - mapSceneGroupName: Octagon Skirmish
+      maxPlayersOnMap: 4
+    - mapSceneGroupName: Duo's Sanctum
+      maxPlayersOnMap: 6
+    - mapSceneGroupName: Tutorial Map
+      maxPlayersOnMap: 6
+    - mapSceneGroupName: Ascendant Dune
+      maxPlayersOnMap: 6
   - gameMode: 6
     gameModeIcon: {fileID: 21300000, guid: c06d59339e467334b97976559c0f5157, type: 3}
     possibleTeams: 0a000000
-    possibleMapSceneGroupNames:
-    - Twilight Chasm
-    maxPlayersOnMap: 05000000
+    mapOptions:
+    - mapSceneGroupName: Twilight Chasm
+      maxPlayersOnMap: 5
   - gameMode: 3
     gameModeIcon: {fileID: 21300000, guid: c06d59339e467334b97976559c0f5157, type: 3}
     possibleTeams: 0a0000000b000000
-    possibleMapSceneGroupNames:
-    - Essence War Test Map
-    maxPlayersOnMap: 0a000000
+    mapOptions:
+    - mapSceneGroupName: Essence War Test Map
+      maxPlayersOnMap: 10
   characterReferenceAddressable:
     m_AssetGUID: 9ad061509b57a4848a6318a1e9067133
     m_SubObjectName: 

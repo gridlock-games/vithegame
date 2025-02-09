@@ -32,8 +32,19 @@ namespace Vi.Core
             public GameMode gameMode;
             public Sprite gameModeIcon;
             public Team[] possibleTeams;
-            public string[] possibleMapSceneGroupNames;
-            public int[] maxPlayersOnMap;
+            public MapOption[] mapOptions;
+        }
+
+        [System.Serializable]
+        public struct MapOption : System.IEquatable<MapOption>
+        {
+            public string mapSceneGroupName;
+            public int maxPlayersOnMap;
+
+            public bool Equals(MapOption other)
+            {
+                return mapSceneGroupName == other.mapSceneGroupName;
+            }
         }
 
         public static bool IsCharacterReferenceLoaded() { return CharacterReferenceHandle.IsValid() & CharacterReferenceHandle.IsDone; }
@@ -107,13 +118,17 @@ namespace Vi.Core
             {
                 if (gameModeInfos.Exists(item => item.gameMode == prev))
                 {
-                    var prevGameModeInfo = gameModeInfos.Find(item => item.gameMode == prev);
-                    if (mapIndex.Value < prevGameModeInfo.possibleMapSceneGroupNames.Length)
+                    GameModeInfo prevGameModeInfo = gameModeInfos.Find(item => item.gameMode == prev);
+
+                    MapOption oldMap = prevGameModeInfo.mapOptions[mapIndex.Value];
+
+                    // Literally have no idea why I can't just use Contains()
+                    if (GetGameModeInfo().mapOptions.Any(item => oldMap.Equals(item)))
                     {
-                        string oldMapName = prevGameModeInfo.possibleMapSceneGroupNames[mapIndex.Value];
-                        if (GetGameModeInfo().possibleMapSceneGroupNames.Contains(oldMapName))
+                        int index = System.Array.IndexOf(GetGameModeInfo().mapOptions, oldMap);
+                        if (index != -1)
                         {
-                            mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().possibleMapSceneGroupNames, oldMapName);
+                            mapIndex.Value = index;
                         }
                         else
                         {
@@ -135,7 +150,14 @@ namespace Vi.Core
         private NetworkVariable<int> mapIndex = new NetworkVariable<int>();
         public string GetMapName()
         {
-            return GetGameModeInfo().possibleMapSceneGroupNames[mapIndex.Value];
+            try
+            {
+                return GetGameModeInfo().mapOptions[mapIndex.Value].mapSceneGroupName;
+            }
+            catch
+            {
+                return "Unknown";
+            }
         }
 
         public int GetMapIndex()
@@ -147,7 +169,7 @@ namespace Vi.Core
         {
             try
             {
-                return GetGameModeInfo().maxPlayersOnMap[mapIndex.Value];
+                return GetGameModeInfo().mapOptions[mapIndex.Value].maxPlayersOnMap;
             }
             catch
             {
@@ -159,7 +181,7 @@ namespace Vi.Core
         {
             if (IsServer)
             {
-                mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().possibleMapSceneGroupNames, map);
+                mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().mapOptions, new MapOption() { mapSceneGroupName = map });
             }
             else
             {

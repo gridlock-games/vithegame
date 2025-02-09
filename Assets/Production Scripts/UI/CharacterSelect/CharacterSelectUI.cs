@@ -1433,7 +1433,8 @@ namespace Vi.UI
             "Duo's Sanctum",
             "Octagon Skirmish",
             "Twilight Chasm",
-            "Eclipse Grove"
+            "Eclipse Grove",
+            "Ascendant Dune"
         };
 
         public void GoToTrainingRoom()
