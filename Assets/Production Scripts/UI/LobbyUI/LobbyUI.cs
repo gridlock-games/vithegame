@@ -295,10 +295,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
+            foreach (PlayerDataManager.MapOption mapOption in PlayerDataManager.Singleton.GetGameModeInfo().mapOptions)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
-                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName, 0)));
+                StartCoroutine(option.Initialize(mapOption.mapSceneGroupName, NetSceneManager.Singleton.GetSceneGroupIcon(mapOption.mapSceneGroupName, 0)));
             }
         }
 
