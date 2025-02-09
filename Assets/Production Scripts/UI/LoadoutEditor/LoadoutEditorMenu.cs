@@ -70,13 +70,15 @@ namespace Vi.UI
             OpenGearsSection();
 
             string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
+            int currentAvailableSkillPoints = 0;
             if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(characterId, out CharacterManager.CharacterStats characterStats))
             {
                 characterLevelText.text = characterStats.level.ToString();
                 maxHPText.text = characterStats.hp.ToString();
                 maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
-                availableSkillPointsText.text = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes).ToString();
-                resetStatsButton.interactable = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes) < characterStats.nextStatPointRwd;
+                currentAvailableSkillPoints = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes); ;
+                availableSkillPointsText.text = currentAvailableSkillPoints.ToString();
+                resetStatsButton.interactable = currentAvailableSkillPoints < characterStats.nextStatPointRwd & characterStats.nextStatPointRwd > 5;
             }
             else // Set Default values
             {
@@ -89,6 +91,8 @@ namespace Vi.UI
 
             foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
             {
+                characterStatElement.GetAddPointButton().interactable = currentAvailableSkillPoints > 0;
+
                 characterStatElement.OnStatCountChange += (statEle, availableSkillPoints) =>
                 {
                     availableSkillPointsText.text = availableSkillPoints.ToString();
