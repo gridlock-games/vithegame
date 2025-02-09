@@ -122,6 +122,54 @@ namespace Vi.Core.CombatAgents
             ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
+        public override float GetMaxHP()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.hp + SessionProgressionHandler.MaxHPBonus;
+            }
+            else
+            {
+                return base.GetMaxHP();
+            }
+        }
+
+        public override float GetMaxStamina()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.stamina + SessionProgressionHandler.MaxStaminaBonus;
+            }
+            else
+            {
+                return base.GetMaxStamina();
+            }
+        }
+
+        public override float GetMaxPhysicalArmor()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.defense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return base.GetMaxPhysicalArmor();
+            }
+        }
+
+        public override float GetMaxMagicalArmor()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return base.GetMaxMagicalArmor();
+            }
+        }
+
         [SerializeField] private AudioClip heartbeatSoundEffect;
         private const float heartbeatVolume = 1;
         private const float heartbeatHPPercentageThreshold = 0.1f;
