@@ -119,12 +119,16 @@ namespace Vi.Core
                 if (gameModeInfos.Exists(item => item.gameMode == prev))
                 {
                     GameModeInfo prevGameModeInfo = gameModeInfos.Find(item => item.gameMode == prev);
-                    if (mapIndex.Value < prevGameModeInfo.mapOptions.Length)
+
+                    MapOption oldMap = prevGameModeInfo.mapOptions[mapIndex.Value];
+
+                    // Literally have no idea why I can't just use Contains()
+                    if (GetGameModeInfo().mapOptions.Any(item => oldMap.Equals(item)))
                     {
-                        MapOption oldMap = prevGameModeInfo.mapOptions[mapIndex.Value];
-                        if (GetGameModeInfo().mapOptions.Contains(oldMap))
+                        int index = System.Array.IndexOf(GetGameModeInfo().mapOptions, oldMap);
+                        if (index != -1)
                         {
-                            mapIndex.Value = System.Array.IndexOf(GetGameModeInfo().mapOptions, oldMap);
+                            mapIndex.Value = index;
                         }
                         else
                         {
