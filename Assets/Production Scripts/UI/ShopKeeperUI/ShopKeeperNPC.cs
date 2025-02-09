@@ -131,7 +131,9 @@ namespace Vi.UI
             string userId = "";
             if (PlayerDataManager.Singleton.ContainsId((int)purchaserClientId))
             {
-                characterId = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character._id.ToString();
+                CharacterManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character;
+                characterId = character._id.ToString();
+                userId = character.userId.ToString();
             }
             else
             {
@@ -220,7 +222,6 @@ namespace Vi.UI
                 if (purchaseSuccessful)
                 {
                     purchaseErrorText.text = "Purchase successful!";
-                    StartCoroutine(RefreshViEssenceAmount());
                     AudioManager.Singleton.Play2DClip(gameObject, purchaseSuccessfulSounds[Random.Range(0, purchaseSuccessfulSounds.Length)], 0.3f);
                 }
                 else
