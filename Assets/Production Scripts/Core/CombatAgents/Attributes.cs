@@ -53,6 +53,14 @@ namespace Vi.Core.CombatAgents
 
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
             teamIndicatorInstance.transform.localPosition = new Vector3(0, 0.01f, 0);
+
+            if (NetworkObject.IsPlayerObject)
+            {
+                if (!IsServer & !IsLocalPlayer)
+                {
+                    StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterAttributes(CachedPlayerData.character._id.ToString()));
+                }
+            }
         }
 
         public void UpdateNetworkVisiblity()
