@@ -369,6 +369,11 @@ namespace Vi.Core.MovementHandlers
 				if (!lookAction.enabled) { return Vector2.zero; }
             }
 
+			if (GameModeManager.Singleton)
+			{
+				if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None) { return Vector2.zero; }
+			}
+
 			bool shouldUseZoomSensMultiplier = false;
             if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }
             

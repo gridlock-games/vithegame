@@ -71,7 +71,7 @@ namespace Vi.UI
 
             string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
             int currentAvailableSkillPoints = 0;
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(characterId, out CharacterManager.CharacterStats characterStats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(characterId, out CharacterManager.CharacterStats characterStats))
             {
                 characterLevelText.text = characterStats.level.ToString();
                 maxHPText.text = characterStats.hp.ToString();
@@ -102,7 +102,7 @@ namespace Vi.UI
                         characterStatElement.GetAddPointButton().interactable = availableSkillPoints > 0;
                     }
 
-                    if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats characterStats))
+                    if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats characterStats))
                     {
                         resetStatsButton.interactable = availableSkillPoints < characterStats.nextStatPointRwd;
                     }
@@ -148,7 +148,7 @@ namespace Vi.UI
             }
 
             string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(characterId, out CharacterManager.CharacterStats characterStats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(characterId, out CharacterManager.CharacterStats characterStats))
             {
                 availableSkillPointsText.text = characterStats.nextStatPointRwd.ToString();
             }

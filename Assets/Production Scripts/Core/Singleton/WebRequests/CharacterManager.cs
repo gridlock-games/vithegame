@@ -9,6 +9,7 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
+using static Vi.Core.CharacterManager;
 
 namespace Vi.Core
 {
@@ -89,8 +90,16 @@ namespace Vi.Core
             for (int i = 0; i < Characters.Count; i++)
             {
                 yield return GetCharacterInventory(Characters[i]);
-                yield return GetCharacterAttributes(Characters[i]._id.ToString());
-                if (!getCharacterAttributesWasSuccessful) { indexesThatFailedValidation.Add(i); }
+
+                if (!ValidateCharacterLoadouts(Characters[i]))
+                {
+                    indexesThatFailedValidation.Add(i);
+                }
+                else
+                {
+                    yield return GetCharacterAttributes(Characters[i]._id.ToString());
+                    if (!getCharacterAttributesWasSuccessful) { indexesThatFailedValidation.Add(i); }
+                }
             }
 
             for (int i = indexesThatFailedValidation.Count - 1; i >= 0; i--)
@@ -119,6 +128,51 @@ namespace Vi.Core
 #endif
 
             IsRefreshingCharacters = false;
+        }
+
+        private bool ValidateCharacterLoadouts(Character characterToValidate)
+        {
+            if (!HasCharacterInventory(characterToValidate._id.ToString())) { Debug.LogWarning("Calling Validate Character Loadouts but we don't have this character's inventory yet! " + characterToValidate._id); return false; }
+
+            foreach (Loadout loadout in characterToValidate.GetLoadouts())
+            {
+                foreach (FixedString64Bytes inventoryItemId in loadout.GetLoadoutItemIDsAsArray())
+                {
+                    if (string.IsNullOrWhiteSpace(inventoryItemId.ToString())) { continue; }
+
+                    if (!HasInventoryItem(characterToValidate._id.ToString(), inventoryItemId.ToString()))
+                    {
+                        Debug.LogWarning("Character loadout is invalid id: " + characterToValidate._id + " loadout item id: " + inventoryItemId);
+                        return false;
+                    }
+                }
+
+                //foreach (KeyValuePair<CharacterReference.EquipmentType, FixedString64Bytes> inventoryItemId in loadout.GetLoadoutArmorPiecesAsDictionary())
+                //{
+                //    if (string.IsNullOrWhiteSpace(inventoryItemId.ToString()))
+                //    {
+                //        if (!NullableEquipmentTypes.Contains(inventoryItemId.Key))
+                //        {
+                //            Debug.LogWarning("Character loadout is invalid id: " + characterToValidate._id + " loadout item id: " + inventoryItemId);
+                //            return false;
+                //        }
+                //    }
+                //}
+
+                //if (string.IsNullOrWhiteSpace(loadout.weapon1ItemId.ToString()))
+                //{
+                //    Debug.LogWarning("Character loadout is invalid id: " + characterToValidate._id + " loadout item id: " + loadout.weapon1ItemId);
+                //    return false;
+                //}
+
+                //if (string.IsNullOrWhiteSpace(loadout.weapon2ItemId.ToString()))
+                //{
+                //    Debug.LogWarning("Character loadout is invalid id: " + characterToValidate._id + " loadout item id: " + loadout.weapon2ItemId);
+                //    return false;
+                //}
+            }
+
+            return true;
         }
 
         public bool IsGettingCharacterById { get; private set; }
@@ -205,6 +259,14 @@ namespace Vi.Core
                 }
 
                 yield return GetCharacterInventory(CharacterById._id.ToString());
+
+                if (!ValidateCharacterLoadouts(CharacterById))
+                {
+                    LastCharacterByIdWasSuccessful = false;
+                    IsGettingCharacterById = false;
+                    yield break;
+                }
+
                 yield return GetCharacterAttributes(CharacterById._id.ToString());
 
                 LastCharacterByIdWasSuccessful = getCharacterAttributesWasSuccessful;
@@ -974,6 +1036,17 @@ namespace Vi.Core
                 serializer.SerializeValue(ref level);
                 serializer.SerializeValue(ref experience);
                 serializer.SerializeValue(ref raceAndGender);
+            }
+
+            public Loadout[] GetLoadouts()
+            {
+                return new Loadout[]
+                {
+                    loadoutPreset1,
+                    loadoutPreset2,
+                    loadoutPreset3,
+                    loadoutPreset4
+                };
             }
 
             public Loadout GetLoadoutFromSlot(int loadoutSlot)
@@ -2412,6 +2485,33 @@ namespace Vi.Core
             public float weaponABaseAtk;
             public float weaponBBaseAtk;
 
+            public CharacterStats(int level, float currentExp, float expToNextLv, int nextStatPointRwd, float attack, float mattack, float defense, float mdefense, float hp, float stamina, float critChance, float crit, float baseHP, float baseST, float baseAtk, float baseMatk, float weaponABaseAtk, float weaponBBaseAtk)
+            {
+                this.level = level;
+                this.currentExp = currentExp;
+                this.expToNextLv = expToNextLv;
+                this.nextStatPointRwd = nextStatPointRwd;
+                this.attack = attack;
+                this.mattack = mattack;
+                this.defense = defense;
+                this.mdefense = mdefense;
+                this.hp = hp;
+                this.stamina = stamina;
+                this.critChance = critChance;
+                this.crit = crit;
+                this.baseHP = baseHP;
+                this.baseST = baseST;
+                this.baseAtk = baseAtk;
+                this.baseMatk = baseMatk;
+                this.weaponABaseAtk = weaponABaseAtk;
+                this.weaponBBaseAtk = weaponBBaseAtk;
+            }
+
+            public static CharacterStats GetDefaultStats()
+            {
+                return new CharacterStats(1, 0, 250, 5, 1, 1, 15, 15, 100, 110, 0, 0, 50, 50, 0, 0, 0, 0);
+            }
+
             public int GetAvailableSkillPoints(CharacterAttributes characterAttributes)
             {
                 int value = nextStatPointRwd;
@@ -2425,28 +2525,21 @@ namespace Vi.Core
             }
         }
 
-        public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
+        public bool TryGetCharacterStats(string characterId, out CharacterStats characterStats)
         {
-            if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
+            if (string.IsNullOrWhiteSpace(characterId)) // Bot character
+            {
+                // TODO change this to use bot profiles, as indicated by the character attributes?
+                characterStats = CharacterStats.GetDefaultStats();
+                return true;
+            }
+            else if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
             {
                 return true;
             }
             else
             {
                 return false;
-            }
-        }
-
-        public CharacterStats FindCharacterAttributesInLookup(string characterId)
-        {
-            if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
-            {
-                return response;
-            }
-            else
-            {
-                Debug.LogWarning("Can't find character attributes for character id in lookup dictionary " + characterId);
-                return default;
             }
         }
 

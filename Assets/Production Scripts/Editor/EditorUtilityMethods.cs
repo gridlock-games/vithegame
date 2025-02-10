@@ -17,6 +17,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using UnityEngine.U2D;
 using UnityEditor.U2D;
+using UnityEngine.UIElements;
 
 namespace Vi.Editor
 {
@@ -1195,6 +1196,29 @@ namespace Vi.Editor
             {
                 counter++;
                 AssetDatabase.CreateAsset(slice.GetComponent<MeshFilter>().sharedMesh, Path.Join(AssetDatabase.GUIDToAssetPath(resultFolderGUID), slice.name + "_" + counter.ToString() + ".asset"));
+            }
+        }
+        
+        public class TextInputWindow : EditorWindow
+        {
+            [MenuItem("Tools/Find Asset Path From GUID")]
+            static void Init()
+            {
+                TextInputWindow window = ScriptableObject.CreateInstance<TextInputWindow>();
+                window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+                window.ShowPopup();
+            }
+
+            static string inputGuid;
+
+            void OnGUI()
+            {
+                inputGuid = EditorGUILayout.TextField(inputGuid);
+                if (GUILayout.Button("Find"))
+                {
+                    Debug.Log(AssetDatabase.GUIDToAssetPath(inputGuid));
+                    Close();
+                }
             }
         }
     }

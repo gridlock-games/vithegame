@@ -187,8 +187,11 @@ namespace Vi.Core
             }
         }
 
-        [SerializeField] private PooledObject armorDestroyedVFX;
-        [SerializeField] private AudioClip armorDestroyedAudio;
+        [Header("Armor Destroyed Assignments")]
+        [SerializeField] private PooledObject physicalArmorDestroyedVFX;
+        [SerializeField] private AudioClip physicalArmorDestroyedAudio;
+        [SerializeField] private PooledObject magicalArmorDestroyedVFX;
+        [SerializeField] private AudioClip magicalArmorDestroyedAudio;
         private List<PooledObject> armorDestroyedVFXInstances = new List<PooledObject>();
         private void OnPhysicalArmorChanged(float prev, float current)
         {
@@ -198,7 +201,7 @@ namespace Vi.Core
 
             if (ShouldUseArmor())
             {
-                StartCoroutine(PlayArmorVFX());
+                StartCoroutine(PlayPhysicalArmorVFX());
             }
         }
 
@@ -210,20 +213,37 @@ namespace Vi.Core
 
             if (ShouldUseArmor())
             {
-                StartCoroutine(PlayArmorVFX());
+                StartCoroutine(PlayMagicalArmorVFX());
             }
         }
 
-        private IEnumerator PlayArmorVFX()
+        private IEnumerator PlayPhysicalArmorVFX()
         {
-            if (armorDestroyedVFX)
+            if (physicalArmorDestroyedVFX)
             {
-                PooledObject instance = ObjectPoolingManager.SpawnObject(armorDestroyedVFX, transform);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(physicalArmorDestroyedVFX, transform);
                 armorDestroyedVFXInstances.Add(instance);
 
-                if (armorDestroyedAudio)
+                if (physicalArmorDestroyedAudio)
                 {
-                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, armorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, physicalArmorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                }
+
+                yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
+                armorDestroyedVFXInstances.Remove(instance);
+            }
+        }
+
+        private IEnumerator PlayMagicalArmorVFX()
+        {
+            if (magicalArmorDestroyedVFX)
+            {
+                PooledObject instance = ObjectPoolingManager.SpawnObject(magicalArmorDestroyedVFX, transform);
+                armorDestroyedVFXInstances.Add(instance);
+
+                if (magicalArmorDestroyedAudio)
+                {
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, magicalArmorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
                 }
 
                 yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
@@ -1489,6 +1509,14 @@ namespace Vi.Core
                 this.physicalArmorDamage = physicalArmorDamage;
                 this.magicalArmorDamage = magicalArmorDamage;
             }
+
+            public override string ToString()
+            {
+                return "Physical HP: " + physicalHPDamage
+                    + " Magical HP: " + magicalHPDamage
+                    + " Physical Armor: " + physicalArmorDamage
+                    + " Magical Armor: " + magicalArmorDamage;
+            }
         }
 
         private DamageDispersion GetArmorDamageDispersion(float physicalDamage, float magicalDamage, float armorPenetration)
@@ -1523,6 +1551,9 @@ namespace Vi.Core
 
             return new DamageDispersion(-physicalHealthDamage, -magicalHealthDamage, -physicalArmorDamage, -magicalArmorDamage);
         }
+
+        protected virtual float GetPhysicalAttack() { return 0; }
+        protected virtual float GetMagicalAttack() { return 0; }
 
         private bool wasIncapacitatedThisLife;
 
@@ -1570,11 +1601,11 @@ namespace Vi.Core
             bool isBlocking = false;
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
-            float physicalHPDamage = -(attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float physicalHPDamage = -(GetPhysicalAttack() + attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
             physicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             physicalHPDamage *= damageMultiplier;
 
-            float magicalHPDamage = -(attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float magicalHPDamage = -(GetMagicalAttack() + attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
             magicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             magicalHPDamage *= damageMultiplier;
 
