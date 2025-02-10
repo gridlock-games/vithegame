@@ -228,6 +228,12 @@ namespace Vi.UI
                 roundResultText.enabled = false;
                 roundResultText.text = string.Empty;
             }
+            else if (gameModeManager.GetPostGameStatus() == GameModeManager.PostGameStatus.Rewards
+                & PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
+            {
+                roundResultText.enabled = true;
+                roundResultText.text = "Displaying Player Rewards";
+            }
             else
             {
                 roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
