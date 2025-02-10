@@ -241,6 +241,15 @@ namespace Vi.UI
 
             trainingRoomMapDropdown.ClearOptions();
             trainingRoomMapDropdown.AddOptions(trainingRoomMapOptions);
+
+            if (FasterPlayerPrefs.Singleton.HasString("Training Room Map"))
+            {
+                int mapIndex = trainingRoomMapOptions.IndexOf(FasterPlayerPrefs.Singleton.GetString("Training Room Map"));
+                if (mapIndex != -1)
+                {
+                    trainingRoomMapDropdown.value = mapIndex;
+                }
+            }
         }
 
         private void OnDestroy()
@@ -249,6 +258,7 @@ namespace Vi.UI
             {
                 data.OnDragEvent -= OnCharPreviewDrag;
             }
+            FasterPlayerPrefs.Singleton.SetString("Training Room Map", trainingRoomMapOptions[trainingRoomMapDropdown.value]);
         }
 
         private void OnCharPreviewDrag(Vector2 delta)
@@ -1445,6 +1455,7 @@ namespace Vi.UI
             {
                 if (FasterPlayerPrefs.Singleton.GetBool("TutorialCompleted"))
                 {
+                    FasterPlayerPrefs.Singleton.SetString("Training Room Map", trainingRoomMapOptions[trainingRoomMapDropdown.value]);
                     NetSceneManager.Singleton.LoadScene("Training Room", trainingRoomMapOptions[trainingRoomMapDropdown.value]);
                 }
                 else
