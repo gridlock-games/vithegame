@@ -360,6 +360,25 @@ namespace Vi.Core.MovementHandlers
 
         public virtual void Flinch(Vector2 flinchAmount) { }
 
+		public bool CanLook()
+		{
+            if (GameModeManager.Singleton)
+            {
+                if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
+                {
+                    if (GameModeManager.Singleton.GetPostGameStatus() == GameModeManager.PostGameStatus.MVP)
+                    {
+						return false;
+                    }
+                }
+                else if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None)
+                {
+					return false;
+                }
+            }
+			return true;
+        }
+
 		private float zoomSensitivityMultiplier = 1;
         protected Vector2 lookInput;
         public Vector2 GetLookInput()
@@ -369,10 +388,7 @@ namespace Vi.Core.MovementHandlers
 				if (!lookAction.enabled) { return Vector2.zero; }
             }
 
-			if (GameModeManager.Singleton)
-			{
-				if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None) { return Vector2.zero; }
-			}
+			if (!CanLook()) { return Vector2.zero; }
 
 			bool shouldUseZoomSensMultiplier = false;
             if (weaponHandler) { shouldUseZoomSensMultiplier = weaponHandler.IsAiming(); }

@@ -490,22 +490,7 @@ namespace Vi.Core.GameModeManagers
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
-
                     ExpEarnedFromMatch += localPlayerScore.GetExpReward();
-
-                    // This is calculated automatically using the leaderboard API, we just set this for the UI
-                    if (GameModeManager.Singleton.LevelingEnabled)
-                    {
-                        KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                        if (kvp.Value)
-                        {
-                            ViEssenceEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
-                        }
-                    }
-                    else
-                    {
-                        ViEssenceEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
-                    }
                 }
             }
         }
@@ -542,8 +527,10 @@ namespace Vi.Core.GameModeManagers
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
-                    float expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
-                    ExpEarnedFromMatch += expToAward;
+                    // This is calculated automatically using the leaderboard API, we just set this for the UI
+                    bool isWinner = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id);
+                    ExpEarnedFromMatch += isWinner ? 20 : 12;
+                    ViEssenceEarnedFromMatch = isWinner ? 5 : 3;
                 }
             }
         }

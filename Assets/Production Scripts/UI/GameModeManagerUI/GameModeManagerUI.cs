@@ -228,6 +228,12 @@ namespace Vi.UI
                 roundResultText.enabled = false;
                 roundResultText.text = string.Empty;
             }
+            else if (gameModeManager.GetPostGameStatus() == GameModeManager.PostGameStatus.Rewards
+                & PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
+            {
+                roundResultText.enabled = true;
+                roundResultText.text = "Displaying Player Rewards";
+            }
             else
             {
                 roundResultText.enabled = gameModeManager.ShouldDisplayNextGameAction();
@@ -252,41 +258,44 @@ namespace Vi.UI
                     MVPCanvasGroup.alpha = 0;
                     break;
                 case GameModeManager.PostGameStatus.Rewards:
-                    Cursor.lockState = CursorLockMode.None;
-                    if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionController.TransitionRunning)
+                    if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                     {
-                        StartCoroutine(transitionController.PlayTransition());
-                    }
-
-                    if (transitionController.TransitionPeakReached)
-                    {
-                        MVPCanvas.enabled = true;
-                        MVPCanvasGroup.alpha = 1;
-                    }
-
-                    if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
-                    {
-                        GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
-                        if (playerScore.isValid)
+                        Cursor.lockState = CursorLockMode.None;
+                        if (gameModeManager.GetPostGameStatus() != lastPostGameStatus & !transitionController.TransitionRunning)
                         {
-                            if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
-                            MVPCanvas.enabled = true;
-                            MVPAccountCard.InitializeAsMVPScore(playerScore.id);
+                            StartCoroutine(transitionController.PlayTransition());
                         }
-                    }
 
-                    gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
-                    rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
+                        if (transitionController.TransitionPeakReached)
+                        {
+                            MVPCanvas.enabled = true;
+                            MVPCanvasGroup.alpha = 1;
+                        }
 
-                    viEssenceEarnedText.text = gameModeManager.ViEssenceEarnedFromMatch.ToString();
-                    if (gameModeManager.ViEssenceEarnedFromMatch > 0)
-                    {
-                        viEssenceEarnedText.text += "x";
-                    }
+                        if (PlayerDataManager.Singleton.LocalPlayerData.id != (int)NetworkManager.ServerClientId)
+                        {
+                            GameModeManager.PlayerScore playerScore = GameModeManager.Singleton.GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+                            if (playerScore.isValid)
+                            {
+                                if (!MVPPreviewObject & !MVPPreviewInProgress) { StartCoroutine(CreateMVPPreview(playerScore)); }
+                                MVPCanvas.enabled = true;
+                                MVPAccountCard.InitializeAsMVPScore(playerScore.id);
+                            }
+                        }
 
-                    if (!displayRewardsHasBeenRun & !transitionController.TransitionRunning)
-                    {
-                        displayRewardsCoroutine = StartCoroutine(DisplayRewards());
+                        gameResultText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
+                        rewardsHeaderText.transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(1.1f, 1, 1), Mathf.PingPong(Time.time * textPingPongSpeed, 1));
+
+                        viEssenceEarnedText.text = gameModeManager.ViEssenceEarnedFromMatch.ToString();
+                        if (gameModeManager.ViEssenceEarnedFromMatch > 0)
+                        {
+                            viEssenceEarnedText.text += "x";
+                        }
+
+                        if (!displayRewardsHasBeenRun & !transitionController.TransitionRunning)
+                        {
+                            displayRewardsCoroutine = StartCoroutine(DisplayRewards());
+                        }
                     }
                     break;
                 case GameModeManager.PostGameStatus.MVP:
