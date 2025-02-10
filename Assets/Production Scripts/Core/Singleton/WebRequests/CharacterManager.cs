@@ -2412,6 +2412,33 @@ namespace Vi.Core
             public float weaponABaseAtk;
             public float weaponBBaseAtk;
 
+            public CharacterStats(int level, float currentExp, float expToNextLv, int nextStatPointRwd, float attack, float mattack, float defense, float mdefense, float hp, float stamina, float critChance, float crit, float baseHP, float baseST, float baseAtk, float baseMatk, float weaponABaseAtk, float weaponBBaseAtk)
+            {
+                this.level = level;
+                this.currentExp = currentExp;
+                this.expToNextLv = expToNextLv;
+                this.nextStatPointRwd = nextStatPointRwd;
+                this.attack = attack;
+                this.mattack = mattack;
+                this.defense = defense;
+                this.mdefense = mdefense;
+                this.hp = hp;
+                this.stamina = stamina;
+                this.critChance = critChance;
+                this.crit = crit;
+                this.baseHP = baseHP;
+                this.baseST = baseST;
+                this.baseAtk = baseAtk;
+                this.baseMatk = baseMatk;
+                this.weaponABaseAtk = weaponABaseAtk;
+                this.weaponBBaseAtk = weaponBBaseAtk;
+            }
+
+            public static CharacterStats GetDefaultStats()
+            {
+                return new CharacterStats(1, 0, 250, 5, 1, 1, 15, 15, 100, 110, 0, 0, 50, 50, 0, 0, 0, 0);
+            }
+
             public int GetAvailableSkillPoints(CharacterAttributes characterAttributes)
             {
                 int value = nextStatPointRwd;
@@ -2427,26 +2454,19 @@ namespace Vi.Core
 
         public bool TryGetCharacterStats(string characterId, out CharacterStats characterStats)
         {
-            if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
+            if (string.IsNullOrWhiteSpace(characterId)) // Bot character
+            {
+                // TODO change this to use bot profiles, as indicated by the character attributes?
+                characterStats = CharacterStats.GetDefaultStats();
+                return true;
+            }
+            else if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
             {
                 return true;
             }
             else
             {
                 return false;
-            }
-        }
-
-        public CharacterStats GetCharacterStats(string characterId)
-        {
-            if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
-            {
-                return response;
-            }
-            else
-            {
-                Debug.LogWarning("Can't find character attributes for character id in lookup dictionary " + characterId);
-                return default;
             }
         }
 
