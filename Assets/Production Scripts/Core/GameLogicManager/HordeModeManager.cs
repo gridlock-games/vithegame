@@ -106,10 +106,10 @@ namespace Vi.Core.GameModeManagers
                         PlayerDataManager.Singleton.GetGameMode(),
                         roundTimer.Value, GetWavesCompleted(),
                         localPlayerScore.cumulativeDamageDealt));
+
+                    ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
                 }
             }
-
-            ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
         }
 
         public override void OnPlayerKill(CombatAgent killer, CombatAgent victim)
