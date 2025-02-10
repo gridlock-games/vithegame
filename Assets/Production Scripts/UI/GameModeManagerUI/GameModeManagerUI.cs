@@ -417,7 +417,7 @@ namespace Vi.UI
 
             gameResultText.text = gameModeManager.GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? "VICTORY!" : "DEFEAT!";
 
-            CharacterManager.CharacterStats stats = WebRequestManager.Singleton.CharacterManager.FindCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
+            CharacterManager.CharacterStats stats = WebRequestManager.Singleton.CharacterManager.GetCharacterStats(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString());
             levelText.text = "Lv " + stats.level.ToString();
             expGainedMessage.text = "+" + gameModeManager.ExpEarnedFromMatch.ToString("F0") + " XP";
 

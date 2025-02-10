@@ -750,7 +750,7 @@ namespace Vi.UI
         {
             updateDisplayCharacterRunning = true;
 
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(character._id.ToString(), out CharacterManager.CharacterStats characterStats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(character._id.ToString(), out CharacterManager.CharacterStats characterStats))
             {
                 maxHPText.text = characterStats.hp.ToString();
                 maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();

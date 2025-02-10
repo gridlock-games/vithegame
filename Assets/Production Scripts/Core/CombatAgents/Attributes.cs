@@ -132,7 +132,7 @@ namespace Vi.Core.CombatAgents
 
         private bool TryGetCharacterStats(out CharacterManager.CharacterStats characterStats)
         {
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
                 characterStats = stats;
                 return true;

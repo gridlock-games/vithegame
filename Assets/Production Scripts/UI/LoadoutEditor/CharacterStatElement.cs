@@ -45,7 +45,7 @@ namespace Vi.UI
             int availableSkillPoints = 0;
             if (characterIndex != -1)
             {
-                if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(WebRequestManager.Singleton.CharacterManager.Characters[characterIndex]._id.ToString(), out var stats))
+                if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(WebRequestManager.Singleton.CharacterManager.Characters[characterIndex]._id.ToString(), out var stats))
                 {
                     availableSkillPoints = stats.GetAvailableSkillPoints(WebRequestManager.Singleton.CharacterManager.Characters[characterIndex].attributes);
                     return availableSkillPoints;

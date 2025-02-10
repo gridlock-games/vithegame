@@ -64,7 +64,7 @@ namespace Vi.UI
 
             nameText.text = character.name.ToString();
 
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(character._id.ToString(), out CharacterManager.CharacterStats stats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(character._id.ToString(), out CharacterManager.CharacterStats stats))
             {
                 levelText.text = "Lv." + stats.level.ToString();
             }

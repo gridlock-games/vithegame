@@ -2425,7 +2425,7 @@ namespace Vi.Core
             }
         }
 
-        public bool TryGetCharacterAttributesInLookup(string characterId, out CharacterStats characterStats)
+        public bool TryGetCharacterStats(string characterId, out CharacterStats characterStats)
         {
             if (characterAttributesLookup.TryGetValue(characterId, out characterStats))
             {
@@ -2437,7 +2437,7 @@ namespace Vi.Core
             }
         }
 
-        public CharacterStats FindCharacterAttributesInLookup(string characterId)
+        public CharacterStats GetCharacterStats(string characterId)
         {
             if (characterAttributesLookup.TryGetValue(characterId, out CharacterStats response))
             {
