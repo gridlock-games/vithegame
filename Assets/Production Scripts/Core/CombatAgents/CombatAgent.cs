@@ -187,8 +187,11 @@ namespace Vi.Core
             }
         }
 
-        [SerializeField] private PooledObject armorDestroyedVFX;
-        [SerializeField] private AudioClip armorDestroyedAudio;
+        [Header("Armor Destroyed Assignments")]
+        [SerializeField] private PooledObject physicalArmorDestroyedVFX;
+        [SerializeField] private AudioClip physicalArmorDestroyedAudio;
+        [SerializeField] private PooledObject magicalArmorDestroyedVFX;
+        [SerializeField] private AudioClip magicalArmorDestroyedAudio;
         private List<PooledObject> armorDestroyedVFXInstances = new List<PooledObject>();
         private void OnPhysicalArmorChanged(float prev, float current)
         {
@@ -198,7 +201,7 @@ namespace Vi.Core
 
             if (ShouldUseArmor())
             {
-                StartCoroutine(PlayArmorVFX());
+                StartCoroutine(PlayPhysicalArmorVFX());
             }
         }
 
@@ -210,20 +213,37 @@ namespace Vi.Core
 
             if (ShouldUseArmor())
             {
-                StartCoroutine(PlayArmorVFX());
+                StartCoroutine(PlayMagicalArmorVFX());
             }
         }
 
-        private IEnumerator PlayArmorVFX()
+        private IEnumerator PlayPhysicalArmorVFX()
         {
-            if (armorDestroyedVFX)
+            if (physicalArmorDestroyedVFX)
             {
-                PooledObject instance = ObjectPoolingManager.SpawnObject(armorDestroyedVFX, transform);
+                PooledObject instance = ObjectPoolingManager.SpawnObject(physicalArmorDestroyedVFX, transform);
                 armorDestroyedVFXInstances.Add(instance);
 
-                if (armorDestroyedAudio)
+                if (physicalArmorDestroyedAudio)
                 {
-                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, armorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, physicalArmorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
+                }
+
+                yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
+                armorDestroyedVFXInstances.Remove(instance);
+            }
+        }
+
+        private IEnumerator PlayMagicalArmorVFX()
+        {
+            if (magicalArmorDestroyedVFX)
+            {
+                PooledObject instance = ObjectPoolingManager.SpawnObject(magicalArmorDestroyedVFX, transform);
+                armorDestroyedVFXInstances.Add(instance);
+
+                if (magicalArmorDestroyedAudio)
+                {
+                    AudioManager.Singleton.PlayClipOnTransform(instance.transform, magicalArmorDestroyedAudio, false, Weapon.hitSoundEffectVolume);
                 }
 
                 yield return ObjectPoolingManager.ReturnVFXToPoolWhenFinishedPlaying(instance);
@@ -1488,6 +1508,14 @@ namespace Vi.Core
                 this.magicalHPDamage = magicalHPDamage;
                 this.physicalArmorDamage = physicalArmorDamage;
                 this.magicalArmorDamage = magicalArmorDamage;
+            }
+
+            public override string ToString()
+            {
+                return "Physical HP: " + physicalHPDamage
+                    + " Magical HP: " + magicalHPDamage
+                    + " Physical Armor: " + physicalArmorDamage
+                    + " Magical Armor: " + magicalArmorDamage;
             }
         }
 
