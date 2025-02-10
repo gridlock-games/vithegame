@@ -1524,6 +1524,9 @@ namespace Vi.Core
             return new DamageDispersion(-physicalHealthDamage, -magicalHealthDamage, -physicalArmorDamage, -magicalArmorDamage);
         }
 
+        protected virtual float GetPhysicalAttack() { return 0; }
+        protected virtual float GetMagicalAttack() { return 0; }
+
         private bool wasIncapacitatedThisLife;
 
         [SerializeField] private bool canBeIncapacitated;
@@ -1570,11 +1573,11 @@ namespace Vi.Core
             bool isBlocking = false;
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
-            float physicalHPDamage = -(attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float physicalHPDamage = -(GetPhysicalAttack() + attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
             physicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             physicalHPDamage *= damageMultiplier;
 
-            float magicalHPDamage = -(attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float magicalHPDamage = -(GetMagicalAttack() + attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
             magicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             magicalHPDamage *= damageMultiplier;
 

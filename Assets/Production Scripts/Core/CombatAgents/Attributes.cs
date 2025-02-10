@@ -130,9 +130,23 @@ namespace Vi.Core.CombatAgents
             ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
         }
 
-        public override float GetMaxHP()
+        private bool TryGetCharacterStats(out CharacterManager.CharacterStats characterStats)
         {
             if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                characterStats = stats;
+                return true;
+            }
+            else
+            {
+                characterStats = new CharacterManager.CharacterStats();
+                return false;
+            }
+        }
+
+        public override float GetMaxHP()
+        {
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats stats))
             {
                 return stats.hp + SessionProgressionHandler.MaxHPBonus;
             }
@@ -144,7 +158,7 @@ namespace Vi.Core.CombatAgents
 
         public override float GetMaxStamina()
         {
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats stats))
             {
                 return stats.stamina + SessionProgressionHandler.MaxStaminaBonus;
             }
@@ -156,7 +170,7 @@ namespace Vi.Core.CombatAgents
 
         public override float GetMaxPhysicalArmor()
         {
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats stats))
             {
                 return stats.defense + SessionProgressionHandler.MaxArmorBonus;
             }
@@ -168,7 +182,7 @@ namespace Vi.Core.CombatAgents
 
         public override float GetMaxMagicalArmor()
         {
-            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats stats))
             {
                 return stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
             }
@@ -229,6 +243,50 @@ namespace Vi.Core.CombatAgents
             IsRespawning = false;
             isWaitingForSpawnPoint = false;
             respawnSelfCalledTime = default;
+        }
+
+        protected override float GetPhysicalAttack()
+        {
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats characterStats))
+            {
+                switch (LoadoutManager.GetEquippedSlotType())
+                {
+                    case LoadoutManager.WeaponSlotType.Primary:
+                        return characterStats.attack + characterStats.weaponABaseAtk;
+                    case LoadoutManager.WeaponSlotType.Secondary:
+                        return characterStats.attack + characterStats.weaponABaseAtk;
+                    default:
+                        Debug.LogWarning("Unsure how to handle weapon slot type " + LoadoutManager.GetEquippedSlotType());
+                        break;
+                }
+                return characterStats.attack;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        protected override float GetMagicalAttack()
+        {
+            if (TryGetCharacterStats(out CharacterManager.CharacterStats characterStats))
+            {
+                switch (LoadoutManager.GetEquippedSlotType())
+                {
+                    case LoadoutManager.WeaponSlotType.Primary:
+                        return characterStats.mattack + characterStats.weaponABaseAtk;
+                    case LoadoutManager.WeaponSlotType.Secondary:
+                        return characterStats.mattack + characterStats.weaponABaseAtk;
+                    default:
+                        Debug.LogWarning("Unsure how to handle weapon slot type " + LoadoutManager.GetEquippedSlotType());
+                        break;
+                }
+                return characterStats.mattack;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public override bool ProcessMeleeHit(CombatAgent attacker, NetworkObject attackingNetworkObject, ActionClip attack, RuntimeWeapon runtimeWeapon, Vector3 impactPosition, Vector3 hitSourcePosition)
