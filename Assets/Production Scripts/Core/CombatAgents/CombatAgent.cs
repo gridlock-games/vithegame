@@ -43,55 +43,13 @@ namespace Vi.Core
         public float GetMagicalArmor() { return magicalArmor.Value; }
         public float GetRage() { return rage.Value; }
 
-        public override float GetMaxHP()
-        {
-            if (!NetworkObject.IsPlayerObject)
-            {
-                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
-            }
-            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
-            {
-                return stats.hp + SessionProgressionHandler.MaxHPBonus;
-            }
-            else
-            {
-                return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus;
-            }
-        }
+        public override float GetMaxHP() { return WeaponHandler.GetWeapon().GetMaxHP() + SessionProgressionHandler.MaxHPBonus; }
 
-        public float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
+        public virtual float GetMaxStamina() { return WeaponHandler.GetWeapon().GetMaxStamina() + SessionProgressionHandler.MaxStaminaBonus; }
 
-        public float GetMaxPhysicalArmor()
-        {
-            if (!NetworkObject.IsPlayerObject)
-            {
-                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
-            }
-            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
-            {
-                return stats.defense + SessionProgressionHandler.MaxArmorBonus;
-            }
-            else
-            {
-                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
-            }
-        }
+        public virtual float GetMaxPhysicalArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
 
-        public float GetMaxMagicalArmor()
-        {
-            if (!NetworkObject.IsPlayerObject)
-            {
-                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
-            }
-            else if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
-            {
-                return stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
-            }
-            else
-            {
-                return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus;
-            }
-        }
+        public virtual float GetMaxMagicalArmor() { return WeaponHandler.GetWeapon().GetMaxArmor() + SessionProgressionHandler.MaxArmorBonus; }
 
         public float GetMaxRage() { return WeaponHandler.GetWeapon().GetMaxRage(); }
 

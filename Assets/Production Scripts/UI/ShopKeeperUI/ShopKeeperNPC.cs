@@ -128,18 +128,21 @@ namespace Vi.UI
             //if (!PlayerDataManager.Singleton.ContainsId((int)purchaserClientId)) { yield break; }
 
             string characterId = "";
+            string userId = "";
             if (PlayerDataManager.Singleton.ContainsId((int)purchaserClientId))
             {
-                characterId = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character._id.ToString();
+                CharacterManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character;
+                characterId = character._id.ToString();
+                userId = character.userId.ToString();
             }
             else
             {
-                PurchaseClientRpc(purchaserClientId, false, itemsToPurchase);
+                PurchaseClientRpc(purchaserClientId, false, itemsToPurchase, 0);
                 yield break;
             }
 
             int viEssenceCount = 0;
-            yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId, (count) => viEssenceCount = count);
+            yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(userId, (count) => viEssenceCount = count);
 
             List<ItemShopManager.PurchaseItem> purchaseItems = itemsToPurchase.ToList();
 
@@ -177,13 +180,17 @@ namespace Vi.UI
             bool success = true;
             yield return WebRequestManager.Singleton.ItemShopManager.PurchaseItems(characterId, purchaseItems, (result) => success = result);
 
-            if (success) { yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId); }
+            if (success)
+            {
+                yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId);
+                yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(userId, (count) => viEssenceCount = count);
+            }
             
-            PurchaseClientRpc(purchaserClientId, success, itemsToPurchase);
+            PurchaseClientRpc(purchaserClientId, success, itemsToPurchase, viEssenceCount);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, ItemShopManager.PurchaseItem[] purchaseItems)
+        private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, ItemShopManager.PurchaseItem[] purchaseItems, int newViEssenceAmount)
         {
             string characterId;
             if (PlayerDataManager.Singleton.ContainsId((int)purchaserClientId))
@@ -203,6 +210,8 @@ namespace Vi.UI
 
             if (purchaserClientId == NetworkManager.LocalClientId)
             {
+                currencyCountText.text = newViEssenceAmount.ToString();
+
                 foreach (ItemShopManager.PurchaseItem purchaseItem in purchaseItems)
                 {
                     ShopKeeperItem instance = shopKeeperItemInstances.Find(item => item.ItemId == purchaseItem.itemId);
@@ -213,7 +222,6 @@ namespace Vi.UI
                 if (purchaseSuccessful)
                 {
                     purchaseErrorText.text = "Purchase successful!";
-                    StartCoroutine(RefreshViEssenceAmount());
                     AudioManager.Singleton.Play2DClip(gameObject, purchaseSuccessfulSounds[Random.Range(0, purchaseSuccessfulSounds.Length)], 0.3f);
                 }
                 else

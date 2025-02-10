@@ -53,6 +53,14 @@ namespace Vi.Core.CombatAgents
 
             teamIndicatorInstance = ObjectPoolingManager.SpawnObject(teamIndicatorPrefab, transform);
             teamIndicatorInstance.transform.localPosition = new Vector3(0, 0.01f, 0);
+
+            if (NetworkObject.IsPlayerObject)
+            {
+                if (!IsServer & !IsLocalPlayer)
+                {
+                    StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterAttributes(CachedPlayerData.character._id.ToString()));
+                }
+            }
         }
 
         public void UpdateNetworkVisiblity()
@@ -120,6 +128,54 @@ namespace Vi.Core.CombatAgents
             PlayerDataManager.Singleton.RemovePlayerObject(GetPlayerDataId());
 
             ObjectPoolingManager.ReturnObjectToPool(ref teamIndicatorInstance);
+        }
+
+        public override float GetMaxHP()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.hp + SessionProgressionHandler.MaxHPBonus;
+            }
+            else
+            {
+                return base.GetMaxHP();
+            }
+        }
+
+        public override float GetMaxStamina()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.stamina + SessionProgressionHandler.MaxStaminaBonus;
+            }
+            else
+            {
+                return base.GetMaxStamina();
+            }
+        }
+
+        public override float GetMaxPhysicalArmor()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.defense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return base.GetMaxPhysicalArmor();
+            }
+        }
+
+        public override float GetMaxMagicalArmor()
+        {
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterAttributesInLookup(CachedPlayerData.character._id.ToString(), out CharacterManager.CharacterStats stats))
+            {
+                return stats.mdefense + SessionProgressionHandler.MaxArmorBonus;
+            }
+            else
+            {
+                return base.GetMaxMagicalArmor();
+            }
         }
 
         [SerializeField] private AudioClip heartbeatSoundEffect;
