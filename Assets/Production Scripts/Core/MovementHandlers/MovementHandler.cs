@@ -371,7 +371,17 @@ namespace Vi.Core.MovementHandlers
 
 			if (GameModeManager.Singleton)
 			{
-				if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None) { return Vector2.zero; }
+				if (PlayerDataManager.Singleton.LocalPlayerData.team == PlayerDataManager.Team.Spectator)
+				{
+					if (GameModeManager.Singleton.GetPostGameStatus() == GameModeManager.PostGameStatus.MVP)
+					{
+						return Vector2.zero;
+					}
+				}
+                else if (GameModeManager.Singleton.GetPostGameStatus() != GameModeManager.PostGameStatus.None)
+                {
+                    return Vector2.zero;
+                }
 			}
 
 			bool shouldUseZoomSensMultiplier = false;
