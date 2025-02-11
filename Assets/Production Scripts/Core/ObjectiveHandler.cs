@@ -7,16 +7,31 @@ namespace Vi.Core
 {
     public class ObjectiveHandler : Objective
     {
-        public void SetObjective(ObjectiveHandler objective)
+        public void SetObjective(Objective objective)
         {
-            Objective = objective;
+            this.objective = objective;
         }
 
-        public Objective Objective { get; private set; }
+        public Objective Objective
+        {
+            get
+            {
+                if (objective)
+                {
+                    if (objective.gameObject.activeInHierarchy)
+                    {
+                        return objective;
+                    }
+                }
+                return null;
+            }
+        }
+
+        private Objective objective;
 
         private void OnDisable()
         {
-            Objective = default;
+            objective = default;
         }
 
         //private void Update()
