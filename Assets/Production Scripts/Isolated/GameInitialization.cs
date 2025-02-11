@@ -138,7 +138,8 @@ namespace Vi.Core
 
             if (!FasterPlayerPrefs.Singleton.HasFloat("MusicVolume")) { FasterPlayerPrefs.Singleton.SetFloat("MusicVolume", 0.5f); }
 
-            if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
+            //if (!FasterPlayerPrefs.Singleton.HasBool("PostProcessingEnabled")) { FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true); }
+            FasterPlayerPrefs.Singleton.SetBool("PostProcessingEnabled", true);
             if (!FasterPlayerPrefs.Singleton.HasFloat("DPIScalingFactor")) { FasterPlayerPrefs.Singleton.SetFloat("DPIScalingFactor", FasterPlayerPrefs.IsMobilePlatform ? 0.5f : 1); }
             QualitySettings.resolutionScalingFixedDPIFactor = 1;
 
