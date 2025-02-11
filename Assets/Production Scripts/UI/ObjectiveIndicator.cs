@@ -44,7 +44,7 @@ namespace Vi.UI
             {
                 if (localObjectiveHandler.Objective)
                 {
-                    Vector3 newPosition = localObjectiveHandler.Objective.transform.position + localObjectiveHandler.MovementHandler.BodyHeightOffset;
+                    Vector3 newPosition = localObjectiveHandler.Objective.GetUIPosition();
                     Quaternion newRot = Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - newPosition);
 
                     Vector3 viewportPos = FindMainCamera.MainCamera.WorldToViewportPoint(newPosition);

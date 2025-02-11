@@ -5,20 +5,14 @@ using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
-    public class ObjectiveHandler : MonoBehaviour
+    public class ObjectiveHandler : Objective
     {
         public void SetObjective(ObjectiveHandler objective)
         {
             Objective = objective;
         }
 
-        public ObjectiveHandler Objective { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
-
-        private void Awake()
-        {
-            MovementHandler = GetComponent<MovementHandler>();
-        }
+        public Objective Objective { get; private set; }
 
         private void OnDisable()
         {
