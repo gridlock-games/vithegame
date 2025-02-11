@@ -1601,11 +1601,11 @@ namespace Vi.Core
             bool isBlocking = false;
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
-            float physicalHPDamage = -(GetPhysicalAttack() + attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float physicalHPDamage = -(attacker.GetPhysicalAttack() + attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
             physicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             physicalHPDamage *= damageMultiplier;
 
-            float magicalHPDamage = -(GetMagicalAttack() + attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float magicalHPDamage = -(attacker.GetMagicalAttack() + attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
             magicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             magicalHPDamage *= damageMultiplier;
 
