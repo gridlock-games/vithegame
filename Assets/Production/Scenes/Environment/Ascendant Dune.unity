@@ -6139,7 +6139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1160910520
 Transform:
   m_ObjectHideFlags: 0
@@ -9704,7 +9704,13 @@ MonoBehaviour:
   environmentViewPoints:
   - position: {x: 8, y: 8, z: -6}
     rotation: {x: -0.15607397, y: 0.43171126, z: -0.07612236, w: -0.88513935}
-  gameItemSpawnPoints: []
+  gameItemSpawnPoints:
+  - position: {x: 0, y: 3.5, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: -30, y: 1.5, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
+  - position: {x: 30, y: 1.5, z: 0}
+    rotation: {x: 0, y: 0, z: 0, w: 0}
   spawnPoints:
   - gameModes: 000000000100000002000000
     teams: 01000000
@@ -9765,9 +9771,9 @@ MonoBehaviour:
   damageCircleMinScale: {x: 15, y: 200, z: 15}
   shrinkSize: 20
   mobSpawnPoints: []
-  displayDefaultGizmos: 0
+  displayDefaultGizmos: 1
   displayDamageCircleGizmos: 0
-  displayPreviewCharacterGizmos: 1
+  displayPreviewCharacterGizmos: 0
 --- !u!4 &1904603669
 Transform:
   m_ObjectHideFlags: 0

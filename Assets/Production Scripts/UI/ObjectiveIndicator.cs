@@ -5,6 +5,7 @@ using Vi.Core.CombatAgents;
 using UnityEngine.UI;
 using Vi.Core.MovementHandlers;
 using Vi.Utility;
+using Vi.ScriptableObjects;
 
 namespace Vi.UI
 {
@@ -12,13 +13,13 @@ namespace Vi.UI
     {
         [SerializeField] private Image indicatorImage;
 
-        private ObjectiveHandler localObjectiveHandler;
+        private Attributes localPlayer;
 
         private void FindObjectiveHandler()
         {
-            if (localObjectiveHandler)
+            if (localPlayer)
             {
-                if (localObjectiveHandler.gameObject.activeInHierarchy) { return; }
+                if (localPlayer.gameObject.activeInHierarchy) { return; }
             }
 
             if (PlayerDataManager.DoesExist())
@@ -26,7 +27,7 @@ namespace Vi.UI
                 KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
                 if (kvp.Value)
                 {
-                    localObjectiveHandler = kvp.Value.MovementHandler.ObjectiveHandler;
+                    localPlayer = kvp.Value;
                 }
             }
         }
@@ -40,11 +41,11 @@ namespace Vi.UI
         {
             FindObjectiveHandler();
 
-            if (localObjectiveHandler & FindMainCamera.MainCamera)
+            if (localPlayer & FindMainCamera.MainCamera)
             {
-                if (localObjectiveHandler.Objective)
+                if (localPlayer.MovementHandler.ObjectiveHandler.Objective & localPlayer.GetAilment() != ActionClip.Ailment.Death)
                 {
-                    Vector3 newPosition = localObjectiveHandler.Objective.transform.position + localObjectiveHandler.MovementHandler.BodyHeightOffset;
+                    Vector3 newPosition = localPlayer.MovementHandler.ObjectiveHandler.Objective.GetUIPosition();
                     Quaternion newRot = Quaternion.LookRotation(FindMainCamera.MainCamera.transform.position - newPosition);
 
                     Vector3 viewportPos = FindMainCamera.MainCamera.WorldToViewportPoint(newPosition);
