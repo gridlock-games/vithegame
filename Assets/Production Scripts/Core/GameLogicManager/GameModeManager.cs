@@ -432,9 +432,16 @@ namespace Vi.Core.GameModeManagers
             gameOver.Value = true;
             gameEndMessage.Value = "Returning to Lobby";
 
-            foreach (int playerDataId in winningPlayersDataIds)
+            if (winningPlayerDataIds.Count == 0)
             {
-                this.winningPlayerDataIds.Add(playerDataId);
+                this.winningPlayerDataIds.Add((int)NetworkManager.ServerClientId);
+            }
+            else
+            {
+                foreach (int playerDataId in winningPlayersDataIds)
+                {
+                    this.winningPlayerDataIds.Add(playerDataId);
+                }
             }
 
             if (PlayerDataManager.Singleton.GetGameModeInfo().possibleTeams.Length > 1)
@@ -507,30 +514,30 @@ namespace Vi.Core.GameModeManagers
                     {
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
                         float expAward = playerScore.GetExpReward();
-                        expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                        expAward += GetGameWinnerIds().Contains(playerData.id) ? 20 : 12;
                         PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
 
                         if (sendKillsLeaderboardResult)
                         {
                             PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
-                                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                                PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                                playerData.character._id.ToString(),
+                                playerData.character.name.ToString(),
                                 PlayerDataManager.Singleton.GetGameMode(),
-                                GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id),
+                                GetGameWinnerIds().Contains(playerData.id),
                                 playerScore.cumulativeKills, playerScore.cumulativeDeaths, playerScore.cumulativeAssists));
                         }
                     }
                 }
             }
 
-            if (IsClient)
+            if (IsClient & sendKillsLeaderboardResult)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
                     // This is calculated automatically using the leaderboard API, we just set this for the UI
                     bool isWinner = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id);
                     ExpEarnedFromMatch += isWinner ? 20 : 12;
-                    ViEssenceEarnedFromMatch = isWinner ? 5 : 3;
+                    ViEssenceEarnedFromMatch += isWinner ? 5 : 3;
                 }
             }
         }

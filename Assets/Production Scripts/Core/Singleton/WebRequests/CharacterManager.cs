@@ -9,7 +9,6 @@ using Vi.ScriptableObjects;
 using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
-using static Vi.Core.CharacterManager;
 
 namespace Vi.Core
 {
@@ -104,6 +103,7 @@ namespace Vi.Core
 
             for (int i = indexesThatFailedValidation.Count - 1; i >= 0; i--)
             {
+                yield return CharacterDisableRequest(Characters[indexesThatFailedValidation[i]]._id.ToString());
                 Characters.RemoveAt(indexesThatFailedValidation[i]);
             }
 
@@ -2509,7 +2509,7 @@ namespace Vi.Core
 
             public static CharacterStats GetDefaultStats()
             {
-                return new CharacterStats(1, 0, 250, 5, 1, 1, 15, 15, 100, 110, 0, 0, 50, 50, 0, 0, 0, 0);
+                return new CharacterStats(1, 0, 250, 5, 6, 5, 36, 33, 210, 120, 0.15f, 8.625f, 170, 105, 1.5f, 1.7f, 1, 1);
             }
 
             public int GetAvailableSkillPoints(CharacterAttributes characterAttributes)
