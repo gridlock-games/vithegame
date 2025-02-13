@@ -96,18 +96,21 @@ namespace Vi.Core.GameModeManagers
 
             if (IsClient)
             {
-                if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
+                foreach (PlayerDataManager.PlayerData playerData in PlayerDataManager.Singleton.GetPlayerDataListWithoutSpectators())
                 {
-                    PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
+                    if (playerData.team != PlayerDataManager.Team.Spectator)
+                    {
+                        PlayerScore localPlayerScore = GetPlayerScore(playerData.id);
 
-                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendHordeModeLeaderboardResult(
-                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
-                        PlayerDataManager.Singleton.GetGameMode(),
-                        roundTimer.Value, GetWavesCompleted(),
-                        localPlayerScore.cumulativeDamageDealt));
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendHordeModeLeaderboardResult(
+                            playerData.character._id.ToString(),
+                            playerData.character.name.ToString(),
+                            PlayerDataManager.Singleton.GetGameMode(),
+                            roundTimer.Value, GetWavesCompleted(),
+                            localPlayerScore.cumulativeDamageDealt));
 
-                    ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
+                        ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
+                    }
                 }
             }
         }

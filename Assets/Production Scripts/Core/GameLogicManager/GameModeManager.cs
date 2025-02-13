@@ -507,16 +507,16 @@ namespace Vi.Core.GameModeManagers
                     {
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
                         float expAward = playerScore.GetExpReward();
-                        expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
+                        expAward += GetGameWinnerIds().Contains(playerData.id) ? 20 : 12;
                         PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
 
                         if (sendKillsLeaderboardResult)
                         {
                             PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
-                                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                                PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                                playerData.character._id.ToString(),
+                                playerData.character.name.ToString(),
                                 PlayerDataManager.Singleton.GetGameMode(),
-                                GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id),
+                                GetGameWinnerIds().Contains(playerData.id),
                                 playerScore.cumulativeKills, playerScore.cumulativeDeaths, playerScore.cumulativeAssists));
                         }
                     }
