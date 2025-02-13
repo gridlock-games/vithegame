@@ -103,6 +103,7 @@ namespace Vi.Core
 
             for (int i = indexesThatFailedValidation.Count - 1; i >= 0; i--)
             {
+                yield return CharacterDisableRequest(Characters[indexesThatFailedValidation[i]]._id.ToString());
                 Characters.RemoveAt(indexesThatFailedValidation[i]);
             }
 
@@ -646,6 +647,7 @@ namespace Vi.Core
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
             string json = JsonConvert.SerializeObject(payload);
+            Debug.Log(json);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "saveLoadOut", jsonData);
