@@ -82,6 +82,8 @@ namespace Vi.Player
         private bool isAscending;
         void OnAscend(InputValue value)
         {
+            if (!CanLook()) { return; }
+
             followTarget = null;
             isAscending = value.isPressed;
         }
@@ -89,6 +91,8 @@ namespace Vi.Player
         private bool isDescending;
         void OnDescend(InputValue value)
         {
+            if (!CanLook()) { return; }
+
             isDescending = value.isPressed;
         }
 
@@ -103,6 +107,8 @@ namespace Vi.Player
 
         void OnFollowPlayer1()
         {
+            if (!CanLook()) { return; }
+
             int index = 0;
             if (shouldViewEnvironmentModifier)
             {
@@ -119,6 +125,8 @@ namespace Vi.Player
 
         void OnFollowPlayer2()
         {
+            if (!CanLook()) { return; }
+
             int index = 1;
             if (shouldViewEnvironmentModifier)
             {
@@ -135,6 +143,8 @@ namespace Vi.Player
 
         void OnFollowPlayer3()
         {
+            if (!CanLook()) { return; }
+
             int index = 2;
             if (shouldViewEnvironmentModifier)
             {
@@ -151,6 +161,8 @@ namespace Vi.Player
 
         void OnFollowPlayer4()
         {
+            if (!CanLook()) { return; }
+
             int index = 3;
             if (shouldViewEnvironmentModifier)
             {
@@ -167,6 +179,8 @@ namespace Vi.Player
 
         void OnFollowPlayer5()
         {
+            if (!CanLook()) { return; }
+
             int index = 4;
             if (shouldViewEnvironmentModifier)
             {
@@ -183,6 +197,8 @@ namespace Vi.Player
 
         void OnFollowPlayer6()
         {
+            if (!CanLook()) { return; }
+
             int index = 5;
             if (shouldViewEnvironmentModifier)
             {
@@ -199,6 +215,8 @@ namespace Vi.Player
 
         void OnFollowPlayer7()
         {
+            if (!CanLook()) { return; }
+
             int index = 6;
             if (shouldViewEnvironmentModifier)
             {
@@ -215,6 +233,8 @@ namespace Vi.Player
 
         void OnFollowPlayer8()
         {
+            if (!CanLook()) { return; }
+
             int index = 7;
             if (shouldViewEnvironmentModifier)
             {
@@ -231,6 +251,8 @@ namespace Vi.Player
 
         void OnFollowPlayer9()
         {
+            if (!CanLook()) { return; }
+
             int index = 8;
             if (shouldViewEnvironmentModifier)
             {
@@ -247,6 +269,8 @@ namespace Vi.Player
 
         void OnFollowPlayer10()
         {
+            if (!CanLook()) { return; }
+
             int index = 9;
             if (shouldViewEnvironmentModifier)
             {
@@ -263,6 +287,8 @@ namespace Vi.Player
 
         void OnIncrementFollowPlayer()
         {
+            if (!CanLook()) { return; }
+
             if (followTarget == null)
             {
                 if (playerList.Count > 0) { followTarget = playerList[0]; }
@@ -284,6 +310,8 @@ namespace Vi.Player
 
         void OnDecrementFollowPlayer()
         {
+            if (!CanLook()) { return; }
+
             if (followTarget == null)
             {
                 if (playerList.Count > 0) { followTarget = playerList[^1]; }
@@ -443,9 +471,12 @@ namespace Vi.Player
                 if (isAscending) { verticalSpeed = 1; }
                 if (isDescending) { verticalSpeed = -1; }
 
-                targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
-                transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
-
+                if (CanLook())
+                {
+                    targetPosition += (isSprinting ? moveSpeed * 2 : moveSpeed) * Time.deltaTime * (transform.rotation * new Vector3(moveInput.x, verticalSpeed, moveInput.y));
+                    transform.position = Vector3.Lerp(transform.position, targetPosition, Time.deltaTime * lerpSpeed);
+                }
+                
                 Vector2 lookInput = GetLookInput();
                 float xAngle = transform.eulerAngles.x - lookInput.y;
                 if (xAngle > 85 & xAngle < 275)

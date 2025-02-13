@@ -91,18 +91,23 @@ namespace Vi.Core.GameModeManagers
 
         protected override void OnGameOverChanged(bool prev, bool current)
         {
-            if (current & IsClient)
+            base.OnGameOverChanged(prev, current);
+            if (!current) { return; }
+
+            if (IsClient)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
 
-                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendHordeModeLeaderboardResult(
+                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendHordeModeLeaderboardResult(
                         PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
                         PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
                         PlayerDataManager.Singleton.GetGameMode(),
                         roundTimer.Value, GetWavesCompleted(),
                         localPlayerScore.cumulativeDamageDealt));
+
+                    ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
                 }
             }
         }

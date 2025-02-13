@@ -55,9 +55,9 @@ namespace Vi.UI
             Button invokeThis = null;
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
 
-            foreach (WebRequestManager.InventoryItem inventoryItem in WebRequestManager.GetInventory(playerData.character._id.ToString()))
+            foreach (CharacterManager.InventoryItem inventoryItem in CharacterManager.GetInventory(playerData.character._id.ToString()))
             {
-                CharacterReference.WeaponOption weaponOption = WebRequestManager.GetWeaponOption(inventoryItem);
+                CharacterReference.WeaponOption weaponOption = CharacterManager.GetWeaponOption(inventoryItem);
 
                 if (weaponOption == null) { continue; }
 
@@ -98,10 +98,10 @@ namespace Vi.UI
             }
         }
 
-        private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, WebRequestManager.InventoryItem inventoryItem, int loadoutSlot)
+        private void ChangeWeapon(Button button, CharacterReference.WeaponOption weaponOption, CharacterManager.InventoryItem inventoryItem, int loadoutSlot)
         {
             PlayerDataManager.PlayerData playerData = PlayerDataManager.Singleton.GetPlayerData(playerDataId);
-            WebRequestManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            CharacterManager.Loadout newLoadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
             string inventoryItemId = inventoryItem.id;
             
@@ -168,7 +168,7 @@ namespace Vi.UI
 
             if (!newLoadout.Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
-                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout));
+                PlayerDataManager.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterLoadout(playerData.character._id.ToString(), newLoadout, true));
 
                 playerData.character = playerData.character.ChangeLoadoutFromSlot(loadoutSlot, newLoadout);
                 PlayerDataManager.Singleton.SetPlayerData(playerData);

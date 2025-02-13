@@ -32,18 +32,18 @@ namespace Vi.UI
         }
 
         List<ServerListElement> serverListElementList = new List<ServerListElement>();
-        List<WebRequestManager.Server> emptyLobbyServerList = new List<WebRequestManager.Server>();
+        List<ServerManager.Server> emptyLobbyServerList = new List<ServerManager.Server>();
         private float lastErrorTextDisplayTime = Mathf.NegativeInfinity;
         private const float errorTextDisplayDuration = 5;
         private void Update()
         {
-            refreshServersButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers;
+            refreshServersButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers;
             createLobbyButton.interactable = refreshServersButton.interactable;
             joinLobbyButton.interactable = refreshServersButton.interactable & serverListElementList.Exists(item => item.Server.ip == networkTransport.ConnectionData.Address & ushort.Parse(item.Server.port) == networkTransport.ConnectionData.Port);
             
-            if (!WebRequestManager.Singleton.IsRefreshingServers)
+            if (!WebRequestManager.Singleton.ServerManager.IsRefreshingServers)
             {
-                foreach (WebRequestManager.Server server in WebRequestManager.Singleton.LobbyServers)
+                foreach (ServerManager.Server server in WebRequestManager.Singleton.ServerManager.LobbyServers)
                 {
                     if (server.ip != networkTransport.ConnectionData.Address) { continue; }
 
@@ -78,7 +78,7 @@ namespace Vi.UI
 
         public void RefreshServerBrowser()
         {
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             foreach (ServerListElement serverListElement in serverListElementList)
             {
                 Destroy(serverListElement.gameObject);
@@ -96,7 +96,7 @@ namespace Vi.UI
         {
             if (emptyLobbyServerList.Count > 0)
             {
-                WebRequestManager.Server server = emptyLobbyServerList[0];
+                ServerManager.Server server = emptyLobbyServerList[0];
                 networkTransport.SetConnectionData(server.ip, ushort.Parse(server.port), FasterPlayerPrefs.serverListenAddress);
                 PersistentLocalObjects.Singleton.StartCoroutine(ConnectToLobbyServerCoroutine());
             }

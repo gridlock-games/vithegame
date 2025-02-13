@@ -20,11 +20,11 @@ namespace Vi.Core
         [SerializeField] private MaterialReplacementDefintion[] materialReplacementDefintions;
         [SerializeField] private WearableEquipmentRendererDefinition[] wearableEquipmentRendererDefinitions;
 
-        public WebRequestManager.Character GetCharacterWebInfo(WebRequestManager.Character currentCharacter)
+        public CharacterManager.Character GetCharacterWebInfo(CharacterManager.Character currentCharacter)
         {
             MaterialReplacementDefintion browsReplacementDefinition = System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Brows);
 
-            WebRequestManager.Character newChar = new WebRequestManager.Character(currentCharacter._id.ToString(), name.Replace("(Clone)", ""), currentCharacter.name.ToString(), currentCharacter.experience,
+            CharacterManager.Character newChar = new CharacterManager.Character(currentCharacter._id.ToString(), name.Replace("(Clone)", ""), currentCharacter.name.ToString(), currentCharacter.experience,
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Body).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 System.Array.Find(materialReplacementDefintions, item => item.characterMaterialType == CharacterReference.MaterialApplicationLocation.Eyes).skinnedMeshRenderers[0].material.name.Replace(" (Instance)", ""),
                 WearableEquipmentInstances.ContainsKey(CharacterReference.EquipmentType.Beard) ? WearableEquipmentInstances[CharacterReference.EquipmentType.Beard].name.Replace("(Clone)", "") : "",
@@ -450,7 +450,7 @@ namespace Vi.Core
         private void Awake()
         {
             animator = GetComponent<Animator>();
-            animator.cullingMode = WebRequestManager.IsServerBuild() | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
+            animator.cullingMode = FasterPlayerPrefs.IsServerPlatform | NetworkManager.Singleton.IsServer ? AnimatorCullingMode.AlwaysAnimate : AnimatorCullingMode.AlwaysAnimate;
 
             limbReferences = GetComponent<LimbReferences>();
             glowRenderer = GetComponent<GlowRenderer>();

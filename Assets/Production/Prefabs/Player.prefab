@@ -683,9 +683,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   excludeFromKillFeed: 0
-  armorDestroyedVFX: {fileID: -5338236817657967816, guid: 6858e08108a42a747b887b19cc89fca4,
+  physicalArmorDestroyedVFX: {fileID: 5859221089523297189, guid: c47f26d5b25a5c0458bffe1401b7967f,
     type: 3}
-  armorDestroyedAudio: {fileID: 8300000, guid: 6fbc3d1fde5734320a9074fed722f622, type: 3}
+  physicalArmorDestroyedAudio: {fileID: 8300000, guid: 6fbc3d1fde5734320a9074fed722f622,
+    type: 3}
+  magicalArmorDestroyedVFX: {fileID: -5338236817657967816, guid: 6858e08108a42a747b887b19cc89fca4,
+    type: 3}
+  magicalArmorDestroyedAudio: {fileID: 8300000, guid: 6fbc3d1fde5734320a9074fed722f622,
+    type: 3}
   rageStartAudio: {fileID: 8300000, guid: 60cef9975a14343e7804f5bd15d9c4fb, type: 3}
   rageAtMaxVFXPrefab: {fileID: 2575221005670951496, guid: a88628a7afdb10e4ca5715f1d767897e,
     type: 3}
@@ -695,7 +700,7 @@ MonoBehaviour:
     type: 3}
   rageStartVFXPrefab: {fileID: -5598191903913794490, guid: f8c2d4cc44c53d348a31254d6ec12242,
     type: 3}
-  rageStartSprite: {fileID: 21300000, guid: 772ab1f1608b0694bb7758951fef42c9, type: 3}
+  rageStartSprite: {fileID: 21300000, guid: 16dc8be6b7a9445768bb0aaf3498c6ff, type: 3}
   onKillAudioClip: {fileID: 8300000, guid: 1902387c27c7f450baab938d3a2bc3c4, type: 3}
   ailmentOnHitActionVFXList:
   - ailment: 3
@@ -850,6 +855,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a87dc2daa2ed39408d62461989dd9e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UIOffset: {x: 0, y: 2, z: 0}
 --- !u!1 &3945128956232022066
 GameObject:
   m_ObjectHideFlags: 0

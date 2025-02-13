@@ -367,7 +367,7 @@ namespace Vi.Core
             float changeAmount;
             if (statusPayload.valueIsPercentage)
             {
-                changeAmount = combatAgent.GetMaxArmor() * statusPayload.value;
+                changeAmount = combatAgent.GetMaxPhysicalArmor() * statusPayload.value;
             }
             else
             {
@@ -692,13 +692,13 @@ namespace Vi.Core
                     }
 
                     break;
-                case ActionClip.Status.armorRegeneration:
+                case ActionClip.Status.physicalArmorRegeneration:
                     elapsedTime = 0;
                     while (elapsedTime < StatusEventsForThisObject[statusEventId].duration & !stopAllStatuses)
                     {
                         if (combatAgent)
                         {
-                            combatAgent.AddArmor(GetArmorChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
+                            combatAgent.AddPhysicalArmor(GetArmorChangeAmount(StatusEventsForThisObject[statusEventId]) * Time.deltaTime);
                         }
 
                         elapsedTime += Time.deltaTime;

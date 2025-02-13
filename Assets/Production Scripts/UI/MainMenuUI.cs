@@ -151,14 +151,14 @@ namespace Vi.UI
                 }
                 else
                 {
-                    yield return WebRequestManager.Singleton.GetPublicIP();
-                    serverIP = WebRequestManager.Singleton.PublicIP;
+                    yield return WebRequestManager.Singleton.ServerManager.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.ServerManager.PublicIP;
                 }
             }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
             networkTransport.SetConnectionData(serverIP, hubPort, FasterPlayerPrefs.serverListenAddress);
@@ -209,17 +209,17 @@ namespace Vi.UI
                 }
                 else
                 {
-                    yield return WebRequestManager.Singleton.GetPublicIP();
-                    serverIP = WebRequestManager.Singleton.PublicIP;
+                    yield return WebRequestManager.Singleton.ServerManager.GetPublicIP();
+                    serverIP = WebRequestManager.Singleton.ServerManager.PublicIP;
                 }
             }
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
             List<int> portList = new List<int>();
-            foreach (WebRequestManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == serverIP))
+            foreach (ServerManager.Server server in System.Array.FindAll(WebRequestManager.Singleton.ServerManager.LobbyServers, item => item.ip == serverIP))
             {
                 portList.Add(int.Parse(server.port));
             }
@@ -264,23 +264,23 @@ namespace Vi.UI
 
             yield return Login();
 
-            if (!WebRequestManager.Singleton.IsLoggedIn) { Debug.LogError("Automated client failed to login"); startAutomatedClientCalled = false; yield break; }
+            if (!WebRequestManager.Singleton.UserManager.IsLoggedIn) { Debug.LogError("Automated client failed to login"); startAutomatedClientCalled = false; yield break; }
 
-            WebRequestManager.Singleton.RefreshCharacters();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingCharacters);
+            WebRequestManager.Singleton.CharacterManager.RefreshCharacters();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.CharacterManager.IsRefreshingCharacters);
 
-            if (WebRequestManager.Singleton.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); startAutomatedClientCalled = false; yield break; }
+            if (WebRequestManager.Singleton.CharacterManager.Characters.Count == 0) { Debug.LogError("Automated client has no character options"); startAutomatedClientCalled = false; yield break; }
 
-            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.Characters[0]._id.ToString());
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(WebRequestManager.Singleton.CharacterManager.Characters[0]._id.ToString());
 
             yield return new WaitUntil(() => !WebRequestManager.Singleton.IsCheckingGameVersion);
-            WebRequestManager.Singleton.RefreshServers();
-            yield return new WaitUntil(() => !WebRequestManager.Singleton.IsRefreshingServers);
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
+            yield return new WaitUntil(() => !WebRequestManager.Singleton.ServerManager.IsRefreshingServers);
 
-            if (WebRequestManager.Singleton.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); startAutomatedClientCalled = false; yield break; }
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length == 0) { Debug.LogError("Automated client has no hub server to connect to"); startAutomatedClientCalled = false; yield break; }
 
             var networkTransport = NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>();
-            networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+            networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
             
             NetworkManager.Singleton.StartClient();
         }
@@ -345,9 +345,9 @@ namespace Vi.UI
         private IEnumerator WaitForSteamAuth(FirebaseUser fireAuth, SteamUserAccountData suad, string steamUsername)
         {
             Debug.Log("Waiting on endpoint");
-            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(suad.userEmail, fireAuth.UserId);
+            yield return WebRequestManager.Singleton.UserManager.LoginWithFirebaseUserId(suad.userEmail, fireAuth.UserId);
 
-            if (WebRequestManager.Singleton.IsLoggedIn)
+            if (WebRequestManager.Singleton.UserManager.IsLoggedIn)
             {
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
@@ -359,7 +359,7 @@ namespace Vi.UI
             else
             {
                 oAuthParent.SetActive(false);
-                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                initialErrorText.text = WebRequestManager.Singleton.UserManager.LogInErrorText;
             }
         }
 
@@ -404,7 +404,7 @@ namespace Vi.UI
 
         public void ReturnToInitialElements()
         {
-            WebRequestManager.Singleton.ResetLogInErrorText();
+            WebRequestManager.Singleton.UserManager.ResetLogInErrorText();
             initialParent.SetActive(true);
             viLogo.enabled = true;
             initialErrorText.text = "";
@@ -412,7 +412,7 @@ namespace Vi.UI
 
         public void GoToCharacterSelect()
         {
-            WebRequestManager.Singleton.RefreshServers();
+            WebRequestManager.Singleton.ServerManager.RefreshServers();
             NetSceneManager.Singleton.LoadScene("Character Select");
         }
 
@@ -475,13 +475,13 @@ namespace Vi.UI
             usernameInput.interactable = false;
             passwordInput.interactable = false;
 
-            yield return WebRequestManager.Singleton.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
+            yield return WebRequestManager.Singleton.UserManager.CreateAccount(usernameInput.text, emailInput.text, passwordInput.text);
 
             emailInput.interactable = true;
             usernameInput.interactable = true;
             passwordInput.interactable = true;
 
-            if (string.IsNullOrEmpty(WebRequestManager.Singleton.LogInErrorText))
+            if (string.IsNullOrEmpty(WebRequestManager.Singleton.UserManager.LogInErrorText))
             {
                 ReturnToInitialElements();
             }
@@ -496,7 +496,7 @@ namespace Vi.UI
             usernameInput.interactable = false;
             passwordInput.interactable = false;
 
-            yield return WebRequestManager.Singleton.Login(usernameInput.text, passwordInput.text);
+            yield return WebRequestManager.Singleton.UserManager.Login(usernameInput.text, passwordInput.text);
 
             welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("username");
             welcomeUserImage.sprite = baseImageSprite;
@@ -588,9 +588,9 @@ namespace Vi.UI
             Debug.Log(authResult.User.Email);
             Debug.Log(authResult.User.UserId);
             oAuthMessageText.text = $"Waiting for Firebase Authentication";
-            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+            yield return WebRequestManager.Singleton.UserManager.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
-            if (WebRequestManager.Singleton.IsLoggedIn)
+            if (WebRequestManager.Singleton.UserManager.IsLoggedIn)
             {
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
@@ -603,7 +603,7 @@ namespace Vi.UI
             else
             {
                 oAuthParent.SetActive(false);
-                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                initialErrorText.text = WebRequestManager.Singleton.UserManager.LogInErrorText;
             }
         }
 
@@ -673,9 +673,9 @@ namespace Vi.UI
             oAuthMessageText.text = $"Waiting for Firebase Authentication";
             Debug.Log(authResult.User.Email);
             Debug.Log(authResult.User.UserId);
-            yield return WebRequestManager.Singleton.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
+            yield return WebRequestManager.Singleton.UserManager.LoginWithFirebaseUserId(authResult.User.Email, authResult.User.UserId);
 
-            if (WebRequestManager.Singleton.IsLoggedIn)
+            if (WebRequestManager.Singleton.UserManager.IsLoggedIn)
             {
                 initialParent.SetActive(false);
                 oAuthParent.SetActive(false);
@@ -688,7 +688,7 @@ namespace Vi.UI
             else
             {
                 oAuthParent.SetActive(false);
-                initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                initialErrorText.text = WebRequestManager.Singleton.UserManager.LogInErrorText;
             }
         }
 
@@ -700,7 +700,7 @@ namespace Vi.UI
         public void Logout()
         {
             FasterPlayerPrefs.IsPlayingOffline = false;
-            WebRequestManager.Singleton.Logout();
+            WebRequestManager.Singleton.UserManager.Logout();
             initialParent.SetActive(true);
             FasterPlayerPrefs.Singleton.DeleteKey("LastSignInType");
             FasterPlayerPrefs.Singleton.DeleteKey("username");
@@ -720,17 +720,17 @@ namespace Vi.UI
             startAutoClientButton.gameObject.SetActive(Application.isEditor);
             initialErrorText.text = "";
 
-            APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL();
+            APIURLInputField.text = WebRequestManager.Singleton.GetAPIURL(true);
 
             foreach (Button button in authenticationButtons)
             {
                 button.interactable = false;
             }
 
-            if (!WebRequestManager.IsServerBuild())
+            if (!FasterPlayerPrefs.IsServerPlatform)
             {
                 auth = FirebaseAuth.DefaultInstance;
-                if (WebRequestManager.Singleton.IsLoggedIn & FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
+                if (WebRequestManager.Singleton.UserManager.IsLoggedIn & FasterPlayerPrefs.Singleton.HasString("LastSignInType"))
                 {
                     welcomeUserText.text = FasterPlayerPrefs.Singleton.GetString("AccountName");
                     switch (FasterPlayerPrefs.Singleton.GetString("LastSignInType"))
@@ -769,7 +769,7 @@ namespace Vi.UI
                 steamLoginButton.SetActive(true);
             }
 
-            initialParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
+            initialParent.SetActive(!WebRequestManager.Singleton.UserManager.IsLoggedIn);
         }
 
         private bool isAutomaticallyLoggingIn;
@@ -786,13 +786,13 @@ namespace Vi.UI
                         usernameInput.text = FasterPlayerPrefs.Singleton.GetString("username");
                         passwordInput.text = FasterPlayerPrefs.Singleton.GetString("password");
                         yield return Login();
-                        if (WebRequestManager.Singleton.IsLoggedIn)
+                        if (WebRequestManager.Singleton.UserManager.IsLoggedIn)
                         {
                             initialParent.SetActive(false);
                         }
                         else
                         {
-                            initialErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+                            initialErrorText.text = WebRequestManager.Singleton.UserManager.LogInErrorText;
                         }
                         break;
 
@@ -885,7 +885,7 @@ namespace Vi.UI
             {
                 loginMethodText.text = "Logging In...";
             }
-            else if (WebRequestManager.Singleton.IsLoggingIn)
+            else if (WebRequestManager.Singleton.UserManager.IsLoggingIn)
             {
                 loginMethodText.text = "Logging In...";
             }
@@ -894,9 +894,9 @@ namespace Vi.UI
                 loginMethodText.text = "Please Select Login Method";
             }
 
-            startHubServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
-            startLobbyServerButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
-            startAutoClientButton.interactable = !WebRequestManager.Singleton.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL() != WebRequestManager.ProdAPIURL[0..^1];
+            startHubServerButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startLobbyServerButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
+            startAutoClientButton.interactable = !WebRequestManager.Singleton.ServerManager.IsRefreshingServers & playButton.gameObject.activeInHierarchy & WebRequestManager.Singleton.GetAPIURL(true) != WebRequestManager.ProdAPIURL[0..^1];
 
             if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-launch-as-hub-server") != -1)
             {
@@ -911,20 +911,20 @@ namespace Vi.UI
                 StartAutomatedClient();
             }
 
-            loginButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            returnButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            openLoginFormButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            openRegisterAccountButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
-            forgotPasswordButton.interactable = !WebRequestManager.Singleton.IsLoggingIn;
+            loginButton.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn;
+            returnButton.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn;
+            openLoginFormButton.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn;
+            openRegisterAccountButton.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn;
+            forgotPasswordButton.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn;
             foreach (Button button in authenticationButtons)
             {
-                button.interactable = !WebRequestManager.Singleton.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion & !isAutomaticallyLoggingIn;
+                button.interactable = !WebRequestManager.Singleton.UserManager.IsLoggingIn & !WebRequestManager.Singleton.IsCheckingGameVersion & !isAutomaticallyLoggingIn;
             }
 
             if (!initialParent.activeSelf)
             {
-                authenticationParent.SetActive(!WebRequestManager.Singleton.IsLoggedIn);
-                playParent.SetActive(WebRequestManager.Singleton.IsLoggedIn);
+                authenticationParent.SetActive(!WebRequestManager.Singleton.UserManager.IsLoggedIn);
+                playParent.SetActive(WebRequestManager.Singleton.UserManager.IsLoggedIn);
             }
             else
             {
@@ -933,7 +933,7 @@ namespace Vi.UI
             }
 
             viLogo.enabled = playParent.activeSelf | initialParent.activeSelf;
-            loginErrorText.text = WebRequestManager.Singleton.LogInErrorText;
+            loginErrorText.text = WebRequestManager.Singleton.UserManager.LogInErrorText;
 
             if (steamAuthExternalstepdone)
             {

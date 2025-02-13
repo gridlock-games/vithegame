@@ -5,9 +5,11 @@ using Unity.Netcode;
 using Vi.Utility;
 using Vi.ScriptableObjects;
 using Vi.Core.Weapons;
+using Vi.Core.CombatAgents;
 
 namespace Vi.Core.GameModeManagers
 {
+    [RequireComponent(typeof(Objective))]
     [RequireComponent(typeof(PooledObject))]
     [RequireComponent(typeof(ObjectiveHandler))]
     public class GameItem : NetworkBehaviour, IHittable
@@ -19,6 +21,17 @@ namespace Vi.Core.GameModeManagers
         protected virtual void Awake()
         {
             ObjectiveHandler = GetComponent<ObjectiveHandler>();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            foreach (Attributes player in PlayerDataManager.Singleton.GetActivePlayerObjects())
+            {
+                if (player.GetPlayerDataId() < 0) { continue; }
+
+                player.MovementHandler.ObjectiveHandler.SetObjective(GetComponent<Objective>());
+            }
         }
 
         protected virtual bool OnHit(CombatAgent attacker)

@@ -5,24 +5,33 @@ using Vi.Core.MovementHandlers;
 
 namespace Vi.Core
 {
-    public class ObjectiveHandler : MonoBehaviour
+    public class ObjectiveHandler : Objective
     {
-        public void SetObjective(ObjectiveHandler objective)
+        public void SetObjective(Objective objective)
         {
-            Objective = objective;
+            this.objective = objective;
         }
 
-        public ObjectiveHandler Objective { get; private set; }
-        public MovementHandler MovementHandler { get; private set; }
-
-        private void Awake()
+        public Objective Objective
         {
-            MovementHandler = GetComponent<MovementHandler>();
+            get
+            {
+                if (objective)
+                {
+                    if (objective.gameObject.activeInHierarchy)
+                    {
+                        return objective;
+                    }
+                }
+                return null;
+            }
         }
+
+        private Objective objective;
 
         private void OnDisable()
         {
-            Objective = default;
+            objective = default;
         }
 
         //private void Update()

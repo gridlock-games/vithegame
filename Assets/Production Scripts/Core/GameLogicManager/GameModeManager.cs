@@ -468,9 +468,11 @@ namespace Vi.Core.GameModeManagers
             return returnedList;
         }
 
+        [SerializeField] private bool sendKillsLeaderboardResult = true;
+
         private NetworkList<int> winningPlayerDataIds;
         public float ExpEarnedFromMatch { get; private set; } = -1;
-        public int TokensEarnedFromMatch { get; private set; }
+        public int ViEssenceEarnedFromMatch { get; protected set; }
         protected virtual void OnGameOverChanged(bool prev, bool current)
         {
             if (!current) { return; }
@@ -481,44 +483,19 @@ namespace Vi.Core.GameModeManagers
                 return;
             }
 
-            StartCoroutine(AwardExpBasedOnWin());
+            StartCoroutine(WaitForGameWinnerIds());
 
             if (IsClient)
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
                     PlayerScore localPlayerScore = GetPlayerScore(PlayerDataManager.Singleton.LocalPlayerData.id);
-
-                    PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.SendKillsLeaderboardResult(
-                        PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
-                        PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
-                        PlayerDataManager.Singleton.GetGameMode(),
-                        localPlayerScore.cumulativeKills, localPlayerScore.cumulativeDeaths, localPlayerScore.cumulativeAssists));
-
                     ExpEarnedFromMatch += localPlayerScore.GetExpReward();
-
-                    // TODO Change this to use web requests on the server
-                    if (GameModeManager.Singleton.LevelingEnabled)
-                    {
-                        KeyValuePair<int, Attributes> kvp = PlayerDataManager.Singleton.GetLocalPlayerObject();
-                        if (kvp.Value)
-                        {
-                            TokensEarnedFromMatch = kvp.Value.SessionProgressionHandler.Essences;
-                            FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") + kvp.Value.SessionProgressionHandler.Essences);
-                        }
-                    }
-                    else
-                    {
-                        TokensEarnedFromMatch = localPlayerScore.cumulativeKills + localPlayerScore.cumulativeAssists;
-                        FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens")
-                            + localPlayerScore.cumulativeKills
-                            + localPlayerScore.cumulativeAssists);
-                    }
                 }
             }
         }
 
-        private IEnumerator AwardExpBasedOnWin()
+        private IEnumerator WaitForGameWinnerIds()
         {
             yield return new WaitUntil(() => GetGameWinnerIds().Count > 0);
 
@@ -531,7 +508,17 @@ namespace Vi.Core.GameModeManagers
                         PlayerScore playerScore = GetPlayerScore(playerData.id);
                         float expAward = playerScore.GetExpReward();
                         expAward += GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
-                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+                        PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.UpdateCharacterExp(playerData.character._id.ToString(), expAward));
+
+                        if (sendKillsLeaderboardResult)
+                        {
+                            PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.LeaderboardManager.SendKillsLeaderboardResult(
+                                PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(),
+                                PlayerDataManager.Singleton.LocalPlayerData.character.name.ToString(),
+                                PlayerDataManager.Singleton.GetGameMode(),
+                                GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id),
+                                playerScore.cumulativeKills, playerScore.cumulativeDeaths, playerScore.cumulativeAssists));
+                        }
                     }
                 }
             }
@@ -540,8 +527,10 @@ namespace Vi.Core.GameModeManagers
             {
                 if (PlayerDataManager.Singleton.LocalPlayerData.team != PlayerDataManager.Team.Spectator)
                 {
-                    float expToAward = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id) ? 20 : 12;
-                    ExpEarnedFromMatch += expToAward;
+                    // This is calculated automatically using the leaderboard API, we just set this for the UI
+                    bool isWinner = GetGameWinnerIds().Contains(PlayerDataManager.Singleton.LocalPlayerData.id);
+                    ExpEarnedFromMatch += isWinner ? 20 : 12;
+                    ViEssenceEarnedFromMatch = isWinner ? 5 : 3;
                 }
             }
         }
@@ -565,10 +554,10 @@ namespace Vi.Core.GameModeManagers
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                NetworkManager.Singleton.GetComponent<Unity.Netcode.Transports.UTP.UnityTransport>().SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }

@@ -70,13 +70,15 @@ namespace Vi.UI
             OpenGearsSection();
 
             string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            int currentAvailableSkillPoints = 0;
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(characterId, out CharacterManager.CharacterStats characterStats))
             {
                 characterLevelText.text = characterStats.level.ToString();
                 maxHPText.text = characterStats.hp.ToString();
                 maxDefenseText.text = (characterStats.defense + characterStats.mdefense).ToString();
-                availableSkillPointsText.text = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes).ToString();
-                resetStatsButton.interactable = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes) < characterStats.nextStatPointRwd;
+                currentAvailableSkillPoints = characterStats.GetAvailableSkillPoints(PlayerDataManager.Singleton.LocalPlayerData.character.attributes); ;
+                availableSkillPointsText.text = currentAvailableSkillPoints.ToString();
+                resetStatsButton.interactable = currentAvailableSkillPoints < characterStats.nextStatPointRwd & characterStats.nextStatPointRwd > 5;
             }
             else // Set Default values
             {
@@ -89,6 +91,8 @@ namespace Vi.UI
 
             foreach (CharacterStatElement characterStatElement in charSectionCharacterStatElements)
             {
+                characterStatElement.GetAddPointButton().interactable = currentAvailableSkillPoints > 0;
+
                 characterStatElement.OnStatCountChange += (statEle, availableSkillPoints) =>
                 {
                     availableSkillPointsText.text = availableSkillPoints.ToString();
@@ -98,7 +102,7 @@ namespace Vi.UI
                         characterStatElement.GetAddPointButton().interactable = availableSkillPoints > 0;
                     }
 
-                    if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out WebRequestManager.CharacterStats characterStats))
+                    if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), out CharacterManager.CharacterStats characterStats))
                     {
                         resetStatsButton.interactable = availableSkillPoints < characterStats.nextStatPointRwd;
                     }
@@ -120,31 +124,31 @@ namespace Vi.UI
 
         public void ResetCharStats()
         {
-            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new WebRequestManager.CharacterAttributes());
+            PlayerDataManager.Singleton.SetCharAttributes(PlayerDataManager.Singleton.LocalPlayerData.id, new CharacterManager.CharacterAttributes(1, 1, 1, 1, 1));
 
-            int characterIndex = WebRequestManager.Singleton.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
+            int characterIndex = WebRequestManager.Singleton.CharacterManager.Characters.FindIndex(item => item._id == PlayerDataManager.Singleton.LocalPlayerData.character._id);
             if (characterIndex != -1)
             {
-                var newCharacter = WebRequestManager.Singleton.Characters[characterIndex];
-                newCharacter.attributes = new WebRequestManager.CharacterAttributes();
-                WebRequestManager.Singleton.Characters[characterIndex] = newCharacter;
+                var newCharacter = WebRequestManager.Singleton.CharacterManager.Characters[characterIndex];
+                newCharacter.attributes = new CharacterManager.CharacterAttributes(1, 1, 1, 1, 1);
+                WebRequestManager.Singleton.CharacterManager.Characters[characterIndex] = newCharacter;
             }
 
             foreach (CharacterStatElement element in gearSectionCharacterStatElements)
             {
-                element.CurrentStatCount = 0;
+                element.CurrentStatCount = 1;
                 element.UpdateDisplay();
             }
 
             foreach (CharacterStatElement element in charSectionCharacterStatElements)
             {
-                element.CurrentStatCount = 0;
+                element.CurrentStatCount = 1;
                 element.UpdateDisplay();
                 element.GetAddPointButton().interactable = true;
             }
 
             string characterId = PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString();
-            if (WebRequestManager.Singleton.TryGetCharacterAttributesInLookup(characterId, out WebRequestManager.CharacterStats characterStats))
+            if (WebRequestManager.Singleton.CharacterManager.TryGetCharacterStats(characterId, out CharacterManager.CharacterStats characterStats))
             {
                 availableSkillPointsText.text = characterStats.nextStatPointRwd.ToString();
             }
@@ -183,10 +187,10 @@ namespace Vi.UI
 
         private GameObject previewLightInstance;
         private GameObject previewObject;
-        private WebRequestManager.Loadout lastLoadoutEvaluated;
+        private CharacterManager.Loadout lastLoadoutEvaluated;
         private void CreatePreview(bool force)
         {
-            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+            CharacterManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
             if (!force)
             {
@@ -303,7 +307,7 @@ namespace Vi.UI
             }
 
             PlayerDataManager.PlayerData playerData = attributes.CachedPlayerData;
-            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
+            CharacterManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlot);
 
             if (!playerData.character.GetActiveLoadout().Equals(playerData.character.GetLoadoutFromSlot(loadoutSlot)))
             {
@@ -314,7 +318,7 @@ namespace Vi.UI
             Dictionary<string, CharacterReference.WeaponOption> weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptionsDictionary();
 
             CharacterReference.WeaponOption primaryWeaponOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out CharacterManager.InventoryItem weapon1InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out primaryWeaponOption))
                 {
@@ -327,7 +331,7 @@ namespace Vi.UI
             }
 
             CharacterReference.WeaponOption secondaryWeaponOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out CharacterManager.InventoryItem weapon2InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out secondaryWeaponOption))
                 {
@@ -343,7 +347,7 @@ namespace Vi.UI
             CharacterReference.WeaponOption otherSecondaryOption = secondaryWeaponOption;
             if (otherSecondaryOption == null)
             {
-                otherSecondaryOption = WebRequestManager.GetDefaultSecondaryWeapon();
+                otherSecondaryOption = CharacterManager.GetDefaultSecondaryWeapon();
             }
             primaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(primaryWeaponOption, otherSecondaryOption, LoadoutManager.WeaponSlotType.Primary, loadoutSlot); });
             primaryWeaponButton.GetComponent<Image>().sprite = primaryWeaponOption == null ? defaultSprite : primaryWeaponOption.weaponIcon;
@@ -354,7 +358,7 @@ namespace Vi.UI
             CharacterReference.WeaponOption otherPrimaryOption = primaryWeaponOption;
             if (otherPrimaryOption == null)
             {
-                otherPrimaryOption = WebRequestManager.GetDefaultPrimaryWeapon();
+                otherPrimaryOption = CharacterManager.GetDefaultPrimaryWeapon();
             }
             secondaryWeaponButton.onClick.AddListener(delegate { OpenWeaponSelect(secondaryWeaponOption, otherPrimaryOption, LoadoutManager.WeaponSlotType.Secondary, loadoutSlot); });
             secondaryWeaponButton.GetComponent<Image>().sprite = secondaryWeaponOption == null ? defaultSprite : secondaryWeaponOption.weaponIcon;
@@ -363,9 +367,9 @@ namespace Vi.UI
             List<CharacterReference.WearableEquipmentOption> armorOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(playerData.character.raceAndGender);
 
             CharacterReference.WearableEquipmentOption helmOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.helmGearItemId.ToString(), out WebRequestManager.InventoryItem helmInventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.helmGearItemId.ToString(), out CharacterManager.InventoryItem helmInventoryItem))
             {
-                helmOption = WebRequestManager.GetEquipmentOption(helmInventoryItem, playerData.character.raceAndGender);
+                helmOption = CharacterManager.GetEquipmentOption(helmInventoryItem, playerData.character.raceAndGender);
             }
             helmButton.onClick.RemoveAllListeners();
             helmButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Helm, loadoutSlot); });
@@ -373,9 +377,9 @@ namespace Vi.UI
             helmImage.sprite = helmOption == null ? defaultSprite : helmOption.GetIcon(playerData.character.raceAndGender);
 
             CharacterReference.WearableEquipmentOption chestOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.chestArmorGearItemId.ToString(), out WebRequestManager.InventoryItem chestInventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.chestArmorGearItemId.ToString(), out CharacterManager.InventoryItem chestInventoryItem))
             {
-                chestOption = WebRequestManager.GetEquipmentOption(chestInventoryItem, playerData.character.raceAndGender);
+                chestOption = CharacterManager.GetEquipmentOption(chestInventoryItem, playerData.character.raceAndGender);
             }
             chestButton.onClick.RemoveAllListeners();
             chestButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Chest, loadoutSlot); });
@@ -383,9 +387,9 @@ namespace Vi.UI
             chestImage.sprite = chestOption == null ? defaultSprite : chestOption.GetIcon(playerData.character.raceAndGender);
 
             CharacterReference.WearableEquipmentOption shouldersOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.shouldersGearItemId.ToString(), out WebRequestManager.InventoryItem shouldersInventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.shouldersGearItemId.ToString(), out CharacterManager.InventoryItem shouldersInventoryItem))
             {
-                shouldersOption = WebRequestManager.GetEquipmentOption(shouldersInventoryItem, playerData.character.raceAndGender);
+                shouldersOption = CharacterManager.GetEquipmentOption(shouldersInventoryItem, playerData.character.raceAndGender);
             }
             shouldersButton.onClick.RemoveAllListeners();
             shouldersButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Shoulders, loadoutSlot); });
@@ -393,9 +397,9 @@ namespace Vi.UI
             shouldersImage.sprite = shouldersOption == null ? defaultSprite : shouldersOption.GetIcon(playerData.character.raceAndGender);
 
             CharacterReference.WearableEquipmentOption glovesOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.glovesGearItemId.ToString(), out WebRequestManager.InventoryItem glovesInventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.glovesGearItemId.ToString(), out CharacterManager.InventoryItem glovesInventoryItem))
             {
-                glovesOption = WebRequestManager.GetEquipmentOption(glovesInventoryItem, playerData.character.raceAndGender);
+                glovesOption = CharacterManager.GetEquipmentOption(glovesInventoryItem, playerData.character.raceAndGender);
             }
             glovesButton.onClick.RemoveAllListeners();
             glovesButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Gloves, loadoutSlot); });
@@ -403,9 +407,9 @@ namespace Vi.UI
             glovesImage.sprite = glovesOption == null ? defaultSprite : glovesOption.GetIcon(playerData.character.raceAndGender);
 
             CharacterReference.WearableEquipmentOption capeOption = null;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.capeGearItemId.ToString(), out WebRequestManager.InventoryItem capeInventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.capeGearItemId.ToString(), out CharacterManager.InventoryItem capeInventoryItem))
             {
-                capeOption = WebRequestManager.GetEquipmentOption(capeInventoryItem, playerData.character.raceAndGender);
+                capeOption = CharacterManager.GetEquipmentOption(capeInventoryItem, playerData.character.raceAndGender);
             }
             capeButton.onClick.RemoveAllListeners();
             capeButton.onClick.AddListener(delegate { OpenArmorSelect(CharacterReference.EquipmentType.Cape, loadoutSlot); });

@@ -98,7 +98,7 @@ namespace Vi.UI
             videoPlayer.Prepare();
         }
 
-        private WebRequestManager.Server[] LobbyServers { get { return System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address); } }
+        private ServerManager.Server[] LobbyServers { get { return System.Array.FindAll(WebRequestManager.Singleton.ServerManager.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address); } }
 
         private const float scalingSpeed = 8;
         private const float rotationSpeed = 15;
@@ -121,13 +121,13 @@ namespace Vi.UI
             {
                 currentlyDeletingServers.RemoveAll(item => !System.Array.Exists(LobbyServers, server => server._id == item));
 
-                WebRequestManager.Server[] emptyServers = System.Array.FindAll(LobbyServers, item => item.population == 0 & !currentlyDeletingServers.Contains(item._id));
-                WebRequestManager.Server[] notEmptyServers = System.Array.FindAll(LobbyServers, item => item.population != 0 & !currentlyDeletingServers.Contains(item._id));
+                ServerManager.Server[] emptyServers = System.Array.FindAll(LobbyServers, item => item.population == 0 & !currentlyDeletingServers.Contains(item._id));
+                ServerManager.Server[] notEmptyServers = System.Array.FindAll(LobbyServers, item => item.population != 0 & !currentlyDeletingServers.Contains(item._id));
 
                 if (emptyServers.Length > emptyLobbyServersRequired)
                 {
                     Debug.Log("Deleting server with id " + emptyServers[0]._id + " prev count: " + currentLobbyCount);
-                    WebRequestManager.Singleton.DeleteServer(emptyServers[0]._id);
+                    WebRequestManager.Singleton.ServerManager.DeleteServer(emptyServers[0]._id);
                     currentlyDeletingServers.Add(emptyServers[0]._id);
                     currentLobbyCount--;
                 }
@@ -143,7 +143,7 @@ namespace Vi.UI
 
         private void CreateNewLobby()
         {
-            int originalServerCount = System.Array.FindAll(WebRequestManager.Singleton.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length;
+            int originalServerCount = System.Array.FindAll(WebRequestManager.Singleton.ServerManager.LobbyServers, item => item.ip == networkTransport.ConnectionData.Address).Length;
 
             string path = "";
             if (Application.isEditor)

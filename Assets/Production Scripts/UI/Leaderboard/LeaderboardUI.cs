@@ -71,7 +71,7 @@ namespace Vi.UI
 
             if (gameModeValues[gameModeDropdown.value] == PlayerDataManager.GameMode.HordeMode)
             {
-                foreach (WebRequestManager.HordeLeaderboardEntry hordeLeaderboardEntry in WebRequestManager.Singleton.hordeLeaderboardEntries.OrderByDescending(item => item.record.wave).ThenByDescending(item => item.record.clearTime).ThenByDescending(item => item.record.damageDealt).Take(100))
+                foreach (LeaderboardManager.HordeLeaderboardEntry hordeLeaderboardEntry in WebRequestManager.Singleton.LeaderboardManager.hordeLeaderboardEntries.OrderByDescending(item => item.record.wave).ThenByDescending(item => item.record.clearTime).ThenByDescending(item => item.record.damageDealt).Take(100))
                 {
                     if (hordeLeaderboardEntry.record.gameMode == gameModeDropdown.options[gameModeDropdown.value].text)
                     {
@@ -82,7 +82,7 @@ namespace Vi.UI
             }
             else
             {
-                foreach (WebRequestManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.killsLeaderboardEntries)
+                foreach (LeaderboardManager.KillsLeaderboardEntry killsLeaderboardEntry in WebRequestManager.Singleton.LeaderboardManager.killsLeaderboardEntries)
                 {
                     if (killsLeaderboardEntry.record.gameMode == gameModeDropdown.options[gameModeDropdown.value].text)
                     {
@@ -102,7 +102,7 @@ namespace Vi.UI
         {
             refreshButton.interactable = false;
             leaderboardRequestText.text = "LOADING LEADERBOARD";
-            yield return WebRequestManager.Singleton.GetLeaderboard();
+            yield return WebRequestManager.Singleton.LeaderboardManager.GetLeaderboard();
             leaderboardRequestText.text = "";
             refreshButton.interactable = true;
             OnGameModeChange();

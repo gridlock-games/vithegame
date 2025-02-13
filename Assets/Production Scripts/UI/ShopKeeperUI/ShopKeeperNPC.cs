@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Vi.Utility;
-using static Vi.ScriptableObjects.CharacterReference;
+using System.Linq;
 
 namespace Vi.UI
 {
@@ -29,12 +29,18 @@ namespace Vi.UI
 
         private List<ShopKeeperItem> shopKeeperItemInstances = new List<ShopKeeperItem>();
 
+        private IEnumerator RefreshViEssenceAmount()
+        {
+            currencyCountText.text = "";
+            yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId, null);
+            currencyCountText.text = WebRequestManager.Singleton.ItemShopManager.ViEssenceCount.ToString();
+        }
+
         private GameObject invoker;
         public override void Interact(GameObject invoker)
         {
             this.invoker = invoker;
             invoker.GetComponent<ActionMapHandler>().SetExternalUI(this);
-            currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
             UICanvas.gameObject.SetActive(true);
             purchaseErrorText.text = "";
 
@@ -42,7 +48,7 @@ namespace Vi.UI
             foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
             {
                 // If this weapon option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
+                bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
 
@@ -53,7 +59,7 @@ namespace Vi.UI
                     | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
 
                 // If this armor option is in our inventory, make it inactive in the UI
-                bool isInInventory = WebRequestManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
+                bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
                 shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId).gameObject.SetActive(!isInInventory);
             }
         }
@@ -80,18 +86,26 @@ namespace Vi.UI
 
         public IEnumerator PurchaseCart()
         {
+            List<ItemShopManager.PurchaseItem> purchaseItems = new List<ItemShopManager.PurchaseItem>();
             foreach (ShopKeeperItem item in cartContents.ToArray())
             {
-                Purchase(item.ItemId, item.Price);
-                yield return new WaitUntil(() => !item.gameObject.activeInHierarchy);
+                purchaseItems.Add(new ItemShopManager.PurchaseItem(item.ItemId, 1, item.Price));
             }
+            Purchase(purchaseItems.ToArray());
+            yield return null;
         }
 
-        private void Purchase(string itemId, int price)
+        private void Purchase(ItemShopManager.PurchaseItem[] purchaseItems)
         {
             if (!IsClient) { Debug.LogError("Calling Purchase() while not being a client!"); return; }
 
-            if (FasterPlayerPrefs.Singleton.GetInt("Tokens") < price)
+            int totalCost = 0;
+            foreach (var purchaseItem in purchaseItems)
+            {
+                totalCost += purchaseItem.cost;
+            }
+
+            if (WebRequestManager.Singleton.ItemShopManager.ViEssenceCount < totalCost)
             {
                 purchaseErrorText.text = "Not Enough Vi Essence!";
                 AudioManager.Singleton.Play2DClip(gameObject, purchaseUnsuccessfulSounds[Random.Range(0, purchaseUnsuccessfulSounds.Length)], 0.3f);
@@ -100,86 +114,114 @@ namespace Vi.UI
 
             waitingForPurchase = true;
             purchaseErrorText.text = "Approving Purchase...";
-            PurchaseServerRpc(NetworkManager.LocalClientId, PlayerDataManager.Singleton.LocalPlayerData.character._id.ToString(), itemId, price);
+            PurchaseServerRpc(NetworkManager.LocalClientId, purchaseItems);
         }
 
         [Rpc(SendTo.Server)]
-        private void PurchaseServerRpc(ulong purchaserClientId, string characterId, string itemId, int price)
+        private void PurchaseServerRpc(ulong purchaserClientId, ItemShopManager.PurchaseItem[] purchaseItems)
         {
-            StartCoroutine(PurchaseOnServer(purchaserClientId, characterId, itemId, price));
+            StartCoroutine(PurchaseOnServer(purchaserClientId, purchaseItems));
         }
 
-        private IEnumerator PurchaseOnServer(ulong purchaserClientId, string characterId, string itemId, int price)
+        private IEnumerator PurchaseOnServer(ulong purchaserClientId, ItemShopManager.PurchaseItem[] itemsToPurchase)
         {
-            if (!PlayerDataManager.Singleton.ContainsId((int)purchaserClientId)) { yield break; }
+            //if (!PlayerDataManager.Singleton.ContainsId((int)purchaserClientId)) { yield break; }
 
-            var allOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character.raceAndGender);
-            foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in allOptions)
+            string characterId = "";
+            string userId = "";
+            if (PlayerDataManager.Singleton.ContainsId((int)purchaserClientId))
             {
-                if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Chest)
+                CharacterManager.Character character = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character;
+                characterId = character._id.ToString();
+                userId = character.userId.ToString();
+            }
+            else
+            {
+                PurchaseClientRpc(purchaserClientId, false, itemsToPurchase, 0);
+                yield break;
+            }
+
+            int viEssenceCount = 0;
+            yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(userId, (count) => viEssenceCount = count);
+
+            List<ItemShopManager.PurchaseItem> purchaseItems = itemsToPurchase.ToList();
+
+            List<CharacterReference.WearableEquipmentOption> allOptions = PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character.raceAndGender);
+            foreach (ItemShopManager.PurchaseItem purchaseItem in itemsToPurchase)
+            {
+                foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in allOptions)
                 {
-                    if (itemId == wearableEquipmentOption.itemWebId)
+                    if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Chest)
                     {
-                        var pants = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Pants);
-                        if (pants != null)
+                        if (purchaseItem.itemId == wearableEquipmentOption.itemWebId)
                         {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, pants.itemWebId);
-                        }
-                        bool setSuccess = WebRequestManager.Singleton.InventoryAddWasSuccessful;
+                            CharacterReference.WearableEquipmentOption pants = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Pants);
+                            if (pants != null)
+                            {
+                                purchaseItems.Add(new ItemShopManager.PurchaseItem(pants.itemWebId, 1, 0));
+                            }
 
-                        var boots = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Boots);
-                        if (boots != null)
-                        {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, boots.itemWebId);
-                        }
-                        setSuccess &= WebRequestManager.Singleton.InventoryAddWasSuccessful;
+                            CharacterReference.WearableEquipmentOption boots = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Boots);
+                            if (boots != null)
+                            {
+                                purchaseItems.Add(new ItemShopManager.PurchaseItem(boots.itemWebId, 1, 0));
+                            }
 
-                        var belt = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Belt);
-                        if (belt != null)
-                        {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, belt.itemWebId);
+                            CharacterReference.WearableEquipmentOption belt = allOptions.Find(item => item.groupName == wearableEquipmentOption.groupName & item.equipmentType == CharacterReference.EquipmentType.Belt);
+                            if (belt != null)
+                            {
+                                purchaseItems.Add(new ItemShopManager.PurchaseItem(belt.itemWebId, 1, 0));
+                            }
                         }
-                        setSuccess &= WebRequestManager.Singleton.InventoryAddWasSuccessful;
-
-                        if (setSuccess)
-                        {
-                            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
-                            setSuccess = WebRequestManager.Singleton.InventoryAddWasSuccessful;
-                            if (setSuccess) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
-                        }
-
-                        PurchaseClientRpc(purchaserClientId, setSuccess, characterId, itemId, price);
-                        yield break;
                     }
                 }
             }
 
-            yield return WebRequestManager.Singleton.AddItemToInventory(characterId, itemId);
-            bool success = WebRequestManager.Singleton.InventoryAddWasSuccessful;
-            if (success) { yield return WebRequestManager.Singleton.GetCharacterInventory(characterId); }
-            PurchaseClientRpc(purchaserClientId, success, characterId, itemId, price);
+            bool success = true;
+            yield return WebRequestManager.Singleton.ItemShopManager.PurchaseItems(characterId, purchaseItems, (result) => success = result);
+
+            if (success)
+            {
+                yield return WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId);
+                yield return WebRequestManager.Singleton.ItemShopManager.GetViEssenceOfUser(userId, (count) => viEssenceCount = count);
+            }
+            
+            PurchaseClientRpc(purchaserClientId, success, itemsToPurchase, viEssenceCount);
         }
 
         [Rpc(SendTo.ClientsAndHost)]
-        private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, string characterId, string itemId, int price)
+        private void PurchaseClientRpc(ulong purchaserClientId, bool purchaseSuccessful, ItemShopManager.PurchaseItem[] purchaseItems, int newViEssenceAmount)
         {
+            string characterId;
+            if (PlayerDataManager.Singleton.ContainsId((int)purchaserClientId))
+            {
+                characterId = PlayerDataManager.Singleton.GetPlayerData((int)purchaserClientId).character._id.ToString();
+            }
+            else
+            {
+                waitingForPurchase = false;
+                return;
+            }
+
             if (purchaseSuccessful)
             {
-                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.GetCharacterInventory(characterId));
+                PersistentLocalObjects.Singleton.StartCoroutine(WebRequestManager.Singleton.CharacterManager.GetCharacterInventory(characterId));
             }
 
             if (purchaserClientId == NetworkManager.LocalClientId)
             {
-                var instance = shopKeeperItemInstances.Find(item => item.ItemId == itemId);
-                RemoveFromCart(instance);
-                instance.gameObject.SetActive(false);
-                waitingForPurchase = false;
+                currencyCountText.text = newViEssenceAmount.ToString();
+
+                foreach (ItemShopManager.PurchaseItem purchaseItem in purchaseItems)
+                {
+                    ShopKeeperItem instance = shopKeeperItemInstances.Find(item => item.ItemId == purchaseItem.itemId);
+                    RemoveFromCart(instance);
+                    instance.gameObject.SetActive(false);
+                }
+
                 if (purchaseSuccessful)
                 {
                     purchaseErrorText.text = "Purchase successful!";
-                    FasterPlayerPrefs.Singleton.SetInt("Tokens", FasterPlayerPrefs.Singleton.GetInt("Tokens") - price);
-                    currencyCountText.text = FasterPlayerPrefs.Singleton.GetInt("Tokens").ToString();
-
                     AudioManager.Singleton.Play2DClip(gameObject, purchaseSuccessfulSounds[Random.Range(0, purchaseSuccessfulSounds.Length)], 0.3f);
                 }
                 else
@@ -188,6 +230,8 @@ namespace Vi.UI
                     AudioManager.Singleton.Play2DClip(gameObject, purchaseUnsuccessfulSounds[Random.Range(0, purchaseUnsuccessfulSounds.Length)], 0.3f);
                 }
             }
+
+            waitingForPurchase = false;
         }
 
         public void OnPause()
@@ -239,6 +283,8 @@ namespace Vi.UI
             base.OnNetworkSpawn();
             if (IsClient)
             {
+                StartCoroutine(RefreshViEssenceAmount());
+
                 foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
                 {
                     ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
@@ -323,7 +369,7 @@ namespace Vi.UI
             }
 
             buyButton.interactable = !waitingForPurchase
-                & FasterPlayerPrefs.Singleton.GetInt("Tokens") >= cartPriceSum
+                & WebRequestManager.Singleton.ItemShopManager.ViEssenceCount >= cartPriceSum
                 & cartContents.Count > 0;
 
             cartCostText.text = cartPriceSum.ToString();

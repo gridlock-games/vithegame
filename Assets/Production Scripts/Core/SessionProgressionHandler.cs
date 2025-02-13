@@ -57,7 +57,8 @@ namespace Vi.Core
             {
                 combatAgent.AddHP(MaxHPBonus);
                 combatAgent.AddStamina(MaxStaminaBonus);
-                combatAgent.AddArmor(MaxArmorBonus);
+                combatAgent.AddPhysicalArmor(MaxArmorBonus);
+                combatAgent.AddMagicalArmor(MaxArmorBonus);
             }
         }
 
@@ -155,7 +156,7 @@ namespace Vi.Core
                         RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.staminaRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
                     case "Armor Regeneration":
-                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.armorRegeneration, 0.1f, true, buffDuration, 0, false));
+                        RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.physicalArmorRegeneration, 0.1f, true, buffDuration, 0, false));
                         break;
                     case "Ability Cooldown Reduction":
                         RegisterEssenceBuffStatus(new ActionClip.StatusPayload(ActionClip.Status.abilityCooldownDecrease, 0.2f, true, buffDuration, 0, false));

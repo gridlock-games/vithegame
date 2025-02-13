@@ -17,6 +17,7 @@ using Vi.ScriptableObjects;
 using Vi.Utility;
 using UnityEngine.U2D;
 using UnityEditor.U2D;
+using UnityEngine.UIElements;
 
 namespace Vi.Editor
 {
@@ -107,6 +108,22 @@ namespace Vi.Editor
             }
             return actionClips;
         }
+
+        [MenuItem("Tools/Mass Edit Action Clips")]
+        private static void MassEditActionClips()
+        {
+            foreach (ActionClip actionClip in GetActionClips())
+            {
+                if (AssetDatabase.GetAssetPath(actionClip).Contains("Staff"))
+                {
+                    actionClip.magicalDamage = actionClip.damage;
+                    actionClip.damage = 0;
+                    EditorUtility.SetDirty(actionClip);
+                }
+            }
+            AssetDatabase.SaveAssets();
+        }
+
         #endregion
 
         #region
@@ -288,8 +305,16 @@ namespace Vi.Editor
                     importer.defaultTargetSettings = defaultSettings;
                     shouldReimport = true;
                 }
-                
-                if (importer.GetTargetSettings("Android").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+
+                VideoImporterTargetSettings existingAndroidSettings = importer.GetTargetSettings("Android");
+                if (existingAndroidSettings == null)
+                {
+                    VideoImporterTargetSettings androidSettings = defaultSettings;
+                    androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("Android", androidSettings);
+                    shouldReimport = true;
+                }
+                else if (existingAndroidSettings.spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
                 {
                     VideoImporterTargetSettings androidSettings = defaultSettings;
                     androidSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
@@ -297,7 +322,15 @@ namespace Vi.Editor
                     shouldReimport = true;
                 }
 
-                if (importer.GetTargetSettings("iPhone").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
+                VideoImporterTargetSettings existingIPhoneSettings = importer.GetTargetSettings("iPhone");
+                if (existingIPhoneSettings == null)
+                {
+                    VideoImporterTargetSettings iPhoneSettings = defaultSettings;
+                    iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
+                    importer.SetTargetSettings("iPhone", iPhoneSettings);
+                    shouldReimport = true;
+                }
+                else if (importer.GetTargetSettings("iPhone").spatialQuality != VideoSpatialQuality.MediumSpatialQuality)
                 {
                     VideoImporterTargetSettings iPhoneSettings = defaultSettings;
                     iPhoneSettings.spatialQuality = VideoSpatialQuality.MediumSpatialQuality;
@@ -318,6 +351,23 @@ namespace Vi.Editor
         [MenuItem("Tools/Production/Set Texture Import Overrides")]
         static void SetTextureImportOverrides()
         {
+            List<Sprite> allSpritesInAtlases = new List<Sprite>();
+
+            // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
+            string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
+            List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
+            foreach (string spriteAtlasGuid in spriteAtlasPaths)
+            {
+                SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
+                spriteAtlases.Add(spriteAtlas);
+
+                Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
+                for (int j = 0; j < spriteAtlas.GetSprites(sprites); j++)
+                {
+                    allSpritesInAtlases.Add(sprites[j]);
+                }
+            }
+
             string[] textures = AssetDatabase.FindAssets("t:Texture");//, new string[] { @"Assets\Production\Images\Map Icons\Mobile version Screenshots" });
             for (int i = 0; i < textures.Length; i++)
             {
@@ -333,30 +383,13 @@ namespace Vi.Editor
                 bool textureIsInSpriteAtlas = false;
                 if (sprite)
                 {
-                    List<Sprite> allSpritesInAtlases = new List<Sprite>();
-
-                    // Skip textures that are in a sprite atlas, you want to set overrides direclty  on the astlas
-                    string[] spriteAtlasPaths = AssetDatabase.FindAssets("t:SpriteAtlas");
-                    List<SpriteAtlas> spriteAtlases = new List<SpriteAtlas>();
-                    foreach (string spriteAtlasGuid in spriteAtlasPaths)
-                    {
-                        SpriteAtlas spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(AssetDatabase.GUIDToAssetPath(spriteAtlasGuid));
-                        spriteAtlases.Add(spriteAtlas);
-
-                        Sprite[] sprites = new Sprite[spriteAtlas.spriteCount];
-                        for (int j = 0; j < spriteAtlas.GetSprites(sprites); j++)
-                        {
-                            allSpritesInAtlases.Add(sprites[j]);
-                        }
-                    }
-
                     if (allSpritesInAtlases.Exists(item => item.name.Replace("(Clone)", "") == sprite.name))
                     {
                         textureIsInSpriteAtlas = true;
                     }
                 }
 
-                EditorUtility.UnloadUnusedAssetsImmediate();
+                //EditorUtility.UnloadUnusedAssetsImmediate();
 
                 if (AssetImporter.GetAtPath(assetPath) is TextureImporter importer)
                 {
@@ -1163,6 +1196,29 @@ namespace Vi.Editor
             {
                 counter++;
                 AssetDatabase.CreateAsset(slice.GetComponent<MeshFilter>().sharedMesh, Path.Join(AssetDatabase.GUIDToAssetPath(resultFolderGUID), slice.name + "_" + counter.ToString() + ".asset"));
+            }
+        }
+        
+        public class TextInputWindow : EditorWindow
+        {
+            [MenuItem("Tools/Find Asset Path From GUID")]
+            static void Init()
+            {
+                TextInputWindow window = ScriptableObject.CreateInstance<TextInputWindow>();
+                window.position = new Rect(Screen.width / 2, Screen.height / 2, 250, 150);
+                window.ShowPopup();
+            }
+
+            static string inputGuid;
+
+            void OnGUI()
+            {
+                inputGuid = EditorGUILayout.TextField(inputGuid);
+                if (GUILayout.Button("Find"))
+                {
+                    Debug.Log(AssetDatabase.GUIDToAssetPath(inputGuid));
+                    Close();
+                }
             }
         }
     }

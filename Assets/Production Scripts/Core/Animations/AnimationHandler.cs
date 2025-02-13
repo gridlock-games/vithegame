@@ -1712,7 +1712,7 @@ namespace Vi.Core
         }
 
         AnimatorReference animatorReference;
-        private IEnumerator ChangeCharacterCoroutine(WebRequestManager.Character character)
+        private IEnumerator ChangeCharacterCoroutine(CharacterManager.Character character)
         {
             bool shouldCreateNewSkin = true;
             animatorReference = GetComponentInChildren<AnimatorReference>();
@@ -1813,7 +1813,7 @@ namespace Vi.Core
             WaitingForActionClipToPlay = false;
         }
 
-        public void ChangeCharacter(WebRequestManager.Character character)
+        public void ChangeCharacter(CharacterManager.Character character)
         {
             if (IsSpawned) { Debug.LogError("Calling change character after object is spawned!"); return; }
             StartCoroutine(ChangeCharacterCoroutine(character));

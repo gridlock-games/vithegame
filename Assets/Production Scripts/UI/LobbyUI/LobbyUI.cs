@@ -224,9 +224,9 @@ namespace Vi.UI
 
             // Randomly return to hub if possible
             float rand = Random.Range(0f, 1);
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
-                if (WebRequestManager.Singleton.HubServers[0].port == "7777")
+                if (WebRequestManager.Singleton.ServerManager.HubServers[0].port == "7777")
                 {
                     if (rand < 0.1f)
                     {
@@ -295,10 +295,10 @@ namespace Vi.UI
                 Destroy(child.gameObject);
             }
 
-            foreach (string mapName in PlayerDataManager.Singleton.GetGameModeInfo().possibleMapSceneGroupNames)
+            foreach (PlayerDataManager.MapOption mapOption in PlayerDataManager.Singleton.GetGameModeInfo().mapOptions)
             {
                 MapOption option = Instantiate(mapOptionPrefab.gameObject, mapOptionParent).GetComponent<MapOption>();
-                StartCoroutine(option.Initialize(mapName, NetSceneManager.Singleton.GetSceneGroupIcon(mapName, 0)));
+                StartCoroutine(option.Initialize(mapOption.mapSceneGroupName, NetSceneManager.Singleton.GetSceneGroupIcon(mapOption.mapSceneGroupName, 0)));
             }
         }
 
@@ -591,10 +591,10 @@ namespace Vi.UI
                 yield return new WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            if (WebRequestManager.Singleton.HubServers.Length > 0)
+            if (WebRequestManager.Singleton.ServerManager.HubServers.Length > 0)
             {
                 yield return new WaitUntil(() => !NetSceneManager.IsBusyLoadingScenes());
-                networkTransport.SetConnectionData(WebRequestManager.Singleton.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
+                networkTransport.SetConnectionData(WebRequestManager.Singleton.ServerManager.HubServers[0].ip, ushort.Parse(WebRequestManager.Singleton.ServerManager.HubServers[0].port), FasterPlayerPrefs.serverListenAddress);
                 NetworkManager.Singleton.StartClient();
             }
         }
@@ -869,7 +869,7 @@ namespace Vi.UI
         {
             if (!PlayerDataManager.Singleton.ContainsId((int)NetworkManager.LocalClientId)) { Debug.LogError("Calling create character preview before the local client is in the data list!"); return; }
 
-            WebRequestManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
+            CharacterManager.Character character = PlayerDataManager.Singleton.LocalPlayerData.character;
 
             if (previewObject)
             {
@@ -1045,10 +1045,10 @@ namespace Vi.UI
                 PlayerDataManager.Singleton.SetPlayerData(playerData);
             }
 
-            WebRequestManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
+            CharacterManager.Loadout loadout = playerData.character.GetLoadoutFromSlot(loadoutSlotIndex);
 
             CharacterReference.WeaponOption primaryOption;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out WebRequestManager.InventoryItem weapon1InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon1ItemId.ToString(), out CharacterManager.InventoryItem weapon1InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon1InventoryItem.itemId._id, out primaryOption))
                 {
@@ -1062,7 +1062,7 @@ namespace Vi.UI
             }
 
             CharacterReference.WeaponOption secondaryOption;
-            if (WebRequestManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out WebRequestManager.InventoryItem weapon2InventoryItem))
+            if (CharacterManager.TryGetInventoryItem(playerData.character._id.ToString(), loadout.weapon2ItemId.ToString(), out CharacterManager.InventoryItem weapon2InventoryItem))
             {
                 if (!weaponOptions.TryGetValue(weapon2InventoryItem.itemId._id, out secondaryOption))
                 {
@@ -1075,8 +1075,8 @@ namespace Vi.UI
                 secondaryOption = null;
             }
 
-            if (primaryOption == null) { primaryOption = WebRequestManager.GetDefaultPrimaryWeapon(); }
-            if (secondaryOption == null) { secondaryOption = WebRequestManager.GetDefaultSecondaryWeapon(); }
+            if (primaryOption == null) { primaryOption = CharacterManager.GetDefaultPrimaryWeapon(); }
+            if (secondaryOption == null) { secondaryOption = CharacterManager.GetDefaultSecondaryWeapon(); }
 
             if (primaryOption != null)
             {
