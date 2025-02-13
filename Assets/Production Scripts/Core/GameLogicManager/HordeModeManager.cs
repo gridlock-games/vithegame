@@ -109,7 +109,7 @@ namespace Vi.Core.GameModeManagers
                             roundTimer.Value, GetWavesCompleted(),
                             localPlayerScore.cumulativeDamageDealt));
 
-                        ViEssenceEarnedFromMatch = GetWavesCompleted() * 2;
+                        ViEssenceEarnedFromMatch += GetWavesCompleted() * 2;
                     }
                 }
             }
