@@ -647,7 +647,6 @@ namespace Vi.Core
             CharacterLoadoutPutPayload payload = new CharacterLoadoutPutPayload(characterId, newLoadout);
 
             string json = JsonConvert.SerializeObject(payload);
-            Debug.Log(json);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest putRequest = UnityWebRequest.Put(WebRequestManager.Singleton.GetAPIURL(false) + "characters/" + "saveLoadOut", jsonData);
