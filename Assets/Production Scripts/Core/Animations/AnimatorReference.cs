@@ -510,6 +510,8 @@ namespace Vi.Core
         private IEnumerator TurnRenderersBackOn()
         {
             yield return null;
+            if (combatAgent) { yield return new WaitUntil(() => combatAgent.WeaponHandler.WeaponInitialized); }
+
             foreach (Renderer r in Renderers)
             {
                 r.forceRenderingOff = false;

@@ -1766,6 +1766,7 @@ namespace Vi.Core
             ApplyCharacterMaterial(characterMaterialOptions.Find(item => item.material.name == character.eyeColor));
 
             yield return null;
+            yield return new WaitUntil(() => combatAgent.WeaponHandler.WeaponInitialized);
 
             // Apply equipment
             List<CharacterReference.WearableEquipmentOption> equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(character.raceAndGender);
