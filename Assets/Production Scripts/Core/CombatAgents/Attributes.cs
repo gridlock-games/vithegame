@@ -254,7 +254,7 @@ namespace Vi.Core.CombatAgents
                     case LoadoutManager.WeaponSlotType.Primary:
                         return characterStats.attack + characterStats.weaponABaseAtk;
                     case LoadoutManager.WeaponSlotType.Secondary:
-                        return characterStats.attack + characterStats.weaponABaseAtk;
+                        return characterStats.attack + characterStats.weaponBBaseAtk;
                     default:
                         Debug.LogWarning("Unsure how to handle weapon slot type " + LoadoutManager.GetEquippedSlotType());
                         break;
@@ -276,7 +276,7 @@ namespace Vi.Core.CombatAgents
                     case LoadoutManager.WeaponSlotType.Primary:
                         return characterStats.mattack + characterStats.weaponABaseAtk;
                     case LoadoutManager.WeaponSlotType.Secondary:
-                        return characterStats.mattack + characterStats.weaponABaseAtk;
+                        return characterStats.mattack + characterStats.weaponBBaseAtk;
                     default:
                         Debug.LogWarning("Unsure how to handle weapon slot type " + LoadoutManager.GetEquippedSlotType());
                         break;

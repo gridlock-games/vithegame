@@ -1601,14 +1601,35 @@ namespace Vi.Core
             bool isBlocking = false;
             ActionClip hitReaction = WeaponHandler.GetWeapon().GetHitReaction(attack, attackAngle, isBlocking, attackAilment, ailment.Value, applyAilmentRegardless);
 
-            float physicalHPDamage = -(attacker.GetPhysicalAttack() + attack.damage + attacker.SessionProgressionHandler.BaseDamageBonus);
+            float physicalHPDamage = -attack.damage;
+            float magicalHPDamage = -attack.magicalDamage;
+
+            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
+            {
+                physicalHPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                magicalHPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
+                if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
+                {
+                    physicalHPDamage *= attack.enhancedChargeDamageMultiplier;
+                    magicalHPDamage *= attack.enhancedChargeDamageMultiplier;
+                }
+            }
+
+            if (IsRaging)
+            {
+                physicalHPDamage *= rageDamageMultiplier;
+                magicalHPDamage *= rageDamageMultiplier;
+            }
+
             physicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             physicalHPDamage *= damageMultiplier;
 
-            float magicalHPDamage = -(attacker.GetMagicalAttack() + attack.magicalDamage + attacker.SessionProgressionHandler.BaseDamageBonus);
             magicalHPDamage *= attacker.StatusAgent.DamageMultiplier;
             magicalHPDamage *= damageMultiplier;
 
+            physicalHPDamage += -(attacker.GetPhysicalAttack() + attacker.SessionProgressionHandler.BaseDamageBonus);
+            magicalHPDamage += -(attacker.GetMagicalAttack() + attacker.SessionProgressionHandler.BaseDamageBonus);
+            
             float HPDamage = physicalHPDamage + magicalHPDamage;
             float originalPhysicalArmor = GetPhysicalArmor();
             float originalMagicalArmor = GetMagicalArmor();
@@ -1678,17 +1699,6 @@ namespace Vi.Core
             {
                 shouldPlayHitReaction = attack.shouldPlayHitReaction;
             }
-
-            if (attack.GetClipType() == ActionClip.ClipType.HeavyAttack)
-            {
-                HPDamage *= attacker.AnimationHandler.HeavyAttackChargeTime * attack.chargeTimeDamageMultiplier;
-                if (attack.canEnhance & attacker.AnimationHandler.HeavyAttackChargeTime > ActionClip.enhanceChargeTime)
-                {
-                    HPDamage *= attack.enhancedChargeDamageMultiplier;
-                }
-            }
-
-            if (IsRaging) { HPDamage *= rageDamageMultiplier; }
 
             bool hitReactionWasPlayed = false;
             if (GetAilment() == ActionClip.Ailment.Incapacitated)

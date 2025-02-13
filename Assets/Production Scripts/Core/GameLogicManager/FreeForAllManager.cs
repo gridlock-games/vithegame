@@ -186,8 +186,15 @@ namespace Vi.Core.GameModeManagers
             Dictionary<int, float> hpDict = new Dictionary<int, float>();
             foreach (PlayerScore score in scoreList)
             {
-                Attributes obj = PlayerDataManager.Singleton.GetPlayerObjectById(score.id);
-                hpDict.Add(score.id, obj ? obj.GetHP() : -1);
+                if (PlayerDataManager.Singleton.IdHasLocalPlayer(score.id))
+                {
+                    Attributes obj = PlayerDataManager.Singleton.GetPlayerObjectById(score.id);
+                    hpDict.Add(score.id, obj ? obj.GetHP() : -1);
+                }
+                else
+                {
+                    hpDict.Add(score.id, -1);
+                }
             }
 
             scoreList = scoreList.OrderByDescending(item => item.killsThisRound).ThenByDescending(item => hpDict[item.id]).ToList();
