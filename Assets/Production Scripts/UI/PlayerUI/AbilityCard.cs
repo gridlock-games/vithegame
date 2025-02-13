@@ -99,7 +99,9 @@ namespace Vi.UI
             {
                 combatAgent.SessionProgressionHandler.OnAbilityUpgrade += OnAbilityUpgrade;
             }
+
             viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.color = StringUtility.SetColorAlpha(upgradeIcon.color, 0);
             upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
@@ -146,6 +148,7 @@ namespace Vi.UI
             stackText.enabled = stackIsVisible;
 
             viLogoUpgradeIcon.color = originalAnimColor;
+            upgradeIcon.color = StringUtility.SetColorAlpha(upgradeIcon.color, 0);
             upgradeIcon.rectTransform.position = upgradeIconInactivePosition.position;
         }
 
@@ -198,6 +201,8 @@ namespace Vi.UI
                 Time.deltaTime * 4);
 
             upgradeIcon.raycastTarget = canUpgrade;
+
+            upgradeIcon.color = StringUtility.SetColorAlpha(upgradeIcon.color, Mathf.Lerp(upgradeIcon.color.a, canUpgrade ? 1 : 0, Time.deltaTime * 4));
 
             if (GameModeManager.Singleton.LevelingEnabled)
             {
@@ -272,11 +277,14 @@ namespace Vi.UI
             AudioManager.Singleton.Play2DClip(combatAgent.gameObject, abilityUpgradeSoundEffects[Random.Range(0, abilityUpgradeSoundEffects.Length)], 0.5f);
         }
 
+        private bool upgradeAbilityAnimationRunning;
         private Coroutine upgradeAbilityAnimationCoroutine;
         private static readonly Color originalAnimColor = new Color(1, 197 / 255f, 61 / 255f, 0);
         private static readonly Color visibleAnimColor = new Color(1, 197 / 255f, 61 / 255f, 1);
         private IEnumerator UpgradeAbilityAnimation()
         {
+            upgradeAbilityAnimationRunning = true;
+
             viLogoUpgradeIcon.color = originalAnimColor;
 
             float lerpProgress = 0;
@@ -298,6 +306,8 @@ namespace Vi.UI
 
                 if (viLogoUpgradeIcon.color == originalAnimColor) { break; }
             }
+
+            upgradeAbilityAnimationRunning = false;
         }
 
         [SerializeField] private AudioClip[] abilityUpgradeSoundEffects;
