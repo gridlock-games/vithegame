@@ -18,7 +18,7 @@ namespace Vi.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in GetRequestTemplate() " + getRequest.error);
+                Debug.LogError("Get Request Error in GetViEssenceOfUser() " + getRequest.error);
                 getRequest.Dispose();
                 ViEssenceCount = 0;
                 if (setMyInt != null) { setMyInt(0); }
@@ -37,34 +37,6 @@ namespace Vi.Core
             }
 
             getRequest.Dispose();
-        }
-
-        public List<ShopItem> ShopItems {  get; private set; } = new List<ShopItem>();
-
-        public IEnumerator GetShopItems()
-        {
-            UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "items/getShopItems");
-            yield return getRequest.SendWebRequest();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Get Request Error in GetShopItems() " + getRequest.error);
-                getRequest.Dispose();
-                yield break;
-            }
-
-            ShopItems = JsonConvert.DeserializeObject<List<ShopItem>>(getRequest.downloadHandler.text);
-            getRequest.Dispose();
-        }
-
-        public struct ShopItem
-        {
-            public string _id;
-            public string itemId;
-            public int cost;
-            public int qty;
-            public bool enabled;
-            public int __v;
         }
 
         public IEnumerator PurchaseItems(string charId, List<PurchaseItem> itemsToPurchase, System.Action<bool> purchaseSuccessfulCallback)
@@ -140,11 +112,43 @@ namespace Vi.Core
             }
         }
 
+        public List<ShopItem> ShopItems { get; private set; } = new List<ShopItem>();
+
+        public IEnumerator GetShopItems()
+        {
+            UnityWebRequest getRequest = UnityWebRequest.Get(WebRequestManager.Singleton.GetAPIURL(false) + "items/getShopItems");
+            yield return getRequest.SendWebRequest();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Get Request Error in GetShopItems() " + getRequest.error);
+                getRequest.Dispose();
+                yield break;
+            }
+
+            ShopItems = JsonConvert.DeserializeObject<List<ShopItem>>(getRequest.downloadHandler.text);
+            ShopItems = ShopItems.FindAll(item => item.enabled);
+            getRequest.Dispose();
+        }
+
+        public struct ShopItem
+        {
+            public string _id;
+            public string itemId;
+            public int cost;
+            public int qty;
+            public bool enabled;
+            public int __v;
+        }
+
+#if UNITY_EDITOR
         public IEnumerator InsertItemToStore(string itemId, int cost, int quantity, bool enabled)
         {
             InsertItemToStorePostPayload payload = new InsertItemToStorePostPayload(itemId, cost, quantity, enabled);
 
             string json = JsonConvert.SerializeObject(payload);
+            json = "[" + json + "]";
+            Debug.Log(json);
             byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
 
             UnityWebRequest postRequest = new UnityWebRequest(WebRequestManager.Singleton.GetAPIURL(false) + "items/insertToStore", UnityWebRequest.kHttpVerbPOST, new DownloadHandlerBuffer(), new UploadHandlerRaw(jsonData));
@@ -163,7 +167,11 @@ namespace Vi.Core
             {
                 Debug.LogError("Post request error in InsertItemToStore()" + postRequest.error);
             }
-            
+            else if (bool.TryParse(postRequest.downloadHandler.text, out bool insertSuccess))
+            {
+                Debug.Log("Insert Success: " + insertSuccess);
+            }
+
             postRequest.Dispose();
         }
 
@@ -182,5 +190,6 @@ namespace Vi.Core
                 this.enabled = enabled;
             }
         }
+#endif
     }
 }

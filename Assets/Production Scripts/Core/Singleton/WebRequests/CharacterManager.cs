@@ -109,22 +109,22 @@ namespace Vi.Core
 
             // This adds all weapons to the inventory if we're in the editor
 #if UNITY_EDITOR
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            foreach (Character character in Characters)
-            {
-                foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
-                {
-                    if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
-                    {
-                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-                    }
-                }
-            }
+            //CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            //foreach (Character character in Characters)
+            //{
+            //    foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
+            //    {
+            //        if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
+            //        {
+            //            yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+            //        }
+            //    }
+            //}
 
-            foreach (Character character in Characters)
-            {
-                yield return GetCharacterInventory(character);
-            }
+            //foreach (Character character in Characters)
+            //{
+            //    yield return GetCharacterInventory(character);
+            //}
 #endif
 
             IsRefreshingCharacters = false;
@@ -786,10 +786,10 @@ namespace Vi.Core
             switch (raceAndGender)
             {
                 case CharacterReference.RaceAndGender.HumanMale:
-                    return new Character("", "Human_Male", "", 0,
+                    return new Character("", WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId, "Human_Male", "", 0,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
-                        "null", "null", "null", 1,
+                        "null", "null", "null",
                         new CharacterAttributes(1, 1, 1, 1, 1),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -797,12 +797,12 @@ namespace Vi.Core
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         CharacterReference.RaceAndGender.HumanMale);
                 case CharacterReference.RaceAndGender.HumanFemale:
-                    return new Character("", "Human_Female", "", 0,
+                    return new Character("", WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId, "Human_Female", "", 0,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).material.name,
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).material.name,
                         "null",
                         PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender).First(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Brows).material.name,
-                        "null", 1,
+                        "null",
                         new CharacterAttributes(1, 1, 1, 1, 1),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
                         GetDefaultDisplayLoadout(CharacterReference.RaceAndGender.HumanMale),
@@ -829,7 +829,7 @@ namespace Vi.Core
             var characterMaterialOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterMaterialOptions(raceAndGender);
             var equipmentOptions = PlayerDataManager.Singleton.GetCharacterReference().GetCharacterEquipmentOptions(raceAndGender);
 
-            return new Character("", model.model.name,
+            return new Character("", WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId, model.model.name,
                 "Name", 0,
                 characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Body).Random().material.name,
                 characterMaterialOptions.FindAll(item => item.materialApplicationLocation == CharacterReference.MaterialApplicationLocation.Eyes).Random().material.name,
@@ -843,7 +843,6 @@ namespace Vi.Core
                     : equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Brows).Random().GetModel(raceAndGender, null).name,
 
                 equipmentOptions.FindAll(item => item.equipmentType == CharacterReference.EquipmentType.Hair).Random().GetModel(raceAndGender, null).name,
-                1,
                 new CharacterAttributes(1, 1, 1, 1, 1),
                 GetRandomizedLoadout(raceAndGender, useDefaultPrimaryWeapon),
                 GetRandomizedLoadout(raceAndGender),
@@ -959,7 +958,7 @@ namespace Vi.Core
                 loadOuts = new List<LoadoutJson>(),
                 userId = character.userId.ToString(),
                 slot = character.slot,
-                level = character.level,
+                //level = character.level,
                 experience = character.experience,
                 race = race,
                 gender = gender
@@ -969,6 +968,7 @@ namespace Vi.Core
         public struct Character : INetworkSerializable
         {
             public FixedString64Bytes _id;
+            public FixedString64Bytes userId;
             public FixedString64Bytes name;
             public FixedString64Bytes model;
             public FixedString64Bytes bodyColor;
@@ -981,13 +981,11 @@ namespace Vi.Core
             public Loadout loadoutPreset2;
             public Loadout loadoutPreset3;
             public Loadout loadoutPreset4;
-            public FixedString64Bytes userId;
             public int slot;
-            public int level;
             public int experience;
             public CharacterReference.RaceAndGender raceAndGender;
 
-            public Character(string _id, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair, int level,
+            public Character(string _id, string userId, string model, string name, int experience, string bodyColor, string eyeColor, string beard, string brows, string hair,
                 CharacterAttributes characterAttributes,
                 Loadout loadoutPreset1, Loadout loadoutPreset2, Loadout loadoutPreset3, Loadout loadoutPreset4, CharacterReference.RaceAndGender raceAndGender)
             {
@@ -1007,8 +1005,7 @@ namespace Vi.Core
                 this.brows = brows;
                 this.hair = hair;
                 attributes = characterAttributes;
-                userId = WebRequestManager.Singleton.UserManager.CurrentlyLoggedInUserId;
-                this.level = level;
+                this.userId = userId;
                 this.loadoutPreset1 = loadoutPreset1;
                 this.loadoutPreset2 = loadoutPreset2;
                 this.loadoutPreset3 = loadoutPreset3;
@@ -1033,7 +1030,6 @@ namespace Vi.Core
                 serializer.SerializeNetworkSerializable(ref loadoutPreset4);
                 serializer.SerializeValue(ref userId);
                 serializer.SerializeValue(ref slot);
-                serializer.SerializeValue(ref level);
                 serializer.SerializeValue(ref experience);
                 serializer.SerializeValue(ref raceAndGender);
             }
@@ -1407,6 +1403,7 @@ namespace Vi.Core
         private struct CharacterJson
         {
             public string _id;
+            public string userId;
             public int slot;
             public string name;
             public string model;
@@ -1422,14 +1419,7 @@ namespace Vi.Core
             public CharacterAttributes attributes;
             public List<LoadoutJson> loadOuts;
             public bool enabled;
-            public string userId;
-            public int level;
-            public double attack;
-            public double defense;
-            public double hp;
-            public double stamina;
-            public double critChance;
-            public double crit;
+            public List<object> mastery;
             public string id;
 
             public static CharacterJson DeserializeJson(string json)
@@ -1704,125 +1694,6 @@ namespace Vi.Core
                             }
                             element.loadOuts.Add(LoadoutJson.FromCharacterJsonExtract(splitLoadoutStrings));
                             break;
-                        case "level":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (int.TryParse(splitStrings[i + 1][1..^1], out int result))
-                                {
-                                    element.level = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing level property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property level!");
-                            }
-                            break;
-                        case "attack":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.attack = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing attack property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property attack!");
-                            }
-                            break;
-                        case "defense":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.defense = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing defense property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property defense!");
-                            }
-                            break;
-                        case "hp":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.hp = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property hp!");
-                            }
-                            break;
-                        case "stamina":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.stamina = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing hp property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property hp!");
-                            }
-                            break;
-                        case "critChance":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.critChance = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing critChance property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property critChance!");
-                            }
-                            break;
-                        case "crit":
-                            if (i + 1 < splitStrings.Count)
-                            {
-                                if (float.TryParse(splitStrings[i + 1][1..^1], out float result))
-                                {
-                                    element.crit = result;
-                                }
-                                else
-                                {
-                                    Debug.LogError("Error while parsing crit property! " + splitStrings[i + 1][1..^1]);
-                                }
-                            }
-                            else
-                            {
-                                Debug.LogError("Could not find value for property crit!");
-                            }
-                            break;
                         case "id":
                             parsedElements.Add(element);
                             if (i + 2 < splitStrings.Count)
@@ -1860,7 +1731,7 @@ namespace Vi.Core
                 //    loadout4Index == -1 ? Singleton.GetDefaultDisplayLoadout(raceAndGender) : loadOuts[loadout4Index].ToLoadout(),
                 //    raceAndGender);
 
-                return new Character(_id, model, name, experience, bodyColor, eyeColor, beard, brows, hair, level, attributes,
+                return new Character(_id, userId, model, name, experience, bodyColor, eyeColor, beard, brows, hair, attributes,
                     loadout1Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout1Index].ToLoadout(),
                     loadout2Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout2Index].ToLoadout(),
                     loadout3Index == -1 ? Loadout.GetEmptyLoadout() : loadOuts[loadout3Index].ToLoadout(),

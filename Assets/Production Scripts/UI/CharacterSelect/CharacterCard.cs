@@ -70,7 +70,7 @@ namespace Vi.UI
             }
             else
             {
-                levelText.text = "Lv." + character.level.ToString();
+                levelText.text = "Lv.1";
             }
 
             SetSelectedState(true);
