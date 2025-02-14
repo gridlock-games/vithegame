@@ -18,7 +18,7 @@ namespace Vi.Core
 
             if (getRequest.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("Get Request Error in GetRequestTemplate() " + getRequest.error);
+                Debug.LogError("Get Request Error in GetViEssenceOfUser() " + getRequest.error);
                 getRequest.Dispose();
                 ViEssenceCount = 0;
                 if (setMyInt != null) { setMyInt(0); }
