@@ -109,22 +109,22 @@ namespace Vi.Core
 
             // This adds all weapons to the inventory if we're in the editor
 #if UNITY_EDITOR
-            CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
-            foreach (Character character in Characters)
-            {
-                foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
-                {
-                    if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
-                    {
-                        yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
-                    }
-                }
-            }
+            //CharacterReference.WeaponOption[] weaponOptions = PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions();
+            //foreach (Character character in Characters)
+            //{
+            //    foreach (CharacterReference.WeaponOption weaponOption in weaponOptions)
+            //    {
+            //        if (!IsItemInInventory(character._id.ToString(), weaponOption.itemWebId))
+            //        {
+            //            yield return AddItemToInventory(character._id.ToString(), weaponOption.itemWebId);
+            //        }
+            //    }
+            //}
 
-            foreach (Character character in Characters)
-            {
-                yield return GetCharacterInventory(character);
-            }
+            //foreach (Character character in Characters)
+            //{
+            //    yield return GetCharacterInventory(character);
+            //}
 #endif
 
             IsRefreshingCharacters = false;
