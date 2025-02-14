@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Vi.Utility;
 using System.Linq;
+using static Vi.ScriptableObjects.CharacterReference;
 
 namespace Vi.UI
 {
@@ -49,7 +50,9 @@ namespace Vi.UI
             {
                 // If this weapon option is in our inventory, make it inactive in the UI
                 bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, weaponOption.itemWebId);
-                shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId).gameObject.SetActive(!isInInventory);
+
+                ShopKeeperItem shopKeeperItem = shopKeeperItemInstances.FindAll(item => item.IsWeapon).Find(item => item.weaponOption.itemWebId == weaponOption.itemWebId);
+                if (shopKeeperItem) { shopKeeperItem.gameObject.SetActive(!isInInventory); }
             }
 
             foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
@@ -60,7 +63,9 @@ namespace Vi.UI
 
                 // If this armor option is in our inventory, make it inactive in the UI
                 bool isInInventory = CharacterManager.IsItemInInventory(localCharacterId, wearableEquipmentOption.itemWebId);
-                shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId).gameObject.SetActive(!isInInventory);
+
+                ShopKeeperItem shopKeeperItem = shopKeeperItemInstances.FindAll(item => item.IsArmor).Find(item => item.equipmentOption.itemWebId == wearableEquipmentOption.itemWebId);
+                if (shopKeeperItem) { shopKeeperItem.gameObject.SetActive(!isInInventory); }
             }
         }
 
@@ -284,36 +289,48 @@ namespace Vi.UI
             if (IsClient)
             {
                 StartCoroutine(RefreshViEssenceAmount());
-
-                foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
-                {
-                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
-                    shopKeeperItemInstances.Add(shopKeeperItem);
-                    shopKeeperItem.InitializeAsWeapon(weaponOption);
-
-                    string itemId = weaponOption.itemWebId;
-                    shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
-                    shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
-                    shopKeeperItem.CloseButton.gameObject.SetActive(false);
-                }
-
-                foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
-                {
-                    if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Boots
-                        | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Pants
-                        | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
-
-                    ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
-                    shopKeeperItemInstances.Add(shopKeeperItem);
-                    shopKeeperItem.InitializeAsArmor(wearableEquipmentOption);
-
-                    string itemId = wearableEquipmentOption.itemWebId;
-                    shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
-                    shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
-                    shopKeeperItem.CloseButton.gameObject.SetActive(false);
-                }
-                buyButton.onClick.AddListener(() => PersistentLocalObjects.Singleton.StartCoroutine(PurchaseCart()));
+                StartCoroutine(InitializeItems());
             }
+        }
+
+        private IEnumerator InitializeItems()
+        {
+            yield return WebRequestManager.Singleton.ItemShopManager.GetShopItems();
+
+            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
+            {
+                // Item doesn't exist in shop API
+                if (!WebRequestManager.Singleton.ItemShopManager.ShopItems.Exists(item => item.itemId == weaponOption.itemWebId)) { continue; }
+
+                ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
+                shopKeeperItemInstances.Add(shopKeeperItem);
+                shopKeeperItem.InitializeAsWeapon(weaponOption);
+
+                string itemId = weaponOption.itemWebId;
+                shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
+                shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
+                shopKeeperItem.CloseButton.gameObject.SetActive(false);
+            }
+
+            foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
+            {
+                // Item doesn't exist in shop API
+                if (!WebRequestManager.Singleton.ItemShopManager.ShopItems.Exists(item => item.itemId == wearableEquipmentOption.itemWebId)) { continue; }
+
+                if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Boots
+                    | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Pants
+                    | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
+
+                ShopKeeperItem shopKeeperItem = Instantiate(shopKeeperItemPrefab.gameObject, itemParent).GetComponent<ShopKeeperItem>();
+                shopKeeperItemInstances.Add(shopKeeperItem);
+                shopKeeperItem.InitializeAsArmor(wearableEquipmentOption);
+
+                string itemId = wearableEquipmentOption.itemWebId;
+                shopKeeperItem.MainButton.onClick.AddListener(() => AddToCart(shopKeeperItem));
+                shopKeeperItem.CloseButton.onClick.AddListener(() => RemoveFromCart(shopKeeperItem));
+                shopKeeperItem.CloseButton.gameObject.SetActive(false);
+            }
+            buyButton.onClick.AddListener(() => PersistentLocalObjects.Singleton.StartCoroutine(PurchaseCart()));
         }
 
         private Vector3 originalScale;
@@ -373,6 +390,50 @@ namespace Vi.UI
                 & cartContents.Count > 0;
 
             cartCostText.text = cartPriceSum.ToString();
+
+#if UNITY_EDITOR
+            EditorUpdate();
+#endif
         }
+
+#if UNITY_EDITOR
+        private void EditorUpdate()
+        {
+            if (createItemsInShopAPI & !createItemsRunning)
+            {
+                StartCoroutine(CreateItemsInShopAPI());
+                createItemsInShopAPI = false;
+            }
+        }
+
+        [SerializeField] private bool createItemsInShopAPI;
+        private bool createItemsRunning;
+
+        private IEnumerator CreateItemsInShopAPI()
+        {
+            createItemsRunning = true;
+
+            foreach (CharacterReference.WeaponOption weaponOption in PlayerDataManager.Singleton.GetCharacterReference().GetWeaponOptions())
+            {
+                if (WebRequestManager.Singleton.ItemShopManager.ShopItems.Exists(item => item.itemId == weaponOption.itemWebId)) { Debug.Log("Skipping " + weaponOption.itemWebId); continue; }
+
+                yield return WebRequestManager.Singleton.ItemShopManager.InsertItemToStore(weaponOption.itemWebId, 5, 1, true);
+            }
+
+            foreach (CharacterReference.WearableEquipmentOption wearableEquipmentOption in PlayerDataManager.Singleton.GetCharacterReference().GetArmorEquipmentOptions(PlayerDataManager.Singleton.LocalPlayerData.character.raceAndGender))
+            {
+                if (WebRequestManager.Singleton.ItemShopManager.ShopItems.Exists(item => item.itemId == wearableEquipmentOption.itemWebId)) { Debug.Log("Skipping " + wearableEquipmentOption.itemWebId); continue; }
+
+                if (wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Boots
+                    | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Pants
+                    | wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Belt) { continue; }
+
+                yield return WebRequestManager.Singleton.ItemShopManager.InsertItemToStore(wearableEquipmentOption.itemWebId,
+                    wearableEquipmentOption.equipmentType == CharacterReference.EquipmentType.Chest ? 15 : 3, 1, true);
+            }
+
+            createItemsRunning = false;
+        }
+#endif
     }
 }
