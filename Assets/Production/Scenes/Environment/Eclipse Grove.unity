@@ -38699,7 +38699,7 @@ Transform:
   m_GameObject: {fileID: 1472496546}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.534489, y: 20.526272, z: 15.571841}
+  m_LocalPosition: {x: 10.534496, y: 20.526272, z: 15.571841}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38718,7 +38718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mode: 0
-  size: {x: 83.07382, y: 28.628878, z: 61.91324}
+  size: {x: 83.07384, y: 28.628878, z: 61.91324}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -42463,6 +42463,10 @@ MonoBehaviour:
     teams: 09000000
     spawnPositions:
     - {x: 0, y: 1.3, z: 0}
+    - {x: 0, y: 1.3, z: 5}
+    - {x: 0, y: 1.3, z: -6}
+    - {x: -7, y: 1.5, z: 0}
+    - {x: 7, y: 1.5, z: 0}
     - {x: 16, y: 1.3, z: 0}
     - {x: -16, y: 1.3, z: 0}
     - {x: -2, y: 2, z: -18}
@@ -42473,7 +42477,15 @@ MonoBehaviour:
     - {x: 5, y: -4.3, z: 11}
     - {x: 22.3, y: 2, z: 15}
     - {x: -22.3, y: 2, z: -15}
+    - {x: -22.3, y: 2, z: -15}
+    - {x: -22.3, y: 2, z: -15}
     spawnRotations:
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 180, z: 0}
+    - {x: 0, y: 0, z: 0}
+    - {x: 0, y: 90, z: 0}
+    - {x: 0, y: -90, z: 0}
+    - {x: 0, y: 270, z: 0}
     - {x: 0, y: 90, z: 0}
     - {x: 0, y: 270, z: 0}
     - {x: 0, y: 90, z: 0}
@@ -42485,15 +42497,15 @@ MonoBehaviour:
     - {x: 0, y: 270, z: 0}
     - {x: 0, y: 172.9, z: 0}
     - {x: 0, y: -5, z: 0}
-    spawnPriorities: 0200000002000000020000000200000001000000010000000000000000000000000000000000000000000000000000000000000000000000
+    spawnPriorities: 0200000002000000020000000200000002000000010000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   damageCircleSpawnPosition: {x: 0, y: 0, z: 0}
   damageCircleMaxScale: {x: 70, y: 200, z: 70}
   damageCircleMinScale: {x: 15, y: 200, z: 15}
   shrinkSize: 20
   mobSpawnPoints: []
-  displayDefaultGizmos: 0
+  displayDefaultGizmos: 1
   displayDamageCircleGizmos: 0
-  displayPreviewCharacterGizmos: 1
+  displayPreviewCharacterGizmos: 0
 --- !u!1001 &1630422047
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -62162,6 +62174,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: === Banners ===
+      objectReference: {fileID: 0}
+    - target: {fileID: 6287802064562011393, guid: 5e4d4868a8f29ed4fbc4f3325bb06db7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6949593553481029374, guid: 5e4d4868a8f29ed4fbc4f3325bb06db7,
         type: 3}
